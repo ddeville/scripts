@@ -1,4 +1,4 @@
 #!/bin/bash
 
-qlmanage -p "$@"
+qlmanage -p "$@" > /dev/null 2>&1
 
