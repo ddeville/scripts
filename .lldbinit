@@ -1,0 +1,2 @@
+command script import Scripts/lldb/block.py
+
