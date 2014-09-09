@@ -1,0 +1,5 @@
+# mem $1 --> memory read -f x -s 8 %1
+command regex memr 's/(.+)/memory read -f x -s 8 %1/'
+
+# paw $1 --> process attach --waitfor --name %1
+command regex paw 's/(.+)/process attach --waitfor --name %1/'
