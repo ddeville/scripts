@@ -1,5 +1,6 @@
 alias ll="ls -lahL"
 alias con="tail -40 -f /var/log/system.log"
+alias kc="killall Dock"
 
 export EDITOR="vi"
 export CLICOLOR=1
