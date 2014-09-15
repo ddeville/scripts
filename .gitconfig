@@ -1,8 +1,21 @@
 [user]
 	name = Damien DeVille
 	email = damien@ddeville.me
+[core]
+	editor = vim
+[diff]
+	tool = Kaleidoscope
+[difftool]
+    prompt = false
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[merge]
+    tool = Kaleidoscope
 [mergetool]
-	keepBackup = true
+    prompt = false
+[mergetool "Kaleidoscope"]
+    cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+    trustExitCode = true
 [filter "media"]
 	clean = git-media-clean %f
 	smudge = git-media-smudge %f
@@ -10,3 +23,6 @@
 	autosetuprebase = always
 [push]
 	default = simple
+[color]
+	ui = auto
+
