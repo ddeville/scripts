@@ -88,7 +88,11 @@ mkdir "${services_destination_folder}" > /dev/null 2>&1
 
 for wf in ${services_origin_folder}/*.{workflow,service};
 do
-	cp -r "${wf}" "${services_destination_folder}/$(basename $wf)"
+	filename=$(basename "${wf}")
+	if [ "${filename}" != "*workflow" -a "${filename}" != "*.service" ]
+	then
+		cp -r "${wf}" "${services_destination_folder}/$filename"
+	fi
 done
 
 echo "=== Services copied ==="
