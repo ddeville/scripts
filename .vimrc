@@ -1,2 +1,2 @@
-syntax on
+syntax enable
 colorscheme railscasts
