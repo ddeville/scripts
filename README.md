@@ -16,4 +16,5 @@ When setting up a new machine, do the following steps:
 > ln -s ~/Scripts/.profile .profile
 > ln -s ~/Scripts/.lldbinit .lldbinit
 > ln -s ~/Scripts/.gitconfig .gitconfig
+> ln -s ~/Scripts/.vimrc .vimrc
 ```
