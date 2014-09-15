@@ -1,4 +1,5 @@
 #!/bin/tcsh
+
 set cmd = 'ps axo pid,ppid,user,command'
 if ("$1" == "") then
   $cmd
