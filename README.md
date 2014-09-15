@@ -10,15 +10,13 @@ When setting up a new machine, do the following steps:
 > git clone git@github.com:ddeville/Scripts.git
 ```
 
-* Link the .dotfiles
+* Run the setup, this will create symbolic links for the dotfiles:
 ```
-> ln -s ~/Scripts/.profile .profile
-> ln -s ~/Scripts/.lldbinit .lldbinit
-> ln -s ~/Scripts/.gitconfig .gitconfig
-> ln -s ~/Scripts/.vim .vim
-> ln -s ~/Scripts/.vimrc .vimrc
+> ./setup.sh
 ```
 
-### Notes
+#### Notes
 
 For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html)
+
+To make sure that `git` keeps the file executable, run the following `git update-index --chmod=+x <file>`.
