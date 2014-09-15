@@ -1,0 +1,12 @@
+[user]
+	name = Damien DeVille
+	email = damien@ddeville.me
+[mergetool]
+	keepBackup = true
+[filter "media"]
+	clean = git-media-clean %f
+	smudge = git-media-smudge %f
+[branch]
+	autosetuprebase = always
+[push]
+	default = simple
