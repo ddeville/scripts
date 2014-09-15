@@ -88,7 +88,7 @@ mkdir "${services_destination_folder}" > /dev/null 2>&1
 
 for wf in ${services_origin_folder}/*.workflow;
 do
-	link_file "${wf}" "${services_destination_folder}/$(basename \"${wf}\")"
+	cp -r "${wf}" "${services_destination_folder}/$(basename $wf)"
 done
 
-echo "=== Services linked ==="
+echo "=== Services copied ==="
