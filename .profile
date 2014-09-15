@@ -7,4 +7,5 @@ export EDITOR="vi"
 export CLICOLOR=1
 export GREP_OPTIONS='--color=auto'
 export XCODE="`xcode-select --print-path`"
-export PATH="/Users/damien/Scripts:$XCODE/Tools:/usr/local/bin:$PATH"
+export PATH="$HOME/Scripts/scripts:$XCODE/Tools:/usr/local/bin:$PATH"
+
