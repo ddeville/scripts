@@ -86,7 +86,7 @@ services_destination_folder="$HOME/Library/Services"
 
 mkdir "${services_destination_folder}" > /dev/null 2>&1
 
-for wf in ${services_origin_folder}/*.workflow;
+for wf in ${services_origin_folder}/*.{workflow,service};
 do
 	cp -r "${wf}" "${services_destination_folder}/$(basename $wf)"
 done
