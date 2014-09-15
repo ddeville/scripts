@@ -15,6 +15,9 @@ When setting up a new machine, do the following steps:
 > ./setup.sh
 ```
 
+* Manually install the Terminal theme by double-clicking it and making it default in Terminal.
+The Xcode and BBEdit themes will be automatically installed but they will have to be selected in their respective apps.
+
 #### Notes
 
 For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html).
