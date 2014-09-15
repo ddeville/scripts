@@ -78,3 +78,17 @@ mkdir "${bbedit_themes_location}" > /dev/null 2>&1
 link_file "${themes_origin_folder}/Gruber.bbcolors" "${bbedit_themes_location}/Gruber.bbcolors"
 
 echo "=== Themes linked ==="
+
+# Workflows
+
+workflows_origin_folder="${scripts_directory}/workflows"
+workflows_destination_folder="$HOME/Library/Services"
+
+mkdir "${workflows_destination_folder}" > /dev/null 2>&1
+
+for wf in ${workflows_origin_folder}/*.workflow;
+do
+	link_file "${wf}" "${workflows_destination_folder}/$(basename \"${wf}\")"
+done
+
+echo "=== Workflows linked ==="
