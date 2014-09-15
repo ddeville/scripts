@@ -1,5 +1,7 @@
 #!/bin/bash
 
+chflags nohidden ~/Library
+
 scripts_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 function link_file
@@ -35,15 +37,38 @@ function link_file
 		fi
 	fi
 	
-	file_origin="${scripts_directory}/${file_name}"
+	file_origin="${scripts_directory}/dotfiles/${file_name}"
 	
 	ln -s "${file_origin}" "${file_location}"
 	echo "> Linked ${file_origin} to ${file_location}"
 }
+
+# Dot files
 
 link_file .profile
 link_file .lldbinit
 link_file .gitconfig
 link_file .vim
 link_file .vimrc
+
+echo "=== Dot files copied ==="
+
+# Xcode themes
+
+xcode_themes_location="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes"
+
+mkdir "${xcode_themes_location}" > /dev/null 2>&1
+cp "${scripts_directory}/themes/Pastel.dvtcolortheme" "${xcode_themes_location}/Pastel.dvtcolortheme"
+
+echo "=== Xcode themes copied ==="
+
+# BBEdit
+
+bbedit_themes_location="$HOME/Library/Application Support/BBEdit/Color Schemes"
+
+mkdir "${bbedit_themes_location}" > /dev/null 2>&1
+cp "${scripts_directory}/themes/Gruber.bbcolors" "${bbedit_themes_location}/Gruber.bbcolors"
+
+echo "=== BBEdit themes copied ==="
+
 
