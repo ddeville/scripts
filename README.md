@@ -11,8 +11,9 @@ When setting up a new machine, do the following steps:
 > git clone git@github.com:ddeville/Scripts.git
 ```
 
-* Link the `.profile` and `.lldbinit` files
+* Link the .dotfiles
 ```
 > ln -s ~/Scripts/.profile .profile
 > ln -s ~/Scripts/.lldbinit .lldbinit
+> ln -s ~/Scripts/.gitconfig .gitconfig
 ```
