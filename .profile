@@ -1,6 +1,7 @@
 alias ll="ls -lahL"
 alias con="tail -40 -f /var/log/system.log"
 alias kd="killall Dock"
+alias kdns="sudo killall -HUP mDNSResponder"
 
 export EDITOR="vi"
 export CLICOLOR=1
