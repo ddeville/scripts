@@ -1,7 +1,7 @@
 set need_reply_mailbox_name to "Needs Reply"
 set need_reply_account_name to "FastMail"
-set omnifocus_email_folder_name to "Email"
-set omnifocus_needsreply_project_name to "Needs Reply"
+set omnifocus_email_folder_name to "Personal"
+set omnifocus_needsreply_project_name to "Email"
 
 set omnifocus_running to false
 

@@ -1,5 +1,5 @@
-set omnifocus_email_folder_name to "Email"
-set omnifocus_support_project_name to "Support"
+set omnifocus_email_folder_name to "Bananafish Software"
+set omnifocus_support_project_name to "Support Email"
 
 set omnifocus_running to false
 
