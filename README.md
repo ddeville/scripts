@@ -22,6 +22,6 @@ The Xcode and BBEdit themes will be automatically installed but they will have t
 
 For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html).
 
-To show the AppleScript scripts in FastScripts, run `defaults write com.red-sweater.FastScripts ScriptTreePathsKey '("FSSP%%%$HOME$/Scripts/applescript", "/Library/Scripts")'`.
+To show the AppleScript scripts in FastScripts, run `defaults write com.red-sweater.FastScripts ScriptTreePathsKey '("FSSP%%%$HOME$/Scripts/applescript")'`.
 
 To make sure that `git` keeps the file executable, run the following `git update-index --chmod=+x <file>`.
