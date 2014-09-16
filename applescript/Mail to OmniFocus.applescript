@@ -1,6 +1,7 @@
 set need_reply_mailbox_name to "Needs Reply"
 set need_reply_account_name to "FastMail"
-set omnifocus_email_project_name to "Needs Reply"
+set omnifocus_email_folder_name to "Email"
+set omnifocus_needsreply_project_name to "Needs Reply"
 
 set omnifocus_running to false
 
@@ -28,8 +29,13 @@ tell application "Mail"
 			
 			tell application "OmniFocus"
 				tell default document
-					set email_project to (first project whose name is omnifocus_email_project_name)
-					tell email_project to make new task with properties {name:task_title, note:task_body}
+					set email_folder to folder named omnifocus_email_folder_name
+					tell email_folder
+						set needsreply_project to (first project whose name is omnifocus_needsreply_project_name)
+						tell needsreply_project
+							make new task with properties {name:task_title, note:task_body}
+						end tell
+					end tell
 				end tell
 			end tell
 		end if
