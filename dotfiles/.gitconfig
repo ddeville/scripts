@@ -36,3 +36,6 @@
 	added = green bold
 	changed = yellow bold
 	untracked = red bold
+[filter "media"]
+	clean = git-media-clean %f
+	smudge = git-media-smudge %f
