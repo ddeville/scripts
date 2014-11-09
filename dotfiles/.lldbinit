@@ -1,4 +1,4 @@
-command source ~/Scripts/lldb/alias
+command source ~/scripts/lldb/alias
 
-command script import ~/Scripts/lldb/block.py
+command script import ~/scripts/lldb/block.py
 
