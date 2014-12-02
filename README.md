@@ -7,7 +7,7 @@ When setting up a new machine, do the following steps:
 * Clone this repo in the Home directory:
 ```
 > cd ~
-> git clone git@github.com:ddeville/Scripts.git
+> git clone git@github.com:ddeville/scripts.git
 ```
 
 * Run the setup, this will create symbolic links for the dotfiles:
