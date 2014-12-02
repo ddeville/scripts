@@ -56,6 +56,8 @@ dot_origin_folder="${scripts_directory}/dotfiles"
 dot_destination_folder="${HOME}"
 
 link_file "${dot_origin_folder}/.profile" "${dot_destination_folder}/.profile"
+link_file "${dot_origin_folder}/.bash_profile" "${dot_destination_folder}/.bash_profile"
+link_file "${dot_origin_folder}/.bashrc" "${dot_destination_folder}/.bashrc"
 link_file "${dot_origin_folder}/.lldbinit" "${dot_destination_folder}/.lldbinit"
 link_file "${dot_origin_folder}/.gitconfig" "${dot_destination_folder}/.gitconfig"
 link_file "${dot_origin_folder}/.vim" "${dot_destination_folder}/.vim"
