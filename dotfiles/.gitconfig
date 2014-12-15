@@ -46,7 +46,10 @@
     co = checkout
     aa = add -A
     ci = commit
+    di = diff
     df = difftool
+    mg = merge
+    mt = mergetool
     unstage = reset HEAD --
     last = log -1 HEAD
 
