@@ -1,4 +1,5 @@
 alias ll="ls -lahL"
+alias oo="open ."
 alias con="tail -40 -f /var/log/system.log"
 alias topc="top -o cpu"
 alias topm="top -o mem"
