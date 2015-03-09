@@ -84,10 +84,8 @@ link_file "${themes_origin_folder}/Gruber.bbcolors" "${bbedit_themes_location}/G
 sublime_text_settings_location="$HOME/Library/Application Support/Sublime Text 3/Packages/"
 mkdir "${sublime_text_settings_location}" > /dev/null 2>&1
 
-link_file "${themes_origin_folder}/sublime-text/Preferences.sublime-settings" "${sublime_text_settings_location}/User/Preferences.sublime-settings"
-link_file "${themes_origin_folder}/sublime-text/Default (OSX).sublime-keymap" "${sublime_text_settings_location}/User/Default (OSX).sublime-keymap"
-link_file "${themes_origin_folder}/sublime-text/Tomorrow-Night-Eighties (SL).tmTheme" "${sublime_text_settings_location}/Tomorrow-Night-Eighties (SL).tmTheme"
 link_file "${themes_origin_folder}/sublime-text/Theme - Brogrammer" "${sublime_text_settings_location}/Theme - Brogrammer"
+link_file "${themes_origin_folder}/sublime-text/Preferences.sublime-settings" "${sublime_text_settings_location}/User/Preferences.sublime-settings"
 
 echo "=== Themes linked ==="
 
