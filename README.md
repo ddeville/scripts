@@ -10,6 +10,14 @@ When setting up a new machine, do the following steps:
 > git clone git@github.com:ddeville/scripts.git
 ```
 
+* Install the following Sublime Text packages:
+
+- [Package Control](https://packagecontrol.io/installation)
+- [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
+- [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
+- [SublimeCodeIntel](https://packagecontrol.io/packages/SublimeCodeIntel)
+- [SublimeLinter](https://packagecontrol.io/packages/SublimeLinter)
+
 * Run the setup, this will create symbolic links for the dotfiles:
 ```
 > ./setup.sh
