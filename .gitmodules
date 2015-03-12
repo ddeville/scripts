@@ -1,0 +1,3 @@
+[submodule "themes/sublime-text/Theme - Aristocat"]
+	path = themes/sublime-text/Theme - Aristocat
+	url = git@github.com:ddeville/aristocat-theme.git
