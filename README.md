@@ -13,6 +13,7 @@ When setting up a new machine, do the following steps:
 * Install the following Sublime Text packages:
 
 - [Package Control](https://packagecontrol.io/installation)
+- [Theme - Aristocat](https://packagecontrol.io/packages/Theme%20-%20Aristocat)
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
 - [SublimeCodeIntel](https://packagecontrol.io/packages/SublimeCodeIntel)
