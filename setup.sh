@@ -50,6 +50,12 @@ chflags nohidden ~/Library
 
 echo "=== ~/Library is now visible ==="
 
+# Defaults
+
+defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
+
+echo "=== Global defaults updated ==="
+
 # Dot files
 
 dot_origin_folder="${scripts_directory}/dotfiles"
