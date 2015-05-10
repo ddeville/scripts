@@ -16,7 +16,6 @@ When setting up a new machine, do the following steps:
 - [Theme - Aristocat](https://packagecontrol.io/packages/Theme%20-%20Aristocat)
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
-- [SublimeCodeIntel](https://packagecontrol.io/packages/SublimeCodeIntel)
 - [SublimeLinter](https://packagecontrol.io/packages/SublimeLinter)
 
 * Run the setup, this will create symbolic links for the dotfiles:
