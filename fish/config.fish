@@ -1,11 +1,13 @@
 set -x EDITOR vi
 set -x CLICOLOR 1
 set -x GREP_OPTIONS "--color=auto"
-set -x XCODE (xcode-select --print-path)
 set -x LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
 set -x PATH $HOME/scripts/bin $PATH
-set -x PATH $XCODE/Tools:/usr/local/bin $PATH
+
+if set -x XCODE (xcode-select --print-path)
+   set -x PATH $XCODE/Tools:/usr/local/bin $PATH
+end
 
 set fish_greeting "
      /\     /\\
