@@ -7,7 +7,21 @@ set -Ux GREP_OPTIONS "--color=auto"
 set -Ux XCODE `xcode-select --print-path`
 set -Ux LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
-set fish_greeting ""
+set fish_greeting "
+     /\     /\\
+    {  `---'  }
+    {  O   O  }
+    ~~>  V  <~~
+     \  \|/  /
+      `-----'____
+      /     \    \_
+     {       }\  )_\_   _
+     |  \_/  |/ /  \_\_/ )
+      \__/  /(_/     \__/
+        (__/
+
+     Did I hear fish? Meow!
+"
 
 alias ll "ls -lahL"
 alias oo "open ."
