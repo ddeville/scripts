@@ -73,6 +73,18 @@ link_file "${dot_origin_folder}/.vimrc" "${dot_destination_folder}/.vimrc"
 
 echo "=== Dot files linked ==="
 
+# Fish shell
+
+fish_origin_folder="${scripts_directory}/fish"
+fish_destination_folder="${HOME}/.config/fish"
+
+mkdir "${fish_destination_folder}" > /dev/null 2>&1
+
+link_file "${fish_origin_folder}/config.fish" "${fish_destination_folder}/config.fish"
+link_file "${fish_origin_folder}/functions" "${fish_destination_folder}/functions"
+
+echo "=== Fish files linked ==="
+
 # Themes
 
 themes_origin_folder="${scripts_directory}/themes"
