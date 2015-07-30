@@ -18,13 +18,20 @@ When setting up a new machine, do the following steps:
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
 - [SublimeLinter](https://packagecontrol.io/packages/SublimeLinter)
 
+* Install the [Fish](http://fishshell.com/) shell.
+Make the Fish shell the default shell by running the following command:
+
+```
+chsh -s /usr/local/bin/fish
+```
+
 * Run the setup, this will create symbolic links for the dotfiles:
 ```
 > ./setup.sh
 ```
 
 * Manually install the Terminal theme by double-clicking it and making it default in Terminal.
-The Xcode and BBEdit themes will be automatically installed but they will have to be selected in their respective apps.
+The Xcode will be automatically installed but it will have to be selected in the Preferences.
 
 #### Notes
 
