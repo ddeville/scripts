@@ -1,11 +1,11 @@
-set -Ux PATH $HOME/scripts/bin $PATH
-set -Ux PATH $XCODE/Tools:/usr/local/bin $PATH
+set -x EDITOR vi
+set -x CLICOLOR 1
+set -x GREP_OPTIONS "--color=auto"
+set -x XCODE (xcode-select --print-path)
+set -x LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
-set -Ux EDITOR vi
-set -Ux CLICOLOR 1
-set -Ux GREP_OPTIONS "--color=auto"
-set -Ux XCODE `xcode-select --print-path`
-set -Ux LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
+set -x PATH $HOME/scripts/bin $PATH
+set -x PATH $XCODE/Tools:/usr/local/bin $PATH
 
 set fish_greeting "
      /\     /\\
@@ -23,10 +23,11 @@ set fish_greeting "
      Did I hear fish? Meow!
 "
 
-alias ll "ls -lahL"
-alias oo "open ."
-alias con "tail -40 -f /var/log/system.log"
-alias topc "top -o cpu"
-alias topm "top -o mem"
-alias kd "killall Dock"
-alias kdns "sudo killall -HUP mDNSResponder"
+abbr -a ll "ls -lahL"
+abbr -a oo "open ."
+abbr -a con "tail -40 -f /var/log/system.log"
+abbr -a topc "top -o cpu"
+abbr -a topm "top -o mem"
+abbr -a kd "killall Dock"
+abbr -a kdns "sudo killall -HUP mDNSResponder"
+
