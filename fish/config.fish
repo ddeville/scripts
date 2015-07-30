@@ -7,6 +7,8 @@ set -Ux GREP_OPTIONS "--color=auto"
 set -Ux XCODE `xcode-select --print-path`
 set -Ux LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
+set fish_greeting ""
+
 alias ll "ls -lahL"
 alias oo "open ."
 alias con "tail -40 -f /var/log/system.log"
