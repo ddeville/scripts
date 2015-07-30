@@ -63,6 +63,7 @@ dot_destination_folder="${HOME}"
 
 mkdir "${dot_destination_folder}/.vim/colors" > /dev/null 2>&1
 
+link_file "${dot_origin_folder}/.hushlogin" "${dot_destination_folder}/.hushlogin"
 link_file "${dot_origin_folder}/.bash_profile" "${dot_destination_folder}/.bash_profile"
 link_file "${dot_origin_folder}/.bashrc" "${dot_destination_folder}/.bashrc"
 link_file "${dot_origin_folder}/.lldbinit" "${dot_destination_folder}/.lldbinit"
