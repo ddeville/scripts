@@ -4,4 +4,7 @@ settings set plugin.process.gdb-remote.target-definition-file ~/scripts/lldb/x86
 command source ~/scripts/lldb/alias
 
 command script import ~/scripts/lldb/block.py
+command script import ~/scripts/lldb/crashlog.py
+command script import ~/scripts/lldb/mach_o.py
+command script import ~/scripts/lldb/symbolication.py
 
