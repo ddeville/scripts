@@ -1,4 +1,6 @@
 settings set target.load-script-from-symbol-file true
+settings set plugin.process.gdb-remote.target-definition-file ~/scripts/lldb/x86_64_target_definition.py
+
 command source ~/scripts/lldb/alias
 
 command script import ~/scripts/lldb/block.py
