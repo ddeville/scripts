@@ -56,6 +56,19 @@ defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bo
 
 echo "=== Global defaults updated ==="
 
+# Dropbox API update
+
+git submodule init
+git submodule update
+
+current_dir=`pwd`
+cd externals/dropbox-sdk-python
+python setup.py install
+git checkout .
+git clean -df
+
+cd "${current_dir}"
+
 # Dot files
 
 dot_origin_folder="${scripts_directory}/dotfiles"
