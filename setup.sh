@@ -56,7 +56,7 @@ defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bo
 
 echo "=== Global defaults updated ==="
 
-# Dropbox API update
+# Dropbox API python package install
 
 git submodule init
 git submodule update
@@ -68,6 +68,8 @@ git checkout .
 git clean -df
 
 cd "${current_dir}"
+
+echo "=== Dropbox API python package installed ==="
 
 # Dot files
 
