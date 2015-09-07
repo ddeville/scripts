@@ -132,6 +132,7 @@ class HtmlEmitter(object):
                 <style type="text/css" media="screen">
                     body {
                         -webkit-font-smoothing: antialiased;
+                        font-family: Avenir, Helvetica, 'Lucida Grande', Lucida, Verdana, sans-serif;
                         margin: 0
                     }
                     #wrapper {
@@ -160,11 +161,13 @@ class HtmlEmitter(object):
                         list-style-type: circle;
                         line-height: 1.4em;
                         color: #888;
-                        font-family: Avenir, Helvetica, 'Lucida Grande', Lucida, Verdana, sans-serif;
                         word-wrap: break-word
                     }
                     a {
                         text-decoration: none;
+                        color: #799a3b;
+                    }
+                    li a {
                         -webkit-transition: all .2s ease-in-out;
                         -moz-transition: all .2s ease-in-out;
                         -o-transition: all .2s ease-in-out;
@@ -174,7 +177,6 @@ class HtmlEmitter(object):
                         display: block;
                         margin: 4px 0;
                         padding: 1px 6px;
-                        color: #799a3b;
                         -moz-border-radius: 8px;
                         -webkit-border-radius: 8px;
                         border-radius: 8px;
@@ -183,9 +185,18 @@ class HtmlEmitter(object):
                         text-overflow: ellipsis;
                         white-space: nowrap;
                     }
-                    a:hover {
+                    li a:hover {
                         border-color: #ccc;
                         background-color: rgba(121, 154, 59, 0.15);
+                    }
+                    #openlinks a {
+                        margin-top: 15px;
+                        display: block;
+                        text-align: center;
+                        font-weight: bold;
+                    }
+                    #openlinks a:hover {
+                        color: black;
                     }
                 </style>
             </head>
@@ -193,6 +204,15 @@ class HtmlEmitter(object):
                 <div id="wrapper">
                     {{links}}
                 </div>
+                <script type="text/javascript">
+                    function openLinks(id) {
+                        var links = document.getElementById(id).getElementsByTagName('a');
+                        var idx; var link;
+                        for (idx = 0; link = links[idx]; idx++) {
+                            open(link.href);
+                        }
+                    }
+                </script>
             </body>
         </html>
     '''
@@ -200,11 +220,16 @@ class HtmlEmitter(object):
     def generate(self, windows):
         links = ''
         for idx, window in enumerate(windows):
+            links_id = 'links' + str(idx + 1)
             links += '<h1>Window ' + str(idx + 1) + '</h1>'
-            links += '<ol id="links">'
+            links += '<ol id="' + links_id + '">'
             for tab in window.tabs:
                 links += '<li><a href="{url}">{title}</a></li>\n'.format(url=tab.url, title=tab.name)
             links += '</ol>'
+            links += '<p id="openlinks">'
+            links += '<a onclick="if (confirm(\'Open all links in your browser?\')) {'
+            links += 'openLinks(\'' + links_id + '\'); }" href="javascript:void(0);">Open All</a>'
+            links += '</p>'
         html = HtmlEmitter.HTML
         html = html.replace('{{links}}', links)
         return html
