@@ -1,0 +1,335 @@
+#!/usr/bin/env python
+
+from AppKit import (
+    NSBundle,
+    NSWorkspace,
+    NSURL
+)
+from subprocess import (
+    Popen,
+    PIPE
+)
+import dropbox
+import json
+import os
+import sys
+import time
+
+def default_browser_identifier():
+    url = NSURL.URLWithString_('http://ddeville.me')
+    app = NSWorkspace.sharedWorkspace().URLForApplicationToOpenURL_(url)
+    return NSBundle.bundleWithPath_(app.path()).bundleIdentifier()
+
+def tabs_filename(extension):
+    browser = default_browser_identifier().split('.')[-1]
+    filename = time.strftime('%Y-%m-%d %H.%M.%S ') + browser + '.' + extension
+    return str(filename)
+
+class BrowserWindow(object):
+    def __init__(self, tabs):
+        self.tabs = tabs
+
+class BrowserTab(object):
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+
+    def __repr__(self):
+        return self.name + ' - ' + self.url
+
+class AppleScriptRunner(object):
+    '''Finds the default browser and retrieves the opened tabs'''
+
+    def retrieve_browser_tabs(self):
+        default_browser = default_browser_identifier()
+
+        if default_browser == 'com.google.Chrome':
+            return self._retrieve_chrome_tabs()
+        elif default_browser == 'com.apple.Safari':
+            return self._retrieve_safari_tabs()
+        else:
+            return None
+
+    CHROME_SCRIPT = '''
+        tell application "System Events"
+            if ((count of (every process whose bundle identifier is "com.google.Chrome")) > 0) then
+                tell application "Google Chrome"
+                    set window_url_list to {}
+                    repeat with each_window in windows
+                        set url_list to {}
+                        repeat with each_tab in (every tab of each_window)
+                            set end of url_list to (title of each_tab) & ":!:" & (URL of each_tab) & (ASCII character 10)
+                        end repeat
+                        set end of window_url_list to url_list & "!=====!" & (ASCII character 10)
+                    end repeat
+                    return window_url_list as string
+                end tell
+            end if
+        end tell
+    '''
+
+    def _retrieve_chrome_tabs(self):
+        output = self._run_applescript(AppleScriptRunner.CHROME_SCRIPT)
+        return self._parse_applescript_output(output)
+
+    SAFARI_SCRIPT = '''
+        tell application "System Events"
+            if ((count of (every process whose bundle identifier is "com.google.Chrome")) > 0) then
+                tell application "Google Chrome"
+                    set window_url_list to {}
+                    repeat with each_window in windows
+                        set url_list to {}
+                        repeat with each_tab in (every tab of each_window)
+                            set end of url_list to (name of each_tab) & ":!:" & (URL of each_tab) & (ASCII character 10)
+                        end repeat
+                        set end of window_url_list to url_list & "!=====!" & (ASCII character 10)
+                    end repeat
+                    return window_url_list as string
+                end tell
+            end if
+        end tell
+    '''
+
+    def _retrieve_safari_tabs(self):
+        output = self._run_applescript(AppleScriptRunner.SAFARI_SCRIPT)
+        return self._parse_applescript_output(output)
+
+    def _run_applescript(self, scpt, args=[]):
+         p = Popen(['osascript', '-'] + args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+         stdout, stderr = p.communicate(scpt)
+         return stdout
+
+    def _parse_applescript_output(self, output):
+        script_windows = output.split('!=====!')
+        browser_windows = []
+
+        for script_window in script_windows:
+            script_tabs = script_window.split('\n')
+            browser_tabs = []
+
+            for script_tab in script_tabs:
+                components = script_tab.split(':!:')
+                if len(components) == 2:
+                    browser_tab = BrowserTab(components[0], components[1])
+                    browser_tabs.append(browser_tab)
+
+            if len(browser_tabs):
+                browser_window = BrowserWindow(browser_tabs)
+                browser_windows.append(browser_window)
+
+        return browser_windows
+
+class HtmlEmitter(object):
+    HTML = '''
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Tabs</title>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+                <style type="text/css" media="screen">
+                    html>body {
+                        font-size: 16px;
+                    }
+                    body {
+                        -webkit-font-smoothing: antialiased;
+                        font: normal .8764em/1.5em Arial, Verdana, sans-serif;
+                        margin: 0
+                    }
+                    li {
+                        font-size: 100%;
+                        list-style-type: circle;
+                    }
+                    li li {
+                        font-size: 100%
+                    }
+                    li p {
+                        font-size: 100%;
+                        margin: .5em 0
+                    }
+                    ul, ol {
+                        list-style-position: inside;
+                        width: 100%;
+                        padding: 0;
+                    }
+                    h1 {
+                        color: #444;
+                        font-size: 1.4em;
+                        line-height: 1.6563em;
+                        margin: 1em 0;
+                        border-bottom: dashed 2px #ccc;
+                        font-weight: 300;
+                    }
+                    h2 {
+                        color: #111;
+                        font-size: 1.7143em;
+                        line-height: .875em;
+                        margin: .875em 0
+                    }
+                    h3 {
+                        color: #111;
+                        font-size: 1.5em;
+                        line-height: 1em;
+                        margin: 1em 0
+                    }
+                    h4 {
+                        color: #111;
+                        font-size: 1.2857em;
+                        line-height: 1.1667em;
+                        margin: 1.1667em 0
+                    }
+                    h5 {
+                        color: #111;
+                        font-size: 1.15em;
+                        line-height: 1.3em;
+                        margin: 1.3em 0
+                    }
+                    h6 {
+                        font-size: 1em;
+                        line-height: 1.5em;
+                        margin: 1.5em 0
+                    }
+                    body, p, td, div {
+                        color: #111;
+                        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+                        word-wrap: break-word
+                    }
+                    #wrapper {
+                        background: #fff;
+                        color: #303030;
+                        font-size: 100%;
+                        position: relative;
+                        text-indent: 0;
+                        max-width: 600px;
+                        margin: 50px auto;
+                        padding: 20px;
+                    }
+                    ::selection {
+                        background: rgba(157, 193, 200, .5)
+                    }
+                    p {
+                        font-weight: 300;
+                        font-size: 15px;
+                    }
+                    #openbunchlink {
+                        border-top: dashed 2px #ccc;
+                        padding-top: 10px;
+                    }
+                    #openbunchlink a {
+                        display: block;
+                        color: rgb(36, 150, 179);
+                        text-align: center;
+                        font-weight: bold;
+                    }
+                    #openbunchlink a:hover {
+                        color: rgb(0, 176, 220);
+                    }
+                    a {
+                        text-decoration: none;
+                        -webkit-transition: all .2s ease-in-out;
+                        -moz-transition: all .2s ease-in-out;
+                        -o-transition: all .2s ease-in-out;
+                        transition: all .1s ease-in;
+                        font-weight: 600;
+                        display: block;
+                        margin: 4px 0;
+                        padding: 1px 6px;
+                        color: #3c8599;
+                        -moz-border-radius: 8px;
+                        -webkit-border-radius: 8px;
+                        border-radius: 8px;
+                        border: dotted 1px transparent;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    a:hover {
+                        border-color: rgba(113, 195, 216, .6);
+                        background-color: rgba(182, 240, 255, .2);
+                    }
+                    small.date {
+                        font-size: 13px;
+                        color: #777;
+                        float: right;
+                    }
+                </style>
+            </head>
+            <body>
+                <div id="wrapper">
+                    {{links}}
+                </div>
+            </body>
+        </html>
+    '''
+
+    def generate(self, windows):
+        links = ''
+        for idx, window in enumerate(windows):
+            links += '<h1>Window ' + str(idx + 1) + '</h1>'
+            links += '<ol id="links">'
+            for tab in window.tabs:
+                links += '<li><a href="{url}">{title}</a></li>\n'.format(url=tab.url, title=tab.name)
+            links += '</ol>'
+        html = HtmlEmitter.HTML
+        html = html.replace('{{links}}', links)
+        return html
+
+class JsonEmitter(object):
+    def generate(self, windows):
+        json_object = []
+        for idx, window in enumerate(windows):
+            tabs = []
+            for tab in window.tabs:
+                tabs.append({'title': tab.name, 'url': tab.url})
+            json_object.append({'title': 'Window ' + str(idx + 1), 'tabs': tabs})
+        return json.dumps(json_object)
+
+class DropboxConnection(object):
+    def __init__(self, config_filename):
+        config_path = os.path.expanduser(config_filename)
+        with open(config_path) as f:
+            settings = json.load(f)
+            self._token = settings['token']
+
+    def upload(self, path, data):
+        # create the dropbox connection
+        connection = dropbox.Dropbox(self._token)
+
+        # upload the file to dropbox
+        upload_mode = dropbox.files.WriteMode('add')
+        connection.files_upload(data, path, upload_mode)
+
+        # retrieve a shared link to the file
+        shared_link_metadata = connection.sharing_create_shared_link(path)
+
+        return shared_link_metadata.url
+
+DROPBOX_BASE_DIRECTORY = '/Tabs'
+DROPBOX_CONFIG_FILE = '~/.save-tabs-dropbox.json'
+
+def main():
+    runner = AppleScriptRunner()
+    tabs = runner.retrieve_browser_tabs()
+
+    if tabs is None:
+        sys.stderr.write('error: No tabs opened!')
+        exit(1)
+
+    emitter = HtmlEmitter()
+    html = emitter.generate(tabs)
+
+    filename = tabs_filename('html')
+
+    try:
+        connection = DropboxConnection(DROPBOX_CONFIG_FILE)
+    except (ValueError, IOError):
+        sys.stderr.write('error: Malformed Dropbox config file: %s\n' % DROPBOX_CONFIG_FILE)
+        exit(1)
+
+    path = os.path.join(DROPBOX_BASE_DIRECTORY, filename)
+    shared_link = connection.upload(path, html)
+
+    NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(shared_link))
+
+if __name__ == '__main__':
+    main()
