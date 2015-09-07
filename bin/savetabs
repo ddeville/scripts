@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
 from AppKit import (
-    NSBundle,
     NSWorkspace,
+    NSRunningApplication,
+    NSUserNotification,
+    NSUserNotificationCenter,
+)
+from Foundation import (
+    NSBundle,
     NSURL
 )
 from subprocess import (
@@ -20,10 +25,26 @@ def default_browser_identifier():
     app = NSWorkspace.sharedWorkspace().URLForApplicationToOpenURL_(url)
     return NSBundle.bundleWithPath_(app.path()).bundleIdentifier()
 
+def active_browser_identifier():
+    running_app_identifier = NSWorkspace.sharedWorkspace().frontmostApplication().bundleIdentifier()
+    if running_app_identifier in ['com.apple.Safari', 'com.google.Chrome']:
+        return running_app_identifier
+    return None
+
 def tabs_filename(extension):
     browser = default_browser_identifier().split('.')[-1]
     filename = time.strftime('%Y-%m-%d %H.%M.%S ') + browser + '.' + extension
     return str(filename)
+
+def notify(title=None, subtitle=None, text=None):
+    notification = NSUserNotification.alloc().init()
+    if title is not None:
+        notification.setTitle_(title)
+    if subtitle is not None:
+        notification.setSubtitle_(subtitle)
+    if text is not None:
+        notification.setInformativeText_(str(text))
+    NSUserNotificationCenter.defaultUserNotificationCenter().scheduleNotification_(notification)
 
 class BrowserWindow(object):
     def __init__(self, tabs):
@@ -41,7 +62,7 @@ class AppleScriptRunner(object):
     '''Finds the default browser and retrieves the opened tabs'''
 
     def retrieve_browser_tabs(self):
-        default_browser = default_browser_identifier()
+        default_browser = active_browser_identifier() or default_browser_identifier()
 
         if default_browser == 'com.google.Chrome':
             return self._retrieve_chrome_tabs()
@@ -74,8 +95,8 @@ class AppleScriptRunner(object):
 
     SAFARI_SCRIPT = '''
         tell application "System Events"
-            if ((count of (every process whose bundle identifier is "com.google.Chrome")) > 0) then
-                tell application "Google Chrome"
+            if ((count of (every process whose bundle identifier is "com.apple.Safari")) > 0) then
+                tell application "Safari"
                     set window_url_list to {}
                     repeat with each_window in windows
                         set url_list to {}
@@ -271,7 +292,7 @@ def upload_to_dropbox(filename, data):
     try:
         connection = DropboxConnection(DROPBOX_CONFIG_FILE)
     except (ValueError, IOError):
-        sys.stderr.write('error: Malformed Dropbox config file: %s\n' % DROPBOX_CONFIG_FILE)
+        report_error('Error: Malformed Dropbox config file: %s\n' % DROPBOX_CONFIG_FILE)
         exit(1)
 
     path = os.path.join(DROPBOX_BASE_DIRECTORY, filename)
@@ -289,6 +310,10 @@ def save_locally(filename, data):
     NSWorkspace.sharedWorkspace().openURLs_withAppBundleIdentifier_options_additionalEventParamDescriptor_launchIdentifiers_(
         [NSURL.fileURLWithPath_(path)], default_browser_identifier(), 0, None, None)
 
+def report_error(error):
+    sys.stderr.write(error)
+    notify(text=error)
+
 def main(argv):
     offline = True if (len(sys.argv) > 1 and sys.argv[1] == '--offline') else False
 
@@ -296,7 +321,7 @@ def main(argv):
     tabs = runner.retrieve_browser_tabs()
 
     if tabs is None:
-        sys.stderr.write('error: No tabs opened!')
+        report_error('Error: No tabs opened!')
         exit(1)
 
     emitter = HtmlEmitter()
