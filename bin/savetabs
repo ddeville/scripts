@@ -307,7 +307,31 @@ class DropboxConnection(object):
 DROPBOX_BASE_DIRECTORY = '/Tabs'
 DROPBOX_CONFIG_FILE = '~/.save-tabs-dropbox.json'
 
-def main():
+def upload_to_dropbox(filename, data):
+    try:
+        connection = DropboxConnection(DROPBOX_CONFIG_FILE)
+    except (ValueError, IOError):
+        sys.stderr.write('error: Malformed Dropbox config file: %s\n' % DROPBOX_CONFIG_FILE)
+        exit(1)
+
+    path = os.path.join(DROPBOX_BASE_DIRECTORY, filename)
+    shared_link = connection.upload(path, data)
+
+    NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(shared_link))
+
+OFFLINE_BASE_DIRECTORY = '~/Desktop'
+
+def save_locally(filename, data):
+    path = os.path.join(os.path.expanduser(OFFLINE_BASE_DIRECTORY), filename)
+    with open(path, 'w') as f:
+        f.write(data)
+
+    NSWorkspace.sharedWorkspace().openURLs_withAppBundleIdentifier_options_additionalEventParamDescriptor_launchIdentifiers_(
+        [NSURL.fileURLWithPath_(path)], default_browser_identifier(), 0, None, None)
+
+def main(argv):
+    offline = True if (len(sys.argv) > 1 and sys.argv[1] == '--offline') else False
+
     runner = AppleScriptRunner()
     tabs = runner.retrieve_browser_tabs()
 
@@ -320,16 +344,10 @@ def main():
 
     filename = tabs_filename('html')
 
-    try:
-        connection = DropboxConnection(DROPBOX_CONFIG_FILE)
-    except (ValueError, IOError):
-        sys.stderr.write('error: Malformed Dropbox config file: %s\n' % DROPBOX_CONFIG_FILE)
-        exit(1)
-
-    path = os.path.join(DROPBOX_BASE_DIRECTORY, filename)
-    shared_link = connection.upload(path, html)
-
-    NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(shared_link))
+    if offline:
+        save_locally(filename, html)
+    else:
+        upload_to_dropbox(filename, html)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
