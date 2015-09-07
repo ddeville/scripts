@@ -69,6 +69,7 @@ cd externals/dropbox-sdk-python
 python setup.py install
 git checkout .
 git clean -df
+git checkout master
 
 cd "${current_dir}"
 
