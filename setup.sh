@@ -37,6 +37,9 @@ function link_file
 		then
 			rm -rf "${file_destination}"
 			echo "> Removed ${file_destination}"
+		else
+			echo "> Skipped ${file_origin}"
+			return
 		fi
 	fi
 
