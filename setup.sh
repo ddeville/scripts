@@ -66,7 +66,7 @@ git submodule update
 
 current_dir=`pwd`
 cd externals/dropbox-sdk-python
-python setup.py install
+python setup.py install --user
 git checkout .
 git clean -df
 git checkout master
