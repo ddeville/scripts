@@ -10,11 +10,13 @@ from Foundation import (
     NSBundle,
     NSURL
 )
+from string import Template
 from subprocess import (
     Popen,
     PIPE
 )
 import dropbox
+import getopt
 import json
 import os
 import sys
@@ -61,58 +63,66 @@ class BrowserTab(object):
 class AppleScriptRunner(object):
     '''Finds the default browser and retrieves the opened tabs'''
 
-    def retrieve_browser_tabs(self):
-        default_browser = active_browser_identifier() or default_browser_identifier()
-
-        if default_browser == 'com.google.Chrome':
-            return self._retrieve_chrome_tabs()
-        elif default_browser == 'com.apple.Safari':
-            return self._retrieve_safari_tabs()
+    def retrieve_browser_tabs_all_windows(self):
+        current_browser = self._current_browser()
+        if current_browser == 'com.google.Chrome':
+            return self._retrieve_chrome_tabs(AppleScriptRunner.CHROME_SCRIPT_ALL)
+        elif current_browser == 'com.apple.Safari':
+            return self._retrieve_safari_tabs(AppleScriptRunner.SAFARI_SCRIPT_ALL)
         else:
             return None
 
-    CHROME_SCRIPT = '''
-        tell application "System Events"
-            if ((count of (every process whose bundle identifier is "com.google.Chrome")) > 0) then
-                tell application "Google Chrome"
-                    set window_url_list to {}
-                    repeat with each_window in windows
-                        set url_list to {}
-                        repeat with each_tab in (every tab of each_window)
-                            set end of url_list to (title of each_tab) & ":!:" & (URL of each_tab) & (ASCII character 10)
-                        end repeat
-                        set end of window_url_list to url_list & "!=====!" & (ASCII character 10)
-                    end repeat
-                    return window_url_list as string
-                end tell
-            end if
+    def retrieve_browser_tabs_front_window(self):
+        current_browser = self._current_browser()
+        if current_browser == 'com.google.Chrome':
+            return self._retrieve_chrome_tabs(AppleScriptRunner.CHROME_SCRIPT_FRONT)
+        elif current_browser == 'com.apple.Safari':
+            return self._retrieve_safari_tabs(AppleScriptRunner.SAFARI_SCRIPT_FRONT)
+        else:
+            return None
+
+    SCRIPT_TEMPLATE_ALL = '''
+        tell application "$browser"
+            set window_url_list to {}
+            repeat with each_window in windows
+                set url_list to {}
+                repeat with each_tab in (every tab of each_window)
+                    set end of url_list to ($title of each_tab) & ":!:" & ($url of each_tab) & (ASCII character 10)
+                end repeat
+                set end of window_url_list to url_list & "!=====!" & (ASCII character 10)
+            end repeat
+            return window_url_list as string
         end tell
     '''
 
-    def _retrieve_chrome_tabs(self):
-        output = self._run_applescript(AppleScriptRunner.CHROME_SCRIPT)
+    SCRIPT_TEMPLATE_FRONT = '''
+        tell application "$browser"
+            set url_list to {}
+            repeat with each_tab in (every tab of window 1)
+                set end of url_list to ($title of each_tab) & ":!:" & ($url of each_tab) & (ASCII character 10)
+            end repeat
+            return url_list as string
+        end tell
+    '''
+
+    CHROME_ARGS = {'browser': 'Google Chrome', 'title': 'title', 'url': 'URL'}
+    CHROME_SCRIPT_ALL = Template(SCRIPT_TEMPLATE_ALL).substitute(CHROME_ARGS)
+    CHROME_SCRIPT_FRONT = Template(SCRIPT_TEMPLATE_FRONT).substitute(CHROME_ARGS)
+
+    SAFARI_ARGS = {'browser': 'Safari', 'title': 'name', 'url': 'URL'}
+    SAFARI_SCRIPT_ALL = Template(SCRIPT_TEMPLATE_ALL).substitute(CHROME_ARGS)
+    SAFARI_SCRIPT_FRONT = Template(SCRIPT_TEMPLATE_FRONT).substitute(CHROME_ARGS)
+
+    def _current_browser(self):
+        current_browser = active_browser_identifier() or default_browser_identifier()
+        return current_browser
+
+    def _retrieve_chrome_tabs(self, script):
+        output = self._run_applescript(script)
         return self._parse_applescript_output(output)
 
-    SAFARI_SCRIPT = '''
-        tell application "System Events"
-            if ((count of (every process whose bundle identifier is "com.apple.Safari")) > 0) then
-                tell application "Safari"
-                    set window_url_list to {}
-                    repeat with each_window in windows
-                        set url_list to {}
-                        repeat with each_tab in (every tab of each_window)
-                            set end of url_list to (name of each_tab) & ":!:" & (URL of each_tab) & (ASCII character 10)
-                        end repeat
-                        set end of window_url_list to url_list & "!=====!" & (ASCII character 10)
-                    end repeat
-                    return window_url_list as string
-                end tell
-            end if
-        end tell
-    '''
-
-    def _retrieve_safari_tabs(self):
-        output = self._run_applescript(AppleScriptRunner.SAFARI_SCRIPT)
+    def _retrieve_safari_tabs(self, script):
+        output = self._run_applescript(script)
         return self._parse_applescript_output(output)
 
     def _run_applescript(self, scpt, args=[]):
@@ -214,7 +224,7 @@ class HtmlEmitter(object):
                         margin-top: 15px;
                         display: block;
                         text-align: center;
-                        font-weight: bold;
+                        font-weight: 600;
                     }
                     #openlinks a:hover {
                         color: black;
@@ -315,10 +325,26 @@ def report_error(error):
     notify(text=error)
 
 def main(argv):
-    offline = True if (len(sys.argv) > 1 and sys.argv[1] == '--offline') else False
+    try:
+        opts, args = getopt.getopt(argv[1:], "fo", ["front","offline"])
+    except getopt.GetoptError:
+        report_error('Usage: savetabs [--front] [--offline]')
+        sys.exit(2)
+
+    front = False
+    offline = False
+
+    for opt, arg in opts:
+        if opt in ('-f', '--front'):
+            front = True
+        elif opt in ('-o', '--offline'):
+            offline = True
 
     runner = AppleScriptRunner()
-    tabs = runner.retrieve_browser_tabs()
+    if front:
+        tabs = runner.retrieve_browser_tabs_front_window()
+    else:
+        tabs = runner.retrieve_browser_tabs_all_windows()
 
     if tabs is None:
         report_error('Error: No tabs opened!')
