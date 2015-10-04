@@ -5,6 +5,10 @@ set -x LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
 set -x PATH $HOME/scripts/bin $PATH
 
+if which rbenv > /dev/null
+  set -x PATH $HOME/.rbenv/shims $PATH
+end
+
 if set -x XCODE (xcode-select --print-path)
    set -x PATH $XCODE/Tools:/usr/local/bin $PATH
 end
