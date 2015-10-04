@@ -7,6 +7,7 @@ set -x PATH $HOME/scripts/bin $PATH
 
 if which rbenv > /dev/null
   set -x PATH $HOME/.rbenv/shims $PATH
+  set -x PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin $PATH
 end
 
 if set -x XCODE (xcode-select --print-path)
