@@ -37,6 +37,12 @@
 	[
 		"Vintage"
 	],
+	"index_exclude_patterns":
+	[
+		"*.log",
+		"/Users/damien/src/client/.arc_lib*",
+		"/Users/damien/src/client/.tmp-pythonuserbase*"
+	],
 	"preview_on_click": true,
 	"rulers":
 	[
