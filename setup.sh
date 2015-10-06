@@ -87,6 +87,7 @@ link_file "${dot_origin_folder}/.bash_profile" "${dot_destination_folder}/.bash_
 link_file "${dot_origin_folder}/.bashrc" "${dot_destination_folder}/.bashrc"
 link_file "${dot_origin_folder}/.lldbinit" "${dot_destination_folder}/.lldbinit"
 link_file "${dot_origin_folder}/.gitconfig" "${dot_destination_folder}/.gitconfig"
+link_file "${dot_origin_folder}/.radare" "${dot_destination_folder}/.radare"
 link_file "${dot_origin_folder}/.vim/colors/railscasts.vim" "${dot_destination_folder}/.vim/colors/railscasts.vim"
 link_file "${dot_origin_folder}/.vimrc" "${dot_destination_folder}/.vimrc"
 link_file "${dot_origin_folder}/.git-remote-dropbox.json" "${dot_destination_folder}/.git-remote-dropbox.json"
