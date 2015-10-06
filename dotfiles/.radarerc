@@ -1,0 +1,6 @@
+eval src.color = true
+eval dbg.bep = entry
+eval file.id = true
+eval file.flag = true
+eval file.analyze = true
+
