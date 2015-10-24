@@ -46,7 +46,7 @@
 	"preview_on_click": true,
 	"rulers":
 	[
-		80
+		120
 	],
 	"tab_size": 4,
 	"theme": "Aristocat.sublime-theme",
