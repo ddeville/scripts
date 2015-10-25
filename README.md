@@ -16,7 +16,6 @@ When setting up a new machine, do the following steps:
 - [Theme - Aristocat](https://packagecontrol.io/packages/Theme%20-%20Aristocat)
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
-- [SublimeLinter](https://packagecontrol.io/packages/SublimeLinter)
 
 * Install the [Fish](http://fishshell.com/) shell.
 Make the Fish shell the default shell by running the following command:
