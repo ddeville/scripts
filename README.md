@@ -33,6 +33,8 @@ chsh -s /usr/local/bin/fish
 * Manually install the Terminal theme by double-clicking it and making it default in Terminal.
 The Xcode will be automatically installed but it will have to be selected in the Preferences.
 
+* Install [iTerm2](https://www.iterm2.com/downloads.html) and make sure that Dropbox is installed and synced for it to pick up the preferences (under `/Apps/iTerm/` in personal account)
+
 #### Notes
 
 For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html).
