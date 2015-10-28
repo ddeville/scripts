@@ -2,7 +2,6 @@
 
 from AppKit import (
     NSWorkspace,
-    NSRunningApplication,
     NSUserNotification,
     NSUserNotificationCenter,
 )
@@ -126,9 +125,9 @@ class AppleScriptRunner(object):
         return self._parse_applescript_output(output)
 
     def _run_applescript(self, scpt, args=[]):
-         p = Popen(['osascript', '-'] + args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-         stdout, stderr = p.communicate(scpt)
-         return stdout
+        p = Popen(['osascript', '-'] + args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate(scpt)
+        return stdout
 
     def _parse_applescript_output(self, output):
         script_windows = output.split('!=====!')
@@ -326,7 +325,7 @@ def report_error(error):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv[1:], "fo", ["front","offline"])
+        opts, args = getopt.getopt(argv[1:], "fo", ["front", "offline"])
     except getopt.GetoptError:
         report_error('Usage: savetabs [--front] [--offline]')
         sys.exit(2)
