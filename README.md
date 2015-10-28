@@ -16,6 +16,8 @@ When setting up a new machine, do the following steps:
 - [Theme - Aristocat](https://packagecontrol.io/packages/Theme%20-%20Aristocat)
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
+- [HTML-CSS-JS Prettify](https://packagecontrol.io/packages/HTML-CSS-JS%20Prettify)
+- [Anaconda](https://packagecontrol.io/packages/Anaconda)
 
 * Install the [Fish](http://fishshell.com/) shell.
 Make the Fish shell the default shell by running the following command:
