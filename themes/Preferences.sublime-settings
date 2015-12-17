@@ -35,6 +35,7 @@
 	"font_size": 13,
 	"ignored_packages":
 	[
+		"Anaconda",
 		"Vintage"
 	],
 	"index_exclude_patterns":
