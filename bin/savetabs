@@ -118,8 +118,8 @@ class AppleScriptBrowserRunner(object):
     CHROME_SCRIPT_FRONT = Template(SCRIPT_TEMPLATE_FRONT).substitute(CHROME_ARGS)
 
     SAFARI_ARGS = {'browser': 'Safari', 'title': 'name', 'url': 'URL'}
-    SAFARI_SCRIPT_ALL = Template(SCRIPT_TEMPLATE_ALL).substitute(CHROME_ARGS)
-    SAFARI_SCRIPT_FRONT = Template(SCRIPT_TEMPLATE_FRONT).substitute(CHROME_ARGS)
+    SAFARI_SCRIPT_ALL = Template(SCRIPT_TEMPLATE_ALL).substitute(SAFARI_ARGS)
+    SAFARI_SCRIPT_FRONT = Template(SCRIPT_TEMPLATE_FRONT).substitute(SAFARI_ARGS)
 
     def _current_browser(self):
         current_browser = active_browser_identifier() or default_browser_identifier()
