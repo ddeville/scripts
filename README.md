@@ -17,6 +17,7 @@ When setting up a new machine, do the following steps:
 - [One Dark Color Scheme](https://packagecontrol.io/packages/One%20Dark%20Color%20Scheme)
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
+- [C Improved](https://packagecontrol.io/packages/C%20Improved)
 - [HTML-CSS-JS Prettify](https://packagecontrol.io/packages/HTML-CSS-JS%20Prettify)
 - [Anaconda](https://packagecontrol.io/packages/Anaconda)
 
