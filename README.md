@@ -18,6 +18,7 @@ When setting up a new machine, do the following steps:
 - [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
 - [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
 - [C Improved](https://packagecontrol.io/packages/C%20Improved)
+- [Git](https://packagecontrol.io/packages/Git)
 - [HTML-CSS-JS Prettify](https://packagecontrol.io/packages/HTML-CSS-JS%20Prettify)
 - [Anaconda](https://packagecontrol.io/packages/Anaconda)
 
