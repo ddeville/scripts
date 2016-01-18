@@ -31,6 +31,11 @@ chsh -s /usr/local/bin/fish
 > ./setup.sh
 ```
 
+* Install the Atom packages
+```
+apm stars --install
+```
+
 * Manually install the Terminal theme by double-clicking it and making it default in Terminal.
 The Xcode will be automatically installed but it will have to be selected in the Preferences.
 
