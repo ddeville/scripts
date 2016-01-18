@@ -1,0 +1,17 @@
+"*":
+  core:
+    projectHome: "~/src"
+  editor:
+    fontFamily: "Anonymous Pro"
+    fontSize: 13
+    invisibles: {}
+    showIndentGuide: true
+    tabLength: 4
+    tabType: "soft"
+  "exception-reporting":
+    userId: "6bd886c0-842b-b18c-b684-b5909616b367"
+  minimap:
+    plugins:
+      cursorline: true
+  welcome:
+    showOnStartup: false
