@@ -116,6 +116,18 @@ link_file "${atom_origin_folder}" "${atom_destination_folder}"
 
 echo "=== Atom files linked ==="
 
+# Sublime text
+
+sublime_text_settings_location="$HOME/Library/Application Support/Sublime Text 3/Packages"
+mkdir "${sublime_text_settings_location}" > /dev/null 2>&1
+
+sublime_origin_folder="${scripts_directory}/sublime"
+sublime_destination_folder="${sublime_text_settings_location}/User"
+
+link_file "${sublime_origin_folder}" "${sublime_destination_folder}"
+
+echo "=== Sublime Text files linked ==="
+
 # Themes
 
 themes_origin_folder="${scripts_directory}/themes"
@@ -129,11 +141,6 @@ bbedit_themes_location="$HOME/Library/Application Support/BBEdit/Color Schemes"
 mkdir "${bbedit_themes_location}" > /dev/null 2>&1
 
 link_file "${themes_origin_folder}/Gruber.bbcolors" "${bbedit_themes_location}/Gruber.bbcolors"
-
-sublime_text_settings_location="$HOME/Library/Application Support/Sublime Text 3/Packages"
-mkdir "${sublime_text_settings_location}" > /dev/null 2>&1
-
-link_file "${themes_origin_folder}/Preferences.sublime-settings" "${sublime_text_settings_location}/User/Preferences.sublime-settings"
 
 echo "=== Themes linked ==="
 

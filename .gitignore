@@ -13,3 +13,8 @@ dev/
 .npm/
 .node-gyp/
 packages/
+
+# Sublime
+*.cache
+Package Control.*
+
