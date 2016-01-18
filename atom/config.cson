@@ -1,5 +1,16 @@
 "*":
   core:
+    ignoredNames: [
+      ".git"
+      ".hg"
+      ".svn"
+      ".DS_Store"
+      ".*"
+      "*.pyc"
+      "build"
+      "bin"
+      ""
+    ]
     projectHome: "~/src"
   editor:
     fontFamily: "Anonymous Pro"
@@ -13,6 +24,7 @@
   minimap:
     plugins:
       cursorline: true
+  "one-dark-ui": {}
   "tree-view":
     hideIgnoredNames: true
     hideVcsIgnoredFiles: true
