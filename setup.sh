@@ -136,6 +136,7 @@ xcode_themes_location="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes
 mkdir "${xcode_themes_location}" > /dev/null 2>&1
 
 link_file "${themes_origin_folder}/Pastel.dvtcolortheme" "${xcode_themes_location}/Pastel.dvtcolortheme"
+link_file "${themes_origin_folder}/Spacegray.dvtcolortheme" "${xcode_themes_location}/Spacegray.dvtcolortheme"
 
 bbedit_themes_location="$HOME/Library/Application Support/BBEdit/Color Schemes"
 mkdir "${bbedit_themes_location}" > /dev/null 2>&1
