@@ -32,9 +32,9 @@ set fish_greeting "
 
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
+abbr -a ss "subl --new-window"
 abbr -a con "tail -40 -f /var/log/system.log"
 abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
 abbr -a kd "killall Dock"
-abbr -a kdns "sudo killall -HUP mDNSResponder"
 
