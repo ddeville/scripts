@@ -386,7 +386,7 @@
 	<key>NSWindow Frame NSColorPanel</key>
 	<string>122 152 231 329 0 0 1280 777 </string>
 	<key>NSWindow Frame NSFontPanel</key>
-	<string>-535 342 445 77 -1280 115 1280 777 </string>
+	<string>1887 279 445 77 0 0 2560 1417 </string>
 	<key>NSWindow Frame Preferences</key>
 	<string>3654 958 606 456 2560 0 2560 1417 </string>
 	<key>NSWindow Frame SUStatusFrame</key>
@@ -398,7 +398,7 @@
 	<key>NSWindow Frame iTerm Window 0</key>
 	<string>1624 209 710 587 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1063 462 710 587 0 0 2560 1417 </string>
+	<string>907 497 710 587 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>45 115 710 587 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
