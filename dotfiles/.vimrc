@@ -1,5 +1,5 @@
 syntax enable
-colorscheme railscasts
+colorscheme spacegray
 
 set smartindent
 set tabstop=4
