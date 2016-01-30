@@ -105,15 +105,6 @@ link_file "${fish_origin_folder}/functions" "${fish_destination_folder}/function
 
 echo "=== Fish files linked ==="
 
-# Atom
-
-atom_origin_folder="${scripts_directory}/atom"
-atom_destination_folder="${HOME}/.atom"
-
-link_file "${atom_origin_folder}" "${atom_destination_folder}"
-
-echo "=== Atom files linked ==="
-
 # Sublime text
 
 sublime_text_settings_location="$HOME/Library/Application Support/Sublime Text 3/Packages"
