@@ -66,5 +66,10 @@ function fish_prompt
     end
   end
 
+
+  function get_git_remote_branch
+    git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
+  end
+
   echo -n -s $arrow ' '$cwd $repo_info $normal ' '
 end
