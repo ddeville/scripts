@@ -40,7 +40,7 @@
     required = true
 [alias]
     st = status
-    br = branch
+    br = branch -vv
     co = checkout
     aa = add -A
     ci = commit
