@@ -10,9 +10,9 @@ if which rbenv > /dev/null
   set -x PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin $PATH
 end
 
-if which multirust > /dev/null
-  set -x PATH $HOME/.multirust/toolchains/stable/cargo/bin $PATH
-end
+if [ -d "$HOME/.cargo/bin" ]; then
+   set -x PATH $HOME/.cargo/bin $PATH
+fi
 
 if set -x XCODE (xcode-select --print-path)
    set -x PATH $XCODE/Tools:/usr/local/bin $PATH
