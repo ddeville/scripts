@@ -10,9 +10,9 @@ if which rbenv > /dev/null
   set -x PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin $PATH
 end
 
-if [ -d "$HOME/.cargo/bin" ]; then
+if test -e "$HOME/.cargo/bin"
    set -x PATH $HOME/.cargo/bin $PATH
-fi
+end
 
 if set -x XCODE (xcode-select --print-path)
    set -x PATH $XCODE/Tools:/usr/local/bin $PATH
