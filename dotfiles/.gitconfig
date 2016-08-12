@@ -51,3 +51,5 @@
     unstage = reset HEAD --
     last = log -1 HEAD
     lo = log --pretty=format:'%C(yellow)%h  %<(11)%Cred%cd %<(20)%Cblue%an%Cgreen%d %Creset%s' --date=short
+    dbclean = clean -f -d -x -e .vagrant -e .idea
+
