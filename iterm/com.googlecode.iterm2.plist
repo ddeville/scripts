@@ -347,14 +347,10 @@
 	<true/>
 	<key>MaxVertically</key>
 	<false/>
-	<key>NSColorPanelMode</key>
-	<string>1</string>
-	<key>NSColorPickerSlidersDefaults</key>
-	<string>1</string>
 	<key>NSNavLastRootDirectory</key>
 	<string>~/scripts/iterm</string>
 	<key>NSNavPanelExpandedSizeForOpenMode</key>
-	<string>{712, 492}</string>
+	<string>{712, 448}</string>
 	<key>NSQuotedKeystrokeBinding</key>
 	<string></string>
 	<key>NSRepeatCountBinding</key>
@@ -385,26 +381,20 @@
 		<key>TB Is Shown</key>
 		<integer>1</integer>
 	</dict>
-	<key>NSWindow Frame NSColorPanel</key>
-	<string>122 152 231 329 0 0 1280 777 </string>
-	<key>NSWindow Frame NSFontPanel</key>
-	<string>1887 279 445 77 0 0 2560 1417 </string>
-	<key>NSWindow Frame Preferences</key>
-	<string>51 460 606 456 0 0 2560 1417 </string>
-	<key>NSWindow Frame SUStatusFrame</key>
-	<string>2360 966 400 129 1280 0 2560 1417 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>330 303 620 392 0 0 1280 777 </string>
-	<key>NSWindow Frame UKCrashReporter</key>
-	<string>3081 726 592 584 2560 0 2560 1417 </string>
+	<string>330 304 620 392 0 0 1280 777 </string>
+	<key>NSWindow Frame SessionsPreferences</key>
+	<string>2829 139 606 456 2560 0 2560 1417 </string>
+	<key>NSWindow Frame SharedPreferences</key>
+	<string>1201 256 796 473 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>522 102 710 587 0 0 1280 777 </string>
+	<string>0 68 1032 706 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>20 82 710 587 0 0 1280 777 </string>
+	<string>134 138 710 587 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>164 108 710 587 0 0 1280 777 </string>
+	<string>1650 658 906 755 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
-	<string>789 773 710 587 0 0 2560 1417 </string>
+	<string>1627 164 710 587 0 0 2560 1417 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1238,30 +1228,12 @@
 			<string>/Users/damien</string>
 		</dict>
 	</array>
-	<key>NoSyncConfirmBeta</key>
-	<true/>
-	<key>NoSyncDoNotWarnBeforeMultilinePaste</key>
-	<true/>
-	<key>NoSyncDoNotWarnBeforeMultilinePaste_selection</key>
-	<integer>0</integer>
 	<key>NoSyncInstallationId</key>
-	<string>E006E812-5590-44D0-845D-E637C62A1E63</string>
-	<key>NoSyncLastTipTime</key>
-	<real>460894393.28988099</real>
-	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
-	<true/>
-	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
-	<integer>0</integer>
-	<key>NoSyncSuppressAnnyoingBellOffer</key>
-	<true/>
+	<string>D82C5025-30C4-4E37-9C45-7D5F2B289546</string>
+	<key>NoSyncPermissionToShowTip</key>
+	<false/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
-	<real>465564172.04982197</real>
-	<key>NoSyncTipsDisabled</key>
-	<true/>
-	<key>NoSyncTipsToNotShow</key>
-	<array>
-		<string>000</string>
-	</array>
+	<real>492048964.21776497</real>
 	<key>OnlyWhenMoreTabs</key>
 	<true/>
 	<key>OpenArrangementAtStartup</key>
@@ -1324,11 +1296,13 @@
 	<key>SUFeedAlternateAppNameKey</key>
 	<string>iTerm</string>
 	<key>SUFeedURL</key>
-	<string>https://iterm2.com/appcasts/testing.xml?shard=96</string>
+	<string>https://iterm2.com/appcasts/testing.xml?shard=0</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2016-07-29T23:04:14Z</date>
+	<date>2016-09-22T19:10:36Z</date>
+	<key>SUSendProfileInfo</key>
+	<false/>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
@@ -1338,7 +1312,7 @@
 	<key>ShowBookmarkName</key>
 	<false/>
 	<key>ShowFullScreenTabBar</key>
-	<true/>
+	<false/>
 	<key>ShowPaneTitles</key>
 	<true/>
 	<key>SmartPlacement</key>
@@ -1359,8 +1333,6 @@
 	<integer>10</integer>
 	<key>TripleClickSelectsFullWrappedLines</key>
 	<false/>
-	<key>UKCrashReporterLastCrashReportDate</key>
-	<real>1438767104</real>
 	<key>URLHandlersByGuid</key>
 	<dict/>
 	<key>UseBorder</key>
@@ -1384,7 +1356,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.0.4</string>
+	<string>3.0.8</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
