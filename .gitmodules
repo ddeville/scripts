@@ -1,9 +1,3 @@
 [submodule "themes/sublime-text/Theme - Aristocat"]
 	path = themes/sublime-text/Theme - Aristocat
 	url = git@github.com:ddeville/aristocat-theme.git
-[submodule "externals/git-remote-dropbox"]
-	path = externals/git-remote-dropbox
-	url = git@github.com:anishathalye/git-remote-dropbox.git
-[submodule "externals/dropbox-sdk-python"]
-	path = externals/dropbox-sdk-python
-	url = git@github.com:dropbox/dropbox-sdk-python.git
