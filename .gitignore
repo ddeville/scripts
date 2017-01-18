@@ -3,6 +3,8 @@ tmp/
 *~
 *.swp
 *.swo
+*.pyc
+*.pyo
 
 # Atom
 blob-store
