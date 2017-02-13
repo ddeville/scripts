@@ -319,14 +319,14 @@
 			<key>Action</key>
 			<integer>25</integer>
 			<key>Text</key>
-			<string>Find Previous</string>
+			<string>Find Next</string>
 		</dict>
 		<key>0x67-0x100000</key>
 		<dict>
 			<key>Action</key>
 			<integer>25</integer>
 			<key>Text</key>
-			<string>Find Next</string>
+			<string>Find Previous</string>
 		</dict>
 		<key>0x9-0x40000</key>
 		<dict>
@@ -507,9 +507,9 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>93 102 606 456 0 0 1280 777 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>324 179 937 465 0 0 1280 778 </string>
+	<string>324 187 937 465 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 91 1018 685 0 0 1280 778 </string>
+	<string>2560 5 1018 1413 2560 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>570 112 710 587 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
