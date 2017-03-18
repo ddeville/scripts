@@ -431,7 +431,7 @@
 	<key>HideScrollbar</key>
 	<false/>
 	<key>HideTab</key>
-	<true/>
+	<false/>
 	<key>HideTabCloseButton</key>
 	<false/>
 	<key>HighlightTabLabels</key>
@@ -446,6 +446,8 @@
 	<integer>44</integer>
 	<key>HotkeyCode</key>
 	<integer>43</integer>
+	<key>HotkeyMigratedFromSingleToMulti</key>
+	<true/>
 	<key>HotkeyModifiers</key>
 	<integer>524576</integer>
 	<key>HotkeyTermAnimationDuration</key>
@@ -507,9 +509,9 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>93 102 606 456 0 0 1280 777 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>324 148 796 473 0 0 1280 778 </string>
+	<string>195 256 796 473 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>521 148 710 587 0 0 1280 778 </string>
+	<string>32 168 710 587 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>1793 518 710 587 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -1481,7 +1483,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.0.14</string>
+	<string>3.1.beta.2</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
