@@ -15,7 +15,7 @@ if test -e "$HOME/.cargo/bin"
 end
 
 if set -x XCODE (xcode-select --print-path)
-   set -x PATH $XCODE/Tools:/usr/local/bin $PATH
+   set -x PATH $XCODE/usr/bin $PATH
 end
 
 set fish_greeting "
