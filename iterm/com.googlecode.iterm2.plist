@@ -505,17 +505,17 @@
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>330 304 620 392 0 0 1280 778 </string>
+	<string>3530 769 620 392 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
-	<string>93 102 606 456 0 0 1280 777 </string>
+	<string>2811 320 606 469 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SharedPreferences</key>
 	<string>195 256 796 473 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>32 168 710 587 0 0 1280 778 </string>
+	<string>35 93 710 610 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1793 518 710 587 0 0 2560 1418 </string>
+	<string>0 808 710 610 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>538 100 710 587 0 0 1280 778 </string>
+	<string>538 72 710 610 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
 	<string>0 94 1088 559 0 0 2560 1417 </string>
 	<key>New Bookmarks</key>
@@ -1357,10 +1357,16 @@
 	<true/>
 	<key>NoSyncInstallationId</key>
 	<string>D82C5025-30C4-4E37-9C45-7D5F2B289546</string>
+	<key>NoSyncLastTipTime</key>
+	<real>511735776.91638303</real>
 	<key>NoSyncPermissionToShowTip</key>
 	<false/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>492048964.21776497</real>
+	<key>NoSyncTipsToNotShow</key>
+	<array>
+		<string>000</string>
+	</array>
 	<key>OnlyWhenMoreTabs</key>
 	<true/>
 	<key>OpenArrangementAtStartup</key>
@@ -1427,7 +1433,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2017-03-17T20:26:10Z</date>
+	<date>2017-05-04T20:32:24Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -1439,7 +1445,7 @@
 	<key>ShowBookmarkName</key>
 	<false/>
 	<key>ShowFullScreenTabBar</key>
-	<true/>
+	<false/>
 	<key>ShowPaneTitles</key>
 	<true/>
 	<key>SmartPlacement</key>
@@ -1480,10 +1486,12 @@
 	<string>/-+\~_.</string>
 	<key>findIgnoreCase_iTerm</key>
 	<true/>
+	<key>findMode_iTerm</key>
+	<integer>0</integer>
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.1.beta.2</string>
+	<string>3.1.beta.3</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
