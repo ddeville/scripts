@@ -45,6 +45,6 @@ abbr -a con "tail -40 -f /var/log/system.log"
 abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
 abbr -a kd "killall Dock"
-abbr -a mypy "time ./ci/mypy_all.sh -i --cache-dir=.mypy_cache/.mypy_cache_2"
+abbr -a mypy2 "time ./ci/mypy_all.sh -i --cache-dir=.mypy_cache/.mypy_cache_2"
 abbr -a mypy3 "time ./ci/mypy3_all.sh -i --cache-dir=.mypy_cache/.mypy_cache_3"
 
