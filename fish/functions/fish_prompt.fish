@@ -13,18 +13,6 @@ function fish_prompt
       git status -s >/dev/null ^/dev/null
     end
 
-    function _hg_branch_name
-      echo (hg branch ^/dev/null)
-    end
-
-    function _is_hg_dirty
-      echo (hg status -mard ^/dev/null)
-    end
-
-    function _is_hg_repo
-      hg summary >/dev/null ^/dev/null
-    end
-
     function _repo_branch_name
       eval "_$argv[1]_branch_name"
     end
@@ -34,9 +22,7 @@ function fish_prompt
     end
 
     function _repo_type
-      if _is_hg_repo
-        echo 'hg'
-      else if _is_git_repo
+      if _is_git_repo
         echo 'git'
       end
     end
