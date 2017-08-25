@@ -1,30 +1,17 @@
 function fish_prompt
-	if not set -q -g __fish_robbyrussell_functions_defined
-    set -g __fish_robbyrussell_functions_defined
+	if not set -q -g __fish_git_functions_defined
+    set -g __fish_git_functions_defined
+
+    function _is_git_repo
+      git rev-parse --is-inside-work-tree ^/dev/null
+    end
+
     function _git_branch_name
       echo (git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
     end
 
     function _is_git_dirty
       echo (git status -s --ignore-submodules=dirty ^/dev/null)
-    end
-
-    function _is_git_repo
-      git status -s >/dev/null ^/dev/null
-    end
-
-    function _repo_branch_name
-      eval "_$argv[1]_branch_name"
-    end
-
-    function _is_repo_dirty
-      eval "_is_$argv[1]_dirty"
-    end
-
-    function _repo_type
-      if _is_git_repo
-        echo 'git'
-      end
     end
   end
 
@@ -41,20 +28,15 @@ function fish_prompt
 
   set -l cwd $cyan(basename (prompt_pwd))
 
-  set -l repo_type (_repo_type)
-  if [ $repo_type ]
-    set -l repo_branch $red(_repo_branch_name $repo_type)
+  if [ (_is_git_repo) ]
+    set -l repo_branch $red(_git_branch_name)
     set repo_info "$blue $repo_type:($repo_branch$blue)"
 
-    if [ (_is_repo_dirty $repo_type) ]
-      set -l dirty "$yellow ✗"
-      set repo_info "$repo_info$dirty"
-    end
-  end
-
-
-  function get_git_remote_branch
-    git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
+    # too slow...
+    #if [ (_is_git_dirty) ]
+    #  set -l dirty "$yellow ✗"
+    #  set repo_info "$repo_info$dirty"
+    #end
   end
 
   echo -n -s $arrow ' '$cwd $repo_info $normal ' '
