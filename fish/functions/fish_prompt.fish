@@ -25,12 +25,13 @@ function fish_prompt
   if [ $USER = 'root' ]
     set arrow "$red# "
   end
-
+  
   set -l cwd $cyan(basename (prompt_pwd))
+  set -l hostname $yellow(hostname -s)
 
   if [ (_is_git_repo) ]
     set -l repo_branch $red(_git_branch_name)
-    set repo_info "$blue $repo_type:($repo_branch$blue)"
+    set repo_info "$blue:($repo_branch$blue)"
 
     # too slow...
     #if [ (_is_git_dirty) ]
@@ -39,5 +40,5 @@ function fish_prompt
     #end
   end
 
-  echo -n -s $arrow ' '$cwd $repo_info $normal ' '
+  echo -n -s $arrow ' '$hostname:$cwd $repo_info $normal ' '
 end
