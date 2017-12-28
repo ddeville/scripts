@@ -72,7 +72,6 @@ link_file "${dot_origin_folder}/.gitconfig" "${dot_destination_folder}/.gitconfi
 link_file "${dot_origin_folder}/.radarerc" "${dot_destination_folder}/.radarerc"
 link_file "${dot_origin_folder}/.vim" "${dot_destination_folder}/.vim"
 link_file "${dot_origin_folder}/.vimrc" "${dot_destination_folder}/.vimrc"
-link_file "${dot_origin_folder}/.save-tabs-dropbox.json" "${dot_destination_folder}/.save-tabs-dropbox.json"
 
 echo "=== Dot files linked ==="
 
