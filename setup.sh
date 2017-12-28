@@ -87,18 +87,6 @@ link_file "${fish_origin_folder}/functions" "${fish_destination_folder}/function
 
 echo "=== Fish files linked ==="
 
-# Sublime text
-
-sublime_text_settings_location="$HOME/Library/Application Support/Sublime Text 3/Packages"
-mkdir "${sublime_text_settings_location}" > /dev/null 2>&1
-
-sublime_origin_folder="${scripts_directory}/sublime"
-sublime_destination_folder="${sublime_text_settings_location}/User"
-
-link_file "${sublime_origin_folder}" "${sublime_destination_folder}"
-
-echo "=== Sublime Text files linked ==="
-
 # Themes
 
 themes_origin_folder="${scripts_directory}/themes"
