@@ -1,6 +1,6 @@
 ## Scripts
 
-A bunch of scripts I use on every machine I set up. A lot of inspiration was taken from a [post](http://furbo.org/2014/09/03/the-terminal/) by Craig Hockenberry.
+A bunch of scripts I use on every machine I set up.
 
 When setting up a new machine, do the following steps:
 
@@ -9,18 +9,6 @@ When setting up a new machine, do the following steps:
 > cd ~
 > git clone git@github.com:ddeville/scripts.git
 ```
-
-* Install the following Sublime Text packages:
-
-- [Package Control](https://packagecontrol.io/installation)
-- [Spacegray](https://packagecontrol.io/packages/Theme%20-%20Spacegray)
-- [One Dark Color Scheme](https://packagecontrol.io/packages/One%20Dark%20Color%20Scheme)
-- [SideBarEnhancements](https://packagecontrol.io/packages/SideBarEnhancements)
-- [BracketHighlighter](https://packagecontrol.io/packages/BracketHighlighter)
-- [C Improved](https://packagecontrol.io/packages/C%20Improved)
-- [Git](https://packagecontrol.io/packages/Git)
-- [HTML-CSS-JS Prettify](https://packagecontrol.io/packages/HTML-CSS-JS%20Prettify)
-- [Anaconda](https://packagecontrol.io/packages/Anaconda)
 
 * Install the [Fish](http://fishshell.com/) shell.
 Make the Fish shell the default shell by running the following command:
@@ -42,7 +30,5 @@ The Xcode will be automatically installed but it will have to be selected in the
 #### Notes
 
 For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html).
-
-To show the AppleScript scripts in FastScripts, run `defaults write com.red-sweater.FastScripts ScriptTreePathsKey '("FSSP%%%$HOME$/Scripts/applescript")'`.
 
 To make sure that `git` keeps the file executable, run the following `git update-index --chmod=+x <file>`.
