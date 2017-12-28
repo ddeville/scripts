@@ -1,0 +1,6 @@
+- Update setup script to use Python
+- Make sure that a few things are installed before running the script (brew basically)
+- Separate things among platforms
+- Install the fonts in the script by copying them to `~/Library/Fonts`
+- Install fish in the script by using brew
+- Change the shell to fish in the setup script
