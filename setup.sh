@@ -123,21 +123,3 @@ done
 cd $OLDPWD
 
 echo "=== Fonts copied ==="
-
-# Services
-
-services_origin_folder="${scripts_directory}/services"
-services_destination_folder="$HOME/Library/Services"
-
-mkdir "${services_destination_folder}" > /dev/null 2>&1
-
-for wf in ${services_origin_folder}/*.{workflow,service};
-do
-	filename=$(basename "${wf}")
-	if [ "${filename}" != "*workflow" -a "${filename}" != "*.service" ]
-	then
-		cp -r "${wf}" "${services_destination_folder}/$filename"
-	fi
-done
-
-echo "=== Services copied ==="
