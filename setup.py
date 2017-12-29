@@ -3,10 +3,13 @@
 import errno
 import inspect
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import urllib
+
+SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 
 COMMAND = "command"
 PRIORITY = "priority"
@@ -79,10 +82,8 @@ def setup_cmd_update_shell_if_needed():
 
 def setup_cmd_update_dot_files():
     def cmd():
-        scripts_path = os.path.dirname(os.path.realpath(__file__))
-        
         # regular dot files
-        orig_dir = os.path.join(scripts_path, "dotfiles")
+        orig_dir = os.path.join(SCRIPTS_PATH, "dotfiles")
         dest_dir = os.path.expanduser("~")
 
         links = [
@@ -101,7 +102,7 @@ def setup_cmd_update_dot_files():
         print("====> linked dot files")
         
         # fish
-        orig_dir = os.path.join(scripts_path, "fish")
+        orig_dir = os.path.join(SCRIPTS_PATH, "fish")
         dest_dir = os.path.join(os.path.expanduser("~"), ".config", "fish")
         
         links = [
@@ -144,6 +145,22 @@ def setup_cmd_update_open_panel_behavior():
     return {
         COMMAND: cmd,
         PRIORITY: 34,
+        PLATFORM: MACOS,
+    }
+
+def setup_cmd_install_fonts():
+    def cmd():
+        fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
+        dest_path = os.path.join(os.path.expanduser("~"), "Library", "Fonts")
+        for folder in os.listdir(fonts_path):
+            font_path = os.path.join(fonts_path, folder)
+            if os.path.isdir(font_path):
+                _copy_dir_if_needed(font_path, os.path.join(dest_path, folder))
+        print("====> installed fonts")
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 35,
         PLATFORM: MACOS,
     }
 
@@ -193,13 +210,22 @@ def _force_symlink(path1, path2):
         if e.errno == errno.EEXIST:
             os.remove(path2)
             os.symlink(path1, path2)
+        else:
+            raise
 
 def _create_dirs_if_needed(path):
     try:
         os.makedirs(path)
     except OSError as e:
-        if e.errno == errno.EEXIST:
-            pass
+        if e.errno != errno.EEXIST:
+            raise
+
+def _copy_dir_if_needed(orig, dest):
+    try:
+        shutil.copytree(orig, dest)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
 def _get_current_platform():
     if "darwin" in sys.platform:
