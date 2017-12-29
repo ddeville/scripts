@@ -8,41 +8,15 @@ import sys
 import tempfile
 import urllib
 
-COMMAND = "cmd"
-PRIORITY = "ord"
-PLATFORM = "plt"
+COMMAND = "command"
+PRIORITY = "priority"
+PLATFORM = "platform"
 
 MACOS = "macos"
 LINUX = "linux"
 ALL_PLATFORMS = (MACOS, LINUX)
 
 # Commands
-
-def setup_cmd_update_library_visibility():
-    def cmd():
-        nohidden_flag = 1 << 15
-        library_path = os.path.expanduser("~/Library")
-        library_stat = os.stat(library_path)
-        os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
-        print("====> updated ~/Library visibility")
-   
-    return {
-        COMMAND: cmd,
-        PRIORITY: 0,
-        PLATFORM: MACOS,
-    }
-
-def setup_cmd_update_open_panel_behavior():
-    def cmd():
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-            "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "-bool", "false"])
-        print("====> updated open panel behavior")
-    
-    return {
-        COMMAND: cmd,
-        PRIORITY: 1,
-        PLATFORM: MACOS,
-    }
 
 def setup_cmd_install_brew_if_needed():
     def cmd():
@@ -55,7 +29,7 @@ def setup_cmd_install_brew_if_needed():
 
     return {
         COMMAND: cmd,
-        PRIORITY: 2,
+        PRIORITY: 1,
         PLATFORM: MACOS,
     }
 
@@ -74,7 +48,7 @@ def setup_cmd_install_brew_formulas_if_needed():
     
     return {
         COMMAND: cmd,
-        PRIORITY: 3,
+        PRIORITY: 8,
         PLATFORM: MACOS,
     }
 
@@ -99,7 +73,7 @@ def setup_cmd_update_shell_if_needed():
     
     return {
         COMMAND: cmd,
-        PRIORITY: 4,
+        PRIORITY: 16,
         PLATFORM: ALL_PLATFORMS,
     }
 
@@ -143,8 +117,34 @@ def setup_cmd_update_dot_files():
 
     return {
         COMMAND: cmd,
-        PRIORITY: 5,
+        PRIORITY: 32,
         PLATFORM: ALL_PLATFORMS,
+    }
+
+def setup_cmd_update_library_visibility():
+    def cmd():
+        nohidden_flag = 1 << 15
+        library_path = os.path.expanduser("~/Library")
+        library_stat = os.stat(library_path)
+        os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
+        print("====> updated ~/Library visibility")
+   
+    return {
+        COMMAND: cmd,
+        PRIORITY: 33,
+        PLATFORM: MACOS,
+    }
+
+def setup_cmd_update_open_panel_behavior():
+    def cmd():
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+            "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "-bool", "false"])
+        print("====> updated open panel behavior")
+    
+    return {
+        COMMAND: cmd,
+        PRIORITY: 34,
+        PLATFORM: MACOS,
     }
 
 # Private helpers
@@ -214,13 +214,15 @@ def _get_current_platform():
 def _run_all_commands():
     plat = _get_current_platform()
 
-    all_manifests = [func() for name, func in 
+    manifests = [func() for name, func in 
             inspect.getmembers(sys.modules[__name__], inspect.isfunction)
             if name.startswith("setup_cmd")]
-    filtered_manifests = [manifest for manifest in all_manifests if plat in manifest[PLATFORM]]
-    sorted_manifests = sorted(filtered_manifests, key=lambda x: x[PRIORITY])
+    manifests = sorted([manifest for manifest in manifests if plat in manifest[PLATFORM]],
+                       key=lambda item: item[PRIORITY])
     
-    print(sorted_manifests)
+    for manifest in manifests:
+        func = manifest[COMMAND]
+        func()
 
 if __name__ == '__main__':
     _run_all_commands()
