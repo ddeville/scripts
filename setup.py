@@ -69,7 +69,7 @@ def setup_cmd_update_shell_if_needed():
     
         # next let's check whether we need to change the shell
         if os.environ.get("SHELL") != "/usr/local/bin/fish":
-            print("====> chaning shell to fish")
+            print("====> changing shell to fish")
             subprocess.check_call(["chsh", "-s", "/usr/local/bin/fish"])
         else:
             print("====> fish is already default shell")
