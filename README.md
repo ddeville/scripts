@@ -4,7 +4,7 @@ A bunch of scripts I use on every machine I set up.
 
 When setting up a new machine, do the following steps:
 
-* Install [iTerm2](https://www.iterm2.com/downloads.html)
+* If on MacOS, install [iTerm2](https://www.iterm2.com/downloads.html)
 
 * Clone this repo in the Home directory:
 ```
