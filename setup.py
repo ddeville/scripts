@@ -28,7 +28,6 @@ def setup_cmd_install_brew_if_needed():
         else:
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
             subprocess.check_call(["/usr/bin/ruby", script_path])
-            print("====> brew was installed installed")
 
     return {
         COMMAND: cmd,
@@ -41,7 +40,6 @@ def setup_cmd_update_apt_get_if_needed():
         print("====> updating package manager")
         subprocess.check_call(["sudo", "apt-add-repository", "ppa:fish-shell/release-2"])
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
-        print("====> updated package manager")
 
     return {
         COMMAND: cmd,
@@ -76,9 +74,8 @@ def setup_cmd_install_brew_formulas_if_needed():
                 except subprocess.CalledProcessError:
                     # brew install succeeds by returning a status code of 1...
                     pass
-            print("====> %s installed" % package)
+            print("====> %s linking" % package)
             _run_command_no_output(["brew", "link", package])
-            print("====> %s linked" % package)
     
     return {
         COMMAND: cmd,
@@ -98,7 +95,6 @@ def setup_cmd_install_linux_packages_if_needed():
         for package in PACKAGES_LINUX:
             print("====> installing %s" % package)
             subprocess.check_call(["sudo", "apt-get", "upgrade", package])
-            print("====> installed %s" % package)
 
     return {
         COMMAND: cmd,
@@ -164,7 +160,6 @@ def setup_cmd_update_dot_files():
         print("====> linking dot files")
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
-        print("====> linked dot files")
         
         # fish
         orig_dir = os.path.join(SCRIPTS_PATH, "fish")
@@ -179,7 +174,6 @@ def setup_cmd_update_dot_files():
         _create_dirs_if_needed(dest_dir)
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
-        print("====> linked fish config files")
 
     return {
         COMMAND: cmd,
@@ -189,11 +183,11 @@ def setup_cmd_update_dot_files():
 
 def setup_cmd_update_library_visibility():
     def cmd():
+        print("====> updating ~/Library visibility")
         nohidden_flag = 1 << 15
         library_path = os.path.expanduser("~/Library")
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
-        print("====> updated ~/Library visibility")
    
     return {
         COMMAND: cmd,
@@ -203,9 +197,9 @@ def setup_cmd_update_library_visibility():
 
 def setup_cmd_update_open_panel_behavior():
     def cmd():
+        print("====> updating open panel behavior")
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
             "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "-bool", "false"])
-        print("====> updated open panel behavior")
     
     return {
         COMMAND: cmd,
@@ -213,8 +207,21 @@ def setup_cmd_update_open_panel_behavior():
         PLATFORM: MACOS,
     }
 
+def setup_cmd_update_iterm_sync_folder_prefs():
+    def cmd():
+        print("====> updating iterm preferences")
+        _run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
+                                os.path.join(SCRIPTS_PATH, "macos", "iterm")])
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 35,
+        PLATFORM: MACOS,
+    }
+
 def setup_cmd_install_fonts():
     def cmd():
+        print("====> installing fonts")
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Fonts")
         _create_dirs_if_needed(dest_path)
@@ -222,7 +229,6 @@ def setup_cmd_install_fonts():
             font_path = os.path.join(fonts_path, folder)
             if os.path.isdir(font_path) and not folder.startswith("."):
                 _copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
-        print("====> installed fonts")
 
     return {
         COMMAND: cmd,
@@ -232,6 +238,7 @@ def setup_cmd_install_fonts():
 
 def setup_cmd_install_xcode_themes():
     def cmd():
+        print("====> installing xcode themes")
         themes_path = os.path.join(SCRIPTS_PATH, "macos", "xcode")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Developer", "Xcode", "UserData",
                                  "FontAndColorThemes")
@@ -240,7 +247,6 @@ def setup_cmd_install_xcode_themes():
             theme_path = os.path.join(themes_path, theme)
             if not theme.startswith("."):
                 _copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
-        print("====> installed xcode themes")
 
     return {
         COMMAND: cmd,
