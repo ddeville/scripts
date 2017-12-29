@@ -270,7 +270,7 @@ def _run_script_as_root(script):
         subprocess.check_call(["sudo", "bash", "-e", fw.name])
 
 def _run_command_no_output(cmd):
-    with open(os.devnull, 'w') as f:
+    with open(os.devnull, "w") as f:
         subprocess.check_call(cmd, stderr=f, stdout=f)
 
 def _force_symlink(path1, path2):
@@ -323,5 +323,5 @@ def _run_all_commands():
         func = manifest[COMMAND]
         func()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _run_all_commands()
