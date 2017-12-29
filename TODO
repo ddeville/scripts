@@ -1,3 +1,4 @@
+- Move iTerm and Alfred settings on other hosts
 - Update setup script to use Python
 - Make sure that a few things are installed before running the script (brew basically)
 - Separate things among platforms

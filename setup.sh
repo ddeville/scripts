@@ -89,7 +89,7 @@ echo "=== Fish files linked ==="
 
 # Themes
 
-themes_origin_folder="${scripts_directory}/themes"
+themes_origin_folder="${scripts_directory}/macos/themes"
 
 xcode_themes_location="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes"
 mkdir "${xcode_themes_location}" > /dev/null 2>&1
