@@ -4,28 +4,18 @@ A bunch of scripts I use on every machine I set up.
 
 When setting up a new machine, do the following steps:
 
+* Install [iTerm2](https://www.iterm2.com/downloads.html)
+
 * Clone this repo in the Home directory:
 ```
 > cd ~
 > git clone git@github.com:ddeville/scripts.git
 ```
 
-* Install the [Fish](http://fishshell.com/) shell.
-Make the Fish shell the default shell by running the following command:
-
+* Run the setup, this will install various tools and create symbolic links to the dotfiles:
 ```
-chsh -s /usr/local/bin/fish
+> python setup.py
 ```
-
-* Run the setup, this will create symbolic links for the dotfiles:
-```
-> ./setup.sh
-```
-
-* Manually install the Terminal theme by double-clicking it and making it default in Terminal.
-The Xcode will be automatically installed but it will have to be selected in the Preferences.
-
-* Install [iTerm2](https://www.iterm2.com/downloads.html) and set its prefs to sync to `~/scripts/iterm`.
 
 #### Notes
 
