@@ -67,13 +67,13 @@ def cmd_update_dot_files():
     dest_dir = os.path.expanduser("~")
 
     links = [
-        (".hushlogin", ".hushlogin"),
-        (".bash_profile", ".bash_profile"),
-        (".bashrc", ".bashrc"),
-        (".lldbinit", ".lldbinit"),
-        (".gitconfig", ".gitconfig"),
-        (".vim", ".vim"),
-        (".vimrc", ".vimrc"),
+        ("hushlogin", ".hushlogin"),
+        ("bash_profile", ".bash_profile"),
+        ("bashrc", ".bashrc"),
+        ("lldbinit", ".lldbinit"),
+        ("gitconfig", ".gitconfig"),
+        ("vim", ".vim"),
+        ("vimrc", ".vimrc"),
     ]
 
     print("====> linking dot files")
