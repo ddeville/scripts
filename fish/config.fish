@@ -48,7 +48,17 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
-set -x PATH $HOME/scripts/bin $PATH
+if test -e "$HOME/scripts/bin"
+    set -x PATH $HOME/scripts/bin $PATH
+end
+
+if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
+  set -x PATH $HOME/scripts/macos/bin $PATH
+end
+
+if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path)
+   set -x PATH $XCODE/usr/bin $PATH
+end
 
 if which rbenv > /dev/null
   set -x PATH $HOME/.rbenv/shims $PATH
@@ -57,10 +67,6 @@ end
 
 if test -e "$HOME/.cargo/bin"
    set -x PATH $HOME/.cargo/bin $PATH
-end
-
-if set -x XCODE (xcode-select --print-path)
-   set -x PATH $XCODE/usr/bin $PATH
 end
 
 abbr -a ll "ls -lahL"
