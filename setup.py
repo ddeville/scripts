@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import errno
 import os
 import subprocess
 import sys
@@ -58,6 +59,43 @@ def cmd_update_shell_if_needed():
     else:
         print("====> fish is already default shell")
 
+def cmd_update_dot_files():
+    scripts_path = os.path.dirname(os.path.realpath(__file__))
+    
+    # regular dot files
+    orig_dir = os.path.join(scripts_path, "dotfiles")
+    dest_dir = os.path.expanduser("~")
+
+    links = [
+        (".hushlogin", ".hushlogin"),
+        (".bash_profile", ".bash_profile"),
+        (".bashrc", ".bashrc"),
+        (".lldbinit", ".lldbinit"),
+        (".gitconfig", ".gitconfig"),
+        (".vim", ".vim"),
+        (".vimrc", ".vimrc"),
+    ]
+
+    print("====> linking dot files")
+    for f1, f2 in links:
+        _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
+    print("====> linked dot files")
+    
+    # fish
+    orig_dir = os.path.join(scripts_path, "fish")
+    dest_dir = os.path.join(os.path.expanduser("~"), ".config", "fish")
+    
+    links = [
+        ("config.fish", "config.fish"),
+        ("functions", "functions"),
+    ]
+
+    print("====> linking fish config files")
+    _create_dirs_if_needed(dest_dir)
+    for f1, f2 in links:
+        _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
+    print("====> linked fish config files")
+
 # Private helpers
 
 def _is_cmd_installed(cmd):
@@ -97,6 +135,21 @@ def _run_command_no_output(cmd):
     with open(os.devnull, 'w') as f:
         subprocess.check_call(cmd, stderr=f, stdout=f)
 
+def _force_symlink(path1, path2):
+    try:
+        os.symlink(path1, path2)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            os.remove(path2)
+            os.symlink(path1, path2)
+
+def _create_dirs_if_needed(path):
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            pass
+
 # main
 
 CMDS = [
@@ -105,6 +158,7 @@ CMDS = [
     cmd_install_brew_if_needed,
     cmd_install_brew_formulas_if_needed,
     cmd_update_shell_if_needed,
+    cmd_update_dot_files,
 ]
 
 if __name__ == '__main__':

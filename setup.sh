@@ -69,7 +69,6 @@ link_file "${dot_origin_folder}/.bash_profile" "${dot_destination_folder}/.bash_
 link_file "${dot_origin_folder}/.bashrc" "${dot_destination_folder}/.bashrc"
 link_file "${dot_origin_folder}/.lldbinit" "${dot_destination_folder}/.lldbinit"
 link_file "${dot_origin_folder}/.gitconfig" "${dot_destination_folder}/.gitconfig"
-link_file "${dot_origin_folder}/.radarerc" "${dot_destination_folder}/.radarerc"
 link_file "${dot_origin_folder}/.vim" "${dot_destination_folder}/.vim"
 link_file "${dot_origin_folder}/.vimrc" "${dot_destination_folder}/.vimrc"
 
