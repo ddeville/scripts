@@ -32,11 +32,23 @@ def setup_cmd_install_brew_if_needed():
 
     return {
         COMMAND: cmd,
-        PRIORITY: 1,
+        PRIORITY: 0,
         PLATFORM: MACOS,
     }
 
-PACKAGES = [
+def setup_cmd_update_apt_get_if_needed():
+    def cmd():
+        print("====> updating package manager")
+        subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
+        print("====> updated package manager")
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 0,
+        PLATFORM: LINUX,
+    }
+
+PACKAGES_MACOS = [
     "fish",
     "ag",
     "tmux",
@@ -44,10 +56,28 @@ PACKAGES = [
 
 def setup_cmd_install_brew_formulas_if_needed():
     def cmd():
-        for package in PACKAGES:
+        for package in PACKAGES_MACOS:
             print("====> installing %s" % package)
-            _install_or_upgrade_brew_formula(package)
+            try:
+                print("====> checking status of %s" % package)
+                subprocess.check_call(["brew", "ls", "--versions", package])
+                # if the previous call succeeded, the package is installed so upgrade
+                print("====> %s installed, upgrading" % package)
+                try:
+                    _run_command_no_output(["brew", "upgrade", package])
+                except subprocess.CalledProcessError:
+                    print("====> %s up to date" % package)
+            except subprocess.CalledProcessError:
+                # the package has never been installed, do that now
+                print("====> installing %s" % package)
+                try:
+                    subprocess.check_call(["brew", "install", package])
+                except subprocess.CalledProcessError:
+                    # brew install succeeds by returning a status code of 1...
+                    pass
+            print("====> %s installed" % package)
             _run_command_no_output(["brew", "link", package])
+            print("====> %s linked" % package)
     
     return {
         COMMAND: cmd,
@@ -55,7 +85,27 @@ def setup_cmd_install_brew_formulas_if_needed():
         PLATFORM: MACOS,
     }
 
-def setup_cmd_update_shell_if_needed():
+PACKAGES_LINUX = [
+    "fish",
+    "silversearcher-ag",
+    "tmux",
+    "vim",
+]
+
+def setup_cmd_install_linux_packages_if_needed():
+    def cmd():
+        for package in PACKAGES_LINUX:
+            print("====> installing %s" % package)
+            subprocess.check_call(["sudo", "apt-get", "upgrade", package])
+            print("====> installed %s" % package)
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 8,
+        PLATFORM: LINUX,
+    }
+
+def setup_cmd_update_shell_macos_if_needed():
     def cmd():
         # let's check whether fish was added to /etc/shells
         with open("/etc/shells") as f:
@@ -77,7 +127,21 @@ def setup_cmd_update_shell_if_needed():
     return {
         COMMAND: cmd,
         PRIORITY: 16,
-        PLATFORM: ALL_PLATFORMS,
+        PLATFORM: MACOS,
+    }
+
+def setup_cmd_update_shell_linux_if_needed():
+    def cmd():
+        if os.environ.get("SHELL") != "/usr/bin/fish":
+            print("====> changing shell to fish")
+            subprocess.check_call(["chsh", "-s", "/usr/bin/fish"])
+        else:
+            print("====> fish is already default shell")
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 16,
+        PLATFORM: LINUX,
     }
 
 def setup_cmd_update_dot_files():
@@ -191,26 +255,6 @@ def _is_cmd_installed(cmd):
         return os.path.exists(path) and os.access(path, os.X_OK)
     except subprocess.CalledProcessError as e:
         return False
-
-def _install_or_upgrade_brew_formula(formula):
-    try:
-        print("====> checking status of %s" % formula)
-        subprocess.check_call(["brew", "ls", "--versions", formula])
-        # if the previous call succeeded, the formula is installed so upgrade
-        print("====> %s installed, upgrading" % formula)
-        try:
-            _run_command_no_output(["brew", "upgrade", formula])
-        except subprocess.CalledProcessError:
-            print("====> %s up to date" % formula)
-    except subprocess.CalledProcessError:
-        # the formula has never been installed, do that now
-        print("====> installing %s" % formula)
-        try:
-            subprocess.check_call(["brew", "install", formula])
-        except subprocess.CalledProcessError:
-            # brew install succeeds by returning a status code of 1...
-            pass
-        print("====> %s installed" % formula)
 
 def _run_script_as_root(script):
     with tempfile.NamedTemporaryFile() as fw:
