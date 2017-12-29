@@ -39,6 +39,7 @@ def setup_cmd_install_brew_if_needed():
 def setup_cmd_update_apt_get_if_needed():
     def cmd():
         print("====> updating package manager")
+        subprocess.check_call(["sudo", "apt-add-repository", "ppa:fish-shell/release-2"])
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
         print("====> updated package manager")
 
@@ -50,7 +51,7 @@ def setup_cmd_update_apt_get_if_needed():
 
 PACKAGES_MACOS = [
     "fish",
-    "ag",
+    "the_silver_searcher",
     "tmux",
 ]
 
