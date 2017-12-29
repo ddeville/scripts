@@ -152,15 +152,34 @@ def setup_cmd_install_fonts():
     def cmd():
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Fonts")
+        _create_dirs_if_needed(dest_path)
         for folder in os.listdir(fonts_path):
             font_path = os.path.join(fonts_path, folder)
-            if os.path.isdir(font_path):
-                _copy_dir_if_needed(font_path, os.path.join(dest_path, folder))
+            if os.path.isdir(font_path) and not folder.startswith("."):
+                _copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
         print("====> installed fonts")
 
     return {
         COMMAND: cmd,
         PRIORITY: 35,
+        PLATFORM: MACOS,
+    }
+
+def setup_cmd_install_xcode_themes():
+    def cmd():
+        themes_path = os.path.join(SCRIPTS_PATH, "macos", "xcode")
+        dest_path = os.path.join(os.path.expanduser("~"), "Library", "Developer", "Xcode", "UserData",
+                                 "FontAndColorThemes")
+        _create_dirs_if_needed(dest_path)
+        for theme in os.listdir(themes_path):
+            theme_path = os.path.join(themes_path, theme)
+            if not theme.startswith("."):
+                _copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
+        print("====> installed xcode themes")
+
+    return {
+        COMMAND: cmd,
+        PRIORITY: 36,
         PLATFORM: MACOS,
     }
 
@@ -220,9 +239,12 @@ def _create_dirs_if_needed(path):
         if e.errno != errno.EEXIST:
             raise
 
-def _copy_dir_if_needed(orig, dest):
+def _copy_file_if_needed(orig, dest, isdir=False):
     try:
-        shutil.copytree(orig, dest)
+        if isdir:
+            shutil.copytree(orig, dest)
+        else:
+            shutil.copyfile(orig, dest)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
