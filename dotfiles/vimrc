@@ -8,6 +8,6 @@ set expandtab
 set hlsearch
 set ruler
 set number
-set colorcolumn=80
+set colorcolumn=120
 
 filetype indent plugin on
