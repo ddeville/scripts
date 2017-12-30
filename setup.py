@@ -195,11 +195,21 @@ def setup_cmd_update_library_visibility():
         PLATFORM: MACOS,
     }
 
-def setup_cmd_update_open_panel_behavior():
+def setup_cmd_update_system_preferences():
     def cmd():
-        print("====> updating open panel behavior")
+        print("====> updating system preferences")
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-            "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "-bool", "false"])
+                                "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "false"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSQuitAlwaysKeepsWindows", "true"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticSpellingCorrectionEnabled", "false"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "KeyRepeat", "1"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "InitialKeyRepeat", "15"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "ApplePressAndHoldEnabled", "false"])
     
     return {
         COMMAND: cmd,
@@ -232,7 +242,7 @@ def setup_cmd_install_fonts():
 
     return {
         COMMAND: cmd,
-        PRIORITY: 35,
+        PRIORITY: 36,
         PLATFORM: MACOS,
     }
 
@@ -250,7 +260,7 @@ def setup_cmd_install_xcode_themes():
 
     return {
         COMMAND: cmd,
-        PRIORITY: 36,
+        PRIORITY: 37,
         PLATFORM: MACOS,
     }
 
