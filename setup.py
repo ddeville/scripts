@@ -199,17 +199,27 @@ def setup_cmd_update_system_preferences():
     def cmd():
         print("====> updating system preferences")
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "false"])
+                                "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "0"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSQuitAlwaysKeepsWindows", "true"])
+                                "NSQuitAlwaysKeepsWindows", "1"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticSpellingCorrectionEnabled", "false"])
+                                "NSAutomaticSpellingCorrectionEnabled", "0"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticCapitalizationEnabled", "0"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticDashSubstitutionEnabled", "0"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticPeriodSubstitutionEnabled", "0"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticQuoteSubstitutionEnabled", "0"])
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
+                                "NSAutomaticTextCompletionEnabled", "0"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
                                 "KeyRepeat", "1"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
                                 "InitialKeyRepeat", "15"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "ApplePressAndHoldEnabled", "false"])
+                                "ApplePressAndHoldEnabled", "0"])
     
     return {
         COMMAND: cmd,
