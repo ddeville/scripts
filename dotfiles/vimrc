@@ -2,6 +2,7 @@ syntax enable
 set background=dark
 colorscheme solarized
 
+set hidden
 set smartindent
 set tabstop=4
 set shiftwidth=4
