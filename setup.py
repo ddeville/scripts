@@ -176,31 +176,24 @@ def setup_cmd_update_library_visibility():
 
 def setup_cmd_update_system_preferences():
     # type: () -> Manifest
+    def update_global_domain(key, val):
+        # type: (str, str) -> None
+        _run_command_no_output(["defaults", "write", "NSGlobalDomain", key, val])
+
     def cmd():
         # type: () -> None
         print("====> updating system preferences")
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSQuitAlwaysKeepsWindows", "1"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticSpellingCorrectionEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticCapitalizationEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticDashSubstitutionEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticPeriodSubstitutionEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticQuoteSubstitutionEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "NSAutomaticTextCompletionEnabled", "0"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "KeyRepeat", "1"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "InitialKeyRepeat", "12"])
-        _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "ApplePressAndHoldEnabled", "0"])
+        update_global_domain("NSShowAppCentricOpenPanelInsteadOfUntitledFile", "0")
+        update_global_domain("NSQuitAlwaysKeepsWindows", "1")
+        update_global_domain("NSAutomaticSpellingCorrectionEnabled", "0")
+        update_global_domain("NSAutomaticCapitalizationEnabled", "0")
+        update_global_domain("NSAutomaticDashSubstitutionEnabled", "0")
+        update_global_domain("NSAutomaticPeriodSubstitutionEnabled", "0")
+        update_global_domain("NSAutomaticQuoteSubstitutionEnabled", "0")
+        update_global_domain("NSAutomaticTextCompletionEnabled", "0")
+        update_global_domain("KeyRepeat", "1")
+        update_global_domain("InitialKeyRepeat", "12")
+        update_global_domain("ApplePressAndHoldEnabled", "0")
 
     return Manifest(cmd=cmd, priority=34, platform=MACOS)
 
