@@ -1,15 +1,38 @@
+" attempt to determine the file type based on name and content
+filetype indent plugin on
+
+" enable syntax highlighting
 syntax enable
+
+" set solarized dark as the color scheme
 set background=dark
 colorscheme solarized
 
+" allow switching between buffers without saving first
 set hidden
-set smartindent
-set tabstop=4
+
+" use 4 spaces instead of tabs
 set shiftwidth=4
+set softtabstop=4
 set expandtab
+
+" if no known file type keep the same indent as the current line
+set autoindent
+
+" highlight search results
 set hlsearch
+
+" display the cursor position in the status line
 set ruler
+
+" display the line number on the left
 set number
+
+" display a column at 120 char
 set colorcolumn=120
 
-filetype indent plugin on
+" highlight the current line
+set cursorline
+
+" always show the status line even when there is only one window
+set laststatus=2
