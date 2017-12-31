@@ -303,7 +303,7 @@ def _get_current_platform():
     elif "linux" in sys.platform:
         return LINUX
     else:
-        return None
+        raise Exception("Platform not supported %s" % sys.platform)
 
 # main
 
