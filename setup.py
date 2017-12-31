@@ -22,30 +22,26 @@ ALL_PLATFORMS = (MACOS, LINUX)
 # Commands
 
 def setup_cmd_install_brew_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         if _is_cmd_installed("brew"):
             print("====> brew already installed")
         else:
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
             subprocess.check_call(["/usr/bin/ruby", script_path])
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 0,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=0, platform=MACOS)
 
 def setup_cmd_update_apt_get_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         print("====> updating package manager")
         subprocess.check_call(["sudo", "apt-add-repository", "ppa:fish-shell/release-2"])
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 0,
-        PLATFORM: LINUX,
-    }
+    return Manifest(cmd=cmd, priority=0, platform=LINUX)
 
 PACKAGES_MACOS = [
     "fish",
@@ -54,7 +50,9 @@ PACKAGES_MACOS = [
 ]
 
 def setup_cmd_install_brew_formulas_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         for package in PACKAGES_MACOS:
             print("====> installing %s" % package)
             try:
@@ -77,11 +75,7 @@ def setup_cmd_install_brew_formulas_if_needed():
             print("====> %s linking" % package)
             _run_command_no_output(["brew", "link", package])
     
-    return {
-        COMMAND: cmd,
-        PRIORITY: 8,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=8, platform=MACOS)
 
 PACKAGES_LINUX = [
     "fish",
@@ -91,19 +85,19 @@ PACKAGES_LINUX = [
 ]
 
 def setup_cmd_install_linux_packages_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         for package in PACKAGES_LINUX:
             print("====> installing %s" % package)
             subprocess.check_call(["sudo", "apt-get", "upgrade", package])
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 8,
-        PLATFORM: LINUX,
-    }
+    return Manifest(cmd=cmd, priority=8, platform=LINUX)
 
 def setup_cmd_update_shell_macos_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         # let's check whether fish was added to /etc/shells
         with open("/etc/shells") as f:
             if not "/usr/local/bin/fish" in f.read():
@@ -121,29 +115,24 @@ def setup_cmd_update_shell_macos_if_needed():
         else:
             print("====> fish is already default shell")
     
-    return {
-        COMMAND: cmd,
-        PRIORITY: 16,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=16, platform=MACOS)
 
 def setup_cmd_update_shell_linux_if_needed():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         if os.environ.get("SHELL") != "/usr/bin/fish":
             print("====> changing shell to fish")
             subprocess.check_call(["chsh", "-s", "/usr/bin/fish"])
         else:
             print("====> fish is already default shell")
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 16,
-        PLATFORM: LINUX,
-    }
+    return Manifest(cmd=cmd, priority=16, platform=LINUX)
 
 def setup_cmd_update_dot_files():
+    # type: () -> Manifest
     def cmd():
-        # regular dot files
+        # type: () -> None
         orig_dir = os.path.join(SCRIPTS_PATH, "dotfiles")
         dest_dir = os.path.expanduser("~")
 
@@ -175,28 +164,24 @@ def setup_cmd_update_dot_files():
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 32,
-        PLATFORM: ALL_PLATFORMS,
-    }
+    return Manifest(cmd=cmd, priority=32, platform=ALL_PLATFORMS)
 
 def setup_cmd_update_library_visibility():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         print("====> updating ~/Library visibility")
         nohidden_flag = 1 << 15
         library_path = os.path.expanduser("~/Library")
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
-   
-    return {
-        COMMAND: cmd,
-        PRIORITY: 33,
-        PLATFORM: MACOS,
-    }
+
+    return Manifest(cmd=cmd, priority=33, platform=MACOS)
 
 def setup_cmd_update_system_preferences():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         print("====> updating system preferences")
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
                                 "NSShowAppCentricOpenPanelInsteadOfUntitledFile", "0"])
@@ -217,29 +202,24 @@ def setup_cmd_update_system_preferences():
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
                                 "KeyRepeat", "1"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
-                                "InitialKeyRepeat", "15"])
+                                "InitialKeyRepeat", "12"])
         _run_command_no_output(["defaults", "write", "NSGlobalDomain",
                                 "ApplePressAndHoldEnabled", "0"])
-    
-    return {
-        COMMAND: cmd,
-        PRIORITY: 34,
-        PLATFORM: MACOS,
-    }
+
+    return Manifest(cmd=cmd, priority=34, platform=MACOS)
 
 def setup_cmd_update_iterm_sync_folder_prefs():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         print("====> updating iterm preferences")
         _run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
                                 os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 35,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=35, platform=MACOS)
 
 def setup_cmd_install_fonts():
+    # type: () -> Manifest
     def cmd():
         print("====> installing fonts")
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
@@ -250,14 +230,12 @@ def setup_cmd_install_fonts():
             if os.path.isdir(font_path) and not folder.startswith("."):
                 _copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 36,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=36, platform=MACOS)
 
 def setup_cmd_install_xcode_themes():
+    # type: () -> Manifest
     def cmd():
+        # type: () -> None
         print("====> installing xcode themes")
         themes_path = os.path.join(SCRIPTS_PATH, "macos", "xcode")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Developer", "Xcode", "UserData",
@@ -268,15 +246,12 @@ def setup_cmd_install_xcode_themes():
             if not theme.startswith("."):
                 _copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
 
-    return {
-        COMMAND: cmd,
-        PRIORITY: 37,
-        PLATFORM: MACOS,
-    }
+    return Manifest(cmd=cmd, priority=37, platform=MACOS)
 
 # Private helpers
 
 def _is_cmd_installed(cmd):
+    # type: (str) -> bool
     try:
         path = subprocess.check_output(["which", cmd]).strip()
         return os.path.exists(path) and os.access(path, os.X_OK)
@@ -284,16 +259,19 @@ def _is_cmd_installed(cmd):
         return False
 
 def _run_script_as_root(script):
+    # type: (str) -> None
     with tempfile.NamedTemporaryFile() as fw:
         fw.write(script)
         fw.flush()
         subprocess.check_call(["sudo", "bash", "-e", fw.name])
 
 def _run_command_no_output(cmd):
+    # type: (str) -> None
     with open(os.devnull, "w") as f:
         subprocess.check_call(cmd, stderr=f, stdout=f)
 
 def _force_symlink(path1, path2):
+    # type: (str, str) -> None
     try:
         os.symlink(path1, path2)
     except OSError as e:
@@ -304,6 +282,7 @@ def _force_symlink(path1, path2):
             raise
 
 def _create_dirs_if_needed(path):
+    # type: (str) -> None
     try:
         os.makedirs(path)
     except OSError as e:
@@ -311,6 +290,7 @@ def _create_dirs_if_needed(path):
             raise
 
 def _copy_file_if_needed(orig, dest, isdir=False):
+    # type: (str, str, bool) -> None
     try:
         if isdir:
             shutil.copytree(orig, dest)
@@ -321,6 +301,7 @@ def _copy_file_if_needed(orig, dest, isdir=False):
             raise
 
 def _get_current_platform():
+    # type: () -> str
     if "darwin" in sys.platform:
         return MACOS
     elif "linux" in sys.platform:
@@ -330,17 +311,24 @@ def _get_current_platform():
 
 # main
 
+class Manifest(object):
+    def __init__(self, cmd, priority, platform):
+        self.cmd = cmd
+        self.priority = priority
+        self.platform = platform
+
 def _run_all_commands():
+    # type: () -> None
     plat = _get_current_platform()
 
     manifests = [func() for name, func in 
             inspect.getmembers(sys.modules[__name__], inspect.isfunction)
             if name.startswith("setup_cmd")]
-    manifests = sorted([manifest for manifest in manifests if plat in manifest[PLATFORM]],
-                       key=lambda item: item[PRIORITY])
+    manifests = sorted([manifest for manifest in manifests if plat in manifest.platform],
+            key=lambda manifest: manifest.priority)
     
     for manifest in manifests:
-        func = manifest[COMMAND]
+        func = manifest.cmd
         func()
 
 if __name__ == "__main__":
