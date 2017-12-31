@@ -11,10 +11,6 @@ import urllib
 
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 
-COMMAND = "command"
-PRIORITY = "priority"
-PLATFORM = "platform"
-
 MACOS = "macos"
 LINUX = "linux"
 ALL_PLATFORMS = (MACOS, LINUX)
