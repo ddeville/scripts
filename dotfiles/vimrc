@@ -6,6 +6,7 @@ syntax enable
 
 " set solarized dark as the color scheme
 set background=dark
+let g:solarized_termcolors=256
 colorscheme solarized
 
 " allow switching between buffers without saving first
@@ -38,4 +39,4 @@ set cursorline
 set laststatus=2
 
 " enable use of the mouse in all modes
-set mouse=a
+"set mouse=a
