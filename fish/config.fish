@@ -7,7 +7,7 @@ set -gx LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
 # fish colors
 set -gx fish_color_autosuggestion 586e75
-set -gx fish_color_command 93a1a1
+set -gx fish_color_command b294bb
 set -gx fish_color_comment 586e75
 set -gx fish_color_end 268bd2
 set -gx fish_color_error dc322f
