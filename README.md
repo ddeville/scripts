@@ -19,6 +19,4 @@ When setting up a new machine, do the following steps:
 
 #### Notes
 
-For additional `vim` color schemes, see this [page](http://vimcolorschemetest.googlecode.com/svn/html/index-c.html).
-
 To make sure that `git` keeps the file executable, run the following `git update-index --chmod=+x <file>`.
