@@ -39,3 +39,8 @@ set laststatus=2
 
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
+
+" vim-plug plugins
+call plug#begin('~/.vim-plug-plugins')
+Plug 'dag/vim-fish'
+call plug#end()
