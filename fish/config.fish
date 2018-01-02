@@ -6,31 +6,14 @@ set -gx GREP_OPTIONS "--color=auto"
 set -gx LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
 # fish colors
-set -gx fish_color_autosuggestion 969896
-set -gx fish_color_command b294bb
-set -gx fish_color_comment f0c674
-set -gx fish_color_cwd b5bd68
-set -gx fish_color_cwd_root red
-set -gx fish_color_end b294bb
-set -gx fish_color_error cc6666
-set -gx fish_color_escape 8abeb7
-set -gx fish_color_history_current cyan
-set -gx fish_color_host \x2do\x1ecyan
-set -gx fish_color_match 8abeb7
-set -gx fish_color_normal c5c8c6
-set -gx fish_color_operator 8abeb7
-set -gx fish_color_param 81a2be
-set -gx fish_color_quote b5bd68
-set -gx fish_color_redirection 8abeb7
-set -gx fish_color_search_match b294bb
-set -gx fish_color_selection \x2d\x2dbackground\x3dpurple
-set -gx fish_color_status red
-set -gx fish_color_user \x2do\x1egreen
-set -gx fish_color_valid_path \x2d\x2dunderline
-set -gx fish_pager_color_completion normal
-set -gx fish_pager_color_description 555\x1eyellow
-set -gx fish_pager_color_prefix cyan
-set -gx fish_pager_color_progress cyan
+set -gx fish_color_autosuggestion 586e75
+set -gx fish_color_command 93a1a1
+set -gx fish_color_comment 586e75
+set -gx fish_color_end 268bd2
+set -gx fish_color_error dc322f
+set -gx fish_color_param 839496
+set -gx fish_color_quote 657b83
+set -gx fish_color_redirection 6c71c4
 
 # use the vim key bindings
 set -gx fish_key_bindings fish_vi_key_bindings
