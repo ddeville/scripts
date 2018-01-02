@@ -19,8 +19,17 @@ set expandtab
 " if no known file type keep the same indent as the current line
 set autoindent
 
-" highlight search results
+" backspace through anything in insert mode
+set backspace=indent,eol,start
+
+" highlight search results and start searching immediately
 set hlsearch
+set incsearch
+
+" always show at least one line above/below the cursor (and 5 on each side if
+" not wrapping
+set scrolloff=1
+set sidescrolloff=5
 
 " display the cursor position in the status line
 set ruler
@@ -36,6 +45,9 @@ set cursorline
 
 " always show the status line even when there is only one window
 set laststatus=2
+
+" autoload file changes
+set autoread
 
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
