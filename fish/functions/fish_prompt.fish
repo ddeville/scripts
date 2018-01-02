@@ -15,7 +15,6 @@ function fish_prompt
         end
     end
 
-
     set -l cyan (set_color --bold cyan)
     set -l yellow (set_color --bold yellow)
     set -l red (set_color --bold red)
@@ -43,4 +42,3 @@ function fish_prompt
 
     echo -n -s $arrow ' '$hostname:$cwd $repo_info $normal ' '
 end
-
