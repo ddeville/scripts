@@ -9,16 +9,12 @@ function fish_prompt
         function _git_branch_name
             echo (git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
         end
-
-        function _is_git_dirty
-            echo (git status -s --ignore-submodules=dirty ^/dev/null)
-        end
     end
 
-    set -l cyan (set_color --bold cyan)
-    set -l yellow (set_color --bold yellow)
-    set -l red (set_color --bold red)
-    set -l blue (set_color --bol blue)
+    set -l cyan (set_color --bold 8abeb7)
+    set -l yellow (set_color --bold f0c674)
+    set -l red (set_color --bold cc6666)
+    set -l blue (set_color --bold 81a2be)
     set -l normal (set_color normal)
 
     set -l arrow "$red➜ "
@@ -32,12 +28,6 @@ function fish_prompt
     if [ (_is_git_repo) ]
         set -l repo_branch $red(_git_branch_name)
         set repo_info "$blue:($repo_branch$blue)"
-
-        # too slow...
-        #if [ (_is_git_dirty) ]
-        #  set -l dirty "$yellow ✗"
-        #  set repo_info "$repo_info$dirty"
-        #end
     end
 
     echo -n -s $arrow ' '$hostname:$cwd $repo_info $normal ' '
