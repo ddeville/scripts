@@ -8,7 +8,7 @@ function fish_mode_prompt
             echo '[R]'
         case default
             set_color f0c674
-            echo '[N]'
+            echo '[C]'
         case visual
             set_color cc6666 
             echo '[V]'
