@@ -1,16 +1,16 @@
 function fish_mode_prompt
     switch $fish_bind_mode
         case insert
-            set_color --bold --background green black
+            set_color green
             echo '[I]'
         case default
-            set_color --bold --background magenta black
+            set_color magenta
             echo '[N]'
         case visual
-            set_color --bold --background cyan black
+            set_color cyan 
             echo '[V]'
         case replace_one
-            set_color --bold --background green black
+            set_color green
             echo '[R]'
         end
         set_color normal
