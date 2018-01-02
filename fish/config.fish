@@ -48,6 +48,8 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
+set -g fish_key_bindings fish_vi_key_bindings
+
 if test -e "$HOME/scripts/bin"
     set -x PATH $HOME/scripts/bin $PATH
 end
@@ -82,4 +84,3 @@ abbr -a topm "top -o mem"
 abbr -a kd "killall Dock"
 abbr -a mypy2 "time ./ci/mypy_all.sh -i --quick"
 abbr -a mypy3 "time ./ci/mypy3_all.sh -i --quick"
-
