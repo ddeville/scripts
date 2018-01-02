@@ -5,6 +5,7 @@ set -gx TERM xterm-256color
 set -gx GREP_OPTIONS "--color=auto"
 set -gx LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
+# fish colors
 set -gx fish_color_autosuggestion 969896
 set -gx fish_color_command b294bb
 set -gx fish_color_comment f0c674
@@ -26,11 +27,13 @@ set -gx fish_color_selection \x2d\x2dbackground\x3dpurple
 set -gx fish_color_status red
 set -gx fish_color_user \x2do\x1egreen
 set -gx fish_color_valid_path \x2d\x2dunderline
-set -gx fish_key_bindings fish_default_key_bindings
 set -gx fish_pager_color_completion normal
 set -gx fish_pager_color_description 555\x1eyellow
 set -gx fish_pager_color_prefix cyan
 set -gx fish_pager_color_progress cyan
+
+# use the vim key bindings
+set -gx fish_key_bindings fish_vi_key_bindings
 
 set -gx fish_greeting "
      /\     /\\
@@ -48,29 +51,25 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
-set -g fish_key_bindings fish_vi_key_bindings
-
+# set the path
 if test -e "$HOME/scripts/bin"
     set -x PATH $HOME/scripts/bin $PATH
 end
-
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
   set -x PATH $HOME/scripts/macos/bin $PATH
 end
-
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path)
    set -x PATH $XCODE/usr/bin $PATH
 end
-
 if which rbenv > /dev/null
   set -x PATH $HOME/.rbenv/shims $PATH
   set -x PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin $PATH
 end
-
 if test -e "$HOME/.cargo/bin"
    set -x PATH $HOME/.cargo/bin $PATH
 end
 
+# abbreviations
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
 abbr -a ss "subl --new-window"
