@@ -37,5 +37,5 @@ set cursorline
 " always show the status line even when there is only one window
 set laststatus=2
 
-" enable use of the mouse in all modes
-"set mouse=a
+" map screen redraw to also turn off search highlighting
+nnoremap <C-L> :nohl<CR><C-L>
