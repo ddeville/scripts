@@ -1,8 +1,8 @@
-" attempt to determine the file type based on name and content
-filetype indent plugin on
-
 " enable syntax highlighting
 syntax enable
+
+" attempt to determine the file type based on name and content
+filetype indent plugin on
 
 " set solarized dark as the color scheme
 set background=dark
