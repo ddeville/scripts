@@ -58,3 +58,8 @@ Plug 'dag/vim-fish'
 Plug 'rhysd/vim-clang-format'
 Plug 'mileszs/ack.vim'
 call plug#end()
+
+" use `ag` in the `ack` plugin if it's available
+if executable('ag')
+    let g:ackprg = 'ag --vimgrep'
+endif
