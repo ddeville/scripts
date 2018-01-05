@@ -56,4 +56,5 @@ nnoremap <C-L> :nohl<CR><C-L>
 call plug#begin('~/.vim-plug-plugins')
 Plug 'dag/vim-fish'
 Plug 'rhysd/vim-clang-format'
+Plug 'mileszs/ack.vim'
 call plug#end()
