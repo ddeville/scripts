@@ -209,6 +209,9 @@ def setup_cmd_update_system_preferences():
         update_global_domain("InitialKeyRepeat", "12")
         update_global_domain("ApplePressAndHoldEnabled", "0")
 
+        print("====> updating login window preferences")
+        _run_command_no_output(["defaults", "write", "com.apple.loginwindow", "TALLogoutSavesState", "1"])
+
     return Manifest(cmd=cmd, priority=35, platform=MACOS)
 
 def setup_cmd_update_iterm_sync_folder_prefs():
