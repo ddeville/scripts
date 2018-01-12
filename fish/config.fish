@@ -36,20 +36,20 @@ set -gx fish_greeting "
 
 # set the path
 if test -e "$HOME/scripts/bin"
-    set -x PATH $HOME/scripts/bin $PATH
+    set -x PATH $PATH $HOME/scripts/bin
 end
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
-  set -x PATH $HOME/scripts/macos/bin $PATH
+  set -x PATH $PATH $HOME/scripts/macos/bin
 end
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path)
-   set -x PATH $XCODE/usr/bin $PATH
+   set -x PATH $PATH $XCODE/usr/bin
 end
 if which rbenv > /dev/null
-  set -x PATH $HOME/.rbenv/shims $PATH
-  set -x PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin $PATH
+  set -x PATH $PATH $HOME/.rbenv/shims
+  set -x PATH $PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin
 end
 if test -e "$HOME/.cargo/bin"
-   set -x PATH $HOME/.cargo/bin $PATH
+   set -x PATH $PATH $HOME/.cargo/bin
 end
 
 # abbreviations
