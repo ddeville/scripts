@@ -48,6 +48,7 @@
     df = difftool
     mg = merge
     mt = mergetool
+    pr = pull --rebase
     un = reset HEAD --
     last = log -1 HEAD
     lo = log --pretty=format:'%C(yellow)%h  %<(11)%Cred%cd %<(20)%Cblue%an%Cgreen%d %Creset%s' --date=short
