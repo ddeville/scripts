@@ -58,6 +58,7 @@ Plug 'dag/vim-fish'
 Plug 'rhysd/vim-clang-format'
 Plug 'mileszs/ack.vim'
 Plug 'vim-scripts/a.vim'
+Plug 'rust-lang/rust.vim'
 call plug#end()
 
 " use `ag` in the `ack` plugin if it's available
