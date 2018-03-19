@@ -54,11 +54,11 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
-Plug 'dag/vim-fish'
-Plug 'rhysd/vim-clang-format'
-Plug 'mileszs/ack.vim'
-Plug 'vim-scripts/a.vim'
-Plug 'rust-lang/rust.vim'
+    Plug 'dag/vim-fish'
+    Plug 'rhysd/vim-clang-format'
+    Plug 'mileszs/ack.vim'
+    Plug 'vim-scripts/a.vim'
+    Plug 'rust-lang/rust.vim'
 call plug#end()
 
 " use `ag` in the `ack` plugin if it's available
