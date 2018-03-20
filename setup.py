@@ -43,7 +43,6 @@ PACKAGES_MACOS = [
     "fish",
     "the_silver_searcher",
     "tmux",
-    "python3",
 ]
 
 def setup_cmd_install_brew_formulas_if_needed():
@@ -79,7 +78,6 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "tmux",
     "vim",
-    "python3",
 ]
 
 def setup_cmd_install_linux_packages_if_needed():
