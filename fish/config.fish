@@ -34,22 +34,27 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
-# set the path
-if test -e "$HOME/scripts/bin"
-    set -x PATH $PATH $HOME/scripts/bin
+# make sure that these are before anything in the path (they overwrite others)
+if which pyenv > /dev/null
+    set -x PATH $HOME/.pyenv/shims $PATH
+    set -x PYENV_SHELL fish
+    # pyenv rehash
 end
+if which rbenv > /dev/null
+  set -x PATH $HOME/.rbenv/shims $PATH 
+end
+# these can come afterwards, it's cool
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
-  set -x PATH $PATH $HOME/scripts/macos/bin
+  set -x PATH $PATH $HOME/scripts/macos/bin 
+end
+if test -e "$HOME/scripts/bin"
+    set -x PATH $PATH $HOME/scripts/bin 
+end
+if test -e "$HOME/.cargo/bin"
+   set -x PATH $PATH $HOME/.cargo/bin 
 end
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path)
    set -x PATH $PATH $XCODE/usr/bin
-end
-if which rbenv > /dev/null
-  set -x PATH $PATH $HOME/.rbenv/shims
-  set -x PATH $PATH $HOME/.rbenv/versions/(cat $HOME/.rbenv/version)/bin
-end
-if test -e "$HOME/.cargo/bin"
-   set -x PATH $PATH $HOME/.cargo/bin
 end
 
 # abbreviations
