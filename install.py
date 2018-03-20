@@ -79,7 +79,6 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "tmux",
     "vim",
-    "pyenv",
 ]
 
 def setup_cmd_install_linux_packages_if_needed():
