@@ -6,17 +6,5 @@ tmp/
 *.pyc
 *.pyo
 
-# Atom
-blob-store
-storage/
-compile-cache/
-dev/
-.apm/
-.npm/
-.node-gyp/
-packages/
-
-# Sublime
-*.cache
-Package Control.*
-
+# Alfred stores local state at this path
+macos/alfred/Alfred.alfredpreferences/preferences/local/
