@@ -35,12 +35,12 @@ set -gx fish_greeting "
 "
 
 # make sure that these are before anything in the path (they overwrite others)
-if which pyenv > /dev/null
+if which pyenv > /dev/null and test -e "$HOME/.pyenv/shims"
     set -x PATH $HOME/.pyenv/shims $PATH
     set -x PYENV_SHELL fish
     # pyenv rehash
 end
-if which rbenv > /dev/null
+if which rbenv > /dev/null and test -e "$HOME/.rbenv/shims"
   set -x PATH $HOME/.rbenv/shims $PATH 
 end
 # these can come afterwards, it's cool
@@ -53,7 +53,7 @@ end
 if test -e "$HOME/.cargo/bin"
    set -x PATH $PATH $HOME/.cargo/bin 
 end
-if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path)
+if which xcode-select > /dev/null and set -x XCODE (xcode-select --print-path) and test -e $XCODE
    set -x PATH $PATH $XCODE/usr/bin
 end
 
