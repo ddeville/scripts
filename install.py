@@ -75,6 +75,7 @@ def setup_cmd_install_brew_formulas_if_needed():
     return Manifest(cmd=cmd, priority=8, platform=MACOS)
 
 PACKAGES_LINUX = [
+    "ttf-anonymous-pro",
     "fish",
     "silversearcher-ag",
     "tmux",
