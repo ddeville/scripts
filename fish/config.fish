@@ -60,7 +60,6 @@ end
 # abbreviations
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
-abbr -a ss "subl --new-window"
 abbr -a gs "git status"
 abbr -a gf "git difftool"
 abbr -a ch "git log --oneline (get_git_remote_branch)..HEAD"
