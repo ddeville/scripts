@@ -43,6 +43,7 @@ PACKAGES_MACOS = [
     "fish",
     "the_silver_searcher",
     "tmux",
+    "jq",
     "pyenv",
 ]
 
