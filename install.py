@@ -34,7 +34,6 @@ def setup_cmd_update_apt_get_if_needed():
     def cmd():
         # type: () -> None
         print("====> updating package manager")
-        subprocess.check_call(["sudo", "apt-add-repository", "ppa:fish-shell/release-2"])
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
 
     return Manifest(cmd=cmd, priority=0, platform=LINUX)
@@ -45,6 +44,7 @@ PACKAGES_MACOS = [
     "tmux",
     "jq",
     "pyenv",
+    "radare2",
 ]
 
 def setup_cmd_install_brew_formulas_if_needed():
@@ -81,6 +81,8 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "tmux",
     "vim",
+    "jq",
+    "radare2",
 ]
 
 def setup_cmd_install_linux_packages_if_needed():
