@@ -35,11 +35,13 @@ set -gx fish_greeting "
 "
 
 # make sure that these are before anything in the path (they overwrite others)
-if test -e "$HOME/.pyenv/bin"; and test -e "$HOME/.pyenv/shims"
+if test -e "$HOME/.pyenv/bin"
     set -x PATH $HOME/.pyenv/bin $PATH
-    set -x PATH $HOME/.pyenv/shims $PATH
     set -x PYENV_SHELL fish
-    # pyenv rehash
+    if test -e "$HOME/.pyenv/shims"
+        set -x PATH $HOME/.pyenv/shims $PATH
+        # pyenv rehash
+    end
 end
 # these can come afterwards, it's cool
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
