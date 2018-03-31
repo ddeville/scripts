@@ -183,7 +183,7 @@ def setup_cmd_install_pyenv():
         else:
             print("====> installing pyenv")
             script_path, _ = urllib.urlretrieve("https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer")
-            subprocess.check_call(["/usr/bin/bash", script_path])
+            subprocess.check_call(["bash", script_path])
 
     return Manifest(cmd=cmd, priority=34, platform=ALL_PLATFORMS)
 
