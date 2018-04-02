@@ -17,15 +17,16 @@ ALL_PLATFORMS = (MACOS, LINUX)
 
 PACKAGES = [
     "fish",
-    "the_silver_searcher",
     "jq",
     "radare2",
 ]
 
 PACKAGES_MACOS = [
+    "the_silver_searcher",
 ]
 
 PACKAGES_LINUX = [
+    "silversearcher-ag",
     "ttf-anonymous-pro",
     "vim",
 ]
