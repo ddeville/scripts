@@ -26,6 +26,7 @@ PACKAGES_MACOS = [
 ]
 
 PACKAGES_LINUX = [
+    "make",
     "silversearcher-ag",
     "ttf-anonymous-pro",
     "vim",
