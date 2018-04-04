@@ -188,6 +188,20 @@ def setup_cmd_install_pyenv():
 
     return Manifest(cmd=cmd, priority=34, platform=ALL_PLATFORMS)
 
+def setup_cmd_install_rustup():
+    # type: () -> Manifest
+    def cmd():
+        if _is_cmd_installed("rustup"):
+            print("====> updating rustup")
+            _run_command_no_output(["rustup", "update"])
+        else:
+            print("====> install rustup")
+            script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
+            subprocess.check_call(["sh", script_path])
+        pass
+
+    return Manifest(cmd=cmd, priority=35, platform=ALL_PLATFORMS)
+
 def setup_cmd_update_library_visibility():
     # type: () -> Manifest
     def cmd():
@@ -198,7 +212,7 @@ def setup_cmd_update_library_visibility():
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
 
-    return Manifest(cmd=cmd, priority=35, platform=MACOS)
+    return Manifest(cmd=cmd, priority=36, platform=MACOS)
 
 def setup_cmd_update_system_preferences():
     # type: () -> Manifest
@@ -224,7 +238,7 @@ def setup_cmd_update_system_preferences():
         print("====> updating login window preferences")
         _run_command_no_output(["defaults", "write", "com.apple.loginwindow", "TALLogoutSavesState", "1"])
 
-    return Manifest(cmd=cmd, priority=36, platform=MACOS)
+    return Manifest(cmd=cmd, priority=37, platform=MACOS)
 
 def setup_cmd_update_iterm_sync_folder_prefs():
     # type: () -> Manifest
@@ -234,7 +248,7 @@ def setup_cmd_update_iterm_sync_folder_prefs():
         _run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
                                 os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
-    return Manifest(cmd=cmd, priority=37, platform=MACOS)
+    return Manifest(cmd=cmd, priority=38, platform=MACOS)
 
 def setup_cmd_install_fonts():
     # type: () -> Manifest
@@ -248,7 +262,7 @@ def setup_cmd_install_fonts():
             if os.path.isdir(font_path) and not folder.startswith("."):
                 _copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
 
-    return Manifest(cmd=cmd, priority=38, platform=MACOS)
+    return Manifest(cmd=cmd, priority=39, platform=MACOS)
 
 def setup_cmd_install_xcode_themes():
     # type: () -> Manifest
@@ -264,7 +278,7 @@ def setup_cmd_install_xcode_themes():
             if not theme.startswith("."):
                 _copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
 
-    return Manifest(cmd=cmd, priority=39, platform=MACOS)
+    return Manifest(cmd=cmd, priority=40, platform=MACOS)
 
 # Private helpers
 

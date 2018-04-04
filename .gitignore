@@ -8,3 +8,5 @@ tmp/
 
 # Alfred stores local state at this path
 macos/alfred/Alfred.alfredpreferences/preferences/local/
+
+dotfiles/vim/.netrwhist
