@@ -58,6 +58,7 @@ if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path);
 end
 
 # abbreviations
+abbr -a k "clear"
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
 abbr -a gs "git status"
