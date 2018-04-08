@@ -462,6 +462,8 @@
 	<real>0.0</real>
 	<key>IRMemory</key>
 	<integer>4</integer>
+	<key>JiggleTTYSizeOnClearBuffer</key>
+	<false/>
 	<key>JobName</key>
 	<true/>
 	<key>LeftCommand</key>
@@ -515,7 +517,7 @@
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame NSFontPanel</key>
-	<string>575 166 445 77 0 0 1280 778 </string>
+	<string>350 255 445 77 0 0 1280 778 </string>
 	<key>NSWindow Frame Preferences</key>
 	<string>269 306 606 456 0 0 1280 777 </string>
 	<key>NSWindow Frame SUStatusFrame</key>
@@ -525,11 +527,11 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 207 606 469 0 0 1280 778 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>364 270 796 473 0 0 1280 778 </string>
+	<string>163 148 796 473 0 0 1280 778 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>80 193 592 584 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 168 1277 610 0 0 1280 778 </string>
+	<string>319 136 878 628 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>558 93 710 610 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 10</key>
@@ -1184,7 +1186,7 @@
 			<key>Scrollback With Status Bar</key>
 			<false/>
 			<key>Scrollback in Alternate Screen</key>
-			<true/>
+			<false/>
 			<key>Selected Text Color</key>
 			<dict>
 				<key>Blue Component</key>
@@ -1340,7 +1342,7 @@
 			<key>Use Italic Font</key>
 			<true/>
 			<key>Use Non-ASCII Font</key>
-			<true/>
+			<false/>
 			<key>Use Tab Color</key>
 			<false/>
 			<key>Vertical Spacing</key>
@@ -2233,7 +2235,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-04-01T02:02:15Z</date>
+	<date>2018-04-08T02:24:33Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
