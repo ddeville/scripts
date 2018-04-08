@@ -144,6 +144,7 @@ def setup_cmd_update_dot_files():
             ("gitconfig", ".gitconfig"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
+            ("tmux.conf", ".tmux.conf"),
         ]
 
         print("====> linking dot files")
