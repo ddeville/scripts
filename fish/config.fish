@@ -1,4 +1,4 @@
-set -gx EDITOR vi
+set -gx EDITOR vim
 set -gx CLICOLOR 1
 set -gx TERM xterm-256color
 
