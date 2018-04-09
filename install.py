@@ -146,8 +146,8 @@ def setup_cmd_update_dot_files():
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
             ("tmux.conf", ".tmux.conf"),
-            ("fish/config.fish", ".config/fish/config.fish"),
-            ("fish/functions", ".config/fish/functions"),
+            (os.path.join("fish", "config.fish"), os.path.join(".config", "fish", "config.fish")),
+            (os.path.join("fish", "functions"), os.path.join(".config", "fish", "functions")),
         ]
 
         # make sure that we create the `.config/fish` directory since it won't be here on new machines
