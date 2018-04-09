@@ -152,7 +152,7 @@ def setup_cmd_update_dot_files():
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
         
         # fish
-        orig_dir = os.path.join(SCRIPTS_PATH, "fish")
+        orig_dir = os.path.join(orig_dir, "fish")
         dest_dir = os.path.join(os.path.expanduser("~"), ".config", "fish")
         
         links = [
