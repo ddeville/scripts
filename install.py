@@ -142,6 +142,7 @@ def setup_cmd_update_dot_files():
             ("bashrc", ".bashrc"),
             ("lldbinit", ".lldbinit"),
             ("gitconfig", ".gitconfig"),
+            ("profile", ".profile"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
             ("tmux.conf", ".tmux.conf"),
