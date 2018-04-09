@@ -46,6 +46,7 @@
     mg = merge
     mt = mergetool
     pr = pull --rebase
+    pu = push
     un = reset HEAD --
     last = log -1 HEAD
     authors = shortlog -s -n -e
