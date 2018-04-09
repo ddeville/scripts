@@ -10,3 +10,6 @@ tmp/
 macos/alfred/Alfred.alfredpreferences/preferences/local/
 
 dotfiles/vim/.netrwhist
+
+# fish stores this generated cache into `.config/fish`...
+fishd.*
