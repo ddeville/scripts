@@ -12,9 +12,9 @@ When setting up a new machine, do the following steps:
 > git clone git@github.com:ddeville/scripts.git
 ```
 
-* Run the setup, this will install various tools and create symbolic links to the dotfiles:
+* Run the install script, this will install various tools and create symbolic links to the dotfiles:
 ```
-> python setup.py
+> python install.py
 ```
 
 #### Notes
