@@ -133,7 +133,7 @@ def setup_cmd_update_dot_files():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
-        orig_dir = os.path.join(SCRIPTS_PATH, "dotfiles")
+        orig_dir = os.path.join(SCRIPTS_PATH, "config")
         dest_dir = os.path.expanduser("~")
         config_dir = os.path.join(dest_dir, ".config")
 
