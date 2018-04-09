@@ -135,10 +135,6 @@ def setup_cmd_update_dot_files():
         # type: () -> None
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
         dest_dir = os.path.expanduser("~")
-        config_dir = os.path.join(dest_dir, ".config")
-
-        # make sure that we create the `.config` directory since it won't be here on new machines
-        _create_dirs_if_needed(config_dir)
 
         links = [
             ("hushlogin", ".hushlogin"),
@@ -150,8 +146,12 @@ def setup_cmd_update_dot_files():
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
             ("tmux.conf", ".tmux.conf"),
-            ("fish", ".config/fish"),
+            ("fish/config.fish", ".config/fish/config.fish"),
+            ("fish/functions", ".config/fish/functions"),
         ]
+
+        # make sure that we create the `.config/fish` directory since it won't be here on new machines
+        _create_dirs_if_needed(os.path.join(dest_dir, ".config", "fish"))
 
         print("====> linking dot files")
         for f1, f2 in links:
