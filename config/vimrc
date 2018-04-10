@@ -57,6 +57,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'dag/vim-fish'
     Plug 'rhysd/vim-clang-format'
     Plug 'ctrlpvim/ctrlp.vim'
+    Plug 'junegunn/fzf.vim'
     Plug 'mileszs/ack.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'

@@ -18,6 +18,7 @@ ALL_PLATFORMS = (MACOS, LINUX)
 PACKAGES = [
     "fish",
     "tmux",
+    "fzf",
     "irssi",
     "jq",
     "radare2",
