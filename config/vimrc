@@ -76,16 +76,5 @@ nmap <Leader>r :Tags<CR>
 if executable('ag')
     " use `ag` over grep
     set grepprg=ag\ --nogroup\ --nocolor
-
-    " use `ag` in `ctrlp` for listing files
-    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
-    " `ag` is fast enough that `ctrlp` doesn't need to cache
-    let g:ctrlp_use_caching = 0
-
     let g:ackprg = 'ag --vimgrep --smart-case'
-    cnoreabbrev ag Ack
-    cnoreabbrev aG Ack
-    cnoreabbrev Ag Ack
-    cnoreabbrev AG Ack
 endif
