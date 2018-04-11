@@ -4,6 +4,16 @@ syntax enable
 " attempt to determine the file type based on name and content
 filetype plugin indent on
 
+" vim-plug plugins
+call plug#begin('~/.vim-plug-plugins')
+    Plug 'dag/vim-fish'
+    Plug 'mileszs/ack.vim'
+    Plug 'junegunn/fzf.vim'
+    Plug 'vim-scripts/a.vim'
+    Plug 'rust-lang/rust.vim'
+    Plug 'rhysd/vim-clang-format'
+call plug#end()
+
 " set solarized dark as the color scheme
 set background=dark
 colorscheme solarized
@@ -52,15 +62,15 @@ set autoread
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
 
-" vim-plug plugins
-call plug#begin('~/.vim-plug-plugins')
-    Plug 'dag/vim-fish'
-    Plug 'mileszs/ack.vim'
-    Plug 'junegunn/fzf.vim'
-    Plug 'vim-scripts/a.vim'
-    Plug 'rust-lang/rust.vim'
-    Plug 'rhysd/vim-clang-format'
-call plug#end()
+" tell `fzf.vim` where the `fzf` executable lives
+if filereadable('/usr/local/bin/fzf')
+    set rtp+=/usr/local/opt/fzf
+endif
+
+" remap some `fzf` functions
+nmap ; :Buffers<CR>
+nmap <Leader>t :Files<CR>
+nmap <Leader>r :Tags<CR>
 
 " use `ag` in the `ack` plugin if it's available
 if executable('ag')
@@ -78,9 +88,4 @@ if executable('ag')
     cnoreabbrev aG Ack
     cnoreabbrev Ag Ack
     cnoreabbrev AG Ack
-endif
-
-" tell `fzf.vim` where the `fzf` executable lives
-if filereadable('/usr/local/bin/fzf')
-    set rtp+=/usr/local/opt/fzf
 endif
