@@ -71,6 +71,7 @@ endif
 nmap ; :Buffers<CR>
 nmap <Leader>t :Files<CR>
 nmap <Leader>r :Tags<CR>
+nmap <Leader>a :Ag<CR>
 
 " use `ag` in the `ack` plugin if it's available
 if executable('ag')
