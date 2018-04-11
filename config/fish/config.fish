@@ -75,3 +75,10 @@ abbr -a kd "killall Dock"
 abbr -a mypy2 "time ./ci/mypy_all.sh -i --quick"
 abbr -a mypy3 "time ./ci/mypy3_all.sh -i --quick"
 abbr -a adp "arc diff --preview"
+
+# setup `fzf` and `ag`
+if type -q fzf; and type -q ag
+    set -x FZF_DEFAULT_COMMAND 'ag --nocolor -g ""'
+    set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+    set -x FZF_ALT_C_COMMAND "$FZF_DEFAULT_COMMAND"
+end
