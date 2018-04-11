@@ -55,12 +55,11 @@ nnoremap <C-L> :nohl<CR><C-L>
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
     Plug 'dag/vim-fish'
-    Plug 'rhysd/vim-clang-format'
-    Plug 'ctrlpvim/ctrlp.vim'
-    Plug 'junegunn/fzf.vim'
     Plug 'mileszs/ack.vim'
+    Plug 'junegunn/fzf.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
+    Plug 'rhysd/vim-clang-format'
 call plug#end()
 
 " use `ag` in the `ack` plugin if it's available
@@ -79,4 +78,9 @@ if executable('ag')
     cnoreabbrev aG Ack
     cnoreabbrev Ag Ack
     cnoreabbrev AG Ack
+endif
+
+" tell `fzf.vim` where the `fzf` executable lives
+if filereadable('/usr/local/bin/fzf')
+    set rtp+=/usr/local/opt/fzf
 endif
