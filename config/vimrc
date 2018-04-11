@@ -9,6 +9,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'dag/vim-fish'
     Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf.vim'
+    Plug 'itchyny/lightline.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
     Plug 'rhysd/vim-clang-format'
