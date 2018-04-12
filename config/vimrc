@@ -10,6 +10,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf.vim'
     Plug 'itchyny/lightline.vim'
+    Plug 'tpope/vim-fugitive'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
     Plug 'rhysd/vim-clang-format'
