@@ -79,5 +79,5 @@ nmap <Leader>a :Ag<CR>
 if executable('ag')
     " use `ag` over grep
     set grepprg=ag\ --nogroup\ --nocolor
-    let g:ackprg = 'ag --vimgrep --smart-case'
+    let g:ackprg='ag --vimgrep --smart-case'
 endif
