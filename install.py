@@ -19,6 +19,7 @@ PACKAGES = [
     "fish",
     "tmux",
     "fzf",
+    "mosh",
     "irssi",
     "jq",
     "radare2",
