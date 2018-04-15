@@ -8,6 +8,7 @@ filetype plugin indent on
 call plug#begin('~/.vim-plug-plugins')
     Plug 'dag/vim-fish'
     Plug 'mileszs/ack.vim'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
     Plug 'itchyny/lightline.vim'
     Plug 'tpope/vim-fugitive'
@@ -63,11 +64,6 @@ set autoread
 
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
-
-" tell `fzf.vim` where the `fzf` executable lives
-if filereadable('/usr/local/bin/fzf')
-    set rtp+=/usr/local/opt/fzf
-endif
 
 " remap some `fzf` functions
 nmap ; :Buffers<CR>
