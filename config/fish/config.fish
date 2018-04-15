@@ -36,10 +36,10 @@ set -gx fish_greeting "
 
 # make sure that these are before anything in the path (they overwrite others)
 if test -e "$HOME/.pyenv/bin"
-    set -x fish_user_paths $HOME/.pyenv/bin $fish_user_paths
+    set -x fish_user_paths "$HOME/.pyenv/bin" $fish_user_paths
     set -x PYENV_SHELL fish
     if test -e "$HOME/.pyenv/shims"
-        set -x fish_user_paths $HOME/.pyenv/shims $fish_user_paths
+        set -x fish_user_paths "$HOME/.pyenv/shims" $fish_user_paths
     end
 end
 # add the dropbox overrides before the rest (if this is a dropbox machine)
@@ -47,17 +47,20 @@ if test -e "/opt/dropbox-override/bin"
     set -x fish_user_paths $fish_user_paths "/opt/dropbox-override/bin"
 end
 # these can come afterwards, it's cool
+if test -e "$HOME/.fzf/bin"
+    set -x fish_user_paths $fish_user_paths "$HOME/.fzf/bin"
+end
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
-  set -x fish_user_paths $fish_user_paths $HOME/scripts/macos/bin
+    set -x fish_user_paths $fish_user_paths "$HOME/scripts/macos/bin"
 end
 if test -e "$HOME/scripts/bin"
-    set -x fish_user_paths $fish_user_paths $HOME/scripts/bin
+    set -x fish_user_paths $fish_user_paths "$HOME/scripts/bin"
 end
 if test -e "$HOME/.cargo/bin"
-   set -x fish_user_paths $fish_user_paths $HOME/.cargo/bin
+    set -x fish_user_paths $fish_user_paths "$HOME/.cargo/bin"
 end
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path); and test -e $XCODE
-   set -x fish_user_paths $fish_user_paths $XCODE/usr/bin
+    set -x fish_user_paths $fish_user_paths "$XCODE/usr/bin"
 end
 
 # abbreviations
