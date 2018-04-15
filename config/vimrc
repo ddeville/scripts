@@ -8,7 +8,7 @@ filetype plugin indent on
 call plug#begin('~/.vim-plug-plugins')
     Plug 'dag/vim-fish'
     Plug 'mileszs/ack.vim'
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
     Plug 'itchyny/lightline.vim'
     Plug 'tpope/vim-fugitive'
