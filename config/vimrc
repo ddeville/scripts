@@ -22,6 +22,9 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'rhysd/vim-clang-format'
 call plug#end()
 
+" shorten the delay to transition to normal mode after pressing escape
+set timeoutlen=1000 ttimeoutlen=0
+
 " set solarized dark as the color scheme
 set background=dark
 colorscheme solarized
