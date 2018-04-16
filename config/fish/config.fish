@@ -99,6 +99,6 @@ set -x FZF_ALT_C_COMMAND "find .\
 
 # setup `fzf` and `ag`
 if type -q fzf; and type -q ag
-    set -x FZF_DEFAULT_COMMAND 'ag -g ""'
+    set -x FZF_DEFAULT_COMMAND 'git ls-files | ag -g ""'
     set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
 end
