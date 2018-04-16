@@ -28,11 +28,7 @@ function fzf_key_bindings
       # Remove last token from commandline.
       commandline -t ""
     end
-    for i in $result
-      commandline -it -- (string escape $i)
-      commandline -it -- ' '
-    end
-    commandline -f repaint
+    vim (string escape $result)
   end
 
   function fzf-history-widget -d "Show command history"
