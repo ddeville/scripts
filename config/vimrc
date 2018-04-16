@@ -67,6 +67,8 @@ let mapleader="'"
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
 
+" ==> CONFIG `junegunn/fzf.vim`
+
 " remap some `fzf` functions
 nmap ; :Buffers<CR>
 nmap <Leader>o :Files<CR>
@@ -74,9 +76,27 @@ nmap <Leader>f :Ag<CR>
 nmap <Leader>t :Tags<CR>
 nmap <Leader>s :GFiles?<CR>
 
+" ==> CONFIG `mileszs/ack.vim`
+
 " use `ag` in the `ack` plugin if it's available
 if executable('ag')
     " use `ag` over grep
     set grepprg=ag\ --nogroup\ --nocolor
     let g:ackprg='ag --nogroup --nocolor --column'
 endif
+
+" ==> CONFIG `itchyny/lightline.vim`
+
+" don't show `-- INSERT --` since we have a fancy status line
+set noshowmode
+
+" update color scheme
+let g:lightline = {
+    \ 'colorscheme': 'wombat',
+    \ 'active': {
+    \   'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
+    \ },
+    \ 'component_function': {
+    \   'gitbranch': 'fugitive#head'
+    \ },
+    \ }
