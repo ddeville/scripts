@@ -28,7 +28,7 @@ function fzf_key_bindings
       # Remove last token from commandline.
       commandline -t ""
     end
-    vim (string escape $result)
+    vim $result
   end
 
   function fzf-history-widget -d "Show command history"
