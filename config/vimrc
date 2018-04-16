@@ -6,14 +6,14 @@ filetype plugin indent on
 
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
+    Plug 'itchyny/lightline.vim'
     Plug 'dag/vim-fish'
     Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
-    Plug 'itchyny/lightline.vim'
     Plug 'tpope/vim-fugitive'
-    Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
+    Plug 'vim-scripts/a.vim'
     Plug 'rhysd/vim-clang-format'
 call plug#end()
 
@@ -39,8 +39,7 @@ set backspace=indent,eol,start
 set hlsearch
 set incsearch
 
-" always show at least one line above/below the cursor (and 5 on each side if
-" not wrapping
+" always show at least one line above/below the cursor (and 5 on each side if not wrapping)
 set scrolloff=1
 set sidescrolloff=5
 
@@ -62,14 +61,17 @@ set laststatus=2
 " autoload file changes
 set autoread
 
+" remap the leader from `\` to `,`
+let mapleader="'"
+
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
 
 " remap some `fzf` functions
 nmap ; :Buffers<CR>
-nmap <Leader>t :Files<CR>
-nmap <Leader>r :Tags<CR>
-nmap <Leader>a :Ag<CR>
+nmap <Leader>o :Files<CR>
+nmap <Leader>f :Ag<CR>
+nmap <Leader>t :Tags<CR>
 
 " use `ag` in the `ack` plugin if it's available
 if executable('ag')
