@@ -91,7 +91,11 @@ abbr -a adp "arc diff --preview"
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
-set -x FZF_ALT_C_COMMAND "find . -type d -name '.git' -prune -o -type d -print | cut -d/ -f2-"
+set -x FZF_ALT_C_COMMAND "find .\
+                          -type d -name '.git' -prune -o\
+                          -type d -name '__pycache__' -prune -o\
+                          -type d -print\
+                          | cut -d/ -f2-"
 
 # setup `fzf` and `ag`
 if type -q fzf; and type -q ag
