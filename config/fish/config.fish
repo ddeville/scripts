@@ -34,33 +34,42 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
+# set up a list to collect the new path entries
+set -l PATH_ENTRIES
+
 # make sure that these are before anything in the path (they overwrite others)
 if test -e "$HOME/.pyenv/bin"
-    set -x fish_user_paths "$HOME/.pyenv/bin" $fish_user_paths
-    set -x PYENV_SHELL fish
     if test -e "$HOME/.pyenv/shims"
-        set -x fish_user_paths "$HOME/.pyenv/shims" $fish_user_paths
+        set PATH_ENTRIES $PATH_ENTRIES "$HOME/.pyenv/shims"
     end
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.pyenv/bin"
+    set -x PYENV_SHELL fish
 end
 # add the dropbox overrides before the rest (if this is a dropbox machine)
 if test -e "/opt/dropbox-override/bin"
-    set -x fish_user_paths $fish_user_paths "/opt/dropbox-override/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
 # these can come afterwards, it's cool
 if test -e "$HOME/.fzf/bin"
-    set -x fish_user_paths $fish_user_paths "$HOME/.fzf/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
 end
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
-    set -x fish_user_paths $fish_user_paths "$HOME/scripts/macos/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/macos/bin"
 end
 if test -e "$HOME/scripts/bin"
-    set -x fish_user_paths $fish_user_paths "$HOME/scripts/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/bin"
 end
 if test -e "$HOME/.cargo/bin"
-    set -x fish_user_paths $fish_user_paths "$HOME/.cargo/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.cargo/bin"
 end
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path); and test -e $XCODE
-    set -x fish_user_paths $fish_user_paths "$XCODE/usr/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$XCODE/usr/bin"
+end
+
+# make sure that we don't set the path if in tmux otherwise there will be
+# duplicate entries in the path
+if test -z $TMUX
+    set -x PATH $PATH_ENTRIES $PATH
 end
 
 # abbreviations
