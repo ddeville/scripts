@@ -1,5 +1,4 @@
-set -gx EDITOR vim
-set -gx CLICOLOR 1
+set -gx EDITOR vim set -gx CLICOLOR 1
 set -gx TERM xterm-256color
 
 set -gx GREP_OPTIONS "--color=auto"
@@ -91,8 +90,8 @@ abbr -a adp "arc diff --preview"
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
-set -x FZF_DEFAULT_COMMAND 'git ls-files 2>/dev/null; or ag -g ""'
-set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+set -x FZF_DEFAULT_COMMAND 'ag -g ""'
+set -x FZF_CTRL_T_COMMAND "git ls-files"
 set -x FZF_ALT_C_COMMAND "find .\
                           -type d -name '.git' -prune -o\
                           -type d -name '__pycache__' -prune -o\
