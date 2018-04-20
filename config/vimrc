@@ -69,8 +69,9 @@ set laststatus=2
 " autoload file changes
 set autoread
 
-" remap the leader from `\` to `,`
+" remap the leader from `\` to `,` and the local leader to `\`
 let mapleader="'"
+let maplocalleader="\\"
 
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
@@ -78,11 +79,11 @@ nnoremap <C-L> :nohl<CR><C-L>
 " ==> CONFIG `junegunn/fzf.vim`
 
 " remap some `fzf` functions
-nmap ; :Buffers<CR>
-nmap <Leader>o :Files<CR>
-nmap <Leader>f :Ag<CR>
-nmap <Leader>t :Tags<CR>
-nmap <Leader>s :GFiles?<CR>
+nnoremap ; :Buffers<CR>
+nnoremap <Leader>o :Files<CR>
+nnoremap <Leader>f :Ag<CR>
+nnoremap <Leader>t :Tags<CR>
+nnoremap <Leader>s :GFiles?<CR>
 
 " ==> CONFIG `mileszs/ack.vim`
 
