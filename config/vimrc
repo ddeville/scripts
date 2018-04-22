@@ -12,11 +12,12 @@ filetype plugin indent on
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
     Plug 'itchyny/lightline.vim'
-    Plug 'dag/vim-fish'
-    Plug 'mileszs/ack.vim'
+    Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-commentary'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
-    Plug 'tpope/vim-fugitive'
+    Plug 'mileszs/ack.vim'
+    Plug 'dag/vim-fish'
     Plug 'rust-lang/rust.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rhysd/vim-clang-format'
@@ -69,12 +70,21 @@ set laststatus=2
 " autoload file changes
 set autoread
 
+" MAPPINGS
+
 " remap the leader from `\` to `,` and the local leader to `\`
 let mapleader="'"
 let maplocalleader="\\"
 
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
+
+" use `H` and `L` to move to start and end of line
+nnoremap <S-l> $
+nnoremap <S-h> 0
+
+" simpler normal mode mapping
+inoremap jk <esc>
 
 " ==> CONFIG `junegunn/fzf.vim`
 
