@@ -20,6 +20,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-unimpaired'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
+    Plug 'tpope/vim-dispatch'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
     Plug 'mileszs/ack.vim'
