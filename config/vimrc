@@ -62,8 +62,8 @@ set sidescrolloff=5
 " display the cursor position in the status line
 set ruler
 
-" display the line number on the left
-set number
+" display the (relative) line number on the left
+set number relativenumber
 
 " display a column at 120 char
 set colorcolumn=120
