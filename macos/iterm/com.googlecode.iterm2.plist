@@ -5,7 +5,7 @@
 	<key>AdjustWindowForFontSizeChange</key>
 	<true/>
 	<key>AllowClipboardAccess</key>
-	<false/>
+	<true/>
 	<key>AlternateMouseScroll</key>
 	<true/>
 	<key>AnimateDimming</key>
@@ -515,17 +515,17 @@
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame NSFontPanel</key>
-	<string>1741 175 445 103 0 0 2560 1418 </string>
+	<string>4301 67 445 77 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
 	<string>3530 769 620 392 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>3933 590 796 473 2560 0 2560 1418 </string>
+	<string>2904 691 796 473 2560 0 2560 1418 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>1489 510 592 584 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>2560 10 1221 1408 2560 0 2560 1418 </string>
+	<string>2560 0 1221 1418 2560 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>862 333 1291 1058 0 0 2560 1418 </string>
+	<string>402 294 710 610 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>97 478 710 610 0 0 2560 1418 </string>
 	<key>New Bookmarks</key>
@@ -1132,7 +1132,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<false/>
 			<key>Normal Font</key>
-			<string>AnonymousPro 12</string>
+			<string>AnonymousPro 13</string>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
@@ -2193,7 +2193,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-04-09T15:57:44Z</date>
+	<date>2018-04-27T15:58:52Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
