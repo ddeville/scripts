@@ -6,7 +6,4 @@ tmp/
 *.pyc
 *.pyo
 
-# Alfred stores local state at this path
-macos/alfred/Alfred.alfredpreferences/preferences/local/
-
 config/vim/.netrwhist
