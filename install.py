@@ -26,6 +26,7 @@ PACKAGES = [
 
 PACKAGES_MACOS = [
     "the_silver_searcher",
+    "tree",
 ]
 
 PACKAGES_LINUX = [
