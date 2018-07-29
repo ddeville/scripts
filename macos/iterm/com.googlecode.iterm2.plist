@@ -521,11 +521,11 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>2811 320 606 469 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>244 310 918 394 0 0 1280 777 </string>
+	<string>350 204 796 486 0 0 1280 777 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>80 194 592 584 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 127 710 650 0 0 1280 777 </string>
+	<string>0 0 1280 777 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>398 137 710 610 0 0 1280 778 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -1150,7 +1150,7 @@
 			<key>Screen</key>
 			<integer>-1</integer>
 			<key>Scrollback Lines</key>
-			<integer>1000</integer>
+			<integer>0</integer>
 			<key>Scrollback With Status Bar</key>
 			<false/>
 			<key>Scrollback in Alternate Screen</key>
@@ -2195,7 +2195,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-07-27T03:55:30Z</date>
+	<date>2018-07-29T05:13:16Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -2268,7 +2268,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.2.0beta8</string>
+	<string>3.2.0beta9</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>7</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
