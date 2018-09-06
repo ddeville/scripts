@@ -28,7 +28,6 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'rust-lang/rust.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rhysd/vim-clang-format'
-    Plug 'nvie/vim-flake8'
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
@@ -147,9 +146,6 @@ let g:lightline = {
     \ }
 
 " LANGUAGES
-
-" flake8
-autocmd BufWritePost *.py call Flake8()
 
 " rust
 let g:rustfmt_autosave = 1
