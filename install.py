@@ -83,7 +83,7 @@ def setup_cmd_install_brew_formulas_if_needed():
                     pass
             print("====> %s linking" % package)
             _run_command_no_output(["brew", "link", package])
-    
+
     return Manifest(cmd=cmd, priority=8, platform=MACOS)
 
 def setup_cmd_install_linux_packages_if_needed():
@@ -109,14 +109,14 @@ def setup_cmd_update_shell_macos_if_needed():
                 _run_script_as_root(script)
             else:
                 print("====> fish already in /etc/shells")
-    
+
         # next let's check whether we need to change the shell
         if os.environ.get("SHELL") != "/usr/local/bin/fish":
             print("====> changing shell to fish")
             subprocess.check_call(["chsh", "-s", "/usr/local/bin/fish"])
         else:
             print("====> fish is already default shell")
-    
+
     return Manifest(cmd=cmd, priority=16, platform=MACOS)
 
 def setup_cmd_update_shell_linux_if_needed():
@@ -147,6 +147,7 @@ def setup_cmd_update_dot_files():
             ("profile", ".profile"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
+            ("tmux", ".tmux"),
             ("tmux.conf", ".tmux.conf"),
             (os.path.join("fish", "config.fish"), os.path.join(".config", "fish", "config.fish")),
             (os.path.join("fish", "functions"), os.path.join(".config", "fish", "functions")),
@@ -158,7 +159,7 @@ def setup_cmd_update_dot_files():
         print("====> linking dot files")
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
-        
+
     return Manifest(cmd=cmd, priority=32, platform=ALL_PLATFORMS)
 
 def setup_cmd_update_vim_plugins():
@@ -350,12 +351,12 @@ def _run_all_commands():
     # type: () -> None
     plat = _get_current_platform()
 
-    manifests = [func() for name, func in 
+    manifests = [func() for name, func in
             inspect.getmembers(sys.modules[__name__], inspect.isfunction)
             if name.startswith("setup_cmd")]
     manifests = sorted([manifest for manifest in manifests if plat in manifest.platform],
             key=lambda manifest: manifest.priority)
-    
+
     for manifest in manifests:
         func = manifest.cmd
         func()
