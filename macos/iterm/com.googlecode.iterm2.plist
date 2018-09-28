@@ -517,15 +517,15 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>4301 67 445 77 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>970 785 620 392 0 0 2560 1418 </string>
+	<string>3530 769 620 392 2560 0 2560 1418 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 137 606 469 0 0 2560 1418 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>2919 680 796 486 2560 0 2560 1418 </string>
+	<string>4010 661 770 429 2560 0 2560 1418 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>1489 510 592 584 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>583 194 1214 1040 0 0 2560 1418 </string>
+	<string>2560 2 1368 1415 2560 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>1487 125 997 1025 0 0 2560 1418 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -2197,7 +2197,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-09-04T21:31:47Z</date>
+	<date>2018-09-21T18:08:08Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -2225,6 +2225,8 @@
 	<key>SwitchWindowModifier</key>
 	<integer>6</integer>
 	<key>TabStyle</key>
+	<integer>1</integer>
+	<key>TabStyleWithAutomaticOption</key>
 	<integer>1</integer>
 	<key>TabViewType</key>
 	<integer>0</integer>
@@ -2268,7 +2270,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.2.1beta3</string>
+	<string>3.2.1beta5</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>7</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
