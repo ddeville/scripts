@@ -63,7 +63,7 @@ set sidescrolloff=5
 set ruler
 
 " display the (relative) line number on the left
-set number relativenumber
+set number
 
 " display a column at 120 char
 set colorcolumn=120
@@ -92,9 +92,6 @@ imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
 
-" esc is sad
-imap jj <Esc>
-
 " MAPPINGS
 
 " remap the leader from `\` to `,` and the local leader to `\`
@@ -110,6 +107,7 @@ nnoremap <S-h> 0
 
 " simpler normal mode mapping
 inoremap jk <esc>
+inoremap jj <esc>
 
 " ==> CONFIG `junegunn/fzf.vim`
 
