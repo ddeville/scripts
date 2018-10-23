@@ -77,10 +77,16 @@ set laststatus=2
 " autoload file changes
 set autoread
 
+" open new splits on right and bottom
+set splitbelow
+set splitright
+
 " trailing whitespace is bad
 highlight WhiteSpaceEOL ctermbg=red guibg=red
 autocmd InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
 autocmd InsertLeave * match WhiteSpaceEOL /\s\+$/
+
+" MAPPINGS
 
 " disable arrow keys
 map <up> <nop>
@@ -91,8 +97,6 @@ imap <up> <nop>
 imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
-
-" MAPPINGS
 
 " remap the leader from `\` to `,` and the local leader to `\`
 let mapleader="'"
