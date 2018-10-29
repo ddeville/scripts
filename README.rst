@@ -9,10 +9,9 @@ When setting up a new machine, do the following steps:
 * If on MacOS, install [iTerm2](https://www.iterm2.com/downloads.html)
 
 * Clone this repo in the Home directory:
-```
-> cd ~
-> git clone git@github.com:ddeville/scripts.git
-```
+::
+    > cd ~
+    > git clone git@github.com:ddeville/scripts.git
 
 * Run the install script, this will install various tools and create symbolic links to the config files.
 ```
