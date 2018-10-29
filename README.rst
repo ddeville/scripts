@@ -2,12 +2,10 @@
 Scripts
 -------
 
-A bunch of scripts I use on every machine I set up.
-
-When setting up a new machine, do the following steps:
+A bunch of scripts I use on every machine I set up. When setting up a new machine, do the following steps:
 
 * If on MacOS, install `iTerm2 <https://www.iterm2.com/downloads.html>`_
-* Clone this repo in the Home directory
+* Clone this repo in the home directory
 * Run the install script, this will install various tools and create symbolic links to the config files
 
 ::
