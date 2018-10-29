@@ -1,4 +1,6 @@
-## Scripts
+-------
+Scripts
+-------
 
 A bunch of scripts I use on every machine I set up.
 
@@ -12,11 +14,13 @@ When setting up a new machine, do the following steps:
 > git clone git@github.com:ddeville/scripts.git
 ```
 
-* Run the install script, this will install various tools and create symbolic links to the dotfiles:
+* Run the install script, this will install various tools and create symbolic links to the config files.
 ```
 > python install.py
 ```
 
-#### Notes
+-----
+Notes
+-----
 
 To make sure that `git` keeps the file executable, run the following `git update-index --chmod=+x <file>`.
