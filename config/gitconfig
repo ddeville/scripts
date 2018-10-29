@@ -41,7 +41,6 @@
     co = checkout
     aa = add -A
     ci = commit
-    aci = commit -a
     di = diff
     df = difftool
     mg = merge
