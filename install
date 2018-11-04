@@ -176,6 +176,7 @@ def setup_cmd_update_tmux_plugins():
     # type: () -> Manifest
     def cmd():
         tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
+
         # first install TPM itself if needed
         if not os.path.exists(tpm_path):
             print("====> installing TPM")
