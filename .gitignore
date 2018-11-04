@@ -7,7 +7,3 @@ tmp/
 *.pyo
 
 config/vim/.netrwhist
-
-# ignore tmux plugins since they're automatically installed
-config/tmux/plugins/tmux-resurrect
-config/tmux/resurrect
