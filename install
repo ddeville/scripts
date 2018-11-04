@@ -147,7 +147,6 @@ def setup_cmd_update_dot_files():
             ("profile", ".profile"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
-            ("tmux", ".tmux"),
             ("tmux.conf", ".tmux.conf"),
             (os.path.join("fish", "config.fish"), os.path.join(".config", "fish", "config.fish")),
             (os.path.join("fish", "functions"), os.path.join(".config", "fish", "functions")),
@@ -176,9 +175,16 @@ def setup_cmd_update_vim_plugins():
 def setup_cmd_update_tmux_plugins():
     # type: () -> Manifest
     def cmd():
+        tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
+        # first install TPM itself if needed
+        if not os.path.exists(tpm_path):
+            print("====> installing TPM")
+            subprocess.check_call(["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_path])
+
+        # and update the plugins
         print("====> updating tmux plugins")
-        subprocess.check_call([os.path.expanduser("~/.tmux/plugins/tpm/bin/install_plugins")])
-        subprocess.check_call([os.path.expanduser("~/.tmux/plugins/tpm/bin/update_plugins"), "all"])
+        subprocess.check_call([os.path.join(tpm_path, "bin", "install_plugins")])
+        subprocess.check_call([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
     return Manifest(cmd=cmd, priority=34, platform=ALL_PLATFORMS)
 
