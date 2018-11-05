@@ -16,20 +16,23 @@ class Manifest(object):
 
 def run_tasks(config):
     # type: (Config) -> None
+    """Run all tasks that match the given config."""
     tasks = [manifest for _, manifest in get_tasks(config)]
     _run_tasks(tasks)
 
 def get_tasks(config):
-    # type: (Config) -> List[Tuple[str, Manifest]]
-    manifests = []
+    # type: (Config) -> Generator[Tuple[str, Manifest]]
+    """Yield tasks that match the given config."""
     for name, func in inspect.getmembers(sys.modules[config.module_name], inspect.isfunction):
         if name.startswith(TASK_PREFIX):
+            name = name[len(TASK_PREFIX):]
             manifest = func()
             if config.platform in manifest.platform:
-                manifests.append((name[len(TASK_PREFIX):], manifest))
-    return sorted(manifests, key=lambda task: task[1].priority)
+                yield name, manifest
 
 def _run_tasks(tasks):
     # type: (List[Manifest]) -> None
+    """Run the given tasks, making sure to respect dependencies."""
+    tasks = sorted(tasks, key=lambda task: task[1].priority)
     for manifest in tasks:
         manifest.cmd()
