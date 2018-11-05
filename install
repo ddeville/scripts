@@ -9,11 +9,22 @@ import sys
 import tempfile
 import urllib
 
-SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "py"))
 
-MACOS = "macos"
-LINUX = "linux"
-ALL_PLATFORMS = (MACOS, LINUX)
+from task import (
+    Config,
+    Manifest,
+    get_tasks,
+    run_tasks,
+)
+from util import (
+    ALL_PLATFORMS,
+    LINUX,
+    MACOS,
+    get_current_platform,
+)
+
+SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 
 PACKAGES = [
     "fish",
@@ -37,7 +48,7 @@ PACKAGES_LINUX = [
 
 # Commands
 
-def setup_cmd_install_brew_if_needed():
+def task_install_brew_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -49,7 +60,7 @@ def setup_cmd_install_brew_if_needed():
 
     return Manifest(cmd=cmd, priority=0, platform=MACOS)
 
-def setup_cmd_update_apt_get_if_needed():
+def task_update_apt_get_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -58,7 +69,7 @@ def setup_cmd_update_apt_get_if_needed():
 
     return Manifest(cmd=cmd, priority=0, platform=LINUX)
 
-def setup_cmd_install_brew_formulas_if_needed():
+def task_install_brew_formulas_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -86,7 +97,7 @@ def setup_cmd_install_brew_formulas_if_needed():
 
     return Manifest(cmd=cmd, priority=8, platform=MACOS)
 
-def setup_cmd_install_linux_packages_if_needed():
+def task_install_linux_packages_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -96,7 +107,7 @@ def setup_cmd_install_linux_packages_if_needed():
 
     return Manifest(cmd=cmd, priority=8, platform=LINUX)
 
-def setup_cmd_update_shell_macos_if_needed():
+def task_update_shell_macos_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -119,7 +130,7 @@ def setup_cmd_update_shell_macos_if_needed():
 
     return Manifest(cmd=cmd, priority=16, platform=MACOS)
 
-def setup_cmd_update_shell_linux_if_needed():
+def task_update_shell_linux_if_needed():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -131,7 +142,7 @@ def setup_cmd_update_shell_linux_if_needed():
 
     return Manifest(cmd=cmd, priority=16, platform=LINUX)
 
-def setup_cmd_update_dot_files():
+def task_update_dot_files():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -161,7 +172,7 @@ def setup_cmd_update_dot_files():
 
     return Manifest(cmd=cmd, priority=32, platform=ALL_PLATFORMS)
 
-def setup_cmd_update_vim_plugins():
+def task_update_vim_plugins():
     # type: () -> Manifest
     def cmd():
         print("====> updating vim plugins")
@@ -172,7 +183,7 @@ def setup_cmd_update_vim_plugins():
 
     return Manifest(cmd=cmd, priority=33, platform=ALL_PLATFORMS)
 
-def setup_cmd_update_tmux_plugins():
+def task_update_tmux_plugins():
     # type: () -> Manifest
     def cmd():
         tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
@@ -189,7 +200,7 @@ def setup_cmd_update_tmux_plugins():
 
     return Manifest(cmd=cmd, priority=34, platform=ALL_PLATFORMS)
 
-def setup_cmd_install_pyenv():
+def task_install_pyenv():
     # type: () -> Manifest
     def cmd():
         if _is_cmd_installed("pyenv"):
@@ -202,7 +213,7 @@ def setup_cmd_install_pyenv():
 
     return Manifest(cmd=cmd, priority=35, platform=ALL_PLATFORMS)
 
-def setup_cmd_install_rustup():
+def task_install_rustup():
     # type: () -> Manifest
     def cmd():
         if _is_cmd_installed("rustup"):
@@ -216,7 +227,7 @@ def setup_cmd_install_rustup():
 
     return Manifest(cmd=cmd, priority=36, platform=ALL_PLATFORMS)
 
-def setup_cmd_update_library_visibility():
+def task_update_library_visibility():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -228,7 +239,7 @@ def setup_cmd_update_library_visibility():
 
     return Manifest(cmd=cmd, priority=37, platform=MACOS)
 
-def setup_cmd_update_system_preferences():
+def task_update_system_preferences():
     # type: () -> Manifest
     def update_global_domain(key, val):
         # type: (str, str) -> None
@@ -254,7 +265,7 @@ def setup_cmd_update_system_preferences():
 
     return Manifest(cmd=cmd, priority=38, platform=MACOS)
 
-def setup_cmd_update_iterm_sync_folder_prefs():
+def task_update_iterm_sync_folder_prefs():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -264,7 +275,7 @@ def setup_cmd_update_iterm_sync_folder_prefs():
 
     return Manifest(cmd=cmd, priority=39, platform=MACOS)
 
-def setup_cmd_install_fonts():
+def task_install_fonts():
     # type: () -> Manifest
     def cmd():
         print("====> installing fonts")
@@ -278,7 +289,7 @@ def setup_cmd_install_fonts():
 
     return Manifest(cmd=cmd, priority=40, platform=MACOS)
 
-def setup_cmd_install_xcode_themes():
+def task_install_xcode_themes():
     # type: () -> Manifest
     def cmd():
         # type: () -> None
@@ -346,36 +357,6 @@ def _copy_file_if_needed(orig, dest, isdir=False):
         if e.errno != errno.EEXIST:
             raise
 
-def _get_current_platform():
-    # type: () -> str
-    if "darwin" in sys.platform:
-        return MACOS
-    elif "linux" in sys.platform:
-        return LINUX
-    else:
-        raise Exception("Platform not supported %s" % sys.platform)
-
-# main
-
-class Manifest(object):
-    def __init__(self, cmd, priority, platform):
-        self.cmd = cmd
-        self.priority = priority
-        self.platform = platform
-
-def _run_all_commands():
-    # type: () -> None
-    plat = _get_current_platform()
-
-    manifests = [func() for name, func in
-            inspect.getmembers(sys.modules[__name__], inspect.isfunction)
-            if name.startswith("setup_cmd")]
-    manifests = sorted([manifest for manifest in manifests if plat in manifest.platform],
-            key=lambda manifest: manifest.priority)
-
-    for manifest in manifests:
-        func = manifest.cmd
-        func()
-
 if __name__ == "__main__":
-    _run_all_commands()
+    config = Config(__name__, get_current_platform())
+    run_tasks(config)
