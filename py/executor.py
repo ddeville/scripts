@@ -12,21 +12,23 @@ class ExecutorConfig(object):
 
 class TaskManifest(object):
     """Each task should return an instance of this class."""
-    def __init__(self, cmd, platform, dependencies):
-        # type: (Callable[[], None], Tuple[str], List[str]) -> None
+    def __init__(self, cmd, platforms, dependencies):
+        # type: (Callable[[], None], List[str], List[str]) -> None
         self.cmd = cmd
-        self.platform = platform
+        self.platforms = platforms
         self.dependencies = dependencies
 
-def retrieve_task_names_for_config(config):
-    # type: (ExecutorConfig) -> List[str]
+def print_all_tasks_for_config(config):
+    # type: (ExecutorConfig) -> None
     """Returns the name of the tasks that would be run for a given config."""
-    return [task.name for task in _get_all_tasks_for_config(config)]
+    for task in _resolve_deps_and_yield_tasks(_get_all_tasks_for_config(config)):
+        print(task.name)
 
 def run_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Run all tasks that match the given config."""
-    _run_tasks(_get_all_tasks_for_config(config))
+    for task in _resolve_deps_and_yield_tasks(_get_all_tasks_for_config(config)):
+        task.cmd()
 
 # Private
 
@@ -46,10 +48,10 @@ def _get_all_tasks_for_config(config):
             manifest = func()
             assert isinstance(manifest, TaskManifest), ("`%s` should return an instance of `TaskManifest`, not %r" %
                     (name, type(manifest)))
-            if config.platform in manifest.platform:
+            if config.platform in manifest.platforms:
                 yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
 
-def _run_tasks(tasks):
+def _resolve_deps_and_yield_tasks(tasks):
     # type: (Sequence[_Task]) -> None
     """Run the given tasks, making sure to respect dependencies."""
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
@@ -62,15 +64,16 @@ def _run_tasks(tasks):
             for name in task.dependencies:
                 # if we can find it in the list, it hasn't been run yet
                 if name in remaining_tasks:
-                    _inner_run_tasks([remaining_tasks[name]])
+                    for inner_task in _inner_run_tasks([remaining_tasks[name]]):
+                        yield inner_task
 
             # make sure that the task is still in the array (otherwise it has already run)
             if task.name in remaining_tasks:
-                # we can now run the task!
-                task.cmd()
+                yield task
                 del remaining_tasks[task.name]
 
-    _inner_run_tasks(list(remaining_tasks.values()))
+    for task in _inner_run_tasks(list(remaining_tasks.values())):
+        yield task
 
     # if we still have a task in there, something went terribly wrong...
     assert not remaining_tasks
