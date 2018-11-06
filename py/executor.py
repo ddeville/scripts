@@ -18,7 +18,19 @@ class TaskManifest(object):
         self.platform = platform
         self.dependencies = dependencies
 
-class Task(object):
+def retrieve_task_names_for_config(config):
+    # type: (ExecutorConfig) -> List[str]
+    """Returns the name of the tasks that would be run for a given config."""
+    return [task.name for task in _get_all_tasks_for_config(config)]
+
+def run_tasks_for_config(config):
+    # type: (ExecutorConfig) -> None
+    """Run all tasks that match the given config."""
+    _run_tasks(_get_all_tasks_for_config(config))
+
+# Private
+
+class _Task(object):
     """A concrete instance of a task, ready to be run."""
     def __init__(self, name, cmd, dependencies):
         # type: (str, Callable[[], None], List[str]) -> None
@@ -26,13 +38,8 @@ class Task(object):
         self.cmd = cmd
         self.dependencies = dependencies
 
-def run_tasks_from_config(config):
-    # type: (Config) -> None
-    """Run all tasks that match the given config."""
-    run_tasks(get_tasks_from_config(config))
-
-def get_tasks_from_config(config):
-    # type: (Config) -> Generator[Task]
+def _get_all_tasks_for_config(config):
+    # type: (ExecutorConfig) -> Generator[_Task]
     """Yield tasks that match the given config."""
     for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
         if name.startswith(TASK_PREFIX):
@@ -40,10 +47,10 @@ def get_tasks_from_config(config):
             assert isinstance(manifest, TaskManifest), ("`%s` should return an instance of `TaskManifest`, not %r" %
                     (name, type(manifest)))
             if config.platform in manifest.platform:
-                yield Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
+                yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
 
-def run_tasks(tasks):
-    # type: (Sequence[Task]) -> None
+def _run_tasks(tasks):
+    # type: (Sequence[_Task]) -> None
     """Run the given tasks, making sure to respect dependencies."""
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
     remaining_tasks = {task.name: task for task in tasks}
