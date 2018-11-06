@@ -361,4 +361,4 @@ def _copy_file_if_needed(orig, dest, isdir=False):
 if __name__ == "__main__":
     config = ExecutorConfig(__name__, get_current_platform())
     print(retrieve_task_names_for_config(config))
-    run_all_tasks_from_config(config)
+    run_all_tasks_for_config(config)
