@@ -5,17 +5,17 @@ TASK_PREFIX = "task_"
 
 class ExecutorConfig(object):
     """The configuration to use when running tasks."""
-    def __init__(self, module_name, platform):
-        # type: (str, str): -> None
+    def __init__(self, module_name, tags):
+        # type: (str, List[str]): -> None
         self.module_name = module_name
-        self.platform = platform
+        self.tags = tags
 
 class TaskManifest(object):
     """Each task should return an instance of this class."""
-    def __init__(self, cmd, platforms, dependencies):
+    def __init__(self, cmd, tags, dependencies):
         # type: (Callable[[], None], List[str], List[str]) -> None
         self.cmd = cmd
-        self.platforms = platforms
+        self.tags = tags
         self.dependencies = dependencies
 
 def print_all_tasks_for_config(config):
@@ -51,7 +51,7 @@ def _get_tasks(config):
                 manifest = func()
                 assert isinstance(manifest, TaskManifest), ("`%s` should return an instance of `TaskManifest`, not %r"
                         % (name, type(manifest)))
-                if config.platform in manifest.platforms:
+                if set(config.tags).issubset(manifest.tags):
                     yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
 
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
