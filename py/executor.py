@@ -43,7 +43,6 @@ class _Task(object):
 def _get_tasks(config):
     # type: (ExecutorConfig) -> Generator[_Task]
     """Retrieve all tasks that match the given config and order them based on dependencies."""
-
     def _extract_tasks():
         # type: () -> Generator[_Task]
         for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
