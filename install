@@ -24,6 +24,7 @@ SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 MACOS = "macos"
 LINUX = "linux"
 ALL_PLATFORMS = [MACOS, LINUX]
+BASIC = "basic"
 
 PACKAGES = [
     "fish",
@@ -57,7 +58,7 @@ def task_install_brew_if_needed():
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
             subprocess.check_call(["/usr/bin/ruby", script_path])
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=[])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=[])
 
 def task_update_apt_get_if_needed():
     # type: () -> TaskManifest
@@ -66,7 +67,7 @@ def task_update_apt_get_if_needed():
         print("====> updating package manager")
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
 
-    return TaskManifest(cmd=cmd, tags=[LINUX], dependencies=[])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=[])
 
 def task_install_brew_formulas_if_needed():
     # type: () -> TaskManifest
@@ -94,7 +95,7 @@ def task_install_brew_formulas_if_needed():
             print("====> %s linking" % package)
             _run_command_no_output(["brew", "link", package])
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["install_brew_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_brew_if_needed"])
 
 def task_install_linux_packages_if_needed():
     # type: () -> TaskManifest
@@ -104,7 +105,7 @@ def task_install_linux_packages_if_needed():
             print("====> installing %s" % package)
             subprocess.check_call(["sudo", "apt-get", "upgrade", package])
 
-    return TaskManifest(cmd=cmd, tags=[LINUX], dependencies=["update_apt_get_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["update_apt_get_if_needed"])
 
 def task_update_shell_macos_if_needed():
     # type: () -> TaskManifest
@@ -127,7 +128,7 @@ def task_update_shell_macos_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["install_brew_formulas_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_brew_formulas_if_needed"])
 
 def task_update_shell_linux_if_needed():
     # type: () -> TaskManifest
@@ -139,7 +140,7 @@ def task_update_shell_linux_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[LINUX], dependencies=["install_linux_packages_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_linux_packages_if_needed"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
@@ -169,7 +170,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS,
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
             dependencies=["update_shell_macos_if_needed", "update_shell_linux_if_needed"])
 
 def task_update_vim_plugins():
@@ -181,7 +182,7 @@ def task_update_vim_plugins():
         # install or update all plugins
         subprocess.check_call(["vim", "+PlugUpdate", "+qall"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
 
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
@@ -198,7 +199,7 @@ def task_update_tmux_plugins():
         subprocess.check_call([os.path.join(tpm_path, "bin", "install_plugins")])
         subprocess.check_call([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
@@ -370,13 +371,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
     parser.add_argument("-l", "--list", action="store_true", help="list all tasks that will be run")
     parser.add_argument("-r", "--run", action="store_true", help="run all tasks")
+    parser.add_argument("-b", "--basic", action="store_true", help="only include basic tasks")
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     args = parser.parse_args()
 
     platform = args.platform if args.platform else _get_current_platform()
     assert platform in ALL_PLATFORMS, "Unknown platform: %s" % platform
 
-    config = ExecutorConfig(__name__, [platform])
+    tags = [platform]
+    if args.basic:
+        tags.append(BASIC)
+
+    config = ExecutorConfig(__name__, tags)
 
     if args.list:
         print_all_tasks_for_config(config)
