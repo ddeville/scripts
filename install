@@ -30,7 +30,6 @@ PACKAGES = [
     "fish",
     "tmux",
     "mosh",
-    "irssi",
     "jq",
     "radare2",
 ]
