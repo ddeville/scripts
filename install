@@ -6,15 +6,13 @@ import subprocess
 import sys
 import urllib
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "py"))
-
-from executor import (
+from py.executor import (
     ExecutorConfig,
     TaskManifest,
     print_all_tasks_for_config,
     run_all_tasks_for_config,
 )
-from util import (
+from py.util import (
     is_cmd_installed,
     run_script_as_root,
     run_command_no_output,
@@ -30,7 +28,6 @@ SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 MACOS = "macos"
 LINUX = "linux"
 ALL_PLATFORMS = [MACOS, LINUX]
-
 BASIC = "basic"
 
 # Packages
