@@ -360,12 +360,12 @@ def _copy_file_if_needed(orig, dest, isdir=False):
             raise
 
 if __name__ == "__main__":
+    config = ExecutorConfig(__name__, get_current_platform())
+
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
     parser.add_argument("-l", "--list", action="store_true", help="list all tasks that will be run")
     parser.add_argument("-r", "--run", action="store_true", help="run all tasks")
     args = parser.parse_args()
-
-    config = ExecutorConfig(__name__, get_current_platform())
 
     if args.list:
         print_all_tasks_for_config(config)
