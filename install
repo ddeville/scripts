@@ -50,7 +50,7 @@ PACKAGES_LINUX = [
     "vim",
 ]
 
-# Commands
+# Tasks
 
 def task_install_brew_if_needed():
     # type: () -> TaskManifest
@@ -370,6 +370,8 @@ def _get_current_platform():
         return LINUX
     else:
         raise Exception("Platform not supported %s" % sys.platform)
+
+# Main
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
