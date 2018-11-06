@@ -375,8 +375,7 @@ def _get_current_platform():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
-    parser.add_argument("-l", "--list", action="store_true", help="list all tasks that will be run")
-    parser.add_argument("-r", "--run", action="store_true", help="run all tasks")
+    parser.add_argument("action", choices=["list", "run"], help="whether to list the tasks or actually run them")
     parser.add_argument("-b", "--basic", action="store_true", help="only include basic tasks")
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     args = parser.parse_args()
@@ -390,9 +389,7 @@ if __name__ == "__main__":
 
     config = ExecutorConfig(__name__, tags)
 
-    if args.list:
+    if args.action == "list":
         print_all_tasks_for_config(config)
-    elif args.run:
+    elif args.action == "run":
         run_all_tasks_for_config(config)
-    else:
-        parser.print_help()
