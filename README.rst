@@ -12,7 +12,7 @@ A bunch of scripts I use on every machine I set up. When setting up a new machin
 
     > cd ~
     > git clone git@github.com:ddeville/scripts.git
-    > ./install
+    > ./install --run
 
 -----
 Notes
