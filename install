@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "py
 from executor import (
     ExecutorConfig,
     TaskManifest,
-    get_tasks_from_config,
-    run_tasks_from_config,
+    retrieve_task_names_for_config,
+    run_tasks_for_config,
 )
 from platform import (
     ALL_PLATFORMS,
@@ -360,4 +360,5 @@ def _copy_file_if_needed(orig, dest, isdir=False):
 
 if __name__ == "__main__":
     config = ExecutorConfig(__name__, get_current_platform())
+    print(retrieve_task_names_for_config(config))
     run_tasks_from_config(config)
