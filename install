@@ -334,14 +334,17 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     args = parser.parse_args()
 
+    module_name = __name__
+    tags = []
+
     platform = args.platform if args.platform else _get_current_platform()
     assert platform in ALL_PLATFORMS, "Unknown platform: %s" % platform
+    tags.append(platform)
 
-    tags = [platform]
     if args.basic:
         tags.append(BASIC)
 
-    config = ExecutorConfig(__name__, tags)
+    config = ExecutorConfig(module_name, tags)
 
     if args.action == "list":
         print_all_tasks_for_config(config)
