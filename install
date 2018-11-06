@@ -367,12 +367,16 @@ def _get_current_platform():
         raise Exception("Platform not supported %s" % sys.platform)
 
 if __name__ == "__main__":
-    config = ExecutorConfig(__name__, [_get_current_platform()])
-
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
     parser.add_argument("-l", "--list", action="store_true", help="list all tasks that will be run")
     parser.add_argument("-r", "--run", action="store_true", help="run all tasks")
+    parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     args = parser.parse_args()
+
+    platform = args.platform if args.platform else _get_current_platform()
+    assert platform in ALL_PLATFORMS, "Unknown platform: %s" % platform
+
+    config = ExecutorConfig(__name__, [platform])
 
     if args.list:
         print_all_tasks_for_config(config)
