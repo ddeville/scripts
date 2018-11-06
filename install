@@ -11,13 +11,13 @@ import urllib
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "py"))
 
-from task import (
-    Config,
-    Manifest,
-    get_tasks,
-    run_tasks,
+from executor import (
+    ExecutorConfig,
+    TaskManifest,
+    get_tasks_from_config,
+    run_tasks_from_config,
 )
-from util import (
+from platform import (
     ALL_PLATFORMS,
     LINUX,
     MACOS,
@@ -49,7 +49,7 @@ PACKAGES_LINUX = [
 # Commands
 
 def task_install_brew_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         if _is_cmd_installed("brew"):
@@ -58,19 +58,19 @@ def task_install_brew_if_needed():
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
             subprocess.check_call(["/usr/bin/ruby", script_path])
 
-    return Manifest(cmd=cmd, priority=0, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=[])
 
 def task_update_apt_get_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         print("====> updating package manager")
         subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
 
-    return Manifest(cmd=cmd, priority=0, platform=LINUX)
+    return TaskManifest(cmd=cmd, platform=LINUX, dependencies=[])
 
 def task_install_brew_formulas_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         for package in PACKAGES + PACKAGES_MACOS:
@@ -95,20 +95,20 @@ def task_install_brew_formulas_if_needed():
             print("====> %s linking" % package)
             _run_command_no_output(["brew", "link", package])
 
-    return Manifest(cmd=cmd, priority=8, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["install_brew_if_needed"])
 
 def task_install_linux_packages_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         for package in PACKAGES + PACKAGES_LINUX:
             print("====> installing %s" % package)
             subprocess.check_call(["sudo", "apt-get", "upgrade", package])
 
-    return Manifest(cmd=cmd, priority=8, platform=LINUX)
+    return TaskManifest(cmd=cmd, platform=LINUX, dependencies=["update_apt_get_if_needed"])
 
 def task_update_shell_macos_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         # let's check whether fish was added to /etc/shells
@@ -128,10 +128,10 @@ def task_update_shell_macos_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return Manifest(cmd=cmd, priority=16, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["install_brew_formulas_if_needed"])
 
 def task_update_shell_linux_if_needed():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         if os.environ.get("SHELL") != "/usr/bin/fish":
@@ -140,10 +140,10 @@ def task_update_shell_linux_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return Manifest(cmd=cmd, priority=16, platform=LINUX)
+    return TaskManifest(cmd=cmd, platform=LINUX, dependencies=["install_linux_packages_if_needed"])
 
 def task_update_dot_files():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
@@ -170,10 +170,11 @@ def task_update_dot_files():
         for f1, f2 in links:
             _force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return Manifest(cmd=cmd, priority=32, platform=ALL_PLATFORMS)
+    return TaskManifest(cmd=cmd, platform=ALL_PLATFORMS,
+            dependencies=["update_shell_macos_if_needed", "update_shell_linux_if_needed"])
 
 def task_update_vim_plugins():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         print("====> updating vim plugins")
         # update vim-plug itself
@@ -181,10 +182,10 @@ def task_update_vim_plugins():
         # install or update all plugins
         subprocess.check_call(["vim", "+PlugUpdate", "+qall"])
 
-    return Manifest(cmd=cmd, priority=33, platform=ALL_PLATFORMS)
+    return TaskManifest(cmd=cmd, platform=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_update_tmux_plugins():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
 
@@ -198,10 +199,10 @@ def task_update_tmux_plugins():
         subprocess.check_call([os.path.join(tpm_path, "bin", "install_plugins")])
         subprocess.check_call([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
-    return Manifest(cmd=cmd, priority=34, platform=ALL_PLATFORMS)
+    return TaskManifest(cmd=cmd, platform=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_install_pyenv():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         if _is_cmd_installed("pyenv"):
             print("====> updating pyenv")
@@ -211,10 +212,10 @@ def task_install_pyenv():
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer")
             subprocess.check_call(["bash", script_path])
 
-    return Manifest(cmd=cmd, priority=35, platform=ALL_PLATFORMS)
+    return TaskManifest(cmd=cmd, platform=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_install_rustup():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         if _is_cmd_installed("rustup"):
             print("====> updating rustup")
@@ -225,10 +226,10 @@ def task_install_rustup():
             subprocess.check_call(["sh", script_path])
         pass
 
-    return Manifest(cmd=cmd, priority=36, platform=ALL_PLATFORMS)
+    return TaskManifest(cmd=cmd, platform=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_update_library_visibility():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         print("====> updating ~/Library visibility")
@@ -237,10 +238,10 @@ def task_update_library_visibility():
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
 
-    return Manifest(cmd=cmd, priority=37, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["update_dot_files"])
 
 def task_update_system_preferences():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def update_global_domain(key, val):
         # type: (str, str) -> None
         _run_command_no_output(["defaults", "write", "NSGlobalDomain", key, val])
@@ -263,20 +264,20 @@ def task_update_system_preferences():
         print("====> updating login window preferences")
         _run_command_no_output(["defaults", "write", "com.apple.loginwindow", "TALLogoutSavesState", "1"])
 
-    return Manifest(cmd=cmd, priority=38, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["update_dot_files"])
 
 def task_update_iterm_sync_folder_prefs():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         print("====> updating iterm preferences")
         _run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
                                 os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
-    return Manifest(cmd=cmd, priority=39, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["update_dot_files"])
 
 def task_install_fonts():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         print("====> installing fonts")
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
@@ -287,10 +288,10 @@ def task_install_fonts():
             if os.path.isdir(font_path) and not folder.startswith("."):
                 _copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
 
-    return Manifest(cmd=cmd, priority=40, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["update_dot_files"])
 
 def task_install_xcode_themes():
-    # type: () -> Manifest
+    # type: () -> TaskManifest
     def cmd():
         # type: () -> None
         print("====> installing xcode themes")
@@ -303,7 +304,7 @@ def task_install_xcode_themes():
             if not theme.startswith("."):
                 _copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
 
-    return Manifest(cmd=cmd, priority=41, platform=MACOS)
+    return TaskManifest(cmd=cmd, platform=MACOS, dependencies=["update_dot_files"])
 
 # Private helpers
 
@@ -358,5 +359,7 @@ def _copy_file_if_needed(orig, dest, isdir=False):
             raise
 
 if __name__ == "__main__":
-    config = Config(__name__, get_current_platform())
-    run_tasks(config)
+    config = ExecutorConfig(__name__, get_current_platform())
+    run_tasks_from_config(config)
+    # tasks = [task.name for task in get_tasks_from_config(config)]
+    # print(tasks)
