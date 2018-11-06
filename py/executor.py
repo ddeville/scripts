@@ -21,13 +21,13 @@ class TaskManifest(object):
 def print_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Returns the name of the tasks that would be run for a given config."""
-    for task in _resolve_deps_and_yield_tasks(_get_all_tasks_for_config(config)):
-        print(task.name)
+    for task in _get_tasks(config):
+        sys.stdout.write("%s\n" % task.name)
 
 def run_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Run all tasks that match the given config."""
-    for task in _resolve_deps_and_yield_tasks(_get_all_tasks_for_config(config)):
+    for task in _get_tasks(config):
         task.cmd()
 
 # Private
@@ -40,34 +40,34 @@ class _Task(object):
         self.cmd = cmd
         self.dependencies = dependencies
 
-def _get_all_tasks_for_config(config):
+def _get_tasks(config):
     # type: (ExecutorConfig) -> Generator[_Task]
-    """Yield all tasks that match the given config."""
-    for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
-        if name.startswith(TASK_PREFIX):
-            manifest = func()
-            assert isinstance(manifest, TaskManifest), ("`%s` should return an instance of `TaskManifest`, not %r" %
-                    (name, type(manifest)))
-            if config.platform in manifest.platforms:
-                yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
+    """Retrieve all tasks that match the given config and order them based on dependencies."""
 
-def _resolve_deps_and_yield_tasks(tasks):
-    # type: (Sequence[_Task]) -> None
-    """Run the given tasks, making sure to respect dependencies."""
+    def _extract_tasks():
+        # type: () -> Generator[_Task]
+        for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
+            if name.startswith(TASK_PREFIX):
+                manifest = func()
+                assert isinstance(manifest, TaskManifest), ("`%s` should return an instance of `TaskManifest`, not %r"
+                        % (name, type(manifest)))
+                if config.platform in manifest.platforms:
+                    yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
+
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
-    remaining_tasks = {task.name: task for task in tasks}
+    remaining_tasks = {task.name: task for task in _extract_tasks()}
 
     def _inner_run_tasks(inner_tasks):
-        # type: (List[Manifest]) -> None
+        # type: (List[Manifest]) -> Generator[_Task]
         for task in inner_tasks:
             # check whether the dependencies of this task have already been run
             for name in task.dependencies:
-                # if we can find it in the list, it hasn't been run yet
+                # if we can find it in the list, it hasn't been run yet so run it
                 if name in remaining_tasks:
                     for inner_task in _inner_run_tasks([remaining_tasks[name]]):
                         yield inner_task
 
-            # make sure that the task is still in the array (otherwise it has already run)
+            # if the task is still in the array, it means that it hasn't been run yet
             if task.name in remaining_tasks:
                 yield task
                 del remaining_tasks[task.name]
