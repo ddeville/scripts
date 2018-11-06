@@ -361,5 +361,3 @@ def _copy_file_if_needed(orig, dest, isdir=False):
 if __name__ == "__main__":
     config = ExecutorConfig(__name__, get_current_platform())
     run_tasks_from_config(config)
-    # tasks = [task.name for task in get_tasks_from_config(config)]
-    # print(tasks)
