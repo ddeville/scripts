@@ -21,8 +21,8 @@ class TaskManifest(object):
 def print_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Print the name of the tasks that would be run for a given config."""
-    for task in _get_tasks(config):
-        sys.stdout.write("%s\n" % task.name)
+    for counter, task in enumerate(_get_tasks(config)):
+        sys.stdout.write("%d: %s\n" % (counter + 1, task.name))
 
 def run_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
