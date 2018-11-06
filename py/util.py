@@ -53,5 +53,3 @@ def copy_file_if_needed(orig, dest, isdir=False):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-
