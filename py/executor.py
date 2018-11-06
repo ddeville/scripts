@@ -20,7 +20,7 @@ class TaskManifest(object):
 
 def print_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
-    """Returns the name of the tasks that would be run for a given config."""
+    """Print the name of the tasks that would be run for a given config."""
     for task in _get_tasks(config):
         sys.stdout.write("%s\n" % task.name)
 
@@ -55,7 +55,7 @@ def _get_tasks(config):
                     yield _Task(name[len(TASK_PREFIX):], manifest.cmd, manifest.dependencies)
 
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
-    remaining_tasks = {task.name: task for task in _extract_tasks()}
+    tasks = {task.name: task for task in _extract_tasks()}
 
     def _inner_run_tasks(inner_tasks):
         # type: (List[Manifest]) -> Generator[_Task]
@@ -63,17 +63,17 @@ def _get_tasks(config):
             # check whether the dependencies of this task have already been run
             for name in task.dependencies:
                 # if we can find it in the list, it hasn't been run yet so run it
-                if name in remaining_tasks:
-                    for inner_task in _inner_run_tasks([remaining_tasks[name]]):
+                if name in tasks:
+                    for inner_task in _inner_run_tasks([tasks[name]]):
                         yield inner_task
 
             # if the task is still in the array, it means that it hasn't been run yet
-            if task.name in remaining_tasks:
+            if task.name in tasks:
                 yield task
-                del remaining_tasks[task.name]
+                del tasks[task.name]
 
-    for task in _inner_run_tasks(list(remaining_tasks.values())):
+    for task in _inner_run_tasks(list(tasks.values())):
         yield task
 
     # if we still have a task in there, something went terribly wrong...
-    assert not remaining_tasks
+    assert not tasks
