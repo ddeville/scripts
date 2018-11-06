@@ -13,7 +13,7 @@ class ExecutorConfig(object):
 class TaskManifest(object):
     """Each task should return an instance of this class."""
     def __init__(self, cmd, platform, dependencies):
-        # type: (Callable[[], None], str, List[str]) -> None
+        # type: (Callable[[], None], Tuple[str], List[str]) -> None
         self.cmd = cmd
         self.platform = platform
         self.dependencies = dependencies
@@ -23,7 +23,7 @@ def retrieve_task_names_for_config(config):
     """Returns the name of the tasks that would be run for a given config."""
     return [task.name for task in _get_all_tasks_for_config(config)]
 
-def run_tasks_for_config(config):
+def run_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Run all tasks that match the given config."""
     _run_tasks(_get_all_tasks_for_config(config))
@@ -40,7 +40,7 @@ class _Task(object):
 
 def _get_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> Generator[_Task]
-    """Yield tasks that match the given config."""
+    """Yield all tasks that match the given config."""
     for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
         if name.startswith(TASK_PREFIX):
             manifest = func()

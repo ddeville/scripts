@@ -2,7 +2,7 @@ import sys
 
 MACOS = "macos"
 LINUX = "linux"
-ALL_PLATFORMS = (MACOS, LINUX)
+ALL_PLATFORMS = [MACOS, LINUX]
 
 def get_current_platform():
     # type: () -> str
