@@ -224,7 +224,7 @@ def task_install_rustup():
     def cmd():
         if is_cmd_installed("rustup"):
             print("====> updating rustup")
-            run_command_no_output(["rustup", "update"])
+            run_command_no_output(["rustup", "self", "update"])
         else:
             print("====> install rustup")
             script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
@@ -267,16 +267,6 @@ def task_update_system_preferences():
         update_prefs("InitialKeyRepeat", "15")
         update_prefs("ApplePressAndHoldEnabled", "0")
         update_prefs("TALLogoutSavesState", "1", "com.apple.loginwindow")
-
-        print("====> killing preferences")
-        try:
-            run_command_no_output(["killall", "SystemUIServer"])
-        except subprocess.CalledProcessError:
-            pass
-        try:
-            run_command_no_output(["killall", "System Preferences"])
-        except subprocess.CalledProcessError:
-            pass
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
