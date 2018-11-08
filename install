@@ -38,7 +38,7 @@ PACKAGES = [
     "mosh",
     "jq",
     "radare2",
-    "cmake",
+    "cmake",  # for YouCompleteMe
 ]
 
 PACKAGES_MACOS = [
@@ -50,6 +50,8 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "ttf-anonymous-pro",
     "vim",
+    "python-dev",  # for YouCompleteMe
+    "python3-dev",
 ]
 
 # Tasks
