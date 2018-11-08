@@ -262,7 +262,6 @@ def task_update_system_preferences():
         update_prefs("NSAutomaticPeriodSubstitutionEnabled", "0")
         update_prefs("NSAutomaticQuoteSubstitutionEnabled", "0")
         update_prefs("NSAutomaticTextCompletionEnabled", "0")
-        update_prefs("slowKey", "0", "com.apple.universalaccess")
         update_prefs("KeyRepeat", "2")
         update_prefs("InitialKeyRepeat", "15")
         update_prefs("ApplePressAndHoldEnabled", "0")
