@@ -38,6 +38,7 @@ PACKAGES = [
     "mosh",
     "jq",
     "radare2",
+    "cmake",
 ]
 
 PACKAGES_MACOS = [
