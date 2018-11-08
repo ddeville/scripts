@@ -217,7 +217,7 @@ def task_install_pyenv():
     def cmd():
         if is_cmd_installed("pyenv"):
             print("====> updating pyenv")
-            run_command_no_output(["pyenv", "update"])
+            run_command(["pyenv", "update"])
         else:
             print("====> installing pyenv")
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer")
@@ -230,7 +230,7 @@ def task_install_rustup():
     def cmd():
         if is_cmd_installed("rustup"):
             print("====> updating rustup")
-            run_command_no_output(["rustup", "self", "update"])
+            run_command(["rustup", "self", "update"])
         else:
             print("====> install rustup")
             script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
@@ -264,7 +264,7 @@ def task_update_system_preferences():
     # type: () -> TaskManifest
     def update_prefs(key, val, domain="NSGlobalDomain"):
         # type: (str, str) -> None
-        run_command_no_output(["defaults", "write", domain, key, val])
+        run_command(["defaults", "write", domain, key, val])
 
     def cmd():
         # type: () -> None
@@ -290,8 +290,8 @@ def task_update_iterm_sync_folder_prefs():
     def cmd():
         # type: () -> None
         print("====> updating iterm preferences")
-        run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
-                                os.path.join(SCRIPTS_PATH, "macos", "iterm")])
+        run_command(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
+            os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
