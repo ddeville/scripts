@@ -53,7 +53,6 @@ PACKAGES_LINUX = [
     "ttf-anonymous-pro",
     "vim",
     "python-dev",  # for YouCompleteMe
-    "python3-dev",
     "build-essential",
 ]
 
