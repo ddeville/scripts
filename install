@@ -13,6 +13,7 @@ from py.executor import (
     run_all_tasks_for_config,
 )
 from py.util import (
+    change_dir,
     is_cmd_installed,
     run_script_as_root,
     run_command_no_output,
@@ -52,6 +53,7 @@ PACKAGES_LINUX = [
     "vim",
     "python-dev",  # for YouCompleteMe
     "python3-dev",
+    "build-essential",
 ]
 
 # Tasks
@@ -235,6 +237,15 @@ def task_install_rustup():
         pass
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+
+def task_build_you_complete_me():
+    # type: () -> TaskManifest
+    def cmd():
+        with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")) as path:
+            subprocess.check_call(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS,
+            dependencies=["update_vim_plugins", "install_pyenv", "install_rustup"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
