@@ -20,8 +20,12 @@ def run_script_as_root(script):
         fw.flush()
         subprocess.check_call(["sudo", "bash", "-e", fw.name])
 
+def run_command(cmd):
+    # type: (List[str]) -> None
+    subprocess.check_call(cmd)
+
 def run_command_no_output(cmd):
-    # type: (str) -> None
+    # type: (List[str]) -> None
     with open(os.devnull, "w") as f:
         subprocess.check_call(cmd, stderr=f, stdout=f)
 
