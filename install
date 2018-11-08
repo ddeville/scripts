@@ -245,8 +245,7 @@ def task_build_you_complete_me():
         with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")) as path:
             subprocess.check_call(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS,
-            dependencies=["update_vim_plugins", "install_pyenv", "install_rustup"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins", "install_rustup"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
