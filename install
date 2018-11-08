@@ -241,6 +241,7 @@ def task_install_rustup():
 def task_build_you_complete_me():
     # type: () -> TaskManifest
     def cmd():
+        print("====> building YouCompleteMe")
         with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")) as path:
             subprocess.check_call(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"])
 
