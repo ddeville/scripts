@@ -67,7 +67,7 @@ def task_install_brew_if_needed():
             print("====> brew already installed")
         else:
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
-            u["/usr/bin/ruby", script_path])
+            run_command(["/usr/bin/ruby", script_path])
 
     return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=[])
 
