@@ -233,7 +233,7 @@ def task_install_rustup():
         else:
             print("====> install rustup")
             script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
-            run_command(["sh", script_path])
+            run_command(["sh", script_path, "-y", "--no-modify-path"])
         pass
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
