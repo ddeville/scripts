@@ -183,34 +183,6 @@ def task_update_dot_files():
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
             dependencies=["update_shell_macos_if_needed", "update_shell_linux_if_needed"])
 
-def task_update_vim_plugins():
-    # type: () -> TaskManifest
-    def cmd():
-        print("====> updating vim plugins")
-        # update vim-plug itself
-        run_command(["vim", "+PlugUpgrade", "+qall"])
-        # install or update all plugins
-        run_command(["vim", "+PlugUpdate", "+qall"])
-
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
-
-def task_update_tmux_plugins():
-    # type: () -> TaskManifest
-    def cmd():
-        tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
-
-        # first install TPM itself if needed
-        if not os.path.exists(tpm_path):
-            print("====> installing TPM")
-            run_command(["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_path])
-
-        # and update the plugins
-        print("====> updating tmux plugins")
-        run_command([os.path.join(tpm_path, "bin", "install_plugins")])
-        run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
-
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
-
 def task_install_pyenv():
     # type: () -> TaskManifest
     def cmd():
@@ -237,6 +209,34 @@ def task_install_rustup():
         pass
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+
+def task_update_tmux_plugins():
+    # type: () -> TaskManifest
+    def cmd():
+        tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
+
+        # first install TPM itself if needed
+        if not os.path.exists(tpm_path):
+            print("====> installing TPM")
+            run_command(["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_path])
+
+        # and update the plugins
+        print("====> updating tmux plugins")
+        run_command([os.path.join(tpm_path, "bin", "install_plugins")])
+        run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
+
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
+
+def task_update_vim_plugins():
+    # type: () -> TaskManifest
+    def cmd():
+        print("====> updating vim plugins")
+        # update vim-plug itself
+        run_command(["vim", "+PlugUpgrade", "+qall"])
+        # install or update all plugins
+        run_command(["vim", "+PlugUpdate", "+qall"])
+
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files", "install_rustup"])
 
 def task_build_you_complete_me():
     # type: () -> TaskManifest
