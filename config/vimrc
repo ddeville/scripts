@@ -12,6 +12,7 @@ filetype plugin indent on
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
     Plug 'itchyny/lightline.vim'
+    Plug 'tpope/vim-git'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-rhubarb'
     Plug 'tpope/vim-commentary'
