@@ -13,12 +13,14 @@ from py.executor import (
     run_all_tasks_for_config,
 )
 from py.util import (
-    is_cmd_installed,
-    run_script_as_root,
-    run_command_no_output,
-    force_symlink,
-    create_dirs_if_needed,
+    change_dir,
     copy_file_if_needed,
+    create_dirs_if_needed,
+    force_symlink,
+    is_cmd_installed,
+    run_command,
+    run_command_no_output,
+    run_script_as_root,
 )
 
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -38,6 +40,7 @@ PACKAGES = [
     "mosh",
     "jq",
     "radare2",
+    "cmake",  # for YouCompleteMe
 ]
 
 PACKAGES_MACOS = [
@@ -49,6 +52,8 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "ttf-anonymous-pro",
     "vim",
+    "python-dev",  # for YouCompleteMe
+    "build-essential",
 ]
 
 # Tasks
@@ -61,7 +66,7 @@ def task_install_brew_if_needed():
             print("====> brew already installed")
         else:
             script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
-            subprocess.check_call(["/usr/bin/ruby", script_path])
+            run_command(["/usr/bin/ruby", script_path])
 
     return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=[])
 
@@ -70,7 +75,7 @@ def task_update_apt_get_if_needed():
     def cmd():
         # type: () -> None
         print("====> updating package manager")
-        subprocess.check_call(["sudo", "apt-get", "update", "--fix-missing"])
+        run_command(["sudo", "apt-get", "update", "--fix-missing"])
 
     return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=[])
 
@@ -82,7 +87,7 @@ def task_install_brew_formulas_if_needed():
             print("====> installing %s" % package)
             try:
                 print("====> checking status of %s" % package)
-                subprocess.check_call(["brew", "ls", "--versions", package])
+                run_command(["brew", "ls", "--versions", package])
                 # if the previous call succeeded, the package is installed so upgrade
                 print("====> %s installed, upgrading" % package)
                 try:
@@ -93,7 +98,7 @@ def task_install_brew_formulas_if_needed():
                 # the package has never been installed, do that now
                 print("====> installing %s" % package)
                 try:
-                    subprocess.check_call(["brew", "install", package])
+                    run_command(["brew", "install", package])
                 except subprocess.CalledProcessError:
                     # brew install succeeds by returning a status code of 1...
                     pass
@@ -108,7 +113,7 @@ def task_install_linux_packages_if_needed():
         # type: () -> None
         for package in PACKAGES + PACKAGES_LINUX:
             print("====> installing %s" % package)
-            subprocess.check_call(["sudo", "apt-get", "upgrade", package])
+            run_command(["sudo", "apt-get", "upgrade", package])
 
     return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["update_apt_get_if_needed"])
 
@@ -129,7 +134,7 @@ def task_update_shell_macos_if_needed():
         # next let's check whether we need to change the shell
         if os.environ.get("SHELL") != "/usr/local/bin/fish":
             print("====> changing shell to fish")
-            subprocess.check_call(["chsh", "-s", "/usr/local/bin/fish"])
+            run_command(["chsh", "-s", "/usr/local/bin/fish"])
         else:
             print("====> fish is already default shell")
 
@@ -141,7 +146,7 @@ def task_update_shell_linux_if_needed():
         # type: () -> None
         if os.environ.get("SHELL") != "/usr/bin/fish":
             print("====> changing shell to fish")
-            subprocess.check_call(["chsh", "-s", "/usr/bin/fish"])
+            run_command(["chsh", "-s", "/usr/bin/fish"])
         else:
             print("====> fish is already default shell")
 
@@ -178,16 +183,32 @@ def task_update_dot_files():
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
             dependencies=["update_shell_macos_if_needed", "update_shell_linux_if_needed"])
 
-def task_update_vim_plugins():
+def task_install_pyenv():
     # type: () -> TaskManifest
     def cmd():
-        print("====> updating vim plugins")
-        # update vim-plug itself
-        subprocess.check_call(["vim", "+PlugUpgrade", "+qall"])
-        # install or update all plugins
-        subprocess.check_call(["vim", "+PlugUpdate", "+qall"])
+        if is_cmd_installed("pyenv"):
+            print("====> updating pyenv")
+            run_command(["pyenv", "update"])
+        else:
+            print("====> installing pyenv")
+            script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer")
+            run_command(["bash", script_path])
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+
+def task_install_rustup():
+    # type: () -> TaskManifest
+    def cmd():
+        if is_cmd_installed("rustup"):
+            print("====> updating rustup")
+            run_command(["rustup", "self", "update"])
+        else:
+            print("====> install rustup")
+            script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
+            run_command(["sh", script_path, "-y", "--no-modify-path"])
+        pass
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
@@ -197,41 +218,34 @@ def task_update_tmux_plugins():
         # first install TPM itself if needed
         if not os.path.exists(tpm_path):
             print("====> installing TPM")
-            subprocess.check_call(["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_path])
+            run_command(["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_path])
 
         # and update the plugins
         print("====> updating tmux plugins")
-        subprocess.check_call([os.path.join(tpm_path, "bin", "install_plugins")])
-        subprocess.check_call([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
+        run_command([os.path.join(tpm_path, "bin", "install_plugins")])
+        run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
 
-def task_install_pyenv():
+def task_update_vim_plugins():
     # type: () -> TaskManifest
     def cmd():
-        if is_cmd_installed("pyenv"):
-            print("====> updating pyenv")
-            run_command_no_output(["pyenv", "update"])
-        else:
-            print("====> installing pyenv")
-            script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer")
-            subprocess.check_call(["bash", script_path])
+        print("====> updating vim plugins")
+        # update vim-plug itself
+        run_command(["vim", "+PlugUpgrade", "+qall"])
+        # install or update all plugins
+        run_command(["vim", "+PlugUpdate", "+qall"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files", "install_rustup"])
 
-def task_install_rustup():
+def task_build_you_complete_me():
     # type: () -> TaskManifest
     def cmd():
-        if is_cmd_installed("rustup"):
-            print("====> updating rustup")
-            run_command_no_output(["rustup", "self", "update"])
-        else:
-            print("====> install rustup")
-            script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
-            subprocess.check_call(["sh", script_path])
-        pass
+        print("====> building YouCompleteMe")
+        with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")) as path:
+            run_command(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins", "install_rustup"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
@@ -249,7 +263,7 @@ def task_update_system_preferences():
     # type: () -> TaskManifest
     def update_prefs(key, val, domain="NSGlobalDomain"):
         # type: (str, str) -> None
-        run_command_no_output(["defaults", "write", domain, key, val])
+        run_command(["defaults", "write", domain, key, val])
 
     def cmd():
         # type: () -> None
@@ -285,8 +299,8 @@ def task_update_iterm_sync_folder_prefs():
     def cmd():
         # type: () -> None
         print("====> updating iterm preferences")
-        run_command_no_output(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
-                                os.path.join(SCRIPTS_PATH, "macos", "iterm")])
+        run_command(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
+            os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
