@@ -1,3 +1,4 @@
+import contextlib
 import errno
 import os
 import shutil
@@ -19,8 +20,12 @@ def run_script_as_root(script):
         fw.flush()
         subprocess.check_call(["sudo", "bash", "-e", fw.name])
 
+def run_command(cmd):
+    # type: (List[str]) -> None
+    subprocess.check_call(cmd)
+
 def run_command_no_output(cmd):
-    # type: (str) -> None
+    # type: (List[str]) -> None
     with open(os.devnull, "w") as f:
         subprocess.check_call(cmd, stderr=f, stdout=f)
 
@@ -53,3 +58,12 @@ def copy_file_if_needed(orig, dest, isdir=False):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
+
+@contextlib.contextmanager
+def change_dir(path):
+    original_path = os.getcwd()
+    try:
+        os.chdir(path)
+        yield path
+    finally:
+        os.chdir(original_path)
