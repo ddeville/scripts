@@ -12,6 +12,7 @@ from py.executor import (
     print_all_tasks_for_config,
     run_all_tasks_for_config,
 )
+from py.package_manager import create_package_manager
 from py.util import (
     copy_file_if_needed,
     create_dirs_if_needed,
@@ -51,72 +52,41 @@ PACKAGES_LINUX = [
     "silversearcher-ag",
     "ttf-anonymous-pro",
     "vim",
-    "python-dev",  # for YouCompleteMe
-    "build-essential",
+    "build-essential",  # for YouCompleteMe
+    "python-dev",
 ]
 
 # Tasks
 
-def task_install_brew_if_needed():
+def task_update_package_manager():
+    # type: () -> TaskManifest
+    def cmd():
+        package_manager = create_package_manager()
+        package_manager.update()
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + BASIC, dependencies=[])
+
+def task_install_mac_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        if is_cmd_installed("brew"):
-            print("====> brew already installed")
-        else:
-            script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
-            run_command(["/usr/bin/ruby", script_path])
-
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=[])
-
-def task_update_apt_get_if_needed():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        print("====> updating package manager")
-        run_command(["sudo", "apt-get", "update", "--fix-missing"])
-
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=[])
-
-def task_install_brew_formulas_if_needed():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
+        package_manager = create_package_manager()
         for package in PACKAGES + PACKAGES_MACOS:
-            print("====> installing %s" % package)
-            try:
-                print("====> checking status of %s" % package)
-                run_command(["brew", "ls", "--versions", package])
-                # if the previous call succeeded, the package is installed so upgrade
-                print("====> %s installed, upgrading" % package)
-                try:
-                    run_command_no_output(["brew", "upgrade", package])
-                except subprocess.CalledProcessError:
-                    print("====> %s up to date" % package)
-            except subprocess.CalledProcessError:
-                # the package has never been installed, do that now
-                print("====> installing %s" % package)
-                try:
-                    run_command(["brew", "install", package])
-                except subprocess.CalledProcessError:
-                    # brew install succeeds by returning a status code of 1...
-                    pass
-            print("====> %s linking" % package)
-            run_command_no_output(["brew", "link", package])
+            package_manager.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_brew_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["update_package_manager"])
 
-def task_install_linux_packages_if_needed():
+def task_install_linux_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
+        package_manager = create_package_manager()
         for package in PACKAGES + PACKAGES_LINUX:
-            print("====> installing %s" % package)
-            run_command(["sudo", "apt-get", "upgrade", package])
+            package_manager.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["update_apt_get_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["update_package_manager"])
 
-def task_update_shell_macos_if_needed():
+def task_update_shell_macos():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
@@ -137,9 +107,9 @@ def task_update_shell_macos_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_brew_formulas_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_mac_packages"])
 
-def task_update_shell_linux_if_needed():
+def task_update_shell_linux():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
@@ -149,7 +119,7 @@ def task_update_shell_linux_if_needed():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_linux_packages_if_needed"])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_linux_packages"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
@@ -180,7 +150,7 @@ def task_update_dot_files():
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
-            dependencies=["update_shell_macos_if_needed", "update_shell_linux_if_needed"])
+            dependencies=["update_shell_macos", "update_shell_linux"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
