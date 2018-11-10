@@ -269,9 +269,18 @@ def task_update_system_preferences():
         update_prefs("NSAutomaticQuoteSubstitutionEnabled", "0")
         update_prefs("NSAutomaticTextCompletionEnabled", "0")
         # key repeat
-        update_prefs("KeyRepeat", "2")
-        update_prefs("InitialKeyRepeat", "15")
         update_prefs("ApplePressAndHoldEnabled", "0")
+        # update_prefs("KeyRepeat", "2")
+        # update_prefs("InitialKeyRepeat", "15")
+        # hot corners
+        # update_prefs("wvous-bl-corner", "4", "com.apple.dock")
+        # update_prefs("wvous-bl-modifier", "0", "com.apple.dock")
+        # update_prefs("wvous-br-corner", "3", "com.apple.dock")
+        # update_prefs("wvous-br-modifier", "0", "com.apple.dock")
+        # update_prefs("wvous-tl-corner", "11", "com.apple.dock")
+        # update_prefs("wvous-tl-modifier", "0", "com.apple.dock")
+        # update_prefs("wvous-tr-corner", "2", "com.apple.dock")
+        # update_prefs("wvous-tr-modifier", "0", "com.apple.dock")
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
