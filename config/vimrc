@@ -24,8 +24,8 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-dispatch'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
-    Plug 'mileszs/ack.vim'
     Plug 'dag/vim-fish'
+    Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'Valloric/YouCompleteMe', {'do': '/usr/bin/python install.py --clang-completer --rust-completer'}
