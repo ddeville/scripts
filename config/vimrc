@@ -22,13 +22,12 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-dispatch'
-    Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
-    Plug 'junegunn/fzf.vim'
+    Plug 'vim-scripts/a.vim'
+    Plug 'rust-lang/rust.vim'
     Plug 'mileszs/ack.vim'
     Plug 'dag/vim-fish'
-    Plug 'rust-lang/rust.vim'
-    Plug 'vim-scripts/a.vim'
-    Plug 'rhysd/vim-clang-format'
+    Plug 'junegunn/fzf.vim'
+    Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'Valloric/YouCompleteMe', {'do': '/usr/bin/python install.py --clang-completer --rust-completer'}
 call plug#end()
 
