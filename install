@@ -13,7 +13,6 @@ from py.executor import (
     run_all_tasks_for_config,
 )
 from py.util import (
-    change_dir,
     copy_file_if_needed,
     create_dirs_if_needed,
     force_symlink,
@@ -237,15 +236,6 @@ def task_update_vim_plugins():
         run_command(["vim", "+PlugUpdate", "+qall"])
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files", "install_rustup"])
-
-def task_build_you_complete_me():
-    # type: () -> TaskManifest
-    def cmd():
-        print("====> building YouCompleteMe")
-        with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")) as path:
-            run_command(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"])
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins", "install_rustup"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest

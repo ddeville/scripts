@@ -29,7 +29,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'rust-lang/rust.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rhysd/vim-clang-format'
-    Plug 'Valloric/YouCompleteMe'
+    Plug 'Valloric/YouCompleteMe', {'do': '/usr/bin/python install.py --clang-completer --rust-completer'}
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
