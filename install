@@ -269,9 +269,9 @@ def task_update_system_preferences():
         update_prefs("NSAutomaticQuoteSubstitutionEnabled", "0")
         update_prefs("NSAutomaticTextCompletionEnabled", "0")
         # key repeat
-        update_prefs("ApplePressAndHoldEnabled", "0")
         # update_prefs("KeyRepeat", "2")
         # update_prefs("InitialKeyRepeat", "15")
+        update_prefs("ApplePressAndHoldEnabled", "0")
         # hot corners
         # update_prefs("wvous-bl-corner", "4", "com.apple.dock")
         # update_prefs("wvous-bl-modifier", "0", "com.apple.dock")
