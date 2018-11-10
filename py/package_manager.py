@@ -52,14 +52,14 @@ class BrewPackageManager(BasePackageManager):
             # if the previous call succeeded, the package is installed so upgrade
             print("====> %s installed, upgrading" % package)
             try:
-                run_command_no_output(["brew", "upgrade", "--display-times", "--cleanup", package])
+                run_command_no_output(["brew", "upgrade", "--cleanup", package])
             except subprocess.CalledProcessError:
                 print("====> %s up to date" % package)
         except subprocess.CalledProcessError:
             # the package has never been installed, do that now
             print("====> installing %s" % package)
             try:
-                run_command(["brew", "install", "--display-times", package])
+                run_command(["brew", "install", package])
             except subprocess.CalledProcessError:
                 # brew install succeeds by returning a status code of 1...
                 pass

@@ -56,23 +56,23 @@ PACKAGES_LINUX = [
     "python-dev",
 ]
 
+PACKAGE_MANAGER = create_package_manager()
+
 # Tasks
 
 def task_update_package_manager():
     # type: () -> TaskManifest
     def cmd():
-        package_manager = create_package_manager()
-        package_manager.update()
+        PACKAGE_MANAGER.update()
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + BASIC, dependencies=[])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [BASIC], dependencies=[])
 
 def task_install_mac_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        package_manager = create_package_manager()
         for package in PACKAGES + PACKAGES_MACOS:
-            package_manager.install_package(package)
+            PACKAGE_MANAGER.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["update_package_manager"])
 
@@ -80,9 +80,8 @@ def task_install_linux_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        package_manager = create_package_manager()
         for package in PACKAGES + PACKAGES_LINUX:
-            package_manager.install_package(package)
+            PACKAGE_MANAGER.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["update_package_manager"])
 
