@@ -20,6 +20,7 @@ from py.util import (
     LINUX,
     MACOS,
     change_dir,
+    command_path,
     copy_file_if_needed,
     create_dirs_if_needed,
     force_symlink,
@@ -32,10 +33,7 @@ from py.util import (
 
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 
-# Tags
-
 ALL_PLATFORMS = [MACOS, LINUX, FREEBSD]
-BASIC = "basic"
 
 # Packages
 
@@ -84,7 +82,7 @@ def task_install_package_manager():
     def cmd():
         PACKAGE_MANAGER.install()
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=[])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=[])
 
 def task_install_packages():
     # type: () -> TaskManifest
@@ -93,42 +91,33 @@ def task_install_packages():
         for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(PACKAGE_MANAGER.format(), []):
             PACKAGE_MANAGER.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["install_package_manager"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
-def task_update_shell_macos():
+def task_update_shell():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
+        shell_path = command_path("fish")
+        assert shell_path is not None, "Cannot find shell path"
+
         # let's check whether fish was added to /etc/shells
         with open("/etc/shells") as f:
-            if not "/usr/local/bin/fish" in f.read():
+            if not shell_path in f.read():
                 # we need to add fish to /etc/shells
                 print("====> adding fish to /etc/shells")
-                script = "#!/bin/bash\necho \"/usr/local/bin/fish\" >> /etc/shells"
+                script = "#!/bin/sh\necho \"%s\" >> /etc/shells" % shell_path
                 run_script_as_root(script)
             else:
                 print("====> fish already in /etc/shells")
 
         # next let's check whether we need to change the shell
-        if os.environ.get("SHELL") != "/usr/local/bin/fish":
+        if os.environ.get("SHELL") != shell_path:
             print("====> changing shell to fish")
-            run_command(["chsh", "-s", "/usr/local/bin/fish"])
+            run_command(["chsh", "-s", shell_path])
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_packages"])
-
-def task_update_shell_linux():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        if os.environ.get("SHELL") != "/usr/bin/fish":
-            print("====> changing shell to fish")
-            run_command(["chsh", "-s", "/usr/bin/fish"])
-        else:
-            print("====> fish is already default shell")
-
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_packages"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_packages"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
@@ -158,8 +147,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
-            dependencies=["install_packages", "update_shell_macos", "update_shell_linux"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
@@ -203,7 +191,7 @@ def task_update_tmux_plugins():
         run_command([os.path.join(tpm_path, "bin", "install_plugins")])
         run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_update_vim_plugins():
     # type: () -> TaskManifest
@@ -214,7 +202,7 @@ def task_update_vim_plugins():
         # install or update all plugins
         run_command(["vim", "+PlugUpdate", "+qall"])
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files", "install_rustup"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files", "install_rustup"])
 
 def task_build_vim_plugins():
     # type: () -> TaskManifest
@@ -234,7 +222,7 @@ def task_build_vim_plugins():
                 python_path = "python"
             run_command([python_path, "install.py", "--clang-completer", "--rust-completer"], env=env)
 
-    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_vim_plugins"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
@@ -328,7 +316,6 @@ def task_install_xcode_themes():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
     parser.add_argument("action", choices=["list", "run"], help="whether to list the tasks or actually run them")
-    parser.add_argument("-b", "--basic", action="store_true", help="only include basic tasks")
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     args = parser.parse_args()
 
@@ -338,9 +325,6 @@ if __name__ == "__main__":
     platform = args.platform if args.platform else get_current_platform()
     assert platform in ALL_PLATFORMS, "Unknown platform: %s" % platform
     tags.append(platform)
-
-    if args.basic:
-        tags.append(BASIC)
 
     config = ExecutorConfig(module_name, tags)
 

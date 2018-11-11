@@ -28,12 +28,16 @@ def get_linux_distro_info():
 
 def is_cmd_installed(cmd):
     # type: (str) -> bool
+    return command_path(cmd) is not None
+
+def command_path(cmd):
+    # type: (str) -> Optional[str]
     try:
         with open(os.devnull, "w") as f:
             path = subprocess.check_output(["which", cmd], stderr=f).strip()
-            return os.path.exists(path) and os.access(path, os.X_OK)
+            return path if os.path.exists(path) and os.access(path, os.X_OK) else None
     except subprocess.CalledProcessError as e:
-        return False
+        return None
 
 def run_script_as_root(script):
     # type: (str) -> None
