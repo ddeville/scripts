@@ -11,7 +11,11 @@ from py.executor import (
     print_all_tasks_for_config,
     run_all_tasks_for_config,
 )
-from py.package_manager import create_package_manager
+from py.package_manager import (
+    DEB,
+    RPM,
+    create_package_manager,
+)
 from py.util import (
     FREEBSD,
     LINUX,
@@ -50,13 +54,22 @@ PACKAGES_MACOS = [
     "tree",
 ]
 
-PACKAGES_LINUX = [
-    "silversearcher-ag",
-    "ttf-anonymous-pro",
-    "vim",
-    "build-essential",  # for YouCompleteMe
-    "python-dev",
-]
+PACKAGES_LINUX = {
+    DEB: [
+        "silversearcher-ag",
+        "ttf-anonymous-pro",
+        "vim",
+        "build-essential",  # for YouCompleteMe
+        "python3-dev",  # for YouCompleteMe
+    ],
+    RPM: [
+        "the_silver_searcher",
+        "vim",
+        "gcc-c++",  # for YouCompleteMe
+        "make",  # for YouCompleteMe
+        "python3-devel",  # for YouCompleteMe
+    ]
+}
 
 PACKAGE_MANAGER = create_package_manager()
 
@@ -82,7 +95,7 @@ def task_install_linux_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        for package in PACKAGES + PACKAGES_LINUX:
+        for package in PACKAGES + PACKAGES_LINUX[PACKAGE_MANAGER.format()]:
             PACKAGE_MANAGER.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_package_manager"])

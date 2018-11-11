@@ -12,6 +12,9 @@ from py.util import (
     run_command_no_output,
 )
 
+DEB = "deb"
+RPM = "rpm"
+
 def create_package_manager():
     # type: () -> BasePackageManager
     """Create a new package manager instance that is appropriate for the current platform."""
@@ -26,8 +29,6 @@ def create_package_manager():
             return AptPackageManager()
         elif "fedora" in distros or is_cmd_installed("dnf"):
             return DnfPackageManager()
-        elif "centos" in distros or is_cmd_installed("yum"):
-            return YumPackageManager()
     elif plat == FREEBSD:
         return PkgPackageManager()
 
@@ -45,6 +46,11 @@ class BasePackageManager(object):
         # type: (str) -> None
         """Install or update a given package."""
         raise NotImplementedError()
+
+    def format(self):
+        # type: () -> str
+        """The package format, mostly for Linux."""
+        raise None
 
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
@@ -81,7 +87,6 @@ class BrewPackageManager(BasePackageManager):
         print("====> %s linking" % package)
         run_command_no_output(["brew", "link", package])
 
-
 class AptPackageManager(BasePackageManager):
     """The APT package manager to use on Debian and derivatives."""
 
@@ -95,6 +100,10 @@ class AptPackageManager(BasePackageManager):
         print("====> installing %s" % package)
         run_command(["sudo", "apt-get", "upgrade", package])
 
+    def format(self):
+        # type: () -> str
+        return DEB
+
 class DnfPackageManager(BasePackageManager):
     """The DNS package manager to use on Fedora and derivatives."""
 
@@ -107,17 +116,9 @@ class DnfPackageManager(BasePackageManager):
         print("====> installing %s" % package)
         run_command(["sudo", "dnf", "install", "--best", package])
 
-class YumPackageManager(BasePackageManager):
-    """The YUM package manager to use on CentOS."""
-
-    def install(self):
-        # type: () -> None
-        pass
-
-    def install_package(self, package):
-        # type: (str) -> None
-        print("====> installing %s" % package)
-        run_command(["sudo", "yum", "install", package])
+    def format(self):
+        # type: () -> str
+        return RPM
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""
