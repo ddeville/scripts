@@ -225,7 +225,14 @@ def task_build_vim_plugins():
             # make sure that cargo is on the path since we might have just changed the shell...
             env = os.environ.copy()
             env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
-            run_command(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"], env=env)
+            # we want to use the system python since pyenv might not include the python dylib...
+            if os.path.isfile("/usr/bin/python"):
+                python_path = "/usr/bin/python"
+            elif os.path.isfile("/usr/local/bin/python"):
+                python_path = "/usr/local/bin/python"
+            else:
+                python_path = "python"
+            run_command([python_path, "install.py", "--clang-completer", "--rust-completer"], env=env)
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_vim_plugins"])
 
