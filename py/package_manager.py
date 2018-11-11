@@ -12,19 +12,6 @@ from py.util import (
     run_command_no_output,
 )
 
-class BasePackageManager(object):
-    """A package manager, that can be used to install packages on the current system."""
-
-    def update(self):
-        # type: () -> None
-        """Update the package manager itself, usually refreshing its package definitions."""
-        raise NotImplementedError()
-
-    def install_package(self, package):
-        # type: (str) -> None
-        """Install or update a given package."""
-        raise NotImplementedError()
-
 def create_package_manager():
     # type: () -> BasePackageManager
     """Create a new package manager instance that is appropriate for the current platform."""
@@ -45,6 +32,19 @@ def create_package_manager():
         return PkgPackageManager()
 
     raise Exception("Platform not supported %s" % plat)
+
+class BasePackageManager(object):
+    """A package manager, that can be used to install packages on the current system."""
+
+    def update(self):
+        # type: () -> None
+        """Update the package manager itself, usually refreshing its package definitions."""
+        raise NotImplementedError()
+
+    def install_package(self, package):
+        # type: (str) -> None
+        """Install or update a given package."""
+        raise NotImplementedError()
 
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
