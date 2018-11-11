@@ -6,7 +6,7 @@ import os
 import subprocess
 import urllib
 
-from py.executor import (
+from py.task_executor import (
     ExecutorConfig,
     TaskManifest,
     print_all_tasks_for_config,
