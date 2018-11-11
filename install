@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import subprocess
 import urllib
 
 from py.executor import (
@@ -27,7 +26,6 @@ from py.util import (
     get_current_platform,
     is_cmd_installed,
     run_command,
-    run_command_no_output,
     run_script_as_root,
 )
 
@@ -155,7 +153,8 @@ def task_install_pyenv():
             run_command(["pyenv", "update"])
         else:
             print("====> installing pyenv")
-            script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer")
+            pyenv_installer_path = "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
+            script_path, _ = urllib.urlretrieve(pyenv_installer_path)
             run_command(["bash", script_path])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
