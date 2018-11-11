@@ -60,6 +60,7 @@ PACKAGES_LINUX = {
         "ttf-anonymous-pro",
         "vim",
         "build-essential",  # for YouCompleteMe
+        "python-dev",  # for YouCompleteMe
         "python3-dev",  # for YouCompleteMe
     ],
     RPM: [
@@ -68,6 +69,7 @@ PACKAGES_LINUX = {
         "util-linux-user",
         "gcc-c++",  # for YouCompleteMe
         "make",  # for YouCompleteMe
+        "python-devel",  # for YouCompleteMe
         "python3-devel",  # for YouCompleteMe
     ]
 }
