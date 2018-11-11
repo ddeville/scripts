@@ -101,10 +101,12 @@ class DnfPackageManager(BasePackageManager):
     def update(self):
         # type: () -> None
         print("====> updating DNS package manager")
+        run_command_no_output(["dnf", "check-update"])
 
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
+        run_command(["sudo", "dnf", "install", "--best", package])
 
 class YumPackageManager(BasePackageManager):
     """The YUM package manager to use on CentOS."""
