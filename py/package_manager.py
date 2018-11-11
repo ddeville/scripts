@@ -96,10 +96,34 @@ class AptPackageManager(BasePackageManager):
         run_command(["sudo", "apt-get", "upgrade", package])
 
 class DnfPackageManager(BasePackageManager):
-    pass
+    """The DNS package manager to use on Fedora and derivatives."""
+
+    def update(self):
+        # type: () -> None
+        print("====> updating DNS package manager")
+
+    def install_package(self, package):
+        # type: (str) -> None
+        print("====> installing %s" % package)
 
 class YumPackageManager(BasePackageManager):
-    pass
+    """The YUM package manager to use on CentOS."""
+
+    def update(self):
+        # type: () -> None
+        print("====> updating YUM package manager")
+
+    def install_package(self, package):
+        # type: (str) -> None
+        print("====> installing %s" % package)
 
 class PkgPackageManager(BasePackageManager):
-    pass
+    """The PKG package manager to use on FreeBSD."""
+
+    def update(self):
+        # type: () -> None
+        print("====> updating PKG package manager")
+
+    def install_package(self, package):
+        # type: (str) -> None
+        print("====> installing %s" % package)
