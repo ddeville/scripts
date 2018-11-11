@@ -15,6 +15,7 @@ from py.util import (
 )
 
 class PackageType(object):
+    """An "enum" of package types."""
     DEB = "deb"
     RPM = "rpm"
     BREW = "brew"
