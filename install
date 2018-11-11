@@ -16,6 +16,7 @@ from py.util import (
     FREEBSD,
     LINUX,
     MACOS,
+    change_dir,
     copy_file_if_needed,
     create_dirs_if_needed,
     force_symlink,
@@ -66,7 +67,7 @@ def task_install_package_manager():
     def cmd():
         PACKAGE_MANAGER.install()
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [BASIC], dependencies=[])
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=[])
 
 def task_install_mac_packages():
     # type: () -> TaskManifest
@@ -206,6 +207,19 @@ def task_update_vim_plugins():
         run_command(["vim", "+PlugUpdate", "+qall"])
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_dot_files", "install_rustup"])
+
+def task_build_vim_plugins():
+    # type: () -> TaskManifest
+    def cmd():
+        # type: () -> None
+        print("====> building ycm")
+        with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")):
+            # make sure that cargo is on the path since we might have just changed the shell...
+            env = os.environ.copy()
+            env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+            run_command(["/usr/bin/python", "install.py", "--clang-completer", "--rust-completer"], env=env)
+
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["update_vim_plugins"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
