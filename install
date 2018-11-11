@@ -14,16 +14,18 @@ from py.package_manager import (
     PackageType,
     create_package_manager,
 )
-from py.util import (
+from py.platform import (
     FREEBSD,
     LINUX,
     MACOS,
+    get_current_platform,
+)
+from py.util import (
     change_dir,
     command_path,
     copy_file_if_needed,
     create_dirs_if_needed,
     force_symlink,
-    get_current_platform,
     is_cmd_installed,
     run_command,
     run_script_as_root,

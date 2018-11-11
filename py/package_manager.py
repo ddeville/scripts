@@ -1,12 +1,14 @@
 import urllib
 import subprocess
 
-from py.util import (
+from py.platform import (
     FREEBSD,
     LINUX,
     MACOS,
     get_current_platform,
     get_linux_distro_info,
+)
+from py.util import (
     is_cmd_installed,
     run_command,
     run_command_no_output,

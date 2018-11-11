@@ -3,32 +3,7 @@ import errno
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
-
-MACOS = "macos"
-LINUX = "linux"
-FREEBSD = "freebsd"
-
-def get_current_platform():
-    # type: () -> str
-    if "darwin" in sys.platform:
-        return MACOS
-    elif "linux" in sys.platform:
-        return LINUX
-    elif "freebsd" in sys.platform:
-        return FREEBSD
-    else:
-        raise Exception("Platform not supported %s" % sys.platform)
-
-def get_linux_distro_info():
-    # type: () -> Dict[str, str]
-    with open("/etc/os-release", "r") as f:
-        return dict([entry.split("=") for entry in f.read().rstrip().split("\n")])
-
-def is_cmd_installed(cmd):
-    # type: (str) -> bool
-    return command_path(cmd) is not None
 
 def command_path(cmd):
     # type: (str) -> Optional[str]
@@ -38,6 +13,10 @@ def command_path(cmd):
             return path if os.path.exists(path) and os.access(path, os.X_OK) else None
     except subprocess.CalledProcessError as e:
         return None
+
+def is_cmd_installed(cmd):
+    # type: (str) -> bool
+    return command_path(cmd) is not None
 
 def run_script_as_root(script):
     # type: (str) -> None
