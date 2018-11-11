@@ -156,7 +156,7 @@ def task_update_dot_files():
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]),
-            dependencies=["update_shell_macos", "update_shell_linux"])
+            dependencies=["install_packages", "update_shell_macos", "update_shell_linux"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
