@@ -29,8 +29,9 @@ def get_linux_distro_info():
 def is_cmd_installed(cmd):
     # type: (str) -> bool
     try:
-        path = subprocess.check_output(["which", cmd]).strip()
-        return os.path.exists(path) and os.access(path, os.X_OK)
+        with open(os.devnull, "w") as f:
+            path = subprocess.check_output(["which", cmd], stderr=f).strip()
+            return os.path.exists(path) and os.access(path, os.X_OK)
     except subprocess.CalledProcessError as e:
         return False
 
