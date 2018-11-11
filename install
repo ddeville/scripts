@@ -228,11 +228,12 @@ def task_build_vim_plugins():
         build_cache_path = os.path.join(plugins_path, "build_cache.json")
         build_cache = _load_build_cache(build_cache_path)
 
-        with change_dir(os.path.join(plugins_path, "YouCompleteMe")):
+        plugin = "YouCompleteMe"
+        with change_dir(os.path.join(plugins_path, plugin)):
             # get the hash of the current commit so that we can check whether we need to rebuild
             cur_hash = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
 
-            if cur_hash != build_cache.get("YouCompleteMe"):
+            if cur_hash != build_cache.get(plugin):
                 print("====> building ycm")
                 # make sure that cargo is on the path since we might have just changed the shell...
                 env = os.environ.copy()
@@ -246,7 +247,7 @@ def task_build_vim_plugins():
                     python_path = "python"
                 run_command([python_path, "install.py", "--clang-completer", "--rust-completer"], env=env)
                 # cache the git hash that we've just built
-                build_cache["YouCompleteMe"] = cur_hash
+                build_cache[plugin] = cur_hash
             else:
                 print("====> ycm already built")
 
