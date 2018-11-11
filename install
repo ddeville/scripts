@@ -65,6 +65,7 @@ PACKAGES_LINUX = {
     RPM: [
         "the_silver_searcher",
         "vim",
+        "util-linux-user",
         "gcc-c++",  # for YouCompleteMe
         "make",  # for YouCompleteMe
         "python3-devel",  # for YouCompleteMe
