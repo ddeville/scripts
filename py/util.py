@@ -23,7 +23,7 @@ def run_script_as_root(script):
     with tempfile.NamedTemporaryFile() as fw:
         fw.write(script)
         fw.flush()
-        subprocess.check_call(["sudo", "bash", "-e", fw.name])
+        subprocess.check_call(["sudo", "sh", "-e", fw.name])
 
 def run_command(cmd, env=None):
     # type: (List[str]) -> None
