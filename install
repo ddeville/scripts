@@ -70,6 +70,9 @@ EXTRA_PACKAGES = {
         "python-devel",  # for YouCompleteMe
         "python3-devel",  # for YouCompleteMe
     ],
+    PackageType.PKG: [
+        "bash",
+    ],
 }
 
 PACKAGE_MANAGER = create_package_manager()
