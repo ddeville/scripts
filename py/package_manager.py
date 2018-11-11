@@ -27,6 +27,13 @@ def create_package_manager():
     if "darwin" in sys.platform:
         return BrewPackageManager()
     elif "linux" in sys.platform:
+        with open("/etc/os-release", "r") as f:
+            props = dict([entry.split("=") for entry in f.read().rstrip().split("\n")])
+            distros = [props.get("ID"), props.get("ID_LIKE")]
+        if "debian" in distros:
+            return AptPackageManager()
+        elif "fedora" in distros:
+            return DnfPackageManager()
         return None
     else:
         raise Exception("Platform not supported %s" % sys.platform)
@@ -79,3 +86,6 @@ class AptPackageManager(BasePackageManager):
         # type: (str) -> None
         print("====> installing %s" % package)
         run_command(["sudo", "apt-get", "upgrade", package])
+
+class DnfPackageManager(BasePackageManager):
+    pass
