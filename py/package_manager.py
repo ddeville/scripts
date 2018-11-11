@@ -21,7 +21,7 @@ def create_package_manager():
         return BrewPackageManager()
     elif plat == LINUX:
         distro_info = get_linux_distro_info()
-        distros = [props.get("ID"), props.get("ID_LIKE")]
+        distros = [distro_info.get("ID"), distro_info.get("ID_LIKE")]
         if "debian" in distros or is_cmd_installed("apt-get"):
             return AptPackageManager()
         elif "fedora" in distros or is_cmd_installed("dnf"):
