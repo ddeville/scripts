@@ -117,6 +117,7 @@ class YumPackageManager(BasePackageManager):
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
+        run_command(["sudo", "yum", "install", package])
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""
