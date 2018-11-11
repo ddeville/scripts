@@ -105,7 +105,7 @@ class AptPackageManager(BasePackageManager):
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
-        run_command(["sudo", "apt-get", "upgrade", package])
+        run_command(["sudo", "apt-get", "upgrade", "--yes", package])
 
     def format(self):
         # type: () -> str
@@ -121,7 +121,7 @@ class DnfPackageManager(BasePackageManager):
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
-        run_command(["sudo", "dnf", "install", "--best", package])
+        run_command(["sudo", "dnf", "install", "--best", "--assumeyes", package])
 
     def format(self):
         # type: () -> str
