@@ -36,9 +36,9 @@ def create_package_manager():
 class BasePackageManager(object):
     """A package manager, that can be used to install packages on the current system."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
-        """Update the package manager itself, usually refreshing its package definitions."""
+        """Install or update the package manager itself (if needed)."""
         raise NotImplementedError()
 
     def install_package(self, package):
@@ -49,7 +49,7 @@ class BasePackageManager(object):
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
         if is_cmd_installed("brew"):
             print("====> updating brew")
@@ -85,10 +85,9 @@ class BrewPackageManager(BasePackageManager):
 class AptPackageManager(BasePackageManager):
     """The APT package manager to use on Debian and derivatives."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
-        print("====> updating APT package manager")
-        run_command(["sudo", "apt-get", "update", "--fix-missing"])
+        pass
 
     def install_package(self, package):
         # type: (str) -> None
@@ -98,10 +97,9 @@ class AptPackageManager(BasePackageManager):
 class DnfPackageManager(BasePackageManager):
     """The DNS package manager to use on Fedora and derivatives."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
-        print("====> updating DNS package manager")
-        run_command_no_output(["dnf", "check-update"])
+        pass
 
     def install_package(self, package):
         # type: (str) -> None
@@ -111,9 +109,9 @@ class DnfPackageManager(BasePackageManager):
 class YumPackageManager(BasePackageManager):
     """The YUM package manager to use on CentOS."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
-        print("====> updating YUM package manager")
+        pass
 
     def install_package(self, package):
         # type: (str) -> None
@@ -122,9 +120,9 @@ class YumPackageManager(BasePackageManager):
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""
 
-    def update(self):
+    def install(self):
         # type: () -> None
-        print("====> updating PKG package manager")
+        pass
 
     def install_package(self, package):
         # type: (str) -> None
