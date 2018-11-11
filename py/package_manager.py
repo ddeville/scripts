@@ -87,7 +87,8 @@ class AptPackageManager(BasePackageManager):
 
     def install(self):
         # type: () -> None
-        pass
+        print("====> updating APT")
+        run_command(["sudo", "apt-get", "update"])
 
     def install_package(self, package):
         # type: (str) -> None
