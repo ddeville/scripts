@@ -132,11 +132,12 @@ class PkgPackageManager(BasePackageManager):
 
     def install(self):
         # type: () -> None
-        pass
+        run_command(["sudo", "pkg", "update"])
 
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
+        run_command(["sudo", "pkg", "install", "--yes", package])
 
     def format(self):
         # type: () -> str
