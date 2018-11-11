@@ -77,7 +77,6 @@ class BrewPackageManager(BasePackageManager):
             print("====> checking status of %s" % package)
             run_command(["brew", "ls", "--versions", package])
             # if the previous call succeeded, the package is installed so upgrade
-            print("====> %s installed, upgrading" % package)
             try:
                 run_command_no_output(["brew", "upgrade", "--cleanup", package])
             except subprocess.CalledProcessError:
@@ -90,7 +89,6 @@ class BrewPackageManager(BasePackageManager):
             except subprocess.CalledProcessError:
                 # brew install succeeds by returning a status code of 1...
                 pass
-        print("====> %s linking" % package)
         run_command_no_output(["brew", "link", package])
 
     def format(self):
@@ -102,7 +100,7 @@ class AptPackageManager(BasePackageManager):
 
     def install(self):
         # type: () -> None
-        print("====> updating APT")
+        print("====> updating apt")
         run_command(["sudo", "apt-get", "update"])
 
     def install_package(self, package):
@@ -115,7 +113,7 @@ class AptPackageManager(BasePackageManager):
         return PackageType.DEB
 
 class DnfPackageManager(BasePackageManager):
-    """The DNS package manager to use on Fedora and derivatives."""
+    """The DNF package manager to use on Fedora and derivatives."""
 
     def install(self):
         # type: () -> None
@@ -135,6 +133,7 @@ class PkgPackageManager(BasePackageManager):
 
     def install(self):
         # type: () -> None
+        print("====> updating pkg")
         run_command(["sudo", "pkg", "update"])
 
     def install_package(self, package):
