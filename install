@@ -43,7 +43,7 @@ COMMON_PACKAGES = [
     "jq",
     "radare2",
     "vim",
-    "cmake",  # for YouCompleteMe
+    "cmake",  # for ycm
 ]
 
 EXTRA_PACKAGES = {
@@ -54,17 +54,17 @@ EXTRA_PACKAGES = {
     PackageType.DEB: [
         "silversearcher-ag",
         "ttf-anonymous-pro",
-        "build-essential",  # for YouCompleteMe
-        "python-dev",  # for YouCompleteMe
-        "python3-dev",  # for YouCompleteMe
+        "build-essential",  # for ycm
+        "python-dev",  # for ycm
+        "python3-dev",  # for ycm
     ],
     PackageType.RPM: [
         "the_silver_searcher",
         "util-linux-user",
-        "gcc-c++",  # for YouCompleteMe
-        "make",  # for YouCompleteMe
-        "python-devel",  # for YouCompleteMe
-        "python3-devel",  # for YouCompleteMe
+        "gcc-c++",  # for ycm
+        "make",  # for ycm
+        "python-devel",  # for ycm
+        "python3-devel",  # for ycm
     ],
     PackageType.PKG: [
         "bash",
