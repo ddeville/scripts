@@ -12,8 +12,10 @@ from py.util import (
     run_command_no_output,
 )
 
-DEB = "deb"
-RPM = "rpm"
+class PackageType(object):
+    DEB = "deb"
+    RPM = "rpm"
+    BREW = "brew"
 
 def create_package_manager():
     # type: () -> BasePackageManager
@@ -50,7 +52,7 @@ class BasePackageManager(object):
     def format(self):
         # type: () -> str
         """The package format, mostly for Linux."""
-        raise None
+        raise NotImplementedError()
 
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
@@ -87,6 +89,10 @@ class BrewPackageManager(BasePackageManager):
         print("====> %s linking" % package)
         run_command_no_output(["brew", "link", package])
 
+    def format(self):
+        # type: () -> str
+        return PackageType.BREW
+
 class AptPackageManager(BasePackageManager):
     """The APT package manager to use on Debian and derivatives."""
 
@@ -102,7 +108,7 @@ class AptPackageManager(BasePackageManager):
 
     def format(self):
         # type: () -> str
-        return DEB
+        return PackageType.DEB
 
 class DnfPackageManager(BasePackageManager):
     """The DNS package manager to use on Fedora and derivatives."""
@@ -118,7 +124,7 @@ class DnfPackageManager(BasePackageManager):
 
     def format(self):
         # type: () -> str
-        return RPM
+        return PackageType.RPM
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""

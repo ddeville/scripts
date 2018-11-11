@@ -12,8 +12,7 @@ from py.executor import (
     run_all_tasks_for_config,
 )
 from py.package_manager import (
-    DEB,
-    RPM,
+    PackageType,
     create_package_manager,
 )
 from py.util import (
@@ -40,7 +39,7 @@ BASIC = "basic"
 
 # Packages
 
-PACKAGES = [
+COMMON_PACKAGES = [
     "fish",
     "tmux",
     "mosh",
@@ -49,13 +48,12 @@ PACKAGES = [
     "cmake",  # for YouCompleteMe
 ]
 
-PACKAGES_MACOS = [
-    "the_silver_searcher",
-    "tree",
-]
-
-PACKAGES_LINUX = {
-    DEB: [
+EXTRA_PACKAGES = {
+    PackageType.BREW: [
+        "the_silver_searcher",
+        "tree",
+    ],
+    PackageType.DEB: [
         "silversearcher-ag",
         "ttf-anonymous-pro",
         "vim",
@@ -63,7 +61,7 @@ PACKAGES_LINUX = {
         "python-dev",  # for YouCompleteMe
         "python3-dev",  # for YouCompleteMe
     ],
-    RPM: [
+    PackageType.RPM: [
         "the_silver_searcher",
         "vim",
         "util-linux-user",
@@ -85,23 +83,14 @@ def task_install_package_manager():
 
     return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=[])
 
-def task_install_mac_packages():
+def task_install_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        for package in PACKAGES + PACKAGES_MACOS:
+        for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(PACKAGE_MANAGER.format(), []):
             PACKAGE_MANAGER.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_package_manager"])
-
-def task_install_linux_packages():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        for package in PACKAGES + PACKAGES_LINUX[PACKAGE_MANAGER.format()]:
-            PACKAGE_MANAGER.install_package(package)
-
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_package_manager"])
 
 def task_update_shell_macos():
     # type: () -> TaskManifest
@@ -124,7 +113,7 @@ def task_update_shell_macos():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_mac_packages"])
+    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_packages"])
 
 def task_update_shell_linux():
     # type: () -> TaskManifest
@@ -136,7 +125,7 @@ def task_update_shell_linux():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_linux_packages"])
+    return TaskManifest(cmd=cmd, tags=[LINUX, BASIC], dependencies=["install_packages"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
