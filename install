@@ -69,7 +69,6 @@ EXTRA_PACKAGES = {
         "python3-devel",  # for ycm
     ],
     PackageType.PKG: [
-        "bash",
     ],
 }
 
