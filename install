@@ -90,7 +90,7 @@ def task_install_packages():
         for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(PACKAGE_MANAGER.format(), []):
             PACKAGE_MANAGER.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, BASIC], dependencies=["install_package_manager"])
+    return TaskManifest(cmd=cmd, tags=(ALL_PLATFORMS + [BASIC]), dependencies=["install_package_manager"])
 
 def task_update_shell_macos():
     # type: () -> TaskManifest
