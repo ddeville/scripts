@@ -28,7 +28,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
-    Plug 'Valloric/YouCompleteMe', {'do': '/usr/bin/python install.py --clang-completer --rust-completer'}
+    Plug 'Valloric/YouCompleteMe'
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape

@@ -42,14 +42,16 @@ def run_script_as_root(script):
         fw.flush()
         subprocess.check_call(["sudo", "bash", "-e", fw.name])
 
-def run_command(cmd):
+def run_command(cmd, env=None):
     # type: (List[str]) -> None
-    subprocess.check_call(cmd)
+    env = os.environ if env is None else env
+    subprocess.check_call(cmd, env=env)
 
-def run_command_no_output(cmd):
+def run_command_no_output(cmd, env=None):
     # type: (List[str]) -> None
     with open(os.devnull, "w") as f:
-        subprocess.check_call(cmd, stderr=f, stdout=f)
+        env = os.environ if env is None else env
+        subprocess.check_call(cmd, env=env, stderr=f, stdout=f)
 
 def force_symlink(path1, path2):
     # type: (str, str) -> None
