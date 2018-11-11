@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
+import json
 import os
+import subprocess
 import urllib
 
 from py.executor import (
@@ -205,21 +207,51 @@ def task_update_vim_plugins():
 
 def task_build_vim_plugins():
     # type: () -> TaskManifest
+    def _load_build_cache(path):
+        # type: (str) -> Dict[str, str]
+        try:
+            with open(path) as f:
+                build_cache = json.load(f)
+        except IOError:
+            build_cache = {}
+        return build_cache
+
+    def _write_build_cache(path, build_cache):
+        # type: (str, Dict[str, str]) -> None
+        with open(path, "w") as f:
+            json.dump(build_cache, f)
+
     def cmd():
         # type: () -> None
-        print("====> building ycm")
-        with change_dir(os.path.expanduser("~/.vim-plug-plugins/YouCompleteMe")):
-            # make sure that cargo is on the path since we might have just changed the shell...
-            env = os.environ.copy()
-            env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
-            # we want to use the system python since pyenv might not include the python dylib...
-            if os.path.isfile("/usr/bin/python"):
-                python_path = "/usr/bin/python"
-            elif os.path.isfile("/usr/local/bin/python"):
-                python_path = "/usr/local/bin/python"
+        plugins_path = os.path.expanduser("~/.vim-plug-plugins")
+
+        # load the config that contains the git hash of the last time we built
+        build_cache_path = os.path.join(plugins_path, "build_cache.json")
+        build_cache = _load_build_cache(build_cache_path)
+
+        with change_dir(os.path.join(plugins_path, "YouCompleteMe")):
+            # get the hash of the current commit so that we can check whether we need to rebuild
+            cur_hash = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
+
+            if cur_hash != build_cache.get("YouCompleteMe"):
+                print("====> building ycm")
+                # make sure that cargo is on the path since we might have just changed the shell...
+                env = os.environ.copy()
+                env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+                # we want to use the system python since pyenv might not include the python dylib...
+                if os.path.isfile("/usr/bin/python"):
+                    python_path = "/usr/bin/python"
+                elif os.path.isfile("/usr/local/bin/python"):
+                    python_path = "/usr/local/bin/python"
+                else:
+                    python_path = "python"
+                run_command([python_path, "install.py", "--clang-completer", "--rust-completer"], env=env)
+                # cache the git hash that we've just built
+                build_cache["YouCompleteMe"] = cur_hash
             else:
-                python_path = "python"
-            run_command([python_path, "install.py", "--clang-completer", "--rust-completer"], env=env)
+                print("====> ycm already built")
+
+        _write_build_cache(build_cache_path, build_cache)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins"])
 
