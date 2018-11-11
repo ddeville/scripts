@@ -1,8 +1,12 @@
 import urllib
 import subprocess
-import sys
 
 from py.util import (
+    FREEBSD,
+    LINUX,
+    MACOS,
+    get_current_platform,
+    get_linux_distro_info,
     is_cmd_installed,
     run_command,
     run_command_no_output,
@@ -24,19 +28,23 @@ class BasePackageManager(object):
 def create_package_manager():
     # type: () -> BasePackageManager
     """Create a new package manager instance that is appropriate for the current platform."""
-    if "darwin" in sys.platform:
+    plat = get_current_platform()
+
+    if plat == MACOS:
         return BrewPackageManager()
-    elif "linux" in sys.platform:
-        with open("/etc/os-release", "r") as f:
-            props = dict([entry.split("=") for entry in f.read().rstrip().split("\n")])
-            distros = [props.get("ID"), props.get("ID_LIKE")]
-        if "debian" in distros:
+    elif plat == LINUX:
+        distro_info = get_linux_distro_info()
+        distros = [props.get("ID"), props.get("ID_LIKE")]
+        if "debian" in distros or is_cmd_installed("apt-get"):
             return AptPackageManager()
-        elif "fedora" in distros:
+        elif "fedora" in distros or is_cmd_installed("dnf"):
             return DnfPackageManager()
-        return None
-    else:
-        raise Exception("Platform not supported %s" % sys.platform)
+        elif "centos" in distros or is_cmd_installed("yum"):
+            return YumPackageManager()
+    elif plat == FREEBSD:
+        return PkgPackageManager()
+
+    raise Exception("Platform not supported %s" % plat)
 
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
@@ -88,4 +96,10 @@ class AptPackageManager(BasePackageManager):
         run_command(["sudo", "apt-get", "upgrade", package])
 
 class DnfPackageManager(BasePackageManager):
+    pass
+
+class YumPackageManager(BasePackageManager):
+    pass
+
+class PkgPackageManager(BasePackageManager):
     pass
