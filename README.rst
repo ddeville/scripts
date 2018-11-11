@@ -2,11 +2,14 @@
 Scripts
 -------
 
-A bunch of scripts I use on every machine I set up. When setting up a new machine, do the following steps:
+A bunch of scripts I use on every machine I set up.
 
-* If on MacOS, install `iTerm2 <https://www.iterm2.com/downloads.html>`_
-* Clone this repo in the home directory
-* Run the install script, this will install various tools and create symbolic links to the config files
+A few requirements:
+
+* :code:`python` - preferably 2.7.10 or later, 3 even better
+* :code:`git` - to clone this repo
+* :code:`sudo` - so that the current user can install packages
+* if on MacOS, install `iTerm2 <https://www.iterm2.com/downloads.html>`_
 
 ::
 
