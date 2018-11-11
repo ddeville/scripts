@@ -69,7 +69,7 @@ EXTRA_PACKAGES = {
         "make",  # for YouCompleteMe
         "python-devel",  # for YouCompleteMe
         "python3-devel",  # for YouCompleteMe
-    ]
+    ],
 }
 
 PACKAGE_MANAGER = create_package_manager()
