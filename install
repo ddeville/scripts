@@ -6,12 +6,6 @@ import os
 import subprocess
 import urllib
 
-from py.task_executor import (
-    ExecutorConfig,
-    TaskManifest,
-    print_all_tasks_for_config,
-    run_all_tasks_for_config,
-)
 from py.package_manager import (
     PackageType,
     create_package_manager,
@@ -21,6 +15,12 @@ from py.platform import (
     LINUX,
     MACOS,
     get_current_platform,
+)
+from py.task_executor import (
+    ExecutorConfig,
+    TaskManifest,
+    print_all_tasks_for_config,
+    run_all_tasks_for_config,
 )
 from py.util import (
     change_dir,
