@@ -43,6 +43,7 @@ COMMON_PACKAGES = [
     "mosh",
     "jq",
     "radare2",
+    "vim",
     "cmake",  # for YouCompleteMe
 ]
 
@@ -54,14 +55,12 @@ EXTRA_PACKAGES = {
     PackageType.DEB: [
         "silversearcher-ag",
         "ttf-anonymous-pro",
-        "vim",
         "build-essential",  # for YouCompleteMe
         "python-dev",  # for YouCompleteMe
         "python3-dev",  # for YouCompleteMe
     ],
     PackageType.RPM: [
         "the_silver_searcher",
-        "vim",
         "util-linux-user",
         "gcc-c++",  # for YouCompleteMe
         "make",  # for YouCompleteMe
