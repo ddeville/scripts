@@ -16,6 +16,7 @@ class PackageType(object):
     DEB = "deb"
     RPM = "rpm"
     BREW = "brew"
+    PKG = "pkg"
 
 def create_package_manager():
     # type: () -> BasePackageManager
@@ -136,3 +137,7 @@ class PkgPackageManager(BasePackageManager):
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
+
+    def format(self):
+        # type: () -> str
+        return PackageType.PKG
