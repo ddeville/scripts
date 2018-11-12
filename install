@@ -72,14 +72,13 @@ EXTRA_PACKAGES = {
     ],
 }
 
-PACKAGE_MANAGER = create_package_manager()
-
 # Tasks
 
 def task_install_package_manager():
     # type: () -> TaskManifest
     def cmd():
-        PACKAGE_MANAGER.install()
+        package_manager = create_package_manager()
+        package_manager.install()
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=[])
 
@@ -87,8 +86,9 @@ def task_install_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(PACKAGE_MANAGER.format(), []):
-            PACKAGE_MANAGER.install_package(package)
+        package_manager = create_package_manager()
+        for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(package_manager.format(), []):
+            package_manager.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
