@@ -41,7 +41,7 @@ class _Task(object):
         self.dependencies = dependencies
 
 def _get_tasks(config):
-    # type: (ExecutorConfig) -> Generator[_Task]
+    # type: (ExecutorConfig) -> Iterator[_Task]
     """Retrieve all tasks that match the given config and order them based on dependencies."""
     def _extract_tasks():
         # type: () -> Iterator[_Task]
@@ -57,7 +57,7 @@ def _get_tasks(config):
     tasks = {task.name: task for task in _extract_tasks()}
 
     def _inner_run_tasks(inner_tasks):
-        # type: (List[Manifest]) -> Generator[_Task]
+        # type: (List[Manifest]) -> Iterator[_Task]
         for task in inner_tasks:
             # check whether the dependencies of this task have already been run
             for name in task.dependencies:
