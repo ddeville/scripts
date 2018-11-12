@@ -25,8 +25,8 @@ from py.task_executor import (
 from py.util import (
     change_dir,
     command_path,
-    copy_file_if_needed,
-    create_dirs_if_needed,
+    copy_file,
+    create_dirs,
     force_symlink,
     is_cmd_installed,
     run_command,
@@ -140,7 +140,7 @@ def task_update_dot_files():
         ]
 
         # make sure that we create the `.config/fish` directory since it won't be here on new machines
-        create_dirs_if_needed(os.path.join(dest_dir, ".config", "fish"))
+        create_dirs(os.path.join(dest_dir, ".config", "fish"))
 
         print("====> linking dot files")
         for f1, f2 in links:
@@ -318,11 +318,11 @@ def task_install_fonts():
         print("====> installing fonts")
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Fonts")
-        create_dirs_if_needed(dest_path)
+        create_dirs(dest_path)
         for folder in os.listdir(fonts_path):
             font_path = os.path.join(fonts_path, folder)
             if os.path.isdir(font_path) and not folder.startswith("."):
-                copy_file_if_needed(font_path, os.path.join(dest_path, folder), True)
+                copy_file(font_path, os.path.join(dest_path, folder), True)
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
@@ -334,11 +334,11 @@ def task_install_xcode_themes():
         themes_path = os.path.join(SCRIPTS_PATH, "macos", "xcode")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Developer", "Xcode", "UserData",
                                  "FontAndColorThemes")
-        create_dirs_if_needed(dest_path)
+        create_dirs(dest_path)
         for theme in os.listdir(themes_path):
             theme_path = os.path.join(themes_path, theme)
             if not theme.startswith("."):
-                copy_file_if_needed(theme_path, os.path.join(dest_path, theme))
+                copy_file(theme_path, os.path.join(dest_path, theme))
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
