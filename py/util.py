@@ -18,23 +18,23 @@ def is_cmd_installed(cmd):
     # type: (str) -> bool
     return command_path(cmd) is not None
 
+def run_command(cmd, env=None):
+    # type: (List[str], Optional[Dict[str, str]]) -> None
+    env = os.environ if env is None else env
+    subprocess.check_call(cmd, env=env)
+
+def run_command_no_output(cmd, env=None):
+    # type: (List[str], Optional[Dict[str, str]]) -> None
+    with open(os.devnull, "w") as f:
+        env = os.environ if env is None else env
+        subprocess.check_call(cmd, env=env, stderr=f, stdout=f)
+
 def run_script_as_root(script):
     # type: (str) -> None
     with tempfile.NamedTemporaryFile() as fw:
         fw.write(script)
         fw.flush()
         subprocess.check_call(["sudo", "sh", "-e", fw.name])
-
-def run_command(cmd, env=None):
-    # type: (List[str]) -> None
-    env = os.environ if env is None else env
-    subprocess.check_call(cmd, env=env)
-
-def run_command_no_output(cmd, env=None):
-    # type: (List[str]) -> None
-    with open(os.devnull, "w") as f:
-        env = os.environ if env is None else env
-        subprocess.check_call(cmd, env=env, stderr=f, stdout=f)
 
 def force_symlink(path1, path2):
     # type: (str, str) -> None
@@ -47,7 +47,7 @@ def force_symlink(path1, path2):
         else:
             raise
 
-def create_dirs_if_needed(path):
+def create_dirs(path):
     # type: (str) -> None
     try:
         os.makedirs(path)
@@ -55,7 +55,7 @@ def create_dirs_if_needed(path):
         if e.errno != errno.EEXIST:
             raise
 
-def copy_file_if_needed(orig, dest, isdir=False):
+def copy_file(orig, dest, isdir=False):
     # type: (str, str, bool) -> None
     try:
         if isdir:
@@ -68,6 +68,7 @@ def copy_file_if_needed(orig, dest, isdir=False):
 
 @contextlib.contextmanager
 def change_dir(path):
+    # type: (str) -> Iterator[str]
     original_path = os.getcwd()
     try:
         os.chdir(path)
