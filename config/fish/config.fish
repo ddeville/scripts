@@ -76,7 +76,6 @@ if test -z $TMUX
 end
 
 # abbreviations
-abbr -a k "clear"
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
 abbr -a gs "git status"
@@ -86,7 +85,6 @@ abbr -a chall "git log --branches  --not --remotes --simplify-by-decoration --de
 abbr -a con "tail -40 -f /var/log/system.log"
 abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
-abbr -a kd "killall Dock"
 abbr -a adp "arc diff --preview"
 
 # setup `fzf`
