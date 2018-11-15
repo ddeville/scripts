@@ -22,6 +22,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-dispatch'
+    Plug 'vifm/vifm.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
     Plug 'dag/vim-fish'
