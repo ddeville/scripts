@@ -1,5 +1,5 @@
 set vicmd=vim
-colorscheme solarized-dark
+colorscheme Default
 set statusline="  Hint: %z%= %A %10u:%-7g %15s %20d  "
 set grepprg=ag\ --line-numbers\ %i\ %a\ %s
 
