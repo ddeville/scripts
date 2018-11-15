@@ -142,10 +142,13 @@ def task_update_dot_files():
             ("tmux.conf", ".tmux.conf"),
             (os.path.join("fish", "config.fish"), os.path.join(".config", "fish", "config.fish")),
             (os.path.join("fish", "functions"), os.path.join(".config", "fish", "functions")),
+            (os.path.join("vifm", "vifmrc"), os.path.join(".config", "vifm", "vifmrc")),
+            (os.path.join("vifm", "colors"), os.path.join(".config", "vifm", "colors")),
         ]
 
-        # make sure that we create the `.config/fish` directory since it won't be here on new machines
+        # make sure that we create the various `.config/xxx` directories since they won't be here on new machines
         create_dirs(os.path.join(dest_dir, ".config", "fish"))
+        create_dirs(os.path.join(dest_dir, ".config", "vifm"))
 
         print("====> linking dot files")
         for f1, f2 in links:
