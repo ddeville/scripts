@@ -76,6 +76,7 @@ if test -z $TMUX
 end
 
 # abbreviations
+abbr -a cdd "cd .."
 abbr -a ll "ls -lahL"
 abbr -a oo "open ."
 abbr -a gs "git status"
