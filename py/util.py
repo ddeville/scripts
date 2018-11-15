@@ -42,7 +42,10 @@ def force_symlink(path1, path2):
         os.symlink(path1, path2)
     except OSError as e:
         if e.errno == errno.EEXIST:
-            os.remove(path2)
+            if not os.path.islink(path2) and os.path.isdir(path2):
+                shutil.rmtree(path2)
+            else:
+                os.remove(path2)
             os.symlink(path1, path2)
         else:
             raise
