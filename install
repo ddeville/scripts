@@ -61,7 +61,6 @@ EXTRA_PACKAGES = {
         "build-essential",  # for ycm
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
-        "glances",
     ],
     PackageType.RPM: [
         "the_silver_searcher",
@@ -70,7 +69,6 @@ EXTRA_PACKAGES = {
         "make",  # for ycm
         "python-devel",  # for ycm
         "python3-devel",  # for ycm
-        "glances",
     ],
     PackageType.PKG: [
     ],
