@@ -1,3 +1,9 @@
+jtool: 1.0
+http://newosxbook.com/tools/jtool.html
+
+procexp: 1.0
+http://newosxbook.com/tools/procexp.html
+
 filemon: 2.0
 http://newosxbook.com/tools/filemon.html
 
