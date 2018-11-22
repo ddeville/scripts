@@ -24,3 +24,10 @@ Open Tweak Tool and toggle Global Dark Theme
 
 ### Keyboard
 If running on a MacBook with a British keyboard layout, open Region & Languages in Settings and change the input source to "English (UK, Macintosh)"
+
+### SSH
+When connecting to the VM via SSH, it will repeatedly ask for the public key passphrase when performing SSH operations but will complain that is cannot open a connection to the authentication agent when running `ssh-add`. To fix this, do:
+```
+eval (ssh-agent -c)
+ssh-add ~/.ssh/id_rsa
+```
