@@ -33,7 +33,7 @@ ssh-add ~/.ssh/id_rsa
 ```
 
 ### Headless VM
-It's possible to run the VM headless with VMWare Fusion. The app exposes a `vmrum` utility that can be used to manage virtual machines.
+It's possible to run the VM headless with VMWare Fusion. The app exposes a `vmrum` utility that can be used to manage virtual machines (located under `/Applications/VMware Fusion.app/Contents/Public` which VMWare Fusion should automatically be adding to the path).
 ```
 # display the list of running VMs
 vmrun list
