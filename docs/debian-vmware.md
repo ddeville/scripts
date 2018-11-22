@@ -36,7 +36,7 @@ ssh-add ~/.ssh/id_rsa
 It's possible to run the VM headless with VMWare Fusion. The app exposes a `vmrum` utility that can be used to manage virtual machines.
 ```
 # display the list of running VMs
-vmrum list
+vmrun list
 # start the Debian vm
 vmrun start ~/vms/debian.vmwarevm nogui
 # pause and unpause the vm
