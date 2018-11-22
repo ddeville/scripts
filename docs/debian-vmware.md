@@ -31,3 +31,17 @@ When connecting to the VM via SSH, it will repeatedly ask for the public key pas
 eval (ssh-agent -c)
 ssh-add ~/.ssh/id_rsa
 ```
+
+### Headless VM
+It's possible to run the VM headless with VMWare Fusion. The app exposes a `vmrum` utility that can be used to manage virtual machines.
+```
+# display the list of running VMs
+vmrum list
+# start the Debian vm
+vmrun start ~/vms/debian.vmwarevm nogui
+# pause and unpause the vm
+vmrun pause ~/vms/debian.vmwarevm nogui
+vmrun unpause ~/vms/debian.vmwarevm nogui
+# stop the vm
+vmrun stop ~/vms/debian.vmwarevm nogui
+```
