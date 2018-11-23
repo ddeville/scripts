@@ -46,6 +46,7 @@ COMMON_PACKAGES = [
     "radare2",
     "cmake",  # for ycm
     "htop",
+    "tree",
     "vim",
     "vifm",
 ]
@@ -53,7 +54,7 @@ COMMON_PACKAGES = [
 EXTRA_PACKAGES = {
     PackageType.BREW: [
         "the_silver_searcher",
-        "tree",
+        "hyperfine",
     ],
     PackageType.DEB: [
         "silversearcher-ag",
