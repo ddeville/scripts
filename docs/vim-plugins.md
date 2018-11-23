@@ -5,7 +5,7 @@
 - gc + motion
 
 ### tpope/vim-eunuch
-- A bunch of UNIX like command to work with files and buffers (:Delete, :Move, etc...)
+A bunch of UNIX like command to work with files and buffers (:Delete, :Move, etc...)
 
 ### tpope/vim-surround
 - cs'" -> changes surrounding ' to "
