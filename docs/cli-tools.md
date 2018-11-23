@@ -1,63 +1,51 @@
 # Command Line Tools
 
-https://github.com/alebcay/awesome-shell
-https://github.com/agarrharr/awesome-cli-apps
-https://github.com/k4m4/terminals-are-sexy
+- https://github.com/alebcay/awesome-shell
+- https://github.com/agarrharr/awesome-cli-apps
+- https://github.com/k4m4/terminals-are-sexy
 
-## Fish
-https://fishshell.com
-https://github.com/fish-shell/fish-shell
+### Fish
+- https://fishshell.com
+- https://github.com/fish-shell/fish-shell
 
-## Vim
-https://www.vim.org
-https://statico.github.io/vim.html
-https://statico.github.io/vim2.html
-https://statico.github.io/vim3.html
+### Vim
+- https://www.vim.org
+- https://statico.github.io/vim.html
+- https://statico.github.io/vim2.html
+- https://statico.github.io/vim3.html
 
-## Vim Plugins
+### Tmux
+- https://github.com/tmux/tmux
+- https://leanpub.com/the-tao-of-tmux/read
 
-### YouCompleteMe
-https://github.com/valloric/YouCompleteMe
-https://shinglyu.github.io/productivity/2016/05/13/rust-completion_with_ycm.html
+### Ag
+- https://geoff.greer.fm/ag
+- https://github.com/ggreer/the_silver_searcher
 
-### Syntastic
-https://github.com/vim-syntastic/syntastic
+### Fzf
+- https://github.com/junegunn/fzf
 
-### ALE
-https://github.com/w0rp/ale
+### Mosh
+- https://mosh.org
 
-## Tmux
-https://github.com/tmux/tmux
-https://leanpub.com/the-tao-of-tmux/read
+### Vifm
+- https://vifm.info
+- https://github.com/vifm/vifm
 
-## Ag
-https://geoff.greer.fm/ag
-https://github.com/ggreer/the_silver_searcher
+### Htop
+- https://hisham.hm/htop
+- https://github.com/hishamhm/htop
 
-## Fzf
-https://github.com/junegunn/fzf
+### Radare2
+- https://rada.re/r
+- https://github.com/radare/radare2
 
-## Mosh
-https://mosh.org
+### Jq
+- https://stedolan.github.io/jq
+- https://github.com/stedolan/jq
 
-## Vifm
-https://vifm.info
-https://github.com/vifm/vifm
+### Lnav
+- http://lnav.org
 
-## Htop
-https://hisham.hm/htop
-https://github.com/hishamhm/htop
-
-## Radare2
-https://rada.re/r
-https://github.com/radare/radare2
-
-## Jq
-https://stedolan.github.io/jq
-https://github.com/stedolan/jq
-
-## Lnav
-http://lnav.org
-
-## Hyperfine
-https://github.com/sharkdp/hyperfine
+### Hyperfine
+- https://github.com/sharkdp/hyperfine

@@ -42,3 +42,10 @@ A bunch of UNIX like command to work with files and buffers (:Delete, :Move, etc
 ### itchyny/lightline.vim
 ### tpope/vim-git
 ### tpope/vim-repeat
+
+## To install
+- Syntastic
+- ALE
+
+## To look into
+- https://shinglyu.github.io/productivity/2016/05/13/rust-completion_with_ycm.html
