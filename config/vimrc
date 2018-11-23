@@ -67,8 +67,8 @@ set ruler
 " display the (relative) line number on the left
 set number
 
-" display a column at 120 char
-set colorcolumn=120
+" display a column at 80 char
+set colorcolumn=80
 
 " highlight the current line
 set cursorline
