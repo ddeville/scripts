@@ -77,7 +77,7 @@ end
 
 # abbreviations
 abbr -a cdd "cd .."
-abbr -a ll "ls -lahL"
+abbr -a ll "ls -lah"
 abbr -a oo "open ."
 abbr -a gs "git status"
 abbr -a gf "git difftool"
