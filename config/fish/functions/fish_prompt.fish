@@ -22,13 +22,13 @@ function fish_prompt
         set arrow "$red# "
     end
   
-    set -l cwd $cyan(basename (prompt_pwd))
-    set -l hostname $yellow(hostname -s)
+    set -l cwd_ $cyan(basename (prompt_pwd))
+    set -l hostname_ $yellow(hostname -s)
 
     if [ (_is_git_repo) ]
         set -l repo_branch $red(_git_branch_name)
         set repo_info "$blue:($repo_branch$blue)"
     end
 
-    echo -n -s $arrow ' '$hostname:$cwd $repo_info $normal ' '
+    echo -n -s $arrow ' '$hostname_:$cwd_ $repo_info $normal ' '
 end
