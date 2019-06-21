@@ -11,7 +11,7 @@ import optparse
 
 def __lldb_init_module(debugger, dict):
     debugger.HandleCommand('command script add -f block.block_disass_command block_disass')
-    print 'The "block_disass" command has been installed'
+    print('The "block_disass" command has been installed')
 
 def create_command_arguments(command):
     return shlex.split(command)
@@ -34,7 +34,7 @@ def block_disass_command(debugger, command, result, dict):
         return
 
     if len(args) == 0:
-        print "You need to specify the name of a variable or an address"
+        print("You need to specify the name of a variable or an address")
         return
 
     variable_arg = args[0]
@@ -54,7 +54,7 @@ def block_disass_command(debugger, command, result, dict):
         try:
             address = int(variable_arg, 0)
         except:
-            print "The argument is not a valid address or variable in the frame"
+            print("The argument is not a valid address or variable in the frame")
             return
 
     if should_signature:
@@ -86,7 +86,7 @@ def print_block_signature(debugger, target, process, block_address):
     flags_error = lldb.SBError()
     flags = process.ReadUnsignedFromMemory(flags_address, 4, flags_error)
     if not flags_error.Success():
-        print "Could not retrieve the block flags"
+        print("Could not retrieve the block flags")
         return
 
     # BLOCK_HAS_SIGNATURE = (1 << 30)
@@ -95,7 +95,7 @@ def print_block_signature(debugger, target, process, block_address):
     block_has_copy_dispose_helpers = ((flags & (1 << 25)) != 0)
 
     if not block_has_signature:
-        print "The block does not have a signature"
+        print("The block does not have a signature")
         return
 
     # The block descriptor struct pointer is after 2 pointers and 2 int in the struct
@@ -104,7 +104,7 @@ def print_block_signature(debugger, target, process, block_address):
     block_descriptor_error = lldb.SBError()
     block_descriptor = process.ReadPointerFromMemory(block_descriptor_address, block_descriptor_error)
     if not block_descriptor_error.Success():
-        print "Could not read the block descriptor struct"
+        print("Could not read the block descriptor struct")
         return
 
     # The signature is after 2 unsigned int in the descriptor struct
@@ -119,7 +119,7 @@ def print_block_signature(debugger, target, process, block_address):
     signature_error = lldb.SBError()
     signature = process.ReadCStringFromMemory(signature_pointer, 256, signature_error)
     if not signature_error.Success():
-        print "Could not retrieve the signature"
+        print("Could not retrieve the signature")
         return
 
     escaped_signature = signature.replace('"', '\\"')
@@ -136,7 +136,7 @@ def disass_block_invoke_function(debugger, target, process, block_address, instr
     invoke_function_error = lldb.SBError()
     invoke_function_pointer = process.ReadPointerFromMemory(invoke_function_address, invoke_function_error)
     if not invoke_function_error.Success():
-        print "Could not retrieve the block invoke function pointer"
+        print("Could not retrieve the block invoke function pointer")
         return
 
     disass_cmd = "disassemble --start-address " + str(invoke_function_pointer) + " -c " + str(instruction_count)
