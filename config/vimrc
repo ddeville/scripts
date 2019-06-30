@@ -143,6 +143,8 @@ let g:lightline = {
 
 " no sticky preview window at the bottom after completion
 let g:ycm_autoclose_preview_window_after_completion = 1
+nnoremap <Leader>] :YcmCompleter GoTo<CR>
+nnoremap <Leader>d :YcmCompleter GetDoc<CR>
 
 " LANGUAGES
 
