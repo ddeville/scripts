@@ -100,10 +100,6 @@ imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
 
-" remap the leader from `\` to `,` and the local leader to `\`
-let mapleader="'"
-let maplocalleader="\\"
-
 " map screen redraw to also turn off search highlighting
 nnoremap <C-L> :nohl<CR><C-L>
 
@@ -120,18 +116,9 @@ inoremap jj <esc>
 " remap some `fzf` functions
 nnoremap ; :Buffers<CR>
 nnoremap <Leader>o :Files<CR>
-nnoremap <Leader>f :Ag<CR>
+nnoremap <Leader>f :Rg<CR>
 nnoremap <Leader>t :Tags<CR>
 nnoremap <Leader>s :GFiles?<CR>
-
-" ==> CONFIG `mileszs/ack.vim`
-
-" use `ag` in the `ack` plugin if it's available
-if executable('ag')
-    " use `ag` over grep
-    set grepprg=ag\ --nogroup\ --nocolor
-    let g:ackprg='ag --nogroup --nocolor --column'
-endif
 
 " ==> CONFIG `itchyny/lightline.vim`
 
