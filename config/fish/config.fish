@@ -87,6 +87,7 @@ abbr -a con "tail -40 -f /var/log/system.log"
 abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
 abbr -a adp "arc diff --preview"
+abbr -a adu "arc diff --update"
 
 # setup `fzf`
 set -x FZF_TMUX 0
