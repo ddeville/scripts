@@ -54,20 +54,26 @@ COMMON_PACKAGES = [
 
 EXTRA_PACKAGES = {
     PackageType.BREW: [
+        "ctags",
         "hyperfine",
     ],
     PackageType.DEB: [
         "ttf-anonymous-pro",
+        "exuberant-ctags",
         "build-essential",  # for ycm
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
     ],
     PackageType.RPM: [
         "util-linux-user",
+        "exuberant-ctags",
         "gcc-c++",  # for ycm
         "make",  # for ycm
         "python-devel",  # for ycm
         "python3-devel",  # for ycm
+    ],
+    PackageType.PKG: [
+        "exuberant-ctags",
     ],
 }
 
