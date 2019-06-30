@@ -215,7 +215,7 @@ def task_build_vim_plugins():
         try:
             with open(path) as f:
                 build_cache = json.load(f)
-        except IOError:
+        except (IOError, json.JSONDecodeError):
             build_cache = {}
         return build_cache
 
@@ -235,7 +235,7 @@ def task_build_vim_plugins():
         plugin = "YouCompleteMe"
         with change_dir(os.path.join(plugins_path, plugin)):
             # get the hash of the current commit so that we can check whether we need to rebuild
-            cur_hash = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
+            cur_hash = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip().decode()
 
             if cur_hash != build_cache.get(plugin):
                 print("====> building ycm")
