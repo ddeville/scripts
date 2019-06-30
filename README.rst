@@ -16,3 +16,8 @@ A few requirements:
     > cd ~
     > git clone git@github.com:ddeville/scripts.git
     > ./install run
+
+Things to do:
+
+* Add the rust source to the rustup install (for YMC to offer auto completion): :code:`rustup component add rust-src`
+* Install Jedi for Python auto completion: :code:`pip install jedi`
