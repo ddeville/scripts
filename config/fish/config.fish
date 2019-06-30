@@ -79,6 +79,7 @@ end
 abbr -a cdd "cd .."
 abbr -a ll "ls -lah"
 abbr -a oo "open ."
+abbr -a gaa "git aa; and git ci"
 abbr -a gs "git status"
 abbr -a gf "git difftool"
 abbr -a ch "git log --oneline (get_git_remote_branch)..HEAD"
