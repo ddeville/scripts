@@ -104,7 +104,7 @@ imap <left> <nop>
 imap <right> <nop>
 
 " map screen redraw to also turn off search highlighting
-nnoremap <C-L> :nohl<CR><C-L>
+nnoremap <C-l> :nohl<CR><C-l>
 
 " use `H` and `L` to move to start and end of line
 nnoremap <S-l> $
@@ -143,8 +143,8 @@ let g:lightline = {
 
 " no sticky preview window at the bottom after completion
 let g:ycm_autoclose_preview_window_after_completion = 1
-nnoremap <Leader>] :YcmCompleter GoTo<CR>
-nnoremap <Leader>d :YcmCompleter GetDoc<CR>
+nnoremap <C-j> :YcmCompleter GoTo<CR>
+nnoremap <C-k> :YcmCompleter GetDoc<CR>
 
 " LANGUAGES
 
