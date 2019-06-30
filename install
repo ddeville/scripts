@@ -46,6 +46,7 @@ COMMON_PACKAGES = [
     "radare2",
     "cmake",  # for ycm
     "htop",
+    "ripgrep",
     "tree",
     "vim",
     "vifm",
@@ -53,26 +54,20 @@ COMMON_PACKAGES = [
 
 EXTRA_PACKAGES = {
     PackageType.BREW: [
-        "the_silver_searcher",
         "hyperfine",
     ],
     PackageType.DEB: [
-        "silversearcher-ag",
         "ttf-anonymous-pro",
         "build-essential",  # for ycm
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
     ],
     PackageType.RPM: [
-        "the_silver_searcher",
         "util-linux-user",
         "gcc-c++",  # for ycm
         "make",  # for ycm
         "python-devel",  # for ycm
         "python3-devel",  # for ycm
-    ],
-    PackageType.PKG: [
-        "the_silver_searcher",
     ],
 }
 
