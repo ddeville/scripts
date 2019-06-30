@@ -19,5 +19,5 @@ A few requirements:
 
 Things to do:
 
-* Add the rust source to the rustup install (for YMC to offer auto completion): :code:`rustup component add rust-src`
+* Add the rust source to the rustup install (for YCM to offer auto completion): :code:`rustup component add rust-src`
 * Install Jedi for Python auto completion: :code:`pip install jedi`
