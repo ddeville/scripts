@@ -26,7 +26,6 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
     Plug 'dag/vim-fish'
-    Plug 'mileszs/ack.vim'
     Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'Valloric/YouCompleteMe'
