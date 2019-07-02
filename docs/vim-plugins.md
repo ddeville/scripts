@@ -1,5 +1,16 @@
 # Vim Plugins
 
+### itchyny/lightline.vim
+A cool status line
+
+### tpope/vim-git
+Simple git integration
+
+### tpope/vim-fugitive
+Powerful git integration
+
+### tpope/vim-rhubarb
+
 ### tpope/vim-commentary
 - (count) + gcc
 - gc + motion
@@ -17,35 +28,23 @@ A bunch of UNIX like command to work with files and buffers (:Delete, :Move, etc
 - (count) + ] + space -> adds newline(s) below cursor
 - ... and a lot more ...
 
-### tpope/vim-fugitive
-
-### tpope/vim-rhubarb
+### tpope/vim-repeat
+Supports repeating plugin actions with .
 
 ### tpope/vim-vinegar
 
 ### tpope/vim-dispatch
 
 ### vifm/vifm.vim
+Integration with the vifm file manager
 
 ### vim-scripts/a.vim
+Supports switching between header and implementation for C languages
 
 ### rust-lang/rust.vim
 
-### mileszs/ack.vim
+### dag/vim-fish
 
 ### junegunn/fzf.vim
 
 ### Valloric/YouCompleteMe
-
-### dag/vim-fish
-
-### itchyny/lightline.vim
-### tpope/vim-git
-### tpope/vim-repeat
-
-## To install
-- Syntastic
-- ALE
-
-## To look into
-- https://shinglyu.github.io/productivity/2016/05/13/rust-completion_with_ycm.html
