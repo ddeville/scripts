@@ -1,4 +1,5 @@
 When searching a file in FZF, do
+
     - [C-v] to open the file in a new vertical window
     - [C-x] to open the file in a new horizontal window
     - [C-t] to open the file in a new tab
