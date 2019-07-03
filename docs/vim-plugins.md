@@ -10,6 +10,7 @@ Simple git integration
 Powerful git integration
 
 ### tpope/vim-rhubarb
+GitHub extension for Fugitive
 
 ### tpope/vim-commentary
 - (count) + gcc
@@ -32,8 +33,11 @@ A bunch of UNIX like command to work with files and buffers (:Delete, :Move, etc
 Supports repeating plugin actions with .
 
 ### tpope/vim-vinegar
+Improve netrw
+Hit - in any buffer to pop up in a directory listing
 
 ### tpope/vim-dispatch
+Run builds and tests asynchronously in the background
 
 ### vifm/vifm.vim
 Integration with the vifm file manager
