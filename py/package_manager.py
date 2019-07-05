@@ -78,17 +78,14 @@ class BrewPackageManager(BasePackageManager):
             run_command(["brew", "ls", "--versions", package])
             # if the previous call succeeded, the package is installed so upgrade
             try:
-                run_command_no_output(["brew", "upgrade", "--cleanup", package])
+                print("====> upgrading %s" % package)
+                run_command(["brew", "upgrade", package])
             except subprocess.CalledProcessError:
-                print("====> %s up to date" % package)
+                pass
         except subprocess.CalledProcessError:
             # the package has never been installed, do that now
             print("====> installing %s" % package)
-            try:
-                run_command(["brew", "install", package])
-            except subprocess.CalledProcessError:
-                # brew install succeeds by returning a status code of 1...
-                pass
+            run_command(["brew", "install", package])
         run_command_no_output(["brew", "link", package])
 
     def format(self):
