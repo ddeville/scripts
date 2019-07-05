@@ -94,7 +94,7 @@ abbr -a sshfix "eval (ssh-agent -c); and ssh-add ~/.ssh/id_rsa"
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
-set -x FZF_DEFAULT_COMMAND "rg --files --hidden"
+set -x FZF_DEFAULT_COMMAND "rg --files --hidden --glob '!.git/*'"
 set -x FZF_CTRL_T_COMMAND "git ls-files"
 set -x FZF_ALT_C_COMMAND "find .\
                           -type d -name '.git' -prune -o\
