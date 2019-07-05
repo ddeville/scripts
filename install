@@ -56,10 +56,12 @@ EXTRA_PACKAGES = {
     PackageType.BREW: [
         "ctags",
         "hyperfine",
+        "fd",
     ],
     PackageType.DEB: [
         "ttf-anonymous-pro",
         "exuberant-ctags",
+        "fd-find",
         "build-essential",  # for ycm
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
@@ -67,6 +69,7 @@ EXTRA_PACKAGES = {
     PackageType.RPM: [
         "util-linux-user",
         "exuberant-ctags",
+        "fd-find",
         "gcc-c++",  # for ycm
         "make",  # for ycm
         "python-devel",  # for ycm
@@ -74,6 +77,7 @@ EXTRA_PACKAGES = {
     ],
     PackageType.PKG: [
         "exuberant-ctags",
+        "fd-find",
     ],
 }
 
