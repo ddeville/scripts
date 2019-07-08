@@ -89,7 +89,7 @@ abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
 abbr -a adp "arc diff --preview"
 abbr -a adu "arc diff --update"
-abbr -a sshfix "eval (ssh-agent -c); and ssh-add ~/.ssh/id_rsa"
+abbr -a sshfix "eval (ssh-agent -c); and ssh-add -K ~/.ssh/id_rsa"
 
 # setup `fzf`
 set -x FZF_TMUX 0
