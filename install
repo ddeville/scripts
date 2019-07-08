@@ -221,12 +221,17 @@ def task_update_vim_plugins():
 
 def task_build_vim_plugins():
     # type: () -> TaskManifest
+    try:
+        from json import JSONDecodeError
+    except ImportError:
+        JSONDecodeError = ValueError  # python 2...
+
     def _load_build_cache(path):
         # type: (str) -> Dict[str, str]
         try:
             with open(path) as f:
                 build_cache = json.load(f)
-        except (IOError, json.JSONDecodeError):
+        except (IOError, JSONDecodeError):
             build_cache = {}
         return build_cache
 
