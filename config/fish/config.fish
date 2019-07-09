@@ -45,7 +45,7 @@ end
 # set up a list to collect the new path entries
 set -l PATH_ENTRIES
 
-# make sure that these are before anything in the path (they overwrite others)
+# make sure that this is before anything in the path (it overwrite others)
 if test -e "$HOME/.pyenv/bin"
     if test -e "$HOME/.pyenv/shims"
         set PATH_ENTRIES $PATH_ENTRIES "$HOME/.pyenv/shims"
