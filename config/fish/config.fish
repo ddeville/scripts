@@ -58,6 +58,9 @@ if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
 # these can come afterwards, it's cool
+if test -e "$HOME/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
+end
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/macos/bin"
 end
@@ -66,9 +69,6 @@ if test -e "$HOME/scripts/bin"
 end
 if test -e "$HOME/.cargo/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/.cargo/bin"
-end
-if test -e "$HOME/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
 end
 if test -e "$HOME/.fzf/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
