@@ -34,6 +34,14 @@ set -gx fish_greeting "
      Did I hear fish? Meow!
 "
 
+# clean up existing path before resourcing it so that starting tmux doesn't end
+# up with duplicate entries in the path (and the default paths prepended to the
+# front) - this is because this config file is loaded twice when starting tmux.
+if test -e "/usr/libexec/path_helper"
+    set PATH ""
+    eval (/usr/libexec/path_helper -c)
+end
+
 # set up a list to collect the new path entries
 set -l PATH_ENTRIES
 
@@ -50,12 +58,6 @@ if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
 # these can come afterwards, it's cool
-if test -e "$HOME/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
-end
-if test -e "$HOME/.fzf/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
-end
 if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/macos/bin"
 end
@@ -65,15 +67,18 @@ end
 if test -e "$HOME/.cargo/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/.cargo/bin"
 end
+if test -e "$HOME/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
+end
+if test -e "$HOME/.fzf/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
+end
 if which xcode-select > /dev/null; and set -x XCODE (xcode-select --print-path); and test -e $XCODE
     set PATH_ENTRIES $PATH_ENTRIES "$XCODE/usr/bin"
 end
 
-# make sure that we don't set the path if in tmux otherwise there will be
-# duplicate entries in the path
-if test -z $TMUX
-    set -x PATH $PATH_ENTRIES $PATH
-end
+# we can now set the new entries in front of the path
+set -x PATH $PATH_ENTRIES $PATH
 
 # abbreviations
 abbr -a cdd "cd .."
