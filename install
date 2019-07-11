@@ -152,7 +152,6 @@ def task_update_dot_files():
         dest_dir = os.path.expanduser("~")
 
         links = [
-            ("base16_theme", ".base16_theme"),
             ("bash_profile", ".bash_profile"),
             ("bashrc", ".bashrc"),
             ("ctags", ".ctags"),
@@ -163,7 +162,6 @@ def task_update_dot_files():
             ("tmux.conf", ".tmux.conf"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
-            ("vimrc_background", ".vimrc_background"),
             (os.path.join("fish", "config.fish"), os.path.join(".config", "fish", "config.fish")),
             (os.path.join("fish", "functions"), os.path.join(".config", "fish", "functions")),
             (os.path.join("vifm", "vifmrc"), os.path.join(".config", "vifm", "vifmrc")),
