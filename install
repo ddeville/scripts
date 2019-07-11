@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import urllib
 
@@ -127,6 +128,22 @@ def task_update_shell():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_packages"])
 
+def task_install_base16_shell():
+    # type: () -> TaskManifest
+    def cmd():
+        # type: () -> None
+        base16_shell_path = os.path.expanduser("~/.config/base16-shell")
+        repo_url = "https://github.com/chriskempson/base16-shell.git"
+        # first remove the existing repo if it exists
+        if os.path.exists(base16_shell_path):
+            print("====> deleting existing base16-shell repo")
+            shutil.rmtree(base16_shell_path)
+        # second, clone the repo in the right place
+        print("====> installing base16-shell repo")
+        run_command(["git", "clone", repo_url, base16_shell_path])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
+
 def task_update_dot_files():
     # type: () -> TaskManifest
     def cmd():
@@ -163,7 +180,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_shell"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
