@@ -29,14 +29,20 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'Valloric/YouCompleteMe'
+    Plug 'chriskempson/base16-vim'
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
 
-" set solarized dark as the color scheme
+" dark background is better
 set background=dark
-colorscheme solarized
+
+" setup base16 colorscheme
+if filereadable(expand("~/.vimrc_background"))
+    let base16colorspace=256
+    source ~/.vimrc_background
+endif
 
 " allow switching between buffers without saving first
 set hidden
