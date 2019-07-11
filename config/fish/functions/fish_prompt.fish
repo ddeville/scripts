@@ -21,7 +21,7 @@ function fish_prompt
     if [ $USER = 'root' ]
         set arrow "$red# "
     end
-  
+
     set -l cwd_ $cyan(basename (prompt_pwd))
     set -l hostname_ $yellow(hostname -s)
 
