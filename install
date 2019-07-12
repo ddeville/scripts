@@ -128,37 +128,25 @@ def task_update_shell():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_packages"])
 
-def task_install_base16_shell():
+def task_install_base16():
     # type: () -> TaskManifest
+    repos = [
+        ("base16-shell", "https://github.com/chriskempson/base16-shell.git"),
+        ("base16-fish", "https://github.com/ddeville/base16-fish.git"),
+    ]
     def cmd():
         # type: () -> None
-        base16_shell_path = os.path.expanduser("~/.config/base16-shell")
-        repo_url = "https://github.com/chriskempson/base16-shell.git"
-        # first remove the existing repo if it exists
-        if os.path.exists(base16_shell_path):
-            print("====> deleting existing base16-shell repo")
-            shutil.rmtree(base16_shell_path)
-        # second, clone the repo in the right place
-        print("====> installing base16-shell repo")
-        run_command(["git", "clone", repo_url, base16_shell_path])
+        for name, repo_url in repos:
+            path = os.path.expanduser(os.path.join("~", ".config", name))
+            # first remove the existing repo if it exists
+            if os.path.exists(path):
+                print("====> deleting existing %s repo" % name)
+                shutil.rmtree(path)
+            # second, clone the repo in the right place
+            print("====> installing %s repo" % name)
+            run_command(["git", "clone", repo_url, path])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
-
-def task_install_base16_fish():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        base16_fish_path = os.path.expanduser("~/.config/base16-fish")
-        repo_url = "https://github.com/ddeville/base16-fish.git"
-        # first remove the existing repo if it exists
-        if os.path.exists(base16_fish_path):
-            print("====> deleting existing base16-fish repo")
-            shutil.rmtree(base16_fish_path)
-        # second, clone the repo in the right place
-        print("====> installing base16-fish repo")
-        run_command(["git", "clone", repo_url, base16_fish_path])
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_shell"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
@@ -194,7 +182,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_fish"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
