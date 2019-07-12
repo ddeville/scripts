@@ -1,24 +1,12 @@
 set -gx EDITOR vim
 set -gx CLICOLOR 1
 set -gx TERM xterm-256color
-
 set -gx GREP_OPTIONS "--color=auto"
-set -gx LSCOLORS gxfxbEaEBxxEhEhBaDaCaD
 
-# fish colors
-set -gx fish_color_autosuggestion 586e75
-set -gx fish_color_command b294bb
-set -gx fish_color_comment 586e75
-set -gx fish_color_end 268bd2
-set -gx fish_color_error dc322f
-set -gx fish_color_param 839496
-set -gx fish_color_quote 657b83
-set -gx fish_color_redirection 6c71c4
-
-# setup the base16 shell
+# setup the base16 shell and source the colors
 if status --is-interactive
-    set BASE16_SHELL "$HOME/.config/base16-shell/"
-    source "$BASE16_SHELL/profile_helper.fish"
+    source "$HOME/.config/base16-shell/profile_helper.fish"
+    source "$HOME/.config/base16-fish/profile_helper.fish"
 end
 
 # use the vim key bindings
