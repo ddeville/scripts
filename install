@@ -144,6 +144,22 @@ def task_install_base16_shell():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
 
+def task_install_base16_fish():
+    # type: () -> TaskManifest
+    def cmd():
+        # type: () -> None
+        base16_fish_path = os.path.expanduser("~/.config/base16-fish")
+        repo_url = "https://github.com/ddeville/base16-fish.git"
+        # first remove the existing repo if it exists
+        if os.path.exists(base16_fish_path):
+            print("====> deleting existing base16-fish repo")
+            shutil.rmtree(base16_fish_path)
+        # second, clone the repo in the right place
+        print("====> installing base16-fish repo")
+        run_command(["git", "clone", repo_url, base16_fish_path])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_shell"])
+
 def task_update_dot_files():
     # type: () -> TaskManifest
     def cmd():
@@ -178,7 +194,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_shell"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16_fish"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
