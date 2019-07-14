@@ -195,6 +195,10 @@ def task_install_pyenv():
             print("====> updating pyenv")
             run_command(["pyenv", "update"])
         else:
+            pyenv_path = os.path.expanduser("~/.pyenv")
+            if os.path.exists(pyenv_path):
+                print("====> deleting existing pyenv install")
+                shutil.rmtree(pyenv_path)
             print("====> installing pyenv")
             pyenv_installer_path = "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
             script_path, _ = urlretrieve(pyenv_installer_path)
