@@ -3,6 +3,7 @@ if &shell =~# 'fish$'
     set shell=bash
 endif
 
+set encoding=utf-8
 " enable syntax highlighting
 syntax enable
 
