@@ -19,6 +19,7 @@ class PackageType(object):
     DEB = "deb"
     RPM = "rpm"
     BREW = "brew"
+    PAC = "pac"
     PKG = "pkg"
 
 def create_package_manager():
@@ -35,6 +36,8 @@ def create_package_manager():
             return AptPackageManager()
         elif "fedora" in distros or is_cmd_installed("dnf"):
             return DnfPackageManager()
+        elif "arch" in distros or is_cmd_installed("pacman"):
+            return PacmanPackageManager()
     elif plat == FREEBSD:
         return PkgPackageManager()
 
@@ -124,6 +127,23 @@ class DnfPackageManager(BasePackageManager):
     def format(self):
         # type: () -> str
         return PackageType.RPM
+
+class PacmanPackageManager(BasePackageManager):
+    """The Pacman package manager to use on Arch."""
+
+    def install(self):
+        # type: () -> None
+        print("====> updating pacman")
+        run_command(["sudo", "pacman", "-Syy"])
+
+    def install_package(self, package):
+        # type: (str) -> None
+        print("====> installing %s" % package)
+        run_command(["sudo", "pacman", "-S", package])
+
+    def format(self):
+        # type: () -> str
+        return PackageType.PAC
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""
