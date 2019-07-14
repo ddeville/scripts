@@ -5,7 +5,11 @@ import json
 import os
 import shutil
 import subprocess
-import urllib
+
+try:
+    from urllib.request import urlretrieve
+except ImportError:
+    from urllib import urlretrieve
 
 from py.package_manager import (
     PackageType,
@@ -193,7 +197,7 @@ def task_install_pyenv():
         else:
             print("====> installing pyenv")
             pyenv_installer_path = "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
-            script_path, _ = urllib.urlretrieve(pyenv_installer_path)
+            script_path, _ = urlretrieve(pyenv_installer_path)
             run_command(["bash", script_path])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
@@ -206,7 +210,7 @@ def task_install_rustup():
             run_command(["rustup", "self", "update"])
         else:
             print("====> install rustup")
-            script_path, _ = urllib.urlretrieve("https://sh.rustup.rs")
+            script_path, _ = urlretrieve("https://sh.rustup.rs")
             run_command(["sh", script_path, "-y", "--no-modify-path"])
         pass
 
