@@ -19,7 +19,7 @@ class PackageType(object):
     DEB = "deb"
     RPM = "rpm"
     BREW = "brew"
-    PAC = "pac"
+    PACMAN = "pacman"
     PKG = "pkg"
 
 def create_package_manager():
@@ -143,7 +143,7 @@ class PacmanPackageManager(BasePackageManager):
 
     def format(self):
         # type: () -> str
-        return PackageType.PAC
+        return PackageType.PACMAN
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""

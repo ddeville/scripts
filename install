@@ -63,6 +63,11 @@ EXTRA_PACKAGES = {
         "hyperfine",
         "fd",
     ],
+    PackageType.PACMAN: [
+        "ttf-anonymous-pro",
+        "ctags",
+        "fd",
+    ],
     PackageType.DEB: [
         "ttf-anonymous-pro",
         "exuberant-ctags",
