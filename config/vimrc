@@ -159,7 +159,7 @@ let g:lightline = {
     \ },
     \ }
 
-" LANGUAGES
+" ==> LANGUAGES
 
 " rust
 let g:rustfmt_autosave = 1
