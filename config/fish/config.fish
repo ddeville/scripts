@@ -111,7 +111,6 @@ abbr -a topm "top -o mem"
 abbr -a adp "arc diff --preview"
 abbr -a adu "arc diff --update"
 abbr -a ssh-fix "eval (ssh-agent -c); and ssh-add -K ~/.ssh/id_rsa"
-abbr -a less "less -R"
 
 # setup `fzf`
 set -x FZF_TMUX 0
