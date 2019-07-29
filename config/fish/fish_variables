@@ -7,6 +7,7 @@ SETUVAR _fish_abbr_adu:arc\x20diff\x20\x2d\x2dupdate
 SETUVAR _fish_abbr_cdd:cd\x20\x2e\x2e
 SETUVAR _fish_abbr_con:tail\x20\x2d40\x20\x2df\x20/var/log/system\x2elog
 SETUVAR _fish_abbr_gaa:git\x20aa\x3b\x20and\x20git\x20ci
+SETUVAR _fish_abbr_less:less\x20\x2dR
 SETUVAR _fish_abbr_ll:ls\x20\x2dlah
 SETUVAR _fish_abbr_oo:open\x20\x2e
 SETUVAR _fish_abbr_sshfix:eval\x20\x28ssh\x2dagent\x20\x2dc\x29\x3b\x20and\x20ssh\x2dadd\x20\x2dK\x20\x7e/\x2essh/id_rsa
