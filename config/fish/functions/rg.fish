@@ -1,3 +1,3 @@
 function rg
-    rg -p $argv | less -RFX
+    command rg -p $argv | less -RFX
 end
