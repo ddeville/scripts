@@ -1576,7 +1576,7 @@
 			<key>Use Tab Color</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<real>1.1000000000000001</real>
+			<real>1.0700000000000001</real>
 			<key>Visual Bell</key>
 			<false/>
 			<key>Window Type</key>
@@ -1587,12 +1587,12 @@
 	</array>
 	<key>NoSyncAllAppVersions</key>
 	<array>
-		<string>3.3.0beta15</string>
+		<string>3.3.0beta11</string>
 		<string>3.3.0beta13</string>
 		<string>3.3.1</string>
 		<string>3.3.0</string>
+		<string>3.3.0beta15</string>
 		<string>3.3.0beta5</string>
-		<string>3.3.0beta11</string>
 	</array>
 	<key>NoSyncBFPRecents</key>
 	<array>
@@ -1603,7 +1603,7 @@
 		<key>screenFrame</key>
 		<string>{{0, 0}, {1920, 1080}}</string>
 		<key>topLeft</key>
-		<string>{245, 872}</string>
+		<string>{761, 738}</string>
 	</dict>
 	<key>NoSyncHaveRequestedFullDiskAccess</key>
 	<true/>
@@ -1614,7 +1614,7 @@
 	<key>NoSyncLastTipTime</key>
 	<real>585028050.40174699</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>17</integer>
+	<integer>18</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
