@@ -7,4 +7,5 @@ tmp/
 *.pyo
 
 config/vim/.netrwhist
+config/vim/backup/
 config/vim/view/
