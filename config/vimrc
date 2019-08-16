@@ -5,6 +5,14 @@ endif
 
 set encoding=utf-8
 
+" store swap and backup files under `~/.vim/backup`
+if !isdirectory($HOME . "/.vim/backup")
+    call mkdir($HOME . "/.vim/backup", "p", 0700)
+endif
+set directory=$HOME/.vim/backup//
+set backupdir=$HOME/.vim/backup//
+set undodir=$HOME/.vim/backup//
+
 " enable syntax highlighting
 syntax enable
 
