@@ -93,7 +93,7 @@ end
 if test -e "$HOME/.fzf/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
 end
-if which xcode-select > /dev/null 2>&1; and set -x XCODE (xcode-select --print-path); and test -e $XCODE
+if which xcode-select > /dev/null 2>&1; and set -x XCODE (xcode-select --print-path); and test -e "$XCODE/usr/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$XCODE/usr/bin"
 end
 
