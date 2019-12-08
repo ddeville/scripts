@@ -40,6 +40,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'Valloric/YouCompleteMe'
     Plug 'chriskempson/base16-vim'
+    Plug 'jremmen/vim-ripgrep'
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
@@ -134,7 +135,7 @@ inoremap jj <esc>
 " remap some `fzf` functions
 nnoremap ; :Buffers<CR>
 nnoremap <Leader>o :Files<CR>
-nnoremap <Leader>f :Rg<CR>
+nnoremap <Leader>f :Rg<space>
 nnoremap <Leader>t :Tags<CR>
 nnoremap <Leader>s :GFiles?<CR>
 
@@ -142,7 +143,7 @@ nnoremap <Leader>s :GFiles?<CR>
 
 " no sticky preview window at the bottom after completion
 let g:ycm_autoclose_preview_window_after_completion = 1
-" no diagnostic integration (this make moving through c/cpp/objc files super slow
+" no diagnostic integration (this makes moving through c/cpp/objc files super slow
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 0
