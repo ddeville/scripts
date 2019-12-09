@@ -135,9 +135,13 @@ inoremap jj <esc>
 " remap some `fzf` functions
 nnoremap ; :Buffers<CR>
 nnoremap <Leader>o :Files<CR>
-nnoremap <Leader>f :Rg<space>
 nnoremap <Leader>t :Tags<CR>
 nnoremap <Leader>s :GFiles?<CR>
+
+" ==> CONFIG `jremmen/vim-ripgrep`
+
+" remove some `rg` functions
+nnoremap <Leader>f :Rg<space>
 
 " ==> CONFIG `Valloric/YouCompleteMe`
 
