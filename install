@@ -296,8 +296,13 @@ def task_build_vim_plugins():
                     python_path = "/usr/local/bin/python"
                 else:
                     python_path = "python"
-                run_command([python_path, "install.py", "--clang-completer", "--clangd-completer",
-                             "--rust-completer"], env=env)
+                completers = [
+                    "--go-completer",
+                    "--clang-completer",
+                    "--clangd-completer",
+                    "--rust-completer",
+                ]
+                run_command([python_path, "install.py"] + completers, env=env)
                 # cache the git hash that we've just built
                 build_cache[plugin] = cur_hash
             else:
