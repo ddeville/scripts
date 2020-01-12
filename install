@@ -62,6 +62,8 @@ EXTRA_PACKAGES = {
         "ctags",
         "hyperfine",
         "fd",
+        "golang",
+        "node",
     ],
     PackageType.PACMAN: [
         "ttf-anonymous-pro",
@@ -297,11 +299,16 @@ def task_build_vim_plugins():
                 else:
                     python_path = "python"
                 completers = [
-                    "--go-completer",
                     "--clang-completer",
                     "--clangd-completer",
                     "--rust-completer",
                 ]
+                # on mac, we also install node and go so install the completers
+                if get_current_platform() == MACOS:
+                    completers += [
+                        "--go-completer",
+                        "--ts-completer",
+                    ]
                 run_command([python_path, "install.py"] + completers, env=env)
                 # cache the git hash that we've just built
                 build_cache[plugin] = cur_hash
