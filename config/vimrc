@@ -128,7 +128,6 @@ nnoremap <S-h> 0
 
 " simpler normal mode mapping
 inoremap jk <esc>
-inoremap jj <esc>
 
 " ==> CONFIG `junegunn/fzf.vim`
 
