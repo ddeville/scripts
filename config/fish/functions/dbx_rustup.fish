@@ -1,4 +1,4 @@
-function dbx_rustup
+function dbx_rustup --description "Install the current rCLIENT Rust version"
     set deps_path "deps/dependency_versions.bzl"
     if test -e $deps_path
         set nightly_version (cat $deps_path | grep RUSTC_VERSION | grep -oE '[0-9]{4}(-[0-9]{2}){2}')
