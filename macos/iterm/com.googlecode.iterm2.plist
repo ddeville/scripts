@@ -12,6 +12,8 @@
 	<false/>
 	<key>AppleAntiAliasingThreshold</key>
 	<integer>1</integer>
+	<key>ApplePressAndHoldEnabled</key>
+	<false/>
 	<key>AppleScrollAnimationEnabled</key>
 	<integer>0</integer>
 	<key>AppleSmoothFixedFontsSizeThreshold</key>
@@ -1606,6 +1608,7 @@
 		<string>3.3.0beta12</string>
 		<string>3.3.1</string>
 		<string>3.3.0beta13</string>
+		<string>3.3.8</string>
 		<string>3.3.0beta15</string>
 		<string>3.3.6</string>
 		<string>3.3.0beta16</string>
@@ -1628,9 +1631,9 @@
 	<key>NoSyncInstallationId</key>
 	<string>2279BC94-1867-47D9-B86E-C66B7805B92D</string>
 	<key>NoSyncLastTipTime</key>
-	<real>587072318.61973095</real>
+	<real>598471167.68609405</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>52</integer>
+	<integer>57</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -2347,30 +2350,6 @@
 			</dict>
 		</array>
 	</dict>
-	<key>NoSyncSearchHistory</key>
-	<array>
-		<string>JAVASCRIPT</string>
-		<string>OH HAI</string>
-		<string>OH HAO</string>
-		<string>JSVA</string>
-		<string>STATI</string>
-		<string>exclude</string>
-		<string>exclide</string>
-		<string>dead</string>
-		<string>strip</string>
-	</array>
-	<key>NoSyncSearchHistory2</key>
-	<array>
-		<string>DOLAN</string>
-		<string>METRICS_RUNTIME</string>
-		<string>METRICS_NETWEO</string>
-		<string>METRICS_NETOR</string>
-		<string>SINK</string>
-		<string>Nucleus</string>
-		<string>http</string>
-		<string>DOLANB</string>
-		<string>tprt_</string>
-	</array>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>522348557.97187299</real>
 	<key>NoSyncTipsToNotShow</key>
@@ -2446,11 +2425,13 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2019-12-17T18:48:29Z</date>
+	<date>2020-02-13T17:22:22Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
+	<key>SUUpdateGroupIdentifier</key>
+	<integer>2371163850</integer>
 	<key>SUUpdateRelaunchingMarker</key>
-	<false/>
+	<true/>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
@@ -2527,7 +2508,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.3.7</string>
+	<string>3.3.8</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>7</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
