@@ -35,6 +35,8 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vifm/vifm.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
+    Plug 'leafgarland/typescript-vim'
+    Plug 'fatih/vim-go'
     Plug 'dag/vim-fish'
     Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
@@ -176,3 +178,10 @@ let g:lightline = {
 
 " rust
 let g:rustfmt_autosave = 1
+
+" vim
+let g:go_fmt_autosave = 1
+
+" typescript
+autocmd Filetype typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2
+autocmd Filetype typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2
