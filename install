@@ -292,7 +292,11 @@ def task_build_vim_plugins():
                 env = os.environ.copy()
                 env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
                 # we want to use the system python since pyenv might not include the python dylib...
-                if os.path.isfile("/usr/bin/python"):
+                if os.path.isfile("/usr/bin/python3"):
+                    python_path = "/usr/bin/python3"
+                elif os.path.isfile("/usr/local/bin/python3"):
+                    python_path = "/usr/local/bin/python3"
+                elif os.path.isfile("/usr/bin/python"):
                     python_path = "/usr/bin/python"
                 elif os.path.isfile("/usr/local/bin/python"):
                     python_path = "/usr/local/bin/python"
