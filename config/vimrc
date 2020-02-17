@@ -35,7 +35,6 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vifm/vifm.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
-    Plug 'leafgarland/typescript-vim'
     Plug 'fatih/vim-go'
     Plug 'dag/vim-fish'
     Plug 'junegunn/fzf.vim'
