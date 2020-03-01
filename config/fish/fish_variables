@@ -3,6 +3,7 @@
 SETUVAR __fish_init_2_39_8:\x1d
 SETUVAR __fish_init_2_3_0:\x1d
 SETUVAR __fish_init_3_x:\x1d
+SETUVAR __fish_initialized:2398
 SETUVAR _fish_abbr_adp:arc\x20diff\x20\x2d\x2dpreview
 SETUVAR _fish_abbr_adu:arc\x20diff\x20\x2d\x2dupdate
 SETUVAR _fish_abbr_cdd:cd\x20\x2e\x2e
