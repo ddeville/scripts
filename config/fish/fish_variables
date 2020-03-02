@@ -3,7 +3,7 @@
 SETUVAR __fish_init_2_39_8:\x1d
 SETUVAR __fish_init_2_3_0:\x1d
 SETUVAR __fish_init_3_x:\x1d
-SETUVAR __fish_initialized:2398
+SETUVAR __fish_initialized:3100
 SETUVAR _fish_abbr_adp:arc\x20diff\x20\x2d\x2dpreview
 SETUVAR _fish_abbr_adu:arc\x20diff\x20\x2d\x2dupdate
 SETUVAR _fish_abbr_cdd:cd\x20\x2e\x2e
@@ -15,3 +15,5 @@ SETUVAR _fish_abbr_oo:open\x20\x2e
 SETUVAR _fish_abbr_ssh_2D_fix:eval\x20\x28ssh\x2dagent\x20\x2dc\x29\x3b\x20and\x20ssh\x2dadd\x20\x2dK\x20\x7e/\x2essh/id_rsa
 SETUVAR _fish_abbr_topc:top\x20\x2do\x20cpu
 SETUVAR _fish_abbr_topm:top\x20\x2do\x20mem
+SETUVAR fish_color_host_remote:yellow
+SETUVAR fish_color_status:red
