@@ -184,3 +184,14 @@ let g:go_fmt_autosave = 1
 " typescript
 autocmd Filetype typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2
 autocmd Filetype typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
+" ==> FUNCTIONS
+
+nnoremap <F8> :call ()<CR>
+function! DateRfc3339()
+  let format = '+\%Y-\%m-\%dT\%H:\%M:\%SZ'
+  let cmd = '/bin/date -u ' . shellescape(format)
+  let result = substitute(system(cmd), '[\]\|[[:cntrl:]]', '', 'g')
+  " Append space + result to current line without moving cursor.
+  call setline(line('.'), getline('.') . ' ' . result)
+endfunction
