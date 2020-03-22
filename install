@@ -72,6 +72,7 @@ EXTRA_PACKAGES = {
     ],
     PackageType.DEB: [
         "exuberant-ctags",
+    ],
 }
 
 EXTRA_PACKAGES_FULL = {
@@ -89,7 +90,6 @@ EXTRA_PACKAGES_FULL = {
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
     ],
-
 }
 
 # Tasks
