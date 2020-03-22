@@ -40,7 +40,7 @@ from py.util import (
 
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 ALL_PLATFORMS = [MACOS, LINUX, FREEBSD]
-FULL = "full"
+LITE = "lite"
 
 # Packages
 
@@ -100,7 +100,7 @@ def task_install_package_manager():
         package_manager = create_package_manager()
         package_manager.install()
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=[])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=[])
 
 def task_install_packages():
     # type: () -> TaskManifest
@@ -110,7 +110,7 @@ def task_install_packages():
         for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(package_manager.format(), []):
             package_manager.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
 def task_install_packages_full():
     # type: () -> TaskManifest
@@ -120,7 +120,7 @@ def task_install_packages_full():
         for package in COMMON_PACKAGES_FULL + EXTRA_PACKAGES_FULL.get(package_manager.format(), []):
             package_manager.install_package(package)
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [FULL], dependencies=["install_package_manager"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
 def task_update_shell():
     # type: () -> TaskManifest
@@ -146,7 +146,7 @@ def task_update_shell():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_packages"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "task_install_packages_full"])
 
 def task_install_base16():
     # type: () -> TaskManifest
@@ -165,7 +165,7 @@ def task_install_base16():
             print("====> installing %s repo" % name)
             run_command(["git", "clone", repo_url, path])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_shell"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_shell"])
 
 def task_update_dot_files():
     # type: () -> TaskManifest
@@ -199,7 +199,7 @@ def task_update_dot_files():
         for f1, f2 in links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_base16"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
@@ -217,7 +217,7 @@ def task_install_pyenv():
             script_path, _ = urlretrieve(pyenv_installer_path)
             run_command(["bash", script_path])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_install_rustup():
     # type: () -> TaskManifest
@@ -231,7 +231,7 @@ def task_install_rustup():
             run_command(["sh", script_path, "-y", "--no-modify-path"])
         pass
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
@@ -248,7 +248,7 @@ def task_update_tmux_plugins():
         run_command([os.path.join(tpm_path, "bin", "install_plugins")])
         run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files"])
 
 def task_update_vim_plugins():
     # type: () -> TaskManifest
@@ -259,7 +259,7 @@ def task_update_vim_plugins():
         # install or update all plugins
         run_command(["vim", "+PlugUpdate", "+qall"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files", "install_rustup"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files", "install_rustup"])
 
 def task_build_vim_plugins():
     # type: () -> TaskManifest
@@ -330,7 +330,7 @@ def task_build_vim_plugins():
 
         _write_build_cache(build_cache_path, build_cache)
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [FULL], dependencies=["update_vim_plugins"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
@@ -342,7 +342,7 @@ def task_update_library_visibility():
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
 def task_update_system_preferences():
     # type: () -> TaskManifest
@@ -377,7 +377,7 @@ def task_update_system_preferences():
         # update_prefs("wvous-tr-corner", "2", "com.apple.dock")
         # update_prefs("wvous-tr-modifier", "0", "com.apple.dock")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
 def task_update_iterm_sync_folder_prefs():
     # type: () -> TaskManifest
@@ -387,7 +387,7 @@ def task_update_iterm_sync_folder_prefs():
         run_command(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
             os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
 def task_install_fonts():
     # type: () -> TaskManifest
@@ -401,7 +401,7 @@ def task_install_fonts():
             if os.path.isdir(font_path) and not folder.startswith("."):
                 copy_file(font_path, os.path.join(dest_path, folder), True)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
 def task_install_xcode_themes():
     # type: () -> TaskManifest
@@ -417,7 +417,7 @@ def task_install_xcode_themes():
             if not theme.startswith("."):
                 copy_file(theme_path, os.path.join(dest_path, theme))
 
-    return TaskManifest(cmd=cmd, tags=[MACOS, FULL], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
 # Main
 
@@ -425,14 +425,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Install scripts on the current system.")
     parser.add_argument("action", choices=["list", "run"], help="whether to list the tasks or actually run them")
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
-    parser.add_argument("-f", "--full", action="store_false", help="whether a full install should be performed")
+    parser.add_argument("-l", "--lite", action="store_true", help="whether a lite install should be performed")
     args = parser.parse_args()
 
     module_name = __name__
     tags = []
 
-    if args.full:
-        tags.append(FULL)
+    if args.lite:
+        tags.append(LITE)
 
     platform = args.platform if args.platform else get_current_platform()
     assert platform in ALL_PLATFORMS, "Unknown platform: %s" % platform
