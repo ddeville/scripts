@@ -73,7 +73,6 @@ EXTRA_PACKAGES = {
     PackageType.DEB: [
         "ttf-anonymous-pro",
         "exuberant-ctags",
-        "fd-find",
         "build-essential",  # for ycm
         "python-dev",  # for ycm
         "python3-dev",  # for ycm
