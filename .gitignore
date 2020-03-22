@@ -5,6 +5,7 @@ tmp/
 *.swo
 *.pyc
 *.pyo
+fishd.*
 
 config/vim/.netrwhist
 config/vim/backup/
