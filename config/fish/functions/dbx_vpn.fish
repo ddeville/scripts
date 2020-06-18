@@ -3,7 +3,7 @@ function dbx_vpn
     set network_service Wi-Fi
     set server damien@damien-mbp.local
 
-    echo "Enabling SOCKS proxy on network service" $network_service "and port" $port
+    echo "Enabling SOCKS proxy on" $network_service "with port" $port
     command networksetup -setsocksfirewallproxy $network_service localhost $port
     command networksetup -setsocksfirewallproxystate $network_service on
 
