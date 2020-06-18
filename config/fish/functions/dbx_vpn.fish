@@ -2,7 +2,7 @@ function dbx_vpn
     set port 45623
     set server damien@damien-mbp.local
 
-    echo "Disabling proxy on port" $port
+    echo "Enabling SOCKS proxy on port" $port
     command networksetup -setsocksfirewallproxy Wi-Fi localhost $port
     command networksetup -setsocksfirewallproxystate Wi-Fi on
 
