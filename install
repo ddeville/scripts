@@ -45,6 +45,7 @@ LITE = "lite"
 # Packages
 
 COMMON_PACKAGES = [
+    "cmake",
     "fish",
     "tmux",
     "mosh",
@@ -57,7 +58,6 @@ COMMON_PACKAGES = [
 ]
 
 COMMON_PACKAGES_FULL = [
-    "cmake",  # for ycm
     "radare2",
 ]
 
