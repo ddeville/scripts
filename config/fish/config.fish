@@ -111,6 +111,7 @@ abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
 abbr -a adp "arc diff --preview"
 abbr -a adu "arc diff --update"
+abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.net"
 
 # setup `fzf`
 set -x FZF_TMUX 0
