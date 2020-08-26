@@ -1,6 +1,6 @@
 function dbx_vpn
     set port 45623
-    set network_service Wi-Fi
+    set network_service Ethernet
     set server $argv[1]
 
     if test -d $server
