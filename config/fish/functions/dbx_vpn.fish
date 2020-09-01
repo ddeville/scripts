@@ -1,8 +1,12 @@
 function dbx_vpn
     set port 45623
-    set network_service Ethernet
-    set server $argv[1]
+    set network_service $argv[1]
+    set server $argv[2]
 
+    if test -d $network_service
+        echo "No network service given, defaulting to Ethernet"
+        set network_service "Ethernet"
+end
     if test -d $server
         echo "No server given, defaulting to damien-mp.local"
         set server "damien-mp.local"
