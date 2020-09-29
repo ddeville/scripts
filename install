@@ -300,17 +300,6 @@ def task_build_vim_plugins():
                 # make sure that cargo is on the path since we might have just changed the shell...
                 env = os.environ.copy()
                 env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
-                # we want to use the system python since pyenv might not include the python dylib...
-                if os.path.isfile("/usr/bin/python3"):
-                    python_path = "/usr/bin/python3"
-                elif os.path.isfile("/usr/local/bin/python3"):
-                    python_path = "/usr/local/bin/python3"
-                elif os.path.isfile("/usr/bin/python"):
-                    python_path = "/usr/bin/python"
-                elif os.path.isfile("/usr/local/bin/python"):
-                    python_path = "/usr/local/bin/python"
-                else:
-                    python_path = "python"
                 completers = [
                     "--clang-completer",
                     "--clangd-completer",
@@ -322,7 +311,7 @@ def task_build_vim_plugins():
                         "--go-completer",
                         "--ts-completer",
                     ]
-                run_command([python_path, "install.py"] + completers, env=env)
+                run_command(["python", "install.py"] + completers, env=env)
                 # cache the git hash that we've just built
                 build_cache[plugin] = cur_hash
             else:
