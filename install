@@ -311,7 +311,7 @@ def task_build_vim_plugins():
                         "--go-completer",
                         "--ts-completer",
                     ]
-                run_command(["python", "install.py"] + completers, env=env)
+                run_command(["python3", "install.py"] + completers, env=env)
                 # cache the git hash that we've just built
                 build_cache[plugin] = cur_hash
             else:
