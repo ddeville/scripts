@@ -534,9 +534,9 @@
 	<key>NSWindow Frame SharedPreferences</key>
 	<string>243 253 796 486 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>13 112 810 642 0 0 2560 1417 </string>
+	<string>1711 377 810 642 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1555 180 810 642 0 0 2560 1417 </string>
+	<string>1283 238 810 642 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>268 84 810 690 0 0 1920 1057 </string>
 	<key>New Bookmarks</key>
@@ -799,7 +799,7 @@
 			<key>Custom Command</key>
 			<string>No</string>
 			<key>Custom Directory</key>
-			<string>Recycle</string>
+			<string>No</string>
 			<key>Default Bookmark</key>
 			<string>No</string>
 			<key>Disable Printing</key>
@@ -1597,12 +1597,13 @@
 	</array>
 	<key>NoSyncAllAppVersions</key>
 	<array>
-		<string>3.3.7</string>
+		<string>3.3.0</string>
 		<string>3.3.5</string>
 		<string>3.3.0beta11</string>
 		<string>3.3.1</string>
 		<string>3.3.8</string>
 		<string>3.3.0beta13</string>
+		<string>3.3.12</string>
 		<string>3.3.6</string>
 		<string>3.3.0beta15</string>
 		<string>3.3.11</string>
@@ -1610,7 +1611,7 @@
 		<string>3.3.2</string>
 		<string>3.3.9</string>
 		<string>3.3.0beta5</string>
-		<string>3.3.0</string>
+		<string>3.3.7</string>
 	</array>
 	<key>NoSyncBFPRecents</key>
 	<array>
@@ -1621,14 +1622,14 @@
 		<key>screenFrame</key>
 		<string>{{0, 0}, {2560, 1440}}</string>
 		<key>topLeft</key>
-		<string>{977, 1199}</string>
+		<string>{975, 1200}</string>
 	</dict>
 	<key>NoSyncFrame_SharedPreferences</key>
 	<dict>
 		<key>screenFrame</key>
 		<string>{{0, 0}, {2560, 1440}}</string>
 		<key>topLeft</key>
-		<string>{517, 844}</string>
+		<string>{1323, 841}</string>
 	</dict>
 	<key>NoSyncHaveRequestedFullDiskAccess</key>
 	<true/>
@@ -1639,7 +1640,7 @@
 	<key>NoSyncLastTipTime</key>
 	<real>611014276.45867598</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>53</integer>
+	<integer>66</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -2152,6 +2153,14 @@
 				<key>isTerminal</key>
 				<true/>
 				<key>name</key>
+				<string>currentTab.titleOverrideFormat</string>
+				<key>nonterminalContext</key>
+				<integer>0</integer>
+			</dict>
+			<dict>
+				<key>isTerminal</key>
+				<true/>
+				<key>name</key>
 				<string>currentTab.currentSession.tty</string>
 				<key>nonterminalContext</key>
 				<integer>0</integer>
@@ -2542,13 +2551,13 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-07-05T12:07:44Z</date>
+	<date>2020-10-20T21:07:45Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUUpdateGroupIdentifier</key>
 	<integer>3011620033</integer>
 	<key>SUUpdateRelaunchingMarker</key>
-	<true/>
+	<false/>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
@@ -2623,7 +2632,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.3.11</string>
+	<string>3.3.12</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>7</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
