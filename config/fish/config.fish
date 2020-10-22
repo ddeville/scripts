@@ -78,6 +78,9 @@ if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
 # these can come afterwards, it's cool
+if test -e "/usr/local/sbin"
+    set PATH_ENTRIES $PATH_ENTRIES "/usr/local/sbin"
+end
 if test -e "$HOME/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
 end
