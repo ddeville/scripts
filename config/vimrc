@@ -133,6 +133,7 @@ inoremap jk <esc>
 
 " ==> CONFIG `junegunn/fzf.vim`
 
+let g:fzf_layout = { 'down': '35%' }
 " remap some `fzf` functions
 nnoremap ; :Buffers<CR>
 nnoremap <Leader>o :Files<CR>
@@ -148,7 +149,7 @@ nnoremap <Leader>f :Rg<space>
 
 " close sticky preview window at the bottom after insertion
 let g:ycm_autoclose_preview_window_after_insertion = 1
-" no diagnostic integration (this makes moving through c/cpp/objc files super slow
+" no diagnostic integration (this makes moving through c/cpp/objc files super slow)
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 0
