@@ -2,7 +2,7 @@
     name = Damien DeVille
     email = damien@ddeville.me
 [core]
-    editor = vim
+    editor = nvim
 	excludesfile = /Users/damien/.gitignore_global
 [diff]
     tool = vimdiff
