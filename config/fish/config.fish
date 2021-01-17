@@ -116,6 +116,9 @@ abbr -a adp "arc diff --preview"
 abbr -a adu "arc diff --update"
 abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.net"
 
+# aliases
+alias e=nvim
+
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
