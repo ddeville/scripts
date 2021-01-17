@@ -305,16 +305,15 @@ def task_build_vim_plugins():
                 env = os.environ.copy()
                 env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
                 completers = [
-                    "--clang-completer",
                     "--clangd-completer",
-                    "--rust-completer",
                 ]
-                # on mac, we also install node and go so install the completers
-                if get_current_platform() == MACOS:
-                    completers += [
-                        "--go-completer",
-                        "--ts-completer",
-                    ]
+                if is_cmd_installed("cargo")
+                    completers.append("--rust-completer")
+                if is_cmd_installed("node")
+                    completers.append("--ts-completer")
+                if is_cmd_installed("go")
+                    completers.append("--go-completer")
+                print("====> installing ycm completers: %s" % (completers,))
                 run_command(["python3", "install.py"] + completers, env=env)
                 # cache the git hash that we've just built
                 build_cache[plugin] = cur_hash
