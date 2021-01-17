@@ -6,7 +6,7 @@ function dbx_vpn
     if test -d $network_service
         echo "No network service given, defaulting to Ethernet"
         set network_service "Ethernet"
-end
+    end
     if test -d $server
         echo "No server given, defaulting to damien-mp.local"
         set server "damien-mp.local"
