@@ -105,19 +105,19 @@ set -x PATH $PATH_ENTRIES $PATH
 
 # abbreviations
 abbr -a cdd "cd .."
-abbr -a ll "ls -lah"
 abbr -a oo "open ."
-abbr -a gaa "git aa; and git ci"
-abbr -a gaaa "git aa; and git ci --amend"
 abbr -a con "tail -40 -f /var/log/system.log"
 abbr -a topc "top -o cpu"
 abbr -a topm "top -o mem"
-abbr -a adp "arc diff --preview"
-abbr -a adu "arc diff --update"
 abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.net"
 
 # aliases
-alias e=nvim
+alias e="nvim"
+alias ll="ls -lah"
+alias gaa="git aa; and git ci"
+alias gaaa="git aa; and git ci --amend"
+alias adp="arc diff --preview"
+alias adu="arc diff --update"
 
 # setup `fzf`
 set -x FZF_TMUX 0
