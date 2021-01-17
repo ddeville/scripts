@@ -55,6 +55,7 @@ COMMON_PACKAGES = [
     "tree",
     "vim",
     "vifm",
+    "neovim",
 ]
 
 COMMON_PACKAGES_FULL = [
@@ -185,6 +186,8 @@ def task_update_dot_files():
             ("tmux.conf", ".tmux.conf"),
             ("vim", ".vim"),
             ("vimrc", ".vimrc"),
+            (os.path.join("vim", "autoload"), os.path.join(".config", "nvim", "autoload")),
+            ("vimrc", os.path.join(".config", "nvim", "init.vim")),
             ("fish", os.path.join(".config", "fish")),
             (os.path.join("vifm", "vifmrc"), os.path.join(".config", "vifm", "vifmrc")),
             (os.path.join("vifm", "colors"), os.path.join(".config", "vifm", "colors")),
@@ -194,6 +197,7 @@ def task_update_dot_files():
         # make sure that we create the various `.config/xxx` directories since they won't be here on new machines
         create_dirs(os.path.join(dest_dir, ".config", "vifm"))
         create_dirs(os.path.join(dest_dir, ".config", "htop"))
+        create_dirs(os.path.join(dest_dir, ".config", "nvim"))
 
         print("====> linking dot files")
         for f1, f2 in links:
