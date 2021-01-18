@@ -307,11 +307,11 @@ def task_build_vim_plugins():
                 completers = [
                     "--clangd-completer",
                 ]
-                if is_cmd_installed("cargo")
+                if is_cmd_installed("cargo"):
                     completers.append("--rust-completer")
-                if is_cmd_installed("node")
+                if is_cmd_installed("node"):
                     completers.append("--ts-completer")
-                if is_cmd_installed("go")
+                if is_cmd_installed("go"):
                     completers.append("--go-completer")
                 print("====> installing ycm completers: %s" % (completers,))
                 run_command(["python3", "install.py"] + completers, env=env)
