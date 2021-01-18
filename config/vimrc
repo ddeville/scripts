@@ -164,22 +164,32 @@ nnoremap <C-k> :YcmCompleter GetDoc<CR>
 set noshowmode
 
 " update color scheme
-let g:lightline = {
-    \ 'colorscheme': 'wombat',
-    \ 'active': {
-    \   'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
-    \ },
-    \ 'component_function': {
-    \   'gitbranch': 'fugitive#head'
-    \ },
-    \ }
+let g:lightline =
+\ {
+\   'colorscheme': 'wombat',
+\   'active': {
+\     'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
+\   },
+\   'component_function': {
+\     'gitbranch': 'fugitive#head'
+\   },
+\ }
 
 " ==> LANGUAGES
 
 " rust
 let g:rustfmt_autosave = 1
+let g:ycm_language_server =
+\ [
+\   {
+\     'name': 'rust',
+\     'cmdline': ['rust-analyzer'],
+\     'filetypes': ['rust'],
+\     'project_root_files': ['Cargo.toml'],
+\   }
+\ ]
 
-" vim
+" go
 let g:go_fmt_autosave = 1
 
 " typescript
