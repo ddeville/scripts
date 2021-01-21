@@ -32,12 +32,13 @@ def create_package_manager():
     elif plat == LINUX:
         distro_info = get_linux_distro_info()
         distros = [distro_info.get("ID"), distro_info.get("ID_LIKE")]
-        if "debian" in distros or is_cmd_installed("apt-get"):
-            return AptPackageManager()
-        elif "fedora" in distros or is_cmd_installed("dnf"):
-            return DnfPackageManager()
-        elif "arch" in distros or is_cmd_installed("pacman"):
-            return PacmanPackageManager()
+        for distro in distros:
+            if "debian" in distro or is_cmd_installed("apt-get"):
+                return AptPackageManager()
+            elif "fedora" in distro or is_cmd_installed("dnf"):
+                return DnfPackageManager()
+            elif "arch" in distro or is_cmd_installed("pacman"):
+                return PacmanPackageManager()
     elif plat == FREEBSD:
         return PkgPackageManager()
 
