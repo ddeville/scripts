@@ -131,6 +131,9 @@ nnoremap <S-h> 0
 " simpler normal mode mapping
 inoremap jk <esc>
 
+" support delete non-empty directory in netrw
+let g:netrw_localrmdir='rm -r'
+
 " ==> CONFIG `junegunn/fzf.vim`
 
 let g:fzf_layout = { 'down': '35%' }
