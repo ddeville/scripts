@@ -124,10 +124,6 @@ imap <right> <nop>
 " map screen redraw to also turn off search highlighting
 nnoremap <C-l> :nohl<CR><C-l>
 
-" use `H` and `L` to move to start and end of line
-nnoremap <S-l> $
-nnoremap <S-h> 0
-
 " simpler normal mode mapping
 inoremap jk <esc>
 
@@ -149,7 +145,7 @@ nnoremap <Leader>s :GFiles?<CR>
 
 " ==> CONFIG `jremmen/vim-ripgrep`
 
-" remove some `rg` functions
+" simpler way to search
 nnoremap <Leader>f :Rg<space>
 
 " ==> CONFIG `Valloric/YouCompleteMe`
