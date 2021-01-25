@@ -125,7 +125,7 @@ imap <right> <nop>
 nnoremap <C-l> :nohl<CR><C-l>
 
 " simpler normal mode mapping
-inoremap jk <esc>
+inoremap jj <esc>
 
 " ==> CONFIG `netrw`
 "
