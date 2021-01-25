@@ -180,6 +180,7 @@ def task_update_dot_files():
             ("bashrc", ".bashrc"),
             ("ctags", ".ctags"),
             ("gitconfig", ".gitconfig"),
+            ("gitignore_global", ".gitignore_global"),
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
             ("profile", ".profile"),
