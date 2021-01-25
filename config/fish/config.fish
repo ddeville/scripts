@@ -1,4 +1,4 @@
-set -gx EDITOR vim
+set -gx EDITOR nvim
 set -gx CLICOLOR 1
 set -gx TERM xterm-256color
 set -gx GREP_OPTIONS "--color=auto"
