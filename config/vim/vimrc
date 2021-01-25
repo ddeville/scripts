@@ -1,6 +1,6 @@
 " vim needs a posix shell and fish is not
 if &shell =~# 'fish$'
-    set shell=bash
+    set shell=sh
 endif
 
 set encoding=utf-8
