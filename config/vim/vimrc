@@ -22,6 +22,19 @@ filetype plugin indent on
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
     Plug 'itchyny/lightline.vim'
+        " don't show `-- INSERT --` since we have a fancy status line
+        set noshowmode
+        " update color scheme
+        let g:lightline =
+        \ {
+        \   'colorscheme': 'wombat',
+        \   'active': {
+        \     'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
+        \   },
+        \   'component_function': {
+        \     'gitbranch': 'fugitive#head'
+        \   },
+        \ }
     Plug 'tpope/vim-git'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-rhubarb'
@@ -35,13 +48,42 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vifm/vifm.vim'
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
+        let g:rustfmt_autosave = 1
     Plug 'fatih/vim-go'
+        let g:go_fmt_autosave = 1
     Plug 'dag/vim-fish'
-    Plug 'junegunn/fzf.vim'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
+    Plug 'junegunn/fzf.vim'
+        let g:fzf_layout = { 'down': '35%' }
+        nnoremap <Leader>; :Buffers<CR>
+        nnoremap <Leader>o :Files<CR>
+        nnoremap <Leader>t :Tags<CR>
+        nnoremap <Leader>s :GFiles?<CR>
     Plug 'Valloric/YouCompleteMe'
+        " close sticky preview window at the bottom after insertion
+        let g:ycm_autoclose_preview_window_after_insertion = 1
+        " no diagnostic integration (this makes moving through c/cpp/objc files super slow)
+        let g:ycm_show_diagnostics_ui = 0
+        let g:ycm_enable_diagnostic_signs = 0
+        let g:ycm_enable_diagnostic_highlighting = 0
+        let g:ycm_echo_current_diagnostic = 0
+        " cool remaps to go to a definition or line
+        nnoremap <C-j> :YcmCompleter GoTo<CR>
+        nnoremap <C-k> :YcmCompleter GetDoc<CR>
+        " language server
+        let g:ycm_language_server =
+        \ [
+        \   {
+        \     'name': 'rust',
+        \     'cmdline': ['rust-analyzer'],
+        \     'filetypes': ['rust'],
+        \     'project_root_files': ['Cargo.toml'],
+        \   }
+        \ ]
     Plug 'chriskempson/base16-vim'
     Plug 'jremmen/vim-ripgrep'
+        " simpler way to search
+        nnoremap <Leader>f :Rg<space>
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
@@ -109,7 +151,13 @@ highlight WhiteSpaceEOL ctermbg=red guibg=red
 autocmd InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
 autocmd InsertLeave * match WhiteSpaceEOL /\s\+$/
 
-" MAPPINGS
+" netrw
+let g:netrw_localrmdir = 'rm -r'
+let g:netrw_liststyle = 1
+let g:netrw_winsize = 85
+let g:netrw_browse_split = 0
+
+" ==> MAPPINGS
 
 " disable arrow keys
 map <up> <nop>
@@ -121,62 +169,11 @@ imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
 
-" map screen redraw to also turn off search highlighting
-nnoremap <C-l> :nohl<CR><C-l>
-
 " simpler normal mode mapping
 inoremap jj <esc>
 
-" ==> CONFIG `netrw`
-"
-let g:netrw_localrmdir = 'rm -r'
-let g:netrw_liststyle = 1
-let g:netrw_winsize = 85
-let g:netrw_browse_split = 0
-
-" ==> CONFIG `junegunn/fzf.vim`
-
-let g:fzf_layout = { 'down': '35%' }
-" remap some `fzf` functions
-nnoremap <Leader>; :Buffers<CR>
-nnoremap <Leader>o :Files<CR>
-nnoremap <Leader>t :Tags<CR>
-nnoremap <Leader>s :GFiles?<CR>
-
-" ==> CONFIG `jremmen/vim-ripgrep`
-
-" simpler way to search
-nnoremap <Leader>f :Rg<space>
-
-" ==> CONFIG `Valloric/YouCompleteMe`
-
-" close sticky preview window at the bottom after insertion
-let g:ycm_autoclose_preview_window_after_insertion = 1
-" no diagnostic integration (this makes moving through c/cpp/objc files super slow)
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_enable_diagnostic_signs = 0
-let g:ycm_enable_diagnostic_highlighting = 0
-let g:ycm_echo_current_diagnostic = 0
-" cool remaps to go to a definition or line
-nnoremap <C-j> :YcmCompleter GoTo<CR>
-nnoremap <C-k> :YcmCompleter GetDoc<CR>
-
-" ==> CONFIG `itchyny/lightline.vim`
-
-" don't show `-- INSERT --` since we have a fancy status line
-set noshowmode
-
-" update color scheme
-let g:lightline =
-\ {
-\   'colorscheme': 'wombat',
-\   'active': {
-\     'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
-\   },
-\   'component_function': {
-\     'gitbranch': 'fugitive#head'
-\   },
-\ }
+" map screen redraw to also turn off search highlighting
+nnoremap <C-l> :nohl<CR><C-l>
 
 " ==> FUNCTIONS
 
