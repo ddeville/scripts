@@ -138,7 +138,7 @@ let g:netrw_browse_split = 0
 
 let g:fzf_layout = { 'down': '35%' }
 " remap some `fzf` functions
-nnoremap ; :Buffers<CR>
+nnoremap <Leader>; :Buffers<CR>
 nnoremap <Leader>o :Files<CR>
 nnoremap <Leader>t :Tags<CR>
 nnoremap <Leader>s :GFiles?<CR>
