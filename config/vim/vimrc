@@ -178,27 +178,6 @@ let g:lightline =
 \   },
 \ }
 
-" ==> LANGUAGES
-
-" rust
-let g:rustfmt_autosave = 1
-let g:ycm_language_server =
-\ [
-\   {
-\     'name': 'rust',
-\     'cmdline': ['rust-analyzer'],
-\     'filetypes': ['rust'],
-\     'project_root_files': ['Cargo.toml'],
-\   }
-\ ]
-
-" go
-let g:go_fmt_autosave = 1
-
-" typescript
-autocmd Filetype typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2
-autocmd Filetype typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2
-
 " ==> FUNCTIONS
 
 nnoremap <F8> :call ()<CR>
