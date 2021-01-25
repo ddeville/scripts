@@ -178,6 +178,8 @@ nnoremap <C-l> :nohl<CR><C-l>
 " ==> FUNCTIONS
 
 nnoremap <F8> :call ()<CR>
+
+" insert an RFC 3339 date
 function! DateRfc3339()
   let format = '+\%Y-\%m-\%dT\%H:\%M:\%SZ'
   let cmd = '/bin/date -u ' . shellescape(format)
@@ -185,3 +187,13 @@ function! DateRfc3339()
   " Append space + result to current line without moving cursor.
   call setline(line('.'), getline('.') . ' ' . result)
 endfunction
+
+" search current selection in visual mode with */#
+function! s:VSetSearch()
+  let temp = @@
+  norm! gvy
+  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @@ = temp
+endfunction
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
