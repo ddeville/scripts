@@ -260,9 +260,9 @@ def task_update_vim_plugins():
     def cmd():
         print("====> updating vim plugins")
         # update vim-plug itself
-        run_command(["vim", "+PlugUpgrade", "+qall"])
+        run_command(["nvim", "+PlugUpgrade", "+qall"])
         # install or update all plugins
-        run_command(["vim", "+PlugUpdate", "+qall"])
+        run_command(["nvim", "+PlugUpdate", "+qall"])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files", "install_rustup"])
 
