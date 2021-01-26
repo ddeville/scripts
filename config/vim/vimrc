@@ -72,8 +72,9 @@ call plug#begin('~/.vim-plug-plugins')
         let g:ycm_enable_diagnostic_signs = 0
         let g:ycm_enable_diagnostic_highlighting = 0
         let g:ycm_echo_current_diagnostic = 0
-        " cool remaps to go to a definition or line
+        " remaps to go to a definition or line
         nnoremap <C-j> :YcmCompleter GoTo<CR>
+        nnoremap <C-]> :YcmCompleter GoTo<CR>
         nnoremap <C-k> :YcmCompleter GetDoc<CR>
         " language server
         let g:ycm_language_server =
