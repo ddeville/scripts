@@ -57,11 +57,11 @@ COMMON_PACKAGES = [
     "vifm",
     "neovim",
     "bat",
-    "lazygit",
 ]
 
 COMMON_PACKAGES_FULL = [
     "radare2",
+    "lazygit",
 ]
 
 EXTRA_PACKAGES = {
