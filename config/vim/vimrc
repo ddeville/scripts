@@ -63,6 +63,7 @@ call plug#begin('~/.vim-plug-plugins')
         nnoremap <Leader>o :Files<CR>
         nnoremap <Leader>t :Tags<CR>
         nnoremap <Leader>s :GFiles?<CR>
+        nnoremap // :BLines<CR>
     Plug 'Valloric/YouCompleteMe'
         " close sticky preview window at the bottom after insertion
         let g:ycm_autoclose_preview_window_after_insertion = 1
