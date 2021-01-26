@@ -5,6 +5,10 @@ endif
 
 set encoding=utf-8
 
+" update and reload config
+command! Config execute ":e $MYVIMRC"
+command! Reload execute "source ~/.vim/vimrc"
+
 " store swap and backup files under `~/.vim/backup`
 if !isdirectory($HOME . "/.vim/backup")
     call mkdir($HOME . "/.vim/backup", "p", 0700)
