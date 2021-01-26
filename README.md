@@ -1,6 +1,6 @@
 # Scripts
 
-A bunch of scripts I use on every machine I set up.
+A bunch of scripts/configs I use on every machine I set up.
 
 A few requirements:
 
