@@ -6,7 +6,7 @@ endif
 set encoding=utf-8
 
 " update and reload config
-command! Config execute ":e $MYVIMRC"
+command! Config execute ":edit $MYVIMRC"
 command! Reload execute "source ~/.vim/vimrc"
 
 " store swap and backup files under `~/.vim/backup`
