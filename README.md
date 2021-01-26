@@ -17,5 +17,5 @@ A few requirements:
 
 Things to do:
 
-* Add the rust source and linters to the rustup install (for YCM to offer auto completion): `rustup component add rust-src rustfmt clippy`.
-* Install Jedi for Python auto completion: `pip install jedi`
+- Add the rust source and linters to the rustup install (for YCM to offer auto completion): `rustup component add rust-src rustfmt clippy`.
+- Install Jedi for Python auto completion: `pip install jedi`
