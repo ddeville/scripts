@@ -93,6 +93,7 @@ call plug#begin('~/.vim-plug-plugins')
         nnoremap <Leader>f :Grepper -tool rg<CR>
         nmap gs <plug>(GrepperOperator)
         xmap gs <plug>(GrepperOperator)
+    Plug 'mhinz/vim-startify'
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
