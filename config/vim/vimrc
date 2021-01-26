@@ -86,9 +86,13 @@ call plug#begin('~/.vim-plug-plugins')
         \   }
         \ ]
     Plug 'chriskempson/base16-vim'
-    Plug 'jremmen/vim-ripgrep'
-        " simpler way to search
-        nnoremap <Leader>f :Rg<space>
+    Plug 'mhinz/vim-grepper'
+        let g:grepper = {}
+        let g:grepper.tools = ['rg', 'git', 'grep']
+        let g:grepper.highlight = 1
+        nnoremap <Leader>f :Grepper -tool rg<CR>
+        nmap gs <plug>(GrepperOperator)
+        xmap gs <plug>(GrepperOperator)
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
