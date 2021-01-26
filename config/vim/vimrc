@@ -112,7 +112,9 @@ set tabstop=4
 set expandtab
 
 " set mouse support so that we can select text and tabs
-set mouse=a
+if has('mouse')
+    set mouse=a
+endif
 
 " if no known file type keep the same indent as the current line
 set autoindent
