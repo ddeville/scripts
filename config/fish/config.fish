@@ -76,6 +76,10 @@ end
 if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
+# we sometimes manually install nightly stuff in there (like neovim 0.5)
+if test -e "/opt/nightly"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/nightly/bin"
+end
 # brew install its stuff there on M1 macs
 if test -e "/opt/homebrew/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/homebrew/bin"
