@@ -32,7 +32,7 @@ def run_command_no_output(cmd, env=None):
 def run_script_as_root(script):
     # type: (str) -> None
     with tempfile.NamedTemporaryFile() as fw:
-        fw.write(script)
+        fw.write(script.encode("utf-8"))
         fw.flush()
         subprocess.check_call(["sudo", "sh", "-e", fw.name])
 

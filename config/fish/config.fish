@@ -76,6 +76,10 @@ end
 if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
+# brew install its stuff there on M1 macs
+if test -e "/opt/homebrew/bin"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/homebrew/bin"
+end
 # these can come afterwards, it's cool
 if test -e "/usr/local/sbin"
     set PATH_ENTRIES $PATH_ENTRIES "/usr/local/sbin"
