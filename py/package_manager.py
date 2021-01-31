@@ -9,6 +9,7 @@ from py.platform import (
     get_linux_distro_info,
 )
 from py.util import (
+    command_path,
     is_cmd_installed,
     run_command,
     run_command_no_output,
@@ -83,7 +84,11 @@ class BrewPackageManager(BasePackageManager):
             # if the previous call succeeded, the package is installed so upgrade
             try:
                 print("====> upgrading %s" % package)
-                run_command(["brew", "upgrade", package])
+                # NOTE: Apple Silicon support
+                if "/opt/homebrew" in command_path("brew"):
+                    run_command(["arch", "-arm64", "brew", "upgrade", package])
+                else:
+                    run_command(["brew", "upgrade", package])
             except subprocess.CalledProcessError:
                 pass
         except subprocess.CalledProcessError:
