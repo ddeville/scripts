@@ -1,4 +1,4 @@
-function dbx_tmux
+function dbx_tmux --description "Create Dropbox tmux session"
     set session "dbx"
     if not command tmux list-sessions | grep $session > /dev/null 2>&1
         # create the session at ~

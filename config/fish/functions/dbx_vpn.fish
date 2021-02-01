@@ -1,4 +1,4 @@
-function dbx_vpn
+function dbx_vpn --description "Forward port to Dropbox Mac Pro and set up proxy on it"
     set port 45623
     set network_service $argv[1]
     set server $argv[2]
