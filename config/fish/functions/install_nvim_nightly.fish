@@ -39,5 +39,5 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     mv {$tmp_dir}"/"{$foldername}"/"* $install_path
 
     # Cleanup
-    rm -r $tmp_dir
+    rm -r {$tmp_dir}"/"{$foldername}
 end
