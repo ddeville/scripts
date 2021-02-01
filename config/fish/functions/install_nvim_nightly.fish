@@ -9,8 +9,9 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     end
 
     # Make sure it's a folder with the right permissions
-    if not test -d $install_path; or not test -O $install_path
+    if not test -e $install_path; or not test -d $install_path; or not test -O $install_path
         echo "Make sure that" $install_path "is a directory and is owned by" $USER
+        return 1
     end
 
     # Get the download URL for the nightly package for the current platform
