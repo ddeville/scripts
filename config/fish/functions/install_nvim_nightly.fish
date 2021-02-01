@@ -17,9 +17,12 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     if test (uname) = "Darwin"
         set filename "nvim-macos.tar.gz"
         set foldername "nvim-osx64"
-    else
+    else if test (uname) = "Linux"
         set filename "nvim-linux64.tar.gz"
         set foldername "nvim-linux64"
+    else
+        echo "Unsupported platform:" (uname)
+        return 1
     end
     set url "https://github.com/neovim/neovim/releases/download/nightly/"{$filename}
 
