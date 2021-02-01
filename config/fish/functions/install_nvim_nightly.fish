@@ -4,8 +4,8 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     # Create install path if needed
     if not test -e $install_path
         echo "Creating install folder"
-        sudo mkdir $install_path
-        sudo chown $USER $install_path
+        command sudo mkdir $install_path
+        command sudo chown $USER $install_path
     end
 
     # Make sure it's a folder with the right permissions
@@ -31,17 +31,17 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     set tmp_dir (mktemp -d)
     set tmp_path {$tmp_dir}"/"{$filename}
     echo "Downloading" $url "to" $tmp_path
-    curl -L --url $url --output $tmp_path
+    command curl -L --url $url --output $tmp_path
 
     # Extract the archive
-    tar xzvf $tmp_path -C $tmp_dir
-    rm $tmp_path
+    command tar xzvf $tmp_path -C $tmp_dir
+    command rm $tmp_path
 
     # Delete the existing install and move the new one over
-    touch {$install_path}"/sentinel"
-    rm -rf {$install_path}"/"*
-    mv {$tmp_dir}"/"{$foldername}"/"* $install_path
+    command touch {$install_path}"/sentinel"
+    command rm -rf {$install_path}"/"*
+    command mv {$tmp_dir}"/"{$foldername}"/"* $install_path
 
     # Cleanup
-    rm -r {$tmp_dir}"/"{$foldername}
+    command rm -r {$tmp_dir}"/"{$foldername}
 end
