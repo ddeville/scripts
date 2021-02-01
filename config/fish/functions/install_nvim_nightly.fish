@@ -30,10 +30,11 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     curl -L --url $url --output $tmp_path
 
     # Extract the archive
-    tar xzvf $tmp_path -C $tmp_dir > /dev/null 2>&1
+    tar xzvf $tmp_path -C $tmp_dir
     rm $tmp_path
 
     # Delete the existing install and move the new one over
+    touch {$install_path}"/sentinel"
     rm -rf {$install_path}"/"*
     mv {$tmp_dir}"/"{$foldername}"/"* $install_path
 
