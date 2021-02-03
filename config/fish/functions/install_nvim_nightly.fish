@@ -45,7 +45,7 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
         if test $cur_version = $new_version
             echo "Version" $cur_version "is already installed"
             # Cleanup
-            command sudo rm -r {$tmp_dir}"/"{$foldername}
+            command rm -rf {$tmp_dir}"/"{$foldername}
             return 0
         end
     end
