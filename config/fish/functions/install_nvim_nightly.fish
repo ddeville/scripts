@@ -37,7 +37,21 @@ function install_nvim_nightly --description "Install the Nightly version of Neov
     command tar xzvf $tmp_path -C $tmp_dir
     command rm $tmp_path
 
+    # Check whether it is a new version
+    set new_version (command {$tmp_dir}"/"{$foldername}"/bin/nvim" --version | head -n 1)
+    if test -e /opt/nvim_nightly/bin/nvim
+        set cur_version (command /opt/nvim_nightly/bin/nvim --version | head -n 1)
+
+        if test $cur_version = $new_version
+            echo "Version" $cur_version "is already installed"
+            # Cleanup
+            command sudo rm -r {$tmp_dir}"/"{$foldername}
+            return 0
+        end
+    end
+
     # Delete the existing install and move the new one over
+    echo "Installing" $new_version
     command touch {$install_path}"/sentinel"
     command rm -rf {$install_path}"/"*
     command mv {$tmp_dir}"/"{$foldername}"/"* $install_path
