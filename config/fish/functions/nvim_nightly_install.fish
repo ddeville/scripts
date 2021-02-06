@@ -1,10 +1,10 @@
-function install_nvim_nightly --description "Install the Nightly version of Neovim"
-    set install_path "/opt/nvim_nightly"
+function nvim_nightly_install --description "Install the Nightly version of Neovim"
+    set install_path "/opt/nvim/nightly_ar"
 
     # Create install path if needed
     if not test -e $install_path
         echo "Creating install folder"
-        command sudo mkdir $install_path
+        command sudo mkdir -p $install_path
         command sudo chown $USER $install_path
     end
 
