@@ -21,6 +21,9 @@ function pyenv
             else
                 echo "Note: OpenSSL is not installed with Homebrew, building Python will likely fail"
             end
+            # YouCompleteMe requires Python built with framework enabled
+            set -gx PYTHON_CONFIGURE_OPTS "--enable-framework"
+            echo "Note: Building Python with `--enable-framework` (see ~/.config/fish/functions/pyenv.fish for more info)"
         end
         command pyenv "$command" $argv
     case '*'
