@@ -1,5 +1,5 @@
 function nvim_nightly_install --description "Install the Nightly version of Neovim"
-    set install_path "/opt/nvim/nightly_ar"
+    set install_path "/opt/nvim/nightly_archived"
 
     # Create install path if needed
     if not test -e $install_path

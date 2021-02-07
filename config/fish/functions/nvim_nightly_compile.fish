@@ -3,7 +3,7 @@
 #   linux: `sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip`
 
 function nvim_nightly_compile --description "Install the Nightly version of Neovim"
-    set install_path "/opt/nvim/nightly_cm"
+    set install_path "/opt/nvim/nightly_compiled"
 
     # Create install path if needed
     if not test -e $install_path

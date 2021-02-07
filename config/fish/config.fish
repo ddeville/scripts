@@ -77,12 +77,12 @@ if test -e "/opt/dropbox-override/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
 end
 # we build neovim nightly in there
-if test -e "/opt/nvim/nightly_cm"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_cm/bin"
+if test -e "/opt/nvim/nightly_compiled"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_compiled/bin"
 end
 # we install neovim nightly in there
-if test -e "/opt/nvim/nightly_ar"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_ar/bin"
+if test -e "/opt/nvim/nightly_archived"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_archived/bin"
 end
 # brew install its stuff there on M1 macs
 if test -e "/opt/homebrew/bin"
