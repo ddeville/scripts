@@ -61,10 +61,11 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'junegunn/fzf.vim'
         let g:fzf_layout = { 'down': '35%' }
         nnoremap <Leader>; :Buffers<CR>
+        nnoremap ; :Buffers<CR>
         nnoremap <Leader>o :Files<CR>
         nnoremap <C-p> :Files<CR>
-        nnoremap <Leader>t :Tags<CR>
         nnoremap <Leader>s :GFiles?<CR>
+        nnoremap <Leader>t :Tags<CR>
         nnoremap // :BLines<CR>
     Plug 'Valloric/YouCompleteMe'
         " close sticky preview window at the bottom after insertion
