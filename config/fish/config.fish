@@ -89,9 +89,6 @@ if test -e "/opt/homebrew/bin"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/homebrew/bin"
 end
 # these can come afterwards, it's cool
-if test -e "/usr/local/sbin"
-    set PATH_ENTRIES $PATH_ENTRIES "/usr/local/sbin"
-end
 if test -e "$HOME/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
 end
@@ -109,6 +106,9 @@ if test -e "$HOME/.fzf/bin"
 end
 if which xcode-select > /dev/null 2>&1; and set XCODE (xcode-select --print-path); and test -e "$XCODE/usr/bin"
     set PATH_ENTRIES $PATH_ENTRIES "$XCODE/usr/bin"
+end
+if test -e "/usr/local/sbin"
+    set PATH_ENTRIES $PATH_ENTRIES "/usr/local/sbin"
 end
 
 # we can now set the new entries in front of the path
