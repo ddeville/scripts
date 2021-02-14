@@ -39,8 +39,8 @@ function nvim_nightly_install --description "Install the Nightly version of Neov
 
     # Check whether it is a new version
     set new_version (command {$tmp_dir}"/"{$foldername}"/bin/nvim" --version | head -n 1)
-    if test -e /opt/nvim_nightly/bin/nvim
-        set cur_version (command /opt/nvim_nightly/bin/nvim --version | head -n 1)
+    if test -e {$install_path}"/bin/nvim"
+        set cur_version (command {$install_path}"/bin/nvim" --version | head -n 1)
 
         if test $cur_version = $new_version
             echo "Version" $cur_version "is already installed"
