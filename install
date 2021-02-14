@@ -150,7 +150,7 @@ def task_update_shell():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "task_install_packages_full"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "install_packages_full"])
 
 def task_install_base16():
     # type: () -> TaskManifest
