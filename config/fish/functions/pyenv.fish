@@ -24,6 +24,10 @@ function pyenv
             else
                 echo "Note: OpenSSL is not installed with Homebrew, building Python will likely fail"
             end
+        else
+            # YouCompleteMe requires Python built with shared libs enabled
+            set -gx PYTHON_CONFIGURE_OPTS "--enable-shared"
+            echo "Note: Building Python with `--enable-shared` (see ~/.config/fish/functions/pyenv.fish for more info)"
         end
         command pyenv "$command" $argv
     case '*'
