@@ -5,10 +5,10 @@ function dbx_tmux --description "Create Dropbox tmux session"
         command tmux new-session -D -s $session -d -c ~
 
         # repo
-        command tmux new-window -t $session -n "repo" -d -c ~/src/client
+        command tmux new-window -t $session -n "desktop" -d -c ~/src/server/desktop
 
         # editor
-        command tmux new-window -t $session -n "editor" -d -c ~/src/client
+        command tmux new-window -t $session -n "editor" -d -c ~/src/server/desktop
         command tmux send-keys -t $session:3 "nvim ." Enter
 
         # server
