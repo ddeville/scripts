@@ -8,8 +8,8 @@ function dbx_vpn --description "Forward port to Dropbox Mac Pro and set up proxy
         set network_service "Ethernet"
     end
     if test -d $server
-        echo "No server given, defaulting to damien-mp.local"
-        set server "damien-mp.local"
+        echo "No server given, defaulting to damien-mp.corp.kattungar.net"
+        set server "damien-mp.corp.kattungar.net"
     end
 
     echo "Enabling SOCKS proxy on" $network_service "with port" $port
