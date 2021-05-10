@@ -96,6 +96,10 @@ call plug#begin('~/.vim-plug-plugins')
         nnoremap <Leader>f :Grepper -tool rg<CR>
         nmap gs <plug>(GrepperOperator)
         xmap gs <plug>(GrepperOperator)
+    if has('nvim')
+        " note that the plugin is installed but not actually enabled...
+        Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    endif
 call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
