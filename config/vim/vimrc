@@ -97,7 +97,7 @@ call plug#begin('~/.vim-plug-plugins')
         nmap gs <plug>(GrepperOperator)
         xmap gs <plug>(GrepperOperator)
     if has('nvim')
-        Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     endif
 call plug#end()
 
@@ -105,6 +105,7 @@ call plug#end()
 if has('nvim')
 lua <<EOF
     require'nvim-treesitter.configs'.setup {
+        ensure_installed = { "c", "cpp", "fish", "go", "java", "javascript", "lua", "python", "rust", "toml", "typescript"},
         highlight = {
             enable = true,
         },
