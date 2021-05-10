@@ -97,10 +97,20 @@ call plug#begin('~/.vim-plug-plugins')
         nmap gs <plug>(GrepperOperator)
         xmap gs <plug>(GrepperOperator)
     if has('nvim')
-        " note that the plugin is installed but not actually enabled...
         Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     endif
 call plug#end()
+
+" setup tree-sitter (needs to be outside of the `plug` block or lua errors)
+if has('nvim')
+lua <<EOF
+    require'nvim-treesitter.configs'.setup {
+        highlight = {
+            enable = true,
+        },
+    }
+EOF
+endif
 
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
