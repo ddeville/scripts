@@ -11,24 +11,23 @@ function fish_prompt
         end
     end
 
-    set -l cyan (set_color --bold 8abeb7)
+    set -l cwd_color (set_color --bold $fish_color_cwd)
     set -l yellow (set_color --bold f0c674)
     set -l red (set_color --bold cc6666)
-    set -l blue (set_color --bold 81a2be)
-    set -l normal (set_color normal)
+    set -l normal_color (set_color $fish_color_normal)
 
     set -l arrow "$red➜ "
     if [ $USER = 'root' ]
         set arrow "$red# "
     end
 
-    set -l cwd_ $cyan(basename (prompt_pwd))
+    set -l cwd_ $cwd_color(basename (prompt_pwd))
     set -l hostname_ $yellow(hostname -s)
 
     if [ (_is_git_repo) ]
         set -l repo_branch $red(_git_branch_name)
-        set repo_info "$blue:($repo_branch$blue)"
+        set repo_info "$normal_color:($repo_branch$normal_color)"
     end
 
-    echo -n -s $arrow ' '$hostname_:$cwd_ $repo_info $normal ' '
+    echo -n -s $arrow ' '$hostname_:$cwd_ $repo_info $normal_color ' '
 end
