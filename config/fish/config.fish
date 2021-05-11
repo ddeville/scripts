@@ -125,8 +125,8 @@ abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.
 # aliases
 alias e="nvim"
 alias ll="ls -lah"
-alias gaa="git aa; and git ci"
-alias gaaa="git aa; and git ci --amend"
+alias gaa="git add .; and git ci"
+alias gaaa="git add .; and git ci --amend"
 alias adp="arc diff --preview"
 alias adu="arc diff --update"
 
