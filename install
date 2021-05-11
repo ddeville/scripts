@@ -193,6 +193,7 @@ def task_update_dot_files():
             ("fish", os.path.join(".config", "fish")),
             ("kitty", os.path.join(".config", "kitty")),
             ("htop", os.path.join(".config", "htop")),
+            ("bat", os.path.join(".config", "bat", "config")),
             (os.path.join("vifm", "vifmrc"), os.path.join(".config", "vifm", "vifmrc")),
             (os.path.join("vifm", "colors"), os.path.join(".config", "vifm", "colors")),
         ]
