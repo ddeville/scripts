@@ -200,6 +200,7 @@ def task_update_dot_files():
 
         # make sure that we create the various `.config/xxx` directories since they won't be here on new machines
         create_dirs(os.path.join(dest_dir, ".config", "vifm"))
+        create_dirs(os.path.join(dest_dir, ".config", "bat"))
 
         print("====> linking dot files")
         for f1, f2 in links:
