@@ -133,12 +133,8 @@ alias adu="arc diff --update"
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
-set -x FZF_DEFAULT_COMMAND "command rg --files --hidden --glob '!.git/*'"
-set -x FZF_CTRL_T_COMMAND "git ls-files"
-set -x FZF_ALT_C_COMMAND "find .\
-                          -type d -name '.git' -prune -o\
-                          -type d -name '__pycache__' -prune -o\
-                          -type d -print\
-                          | cut -d/ -f2-"
+set -x FZF_DEFAULT_COMMAND "fd --exclude .git --hidden . $HOME"
+set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+set -x FZF_ALT_C_COMMAND "fd --type d --exclude .git --exclude __pycache__ --hidden . $HOME"
 # alt-c doesn't work on macos so rather than tweaking the iterm settings bind it
 bind -M insert "ç" fzf-cd-widget
