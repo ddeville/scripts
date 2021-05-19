@@ -140,3 +140,5 @@ set -x FZF_ALT_C_COMMAND "find .\
                           -type d -name '__pycache__' -prune -o\
                           -type d -print\
                           | cut -d/ -f2-"
+# alt-c doesn't work on macos so rather than tweaking the iterm settings bind it
+bind -M insert "ç" fzf-cd-widget
