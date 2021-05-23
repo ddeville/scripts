@@ -9,4 +9,5 @@ fishd.*
 
 config/vim/.netrwhist
 config/vim/backup/
+config/vim/undo/
 config/vim/view/
