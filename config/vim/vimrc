@@ -61,6 +61,8 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
         let g:rustfmt_autosave = 1
+        let g:rustfmt_emit_files = 1
+        let g:rustfmt_fail_silently = 0
     Plug 'fatih/vim-go'
         let g:go_fmt_autosave = 1
     Plug 'dag/vim-fish'
