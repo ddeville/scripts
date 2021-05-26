@@ -5,6 +5,9 @@ endif
 
 set encoding=utf-8
 
+" set leader to space instead of the default backslash
+let mapleader = "\<Space>"
+
 " update and reload config
 command! Config execute ":edit $MYVIMRC"
 command! Reload execute "source ~/.vim/vimrc"
@@ -58,7 +61,6 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-sleuth'
     Plug 'vifm/vifm.vim'
-    Plug 'vim-scripts/a.vim'
     Plug 'rust-lang/rust.vim'
         let g:rustfmt_autosave = 1
         let g:rustfmt_emit_files = 1
@@ -136,7 +138,7 @@ set background=dark
 
 " setup base16 colorscheme
 if filereadable(expand("~/.vimrc_background"))
-    let base16colorspace=256
+    let base16colorspace = 256
     source ~/.vimrc_background
 endif
 
@@ -189,6 +191,9 @@ set autoread
 " open new splits on right and bottom
 set splitbelow
 set splitright
+
+" dont' add an extra space when joining lines
+set nojoinspaces
 
 " trailing whitespace is bad
 highlight WhiteSpaceEOL ctermbg=red guibg=red
