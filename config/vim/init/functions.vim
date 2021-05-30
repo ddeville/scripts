@@ -40,3 +40,9 @@ endif
 if index(g:fugitive_browse_handlers, function('DropboxSourcegraphURL')) < 0
     call insert(g:fugitive_browse_handlers, function('DropboxSourcegraphURL'))
 endif
+
+" insert a todo
+function! Todo()
+    " Append space + todo to current line without moving cursor.
+    call setline(line('.'), getline('.') . ' ' . "TODO(damien)")
+endfunction
