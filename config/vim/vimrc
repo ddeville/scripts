@@ -35,6 +35,11 @@ filetype plugin indent on
 
 " vim-plug plugins
 call plug#begin('~/.vim-plug-plugins')
+    " VIM & NEOVIM
+    Plug 'chriskempson/base16-vim'
+    Plug 'dag/vim-fish'
+    Plug 'fatih/vim-go'
+        let g:go_fmt_autosave = 1
     Plug 'itchyny/lightline.vim'
         " don't show `-- INSERT --` since we have a fancy status line
         set noshowmode
@@ -49,25 +54,6 @@ call plug#begin('~/.vim-plug-plugins')
         \     'gitbranch': 'fugitive#head'
         \   },
         \ }
-    Plug 'chriskempson/base16-vim'
-    Plug 'mhinz/vim-startify'
-    Plug 'tpope/vim-git'
-    Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-eunuch'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-unimpaired'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-vinegar'
-    Plug 'tpope/vim-sleuth'
-    Plug 'vifm/vifm.vim'
-    Plug 'rust-lang/rust.vim'
-        let g:rustfmt_autosave = 1
-        let g:rustfmt_emit_files = 1
-        let g:rustfmt_fail_silently = 0
-    Plug 'fatih/vim-go'
-        let g:go_fmt_autosave = 1
-    Plug 'dag/vim-fish'
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
         let g:fzf_layout = { 'down': '35%' }
@@ -80,7 +66,28 @@ call plug#begin('~/.vim-plug-plugins')
         nnoremap <Leader>s :GFiles?<CR>
         nnoremap <Leader>t :Tags<CR>
         nnoremap // :BLines<CR>
-    Plug 'Valloric/YouCompleteMe'
+    Plug 'mhinz/vim-grepper'
+        let g:grepper = {}
+        let g:grepper.tools = ['rg', 'git', 'grep']
+        let g:grepper.highlight = 1
+        nnoremap <Leader>f :Grepper -tool rg<CR>
+        nmap gs <plug>(GrepperOperator)
+        xmap gs <plug>(GrepperOperator)
+    Plug 'mhinz/vim-startify'
+    Plug 'rust-lang/rust.vim'
+        let g:rustfmt_autosave = 1
+        let g:rustfmt_emit_files = 1
+        let g:rustfmt_fail_silently = 0
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-eunuch'
+    Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-git'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-sleuth'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-unimpaired'
+    Plug 'tpope/vim-vinegar'
+    Plug 'valloric/youcompleteme'
         " close sticky preview window at the bottom after insertion
         let g:ycm_autoclose_preview_window_after_insertion = 1
         " remaps to go to a definition or line
@@ -97,13 +104,9 @@ call plug#begin('~/.vim-plug-plugins')
         \     'project_root_files': ['Cargo.toml'],
         \   }
         \ ]
-    Plug 'mhinz/vim-grepper'
-        let g:grepper = {}
-        let g:grepper.tools = ['rg', 'git', 'grep']
-        let g:grepper.highlight = 1
-        nnoremap <Leader>f :Grepper -tool rg<CR>
-        nmap gs <plug>(GrepperOperator)
-        xmap gs <plug>(GrepperOperator)
+    Plug 'vifm/vifm.vim'
+
+    " NEOVIM ONLY
     if has('nvim')
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     " popup and plenary and dependencies of telescope
@@ -112,11 +115,6 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'nvim-telescope/telescope.nvim'
     endif
 call plug#end()
-
-" setup the various nvim (plugin) settings implemented in lua
-if has('nvim')
-lua require('treesitter')
-endif
 
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
@@ -223,7 +221,14 @@ nnoremap <C-l> :nohl<CR><C-l>
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
-" ==> FUNCTIONS
-
 nnoremap <F8> :call ()<CR>
+
+" ==> MORE CONFIGS
+
+" load more configs written in vimscript
 source <sfile>:h/init/functions.vim
+
+" load more configs written in lua (for neovim only)
+if has('nvim')
+lua require('treesitter')
+endif
