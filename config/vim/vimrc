@@ -169,6 +169,13 @@ set ruler
 " display the line number on the left
 set number
 
+" show the diagnostic ui where the number goes
+if has('patch-8.1.1564')
+    set signcolumn=number
+else
+    set signcolumn=yes
+end
+
 " display a column at 80 char
 set colorcolumn=80
 
