@@ -118,16 +118,9 @@ call plug#begin('~/.vim-plug-plugins')
     endif
 call plug#end()
 
-" setup tree-sitter (needs to be outside of the `plug` block or lua errors)
+" setup the various nvim (plugin) settings implemented in lua
 if has('nvim')
-lua <<EOF
-    require'nvim-treesitter.configs'.setup {
-        ensure_installed = { "c", "cpp", "fish", "go", "java", "javascript", "lua", "python", "rust", "toml", "typescript"},
-        highlight = {
-            enable = true,
-        },
-    }
-EOF
+lua require('treesitter')
 endif
 
 " shorten the delay to transition to normal mode after pressing escape
