@@ -165,7 +165,7 @@ set ruler
 set number
 
 " show the diagnostic ui where the number goes
-if has('patch-8.1.1564')
+if has('nvim-0.5') || has('patch-8.1.1564')
     set signcolumn=number
 else
     set signcolumn=yes
