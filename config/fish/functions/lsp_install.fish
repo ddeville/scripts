@@ -1,5 +1,5 @@
 function lsp_install --description "Install various LSP server for Neovim"
-    set install_path "/opt/nvim/lsp"
+    set install_path "/opt/lsp"
 
     if not test -e $install_path
         echo "Creating install folder"
@@ -66,7 +66,6 @@ function rust_analyzer
         end
     else if test (uname) = "Linux"
         set filename "rust-analyzer-x86_64-unknown-linux-gnu"
-        set foldername "nvim-linux64"
     else
         echo "Unsupported platform:" (uname)
         return 1
