@@ -28,9 +28,6 @@ endif
 set undodir=$HOME/.vim/undo
 set undofile
 
-" enable syntax highlighting
-syntax enable
-
 " attempt to determine the file type based on name and content
 filetype plugin indent on
 
@@ -100,6 +97,9 @@ call plug#end()
 
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
+
+" enable syntax highlighting
+syntax enable
 
 " dark background is better
 set background=dark
