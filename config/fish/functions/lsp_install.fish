@@ -19,6 +19,10 @@ end
 
 function rust_analyzer
     set install_path $argv[1]
+    if not test -e $install_path
+        echo "Missing install path"
+        return 1
+    end
 
     # Get the download URL for the latest package for the current platform
     if test (uname) = "Darwin"
