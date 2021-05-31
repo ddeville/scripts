@@ -1,4 +1,3 @@
-import contextlib
 import errno
 import os
 import shutil
@@ -68,13 +67,3 @@ def copy_file(orig, dest, isdir=False):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-@contextlib.contextmanager
-def change_dir(path):
-    # type: (str) -> Iterator[str]
-    original_path = os.getcwd()
-    try:
-        os.chdir(path)
-        yield path
-    finally:
-        os.chdir(original_path)
