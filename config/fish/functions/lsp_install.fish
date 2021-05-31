@@ -14,15 +14,15 @@ function lsp_install --description "Install various LSP server for Neovim"
         return 1
     end
 
-    rust_analyzer $install_path
+    pushd $install_path
+    rust_analyzer
+    gopls
+    # tsserver
+    popd $install_path
 end
 
 function rust_analyzer
-    set install_path $argv[1]
-    if not test -e $install_path
-        echo "Missing install path"
-        return 1
-    end
+    echo "Installing rust-analyzer"
 
     # Get the download URL for the latest package for the current platform
     if test (uname) = "Darwin"
@@ -48,6 +48,35 @@ function rust_analyzer
 
     # Extract the archive to output dir
     command gzip -d $tmp_path
-    command mv $tmp_dir"/"{$filename} $install_path"/rust-analyzer"
-    command chmod +x $install_path"/rust-analyzer"
+    command mv $tmp_dir"/"{$filename} rust-analyzer
+    command chmod +x rust-analyzer
+end
+
+function gopls
+    echo "Installing gopls"
+
+    if not type -q go
+        echo "The gopls language server requires Go to be installed"
+        return 1
+    end
+
+    set -x GOPATH (command pwd)
+    set -x GOBIN (command pwd)
+    set -x GO111MODULE on
+    go get -v golang.org/x/tools/gopls
+    go clean -modcache
+end
+
+function tsserver
+    echo "Installing tsserver"
+
+    if not type -q npm
+        echo "The tsserver language server requires Node to be installed"
+        return 1
+    end
+
+    if not test -e package.json
+        npm init -y --scope=lsp
+    end
+    npm install typescript-language-server@latest typescript@latest
 end
