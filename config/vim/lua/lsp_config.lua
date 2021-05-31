@@ -1,6 +1,16 @@
 local nvim_lsp = require('lspconfig')
 
 local on_attach = function(client, bufnr)
+  vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+    vim.lsp.diagnostic.on_publish_diagnostics, {
+      signs = true,
+      update_in_insert = false,
+      virtual_text = {
+        spacing = 3,
+      },
+    }
+  )
+
   -- Mappings.
   local opts = { noremap=true, silent=true }
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
