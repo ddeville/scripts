@@ -87,32 +87,13 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-unimpaired'
     Plug 'tpope/vim-vinegar'
-    Plug 'valloric/youcompleteme'
-        " close sticky preview window at the bottom after insertion
-        let g:ycm_autoclose_preview_window_after_insertion = 1
-        " remaps to go to a definition or line
-        nnoremap <C-j> :YcmCompleter GoTo<CR>
-        nnoremap <C-]> :YcmCompleter GoTo<CR>
-        nnoremap <C-k> :YcmCompleter GetDoc<CR>
-        " language server
-        let g:ycm_language_server =
-        \ [
-        \   {
-        \     'name': 'rust',
-        \     'cmdline': ['rust-analyzer'],
-        \     'filetypes': ['rust'],
-        \     'project_root_files': ['Cargo.toml'],
-        \   }
-        \ ]
     Plug 'vifm/vifm.vim'
 
     " NEOVIM ONLY
     if has('nvim')
+    Plug 'hrsh7th/nvim-compe'
+    Plug 'neovim/nvim-lspconfig'
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    " popup and plenary and dependencies of telescope
-    Plug 'nvim-lua/popup.nvim'
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-telescope/telescope.nvim'
     endif
 call plug#end()
 
@@ -230,5 +211,7 @@ source <sfile>:h/init/functions.vim
 
 " load more configs written in lua (for neovim only)
 if has('nvim')
-lua require('treesitter')
+lua require('lsp_config')
+lua require('compe_config')
+lua require('treesitter_config')
 endif
