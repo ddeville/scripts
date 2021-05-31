@@ -6,6 +6,7 @@ endif
 set encoding=utf-8
 
 " set leader to space instead of the default backslash
+noremap <Space> <Nop>
 let mapleader = "\<Space>"
 
 " update and reload config
