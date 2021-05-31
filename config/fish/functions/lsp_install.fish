@@ -1,4 +1,19 @@
 function lsp_install --description "Install various LSP server for Neovim"
+    if test -d $argv
+        echo "Available servers:"
+        echo "  * rust-analyzer"
+        echo "  * clangd"
+        echo "  * gopls"
+        echo "  * tsserver"
+        echo "  * pyright"
+        return 1
+    end
+
+    # If `all` was passed or `lsp_install` was invoked without arg, install all
+    if contains all $argv
+        set install_all 1
+    end
+
     set install_path "/opt/lsp"
 
     if not test -e $install_path
@@ -15,10 +30,6 @@ function lsp_install --description "Install various LSP server for Neovim"
 
     pushd $install_path
 
-    # If `all` was passed or `lsp_install` was invoked without arg, install all
-    if contains all $argv || test -d $argv
-        set install_all 1
-    end
 
     # Install!
 
