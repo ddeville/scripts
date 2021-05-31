@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
-import json
 import os
 import shutil
-import subprocess
 
 try:
     from urllib.request import urlretrieve
@@ -28,7 +26,6 @@ from py.task_executor import (
     run_all_tasks_for_config,
 )
 from py.util import (
-    change_dir,
     command_path,
     copy_file,
     create_dirs,
@@ -57,6 +54,7 @@ COMMON_PACKAGES = [
     "vifm",
     "neovim",
     "bat",
+    "exa",
 ]
 
 COMMON_PACKAGES_FULL = [
@@ -90,9 +88,6 @@ EXTRA_PACKAGES_FULL = {
     ],
     PackageType.DEB: [
         "ttf-anonymous-pro",
-        "build-essential",  # for ycm
-        "python-dev",  # for ycm
-        "python3-dev",  # for ycm
     ],
 }
 
@@ -268,65 +263,6 @@ def task_update_vim_plugins():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files", "install_rustup"])
 
-def task_build_vim_plugins():
-    # type: () -> TaskManifest
-    try:
-        from json import JSONDecodeError
-    except ImportError:
-        JSONDecodeError = ValueError  # python 2...
-
-    def _load_build_cache(path):
-        # type: (str) -> Dict[str, str]
-        try:
-            with open(path) as f:
-                build_cache = json.load(f)
-        except (IOError, JSONDecodeError):
-            build_cache = {}
-        return build_cache
-
-    def _write_build_cache(path, build_cache):
-        # type: (str, Dict[str, str]) -> None
-        with open(path, "w") as f:
-            json.dump(build_cache, f)
-
-    def cmd():
-        # type: () -> None
-        plugins_path = os.path.expanduser("~/.vim-plug-plugins")
-
-        # load the config that contains the git hash of the last time we built
-        build_cache_path = os.path.join(plugins_path, "build_cache.json")
-        build_cache = _load_build_cache(build_cache_path)
-
-        plugin = "YouCompleteMe"
-        with change_dir(os.path.join(plugins_path, plugin)):
-            # get the hash of the current commit so that we can check whether we need to rebuild
-            cur_hash = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip().decode()
-
-            if cur_hash != build_cache.get(plugin):
-                print("====> building ycm")
-                # make sure that cargo is on the path since we might have just changed the shell...
-                env = os.environ.copy()
-                env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
-                completers = [
-                    "--clangd-completer",
-                ]
-                if is_cmd_installed("cargo"):
-                    completers.append("--rust-completer")
-                if is_cmd_installed("node"):
-                    completers.append("--ts-completer")
-                if is_cmd_installed("go"):
-                    completers.append("--go-completer")
-                print("====> installing ycm completers: %s" % (completers,))
-                run_command(["python3", "install.py"] + completers, env=env)
-                # cache the git hash that we've just built
-                build_cache[plugin] = cur_hash
-            else:
-                print("====> ycm already built")
-
-        _write_build_cache(build_cache_path, build_cache)
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_vim_plugins"])
-
 def task_update_library_visibility():
     # type: () -> TaskManifest
     def cmd():
@@ -342,7 +278,7 @@ def task_update_library_visibility():
 def task_update_system_preferences():
     # type: () -> TaskManifest
     def update_prefs(key, val, domain="NSGlobalDomain"):
-        # type: (str, str) -> None
+        # type: (str, str, str) -> None
         run_command(["defaults", "write", domain, key, val])
 
     def cmd():
