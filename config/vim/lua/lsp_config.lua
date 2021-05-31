@@ -1,5 +1,3 @@
-local nvim_lsp = require('lspconfig')
-
 local servers = { "rust_analyzer", "sourcekit", "clangd", "gopls", "pyright", "tsserver" }
 
 local on_attach = function(client, bufnr)
@@ -56,6 +54,7 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_command("highlight LspDiagnosticsUnderlineHint guifg=Gray ctermfg=Gray")
 end
 
+local nvim_lsp = require('lspconfig')
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach

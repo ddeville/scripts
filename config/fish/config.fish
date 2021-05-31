@@ -85,8 +85,8 @@ if test -e "/opt/nvim/nightly_archived"
     set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_archived/bin"
 end
 # we install the lsp server binaries in there
-if test -e "/opt/nvim/lsp"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/lsp"
+if test -e "/opt/lsp"
+    set PATH_ENTRIES $PATH_ENTRIES "/opt/lsp"
 end
 # brew install its stuff there on M1 macs
 if test -e "/opt/homebrew/bin"
