@@ -17,9 +17,10 @@ A few requirements:
 
 Things to do:
 
-- Add the rust source and linters to the rustup install (for YCM to offer auto completion): `rustup component add rust-src rustfmt clippy`.
-- Install Jedi for Python auto completion: `pip install jedi`
+- Add the rust source and linters to the rustup install: `rustup component add rust-src rustfmt clippy`.
+- Install the nightly Neovim (by running either `nvim_nightly_install` or `nvim_nightly_compile`).
 - Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
     - `python2 -m pip install --upgrade pynvim`
     - `python3 -m pip install --upgrade pynvim`
     - `npm install -g neovim`
+- Install the various LSP servers by running `lsp_install`.
