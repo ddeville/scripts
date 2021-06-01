@@ -1,3 +1,5 @@
+local nvim_lsp = require('lspconfig')
+
 local servers = { "rust_analyzer", "sourcekit", "clangd", "gopls", "pyright", "tsserver" }
 
 local on_attach = function(client, bufnr)
@@ -54,9 +56,14 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_command("highlight LspDiagnosticsUnderlineHint guifg=Gray ctermfg=Gray")
 end
 
-local nvim_lsp = require('lspconfig')
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup {
-    on_attach = on_attach
+local extra_config = {
+  rust_analyzer = {
+    root_dir = nvim_lsp.util.root_pattern('rust-toolchain'),
   }
+}
+
+for _, lsp in ipairs(servers) do
+  config = (extra_config[lsp] and extra_config[lsp] or {})
+  config["on_attach"] = on_attach
+  nvim_lsp[lsp].setup(config)
 end
