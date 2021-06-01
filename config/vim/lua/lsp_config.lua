@@ -58,12 +58,12 @@ end
 
 local extra_config = {
   rust_analyzer = {
-    root_dir = nvim_lsp.util.root_pattern('rust-toolchain'),
+    root_dir = nvim_lsp.util.root_pattern("Cargo.toml", "rust-project.json"),
   }
 }
 
 for _, lsp in ipairs(servers) do
-  config = (extra_config[lsp] and extra_config[lsp] or {})
-  config["on_attach"] = on_attach
-  nvim_lsp[lsp].setup(config)
+  nvim_lsp[lsp].setup(vim.tbl_deep_extend("force", extra_config[lsp] or {}, {
+    on_attach = on_attach,
+  }))
 end
