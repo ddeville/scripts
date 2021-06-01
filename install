@@ -87,11 +87,13 @@ EXTRA_PACKAGES_FULL = {
         "ttf-anonymous-pro",
         "golang",
         "nodejs",
+        "npm",
     ],
     PackageType.DEB: [
         "ttf-anonymous-pro",
         "golang",
         "nodejs",
+        "npm",
     ],
 }
 
