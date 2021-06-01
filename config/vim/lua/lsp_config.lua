@@ -58,9 +58,31 @@ end
 
 local extra_config = {
   rust_analyzer = {
-    root_dir = nvim_lsp.util.root_pattern("Cargo.toml", "rust-project.json"),
+    root_dir = function(fname)
+      local current_cargo_dir = nvim_lsp.util.root_pattern("Cargo.toml")(fname)
+      -- Make sure that we run `cargo metadata` in the current project dir
+      -- rather that the dir from which nvim was initially launched.
+      local cmd = "cargo metadata --no-deps --format-version 1"
+      if current_cargo_dir ~= nil then
+        cmd = cmd .. " --manifest-path " .. nvim_lsp.util.path.join(current_cargo_dir, "/Cargo.toml")
+      end
+      local cargo_metadata = vim.fn.system(cmd)
+      local cargo_root = nil
+      if vim.v.shell_error == 0 then
+        cargo_root = vim.fn.json_decode(cargo_metadata)["workspace_root"]
+      end
+      -- Order of preference:
+      --   * Current workspace Cargo.toml
+      --   * Current crate Cargo.toml
+      --   * Rust project root (for non Cargo projects)
+      --   * Current git repository
+      return cargo_root or current_cargo_dir or
+        nvim_lsp.util.root_pattern("rust-project.json")(fname) or
+        nvim_lsp.util.find_git_ancestor(fname)
+    end;
   }
 }
+
 
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup(vim.tbl_deep_extend("force", extra_config[lsp] or {}, {
