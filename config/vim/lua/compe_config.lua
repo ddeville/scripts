@@ -1,6 +1,8 @@
+local compe = require('compe')
+
 vim.o.completeopt = "menuone,noselect"
 
-require'compe'.setup {
+compe.setup {
   enabled = true;
   autocomplete = true;
   debug = false;
@@ -13,7 +15,6 @@ require'compe'.setup {
   max_kind_width = 100;
   max_menu_width = 100;
   documentation = true;
-
   source = {
     nvim_lsp = true;
     buffer = true;
