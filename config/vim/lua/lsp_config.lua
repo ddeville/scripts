@@ -26,10 +26,10 @@ local on_generic_client_attach = function(client, bufnr)
   )
 
   -- Configure sign column for diagnostic messages
-  vim.fn.sign_define("LspDiagnosticsSignError",         { text = "E", texthl = "LspDiagnosticsDefaultError" })
-  vim.fn.sign_define("LspDiagnosticsSignWarning",       { text = "W", texthl = "LspDiagnosticsDefaultWarning" })
-  vim.fn.sign_define("LspDiagnosticsSignInformation",   { text = "I", texthl = "LspDiagnosticsDefaultInformation" })
-  vim.fn.sign_define("LspDiagnosticsSignHint",          { text = "H", texthl = "LspDiagnosticsDefaultHint" })
+  vim.fn.sign_define("LspDiagnosticsSignError",       { text = "E", texthl = "LspDiagnosticsDefaultError" })
+  vim.fn.sign_define("LspDiagnosticsSignWarning",     { text = "W", texthl = "LspDiagnosticsDefaultWarning" })
+  vim.fn.sign_define("LspDiagnosticsSignInformation", { text = "I", texthl = "LspDiagnosticsDefaultInformation" })
+  vim.fn.sign_define("LspDiagnosticsSignHint",        { text = "H", texthl = "LspDiagnosticsDefaultHint" })
 
   -- Colorscheme for diagnostic messages
   -- Error in Red
