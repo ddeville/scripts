@@ -10,7 +10,7 @@ local servers = {
   "sumneko_lua",
 }
 
-local on_attach = function(client, bufnr)
+local on_client_attach = function(client, bufnr)
   -- Diagnostic settings
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -119,6 +119,6 @@ local extra_config = {
 
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup(vim.tbl_deep_extend("force", extra_config[lsp] or {}, {
-    on_attach = on_attach,
+    on_attach = on_client_attach,
   }))
 end
