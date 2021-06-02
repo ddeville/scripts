@@ -89,6 +89,22 @@ local extra_config = {
         nvim_lsp.util.root_pattern("rust-project.json")(fname) or
         nvim_lsp.util.find_git_ancestor(fname)
     end;
+    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
+        textDocument = {
+          completion = {
+            completionItem = {
+              snippetSupport = true,
+              resolveSupport = {
+                properties = {
+                  "documentation",
+                  "detail",
+                  "additionalTextEdits",
+                },
+              },
+            },
+          },
+        },
+      }),
   },
   sumneko_lua = {
     cmd = {"/opt/lsp/lua-language-server"};
