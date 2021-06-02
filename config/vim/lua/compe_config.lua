@@ -17,6 +17,7 @@ compe.setup {
   documentation = true;
   source = {
     nvim_lsp = true;
+    nvim_lua = true;
     buffer = true;
     path = true;
     spell = true;
