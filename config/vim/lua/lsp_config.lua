@@ -1,6 +1,6 @@
 local nvim_lsp = require('lspconfig')
 
-local servers = { "rust_analyzer", "sourcekit", "clangd", "gopls", "pyright", "tsserver" }
+local servers = { "rust_analyzer", "sourcekit", "clangd", "gopls", "pyright", "sumneko_lua", "tsserver" }
 
 local on_attach = function(client, bufnr)
   -- Diagnostic settings
@@ -81,6 +81,31 @@ local extra_config = {
         nvim_lsp.util.root_pattern("rust-project.json")(fname) or
         nvim_lsp.util.find_git_ancestor(fname)
     end;
+  },
+  sumneko_lua = {
+    cmd = {"/opt/lsp/lua-language-server"};
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT',
+          path = vim.list_extend(vim.split(package.path, ';'), {"lua/?.lua", "lua/?/init.lua"}),
+        },
+        diagnostics = {
+          -- Get the language server to recognize the `vim` global
+          globals = {'vim'},
+        },
+        workspace = {
+          -- Make the server aware of Neovim runtime files
+          library = {
+            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+            [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+          },
+        },
+        telemetry = {
+          enable = false,
+        },
+      },
+    },
   }
 }
 

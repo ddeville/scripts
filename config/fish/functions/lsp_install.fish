@@ -6,6 +6,7 @@ function lsp_install --description "Install various LSP server for Neovim"
         echo "  * gopls"
         echo "  * tsserver"
         echo "  * pyright"
+        echo "  * sumneko_lua"
         return 1
     end
 
@@ -47,6 +48,9 @@ function lsp_install --description "Install various LSP server for Neovim"
     end
     if contains pyright $argv || set -q install_all
         pyright
+    end
+    if contains sumneko_lua $argv || set -q install_all
+        sumneko_lua
     end
 
     popd $install_path
@@ -233,4 +237,67 @@ function pyright
     popd $foldername
 
     command ln -s $foldername/node_modules/.bin/pyright-langserver $linkname
+end
+
+function sumneko_lua
+    echo "Installing sumneko_lua"
+
+    if not type -q ninja
+        echo "The numseko_lua language server requires Ninja to be installed"
+        return 1
+    end
+
+    set foldername "_lua"
+    set linkname "lua-language-server"
+
+    if test -e $foldername
+        command rm -rf $foldername
+    end
+    if test -L $linkname
+        command rm $linkname
+    end
+
+    command mkdir $foldername
+
+    pushd $foldername
+
+    if test (uname) = "Darwin"
+        set ninja_file "macos.ninja"
+        set bin_dir = "macOS"
+    else if test (uname) = "Linux"
+        set ninja_file "linux.ninja"
+        set bin_dir = "Linux"
+    else
+        echo "Unsupported platform:" (uname)
+        return 1
+    end
+
+    # We assume that the first tag is the latest, an assumption that the GH API
+    # also makes...
+    set tags_url "https://api.github.com/repos/sumneko/lua-language-server/tags"
+    set tag_name (curl $tags_url | jq --raw-output '.[0].name')
+
+    command git clone -b $tag_name "https://github.com/sumneko/lua-language-server.git"
+
+    pushd "lua-language-server"
+
+    command git submodule update --init --recursive
+
+    pushd "3rd/luamake"
+    command ninja -f compile/ninja/$ninja_file
+    popd "3rd/luamake"
+
+    ./3rd/luamake/luamake rebuild
+
+    popd "lua-language-server"
+
+    set curpath (pwd)
+
+    command echo >lua "#!/bin/sh
+    "$curpath"/lua-language-server/bin/"$bin_dir"/lua-language-server -E "$curpath"/lua-language-server/main.lua"
+    command chmod +x lua
+
+    popd $foldername
+
+    command ln -s $curpath/lua $linkname
 end
