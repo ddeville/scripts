@@ -213,7 +213,5 @@ source <sfile>:h/init/functions.vim
 
 " load more configs written in lua (for neovim only)
 if has('nvim')
-lua require('lsp_config')
-lua require('compe_config')
-lua require('treesitter_config')
+lua require('config')
 endif
