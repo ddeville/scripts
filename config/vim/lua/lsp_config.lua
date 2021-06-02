@@ -93,7 +93,7 @@ local extra_config = {
       textDocument = {
         completion = {
           completionItem = {
-            -- We need snippets for Compe to fully support rust-analyzer magic
+            -- We need snippets for compe to fully support rust-analyzer magic
             snippetSupport = true;
             resolveSupport = {
               properties = {
