@@ -7,7 +7,7 @@ import shutil
 try:
     from urllib.request import urlretrieve
 except ImportError:
-    from urllib import urlretrieve
+    from urllib import urlretrieve  # type: ignore
 
 from py.package_manager import (
     PackageType,
