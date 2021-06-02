@@ -19,6 +19,7 @@ compe.setup {
     nvim_lsp = true;
     buffer = true;
     path = true;
+    spell = true;
   };
 }
 
