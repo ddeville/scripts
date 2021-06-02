@@ -1,7 +1,19 @@
-local treesitter = require('nvim-treesitter.configs')
+local treesitter = require("nvim-treesitter.configs")
 
 treesitter.setup {
-  ensure_installed = { "c", "cpp", "fish", "go", "java", "javascript", "lua", "python", "rust", "toml", "typescript"},
+  ensure_installed = {
+    "c",
+    "cpp",
+    "fish",
+    "go",
+    "java",
+    "javascript",
+    "lua",
+    "python",
+    "rust",
+    "toml",
+    "typescript",
+  },
   highlight = {
     enable = true,
   },
