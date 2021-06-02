@@ -263,10 +263,10 @@ function sumneko_lua
 
     if test (uname) = "Darwin"
         set ninja_file "macos.ninja"
-        set bin_dir = "macOS"
+        set bin_dir "macOS"
     else if test (uname) = "Linux"
         set ninja_file "linux.ninja"
-        set bin_dir = "Linux"
+        set bin_dir "Linux"
     else
         echo "Unsupported platform:" (uname)
         return 1
