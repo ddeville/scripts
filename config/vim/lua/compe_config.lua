@@ -1,4 +1,4 @@
-local compe = require('compe')
+local compe = require("compe")
 
 vim.o.completeopt = "menuone,noselect"
 
@@ -7,7 +7,7 @@ compe.setup {
   autocomplete = true;
   debug = false;
   min_length = 1;
-  preselect = 'enable';
+  preselect = "enable";
   throttle_time = 80;
   source_timeout = 200;
   incomplete_delay = 400;
@@ -23,8 +23,8 @@ compe.setup {
 }
 
 local check_back_space = function()
-  local col = vim.fn.col('.') - 1
-  if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+  local col = vim.fn.col(".") - 1
+  if col == 0 or vim.fn.getline("."):sub(col, col):match("%s") then
     return true
   else
     return false
@@ -38,7 +38,7 @@ _G.tab_complete = function()
   elseif check_back_space() then
     return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
   else
-    return vim.fn['compe#complete']()
+    return vim.fn["compe#complete"]()
   end
 end
 _G.s_tab_complete = function()

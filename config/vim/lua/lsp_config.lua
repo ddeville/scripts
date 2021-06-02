@@ -1,4 +1,4 @@
-local nvim_lsp = require('lspconfig')
+local nvim_lsp = require("lspconfig")
 
 local servers = {
   "rust_analyzer",
@@ -95,18 +95,18 @@ local extra_config = {
     settings = {
       Lua = {
         runtime = {
-          version = 'LuaJIT',
-          path = vim.list_extend(vim.split(package.path, ';'), {"lua/?.lua", "lua/?/init.lua"}),
+          version = "LuaJIT",
+          path = vim.list_extend(vim.split(package.path, ";"), {"lua/?.lua", "lua/?/init.lua"}),
         },
         diagnostics = {
           -- Get the language server to recognize the `vim` global
-          globals = {'vim'},
+          globals = {"vim"},
         },
         workspace = {
           -- Make the server aware of Neovim runtime files
           library = {
-            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-            [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
           },
         },
         telemetry = {
