@@ -1,8 +1,8 @@
 " insert an RFC 3339 date
 function! DateRfc3339()
-    let format = '+\%Y-\%m-\%dT\%H:\%M:\%SZ'
-    let cmd = '/bin/date -u ' . shellescape(format)
-    let result = substitute(system(cmd), '[\]\|[[:cntrl:]]', '', 'g')
+    let format = "+\%Y-\%m-\%dT\%H:\%M:\%SZ"
+    let cmd = "/bin/date -u " . shellescape(format)
+    let result = substitute(system(cmd), "[\]\|[[:cntrl:]]", '', 'g')
     " Append space + result to current line without moving cursor.
     call setline(line('.'), getline('.') . ' ' . result)
 endfunction
@@ -19,9 +19,9 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 
 " fugitive extension to get `:Gbrowse` to print the sourcegraph link
 function! DropboxSourcegraphURL(opts) abort
-    let repo = matchstr(a:opts.remote, '^git@git.sjc.dropbox.com:\zs.*\ze$')
+    let repo = matchstr(a:opts.remote, "^git@git.sjc.dropbox.com:\zs.*\ze$")
     if repo ==# ''
-        let repo = matchstr(a:opts.remote, '^ssh://git@git.sjc.dropbox.com/\zs.*\ze$')
+        let repo = matchstr(a:opts.remote, "^ssh://git@git.sjc.dropbox.com/\zs.*\ze$")
         if repo ==# ''
             return ''
         endif
@@ -34,11 +34,11 @@ function! DropboxSourcegraphURL(opts) abort
     endif
     return url
 endfunction
-if !exists('g:fugitive_browse_handlers')
+if !exists("g:fugitive_browse_handlers")
     let g:fugitive_browse_handlers = []
 endif
-if index(g:fugitive_browse_handlers, function('DropboxSourcegraphURL')) < 0
-    call insert(g:fugitive_browse_handlers, function('DropboxSourcegraphURL'))
+if index(g:fugitive_browse_handlers, function("DropboxSourcegraphURL")) < 0
+    call insert(g:fugitive_browse_handlers, function("DropboxSourcegraphURL"))
 endif
 
 " insert a todo
