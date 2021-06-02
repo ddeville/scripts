@@ -14,18 +14,18 @@ local on_client_attach = function(client, bufnr)
   -- Diagnostic settings
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
-      signs = true,
-      underline = true,
+      signs = true;
+      underline = true;
       virtual_text = {
-        spacing = 4,
-        severity_limit = "Hint",  -- Basically show all messages
-      },
-      update_in_insert = false,
+        spacing = 4;
+        severity_limit = "Hint";  -- Basically show all messages
+      };
+      update_in_insert = false;
     }
   )
 
   -- Mappings.
-  local key_opts = { noremap=true, silent=true }
+  local key_opts = { noremap = true, silent = true }
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<Cmd>lua vim.lsp.buf.definition()<CR>", key_opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-j>", "<Cmd>lua vim.lsp.buf.definition()<CR>", key_opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", key_opts)
@@ -88,54 +88,54 @@ local extra_config = {
         cargo_crate_dir or
         nvim_lsp.util.root_pattern("rust-project.json")(fname) or
         nvim_lsp.util.find_git_ancestor(fname)
-    end,
+    end;
     capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
       textDocument = {
         completion = {
           completionItem = {
             -- We need snippets for Compe to fully support magic rust-analyzer
-            snippetSupport = true,
+            snippetSupport = true;
             resolveSupport = {
               properties = {
-                "documentation",
-                "detail",
-                "additionalTextEdits",
-              },
-            },
-          },
-        },
-      },
-    }),
-  },
+                "documentation";
+                "detail";
+                "additionalTextEdits";
+              };
+            };
+          };
+        };
+      };
+    });
+  };
   sumneko_lua = {
     cmd = {"/opt/lsp/lua-language-server"};
     settings = {
       Lua = {
         runtime = {
-          version = "LuaJIT",
-          path = vim.list_extend(vim.split(package.path, ";"), {"lua/?.lua", "lua/?/init.lua"}),
-        },
+          version = "LuaJIT";
+          path = vim.list_extend(vim.split(package.path, ";"), {"lua/?.lua", "lua/?/init.lua"});
+        };
         diagnostics = {
           -- Get the language server to recognize the `vim` global
-          globals = {"vim"},
-        },
+          globals = {"vim"};
+        };
         workspace = {
           -- Make the server aware of Neovim runtime files
           library = {
-            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-          },
-        },
+            [vim.fn.expand("$VIMRUNTIME/lua")] = true;
+            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true;
+          };
+        };
         telemetry = {
-          enable = false,
-        },
-      },
-    },
+          enable = false;
+        };
+      };
+    };
   }
 }
 
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup(vim.tbl_deep_extend("force", extra_config[lsp] or {}, {
-    on_attach = on_client_attach,
+    on_attach = on_client_attach;
   }))
 end
