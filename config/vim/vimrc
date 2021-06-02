@@ -1,5 +1,5 @@
 " vim needs a posix shell and fish is not
-if &shell =~# 'fish$'
+if &shell =~# "fish$"
     set shell=bash
 endif
 
@@ -32,7 +32,7 @@ set undofile
 filetype plugin indent on
 
 " vim-plug plugins
-call plug#begin('~/.vim-plug-plugins')
+call plug#begin("~/.vim-plug-plugins")
     " VIM & NEOVIM
     Plug 'chriskempson/base16-vim'
     Plug 'dag/vim-fish'
@@ -44,17 +44,17 @@ call plug#begin('~/.vim-plug-plugins')
         " update color scheme
         let g:lightline =
         \ {
-        \   'colorscheme': 'wombat',
-        \   'active': {
-        \     'left': [['mode', 'paste'], ['gitbranch', 'readonly', 'filename', 'modified']]
+        \   "colorscheme": "wombat",
+        \   "active": {
+        \     "left": [["mode", "paste"], ["gitbranch", "readonly", "filename", "modified"]]
         \   },
-        \   'component_function': {
-        \     'gitbranch': 'fugitive#head'
+        \   "component_function": {
+        \     "gitbranch": "fugitive#head"
         \   },
         \ }
     Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --bin'}
     Plug 'junegunn/fzf.vim'
-        let g:fzf_layout = { 'down': '35%' }
+        let g:fzf_layout = { "down": "35%" }
         " we use different commands in the shell
         let $FZF_DEFAULT_COMMAND = "fd --type file --color=never --hidden --exclude .git"
         nnoremap <Leader>; :Buffers<CR>
@@ -66,7 +66,7 @@ call plug#begin('~/.vim-plug-plugins')
         nnoremap // :BLines<CR>
     Plug 'mhinz/vim-grepper'
         let g:grepper = {}
-        let g:grepper.tools = ['rg', 'git', 'grep']
+        let g:grepper.tools = ["rg", "git", "grep"]
         let g:grepper.highlight = 1
         nnoremap <Leader>f :Grepper -tool rg<CR>
         nmap gs <plug>(GrepperOperator)
@@ -88,7 +88,7 @@ call plug#begin('~/.vim-plug-plugins')
     Plug 'vifm/vifm.vim'
 
     " NEOVIM ONLY
-    if has('nvim')
+    if has("nvim")
     Plug 'hrsh7th/nvim-compe'
     Plug 'hrsh7th/vim-vsnip'
     Plug 'neovim/nvim-lspconfig'
@@ -121,7 +121,7 @@ set tabstop=4
 set expandtab
 
 " set mouse support so that we can select text and tabs
-if has('mouse')
+if has("mouse")
     set mouse=a
 endif
 
@@ -146,7 +146,7 @@ set ruler
 set number
 
 " show the diagnostic ui where the number goes
-if has('nvim-0.5') || has('patch-8.1.1564')
+if has("nvim-0.5") || has("patch-8.1.1564")
     set signcolumn=number
 else
     set signcolumn=yes
@@ -177,7 +177,7 @@ autocmd InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
 autocmd InsertLeave * match WhiteSpaceEOL /\s\+$/
 
 " netrw
-let g:netrw_localrmdir = 'rm -r'
+let g:netrw_localrmdir = "rm -r"
 let g:netrw_liststyle = 1
 let g:netrw_winsize = 85
 let g:netrw_browse_split = 0
@@ -212,6 +212,6 @@ nnoremap <F8> :call ()<CR>
 source <sfile>:h/init/functions.vim
 
 " load more configs written in lua (for neovim only)
-if has('nvim')
-lua require('config')
+if has("nvim")
+lua require("config")
 endif
