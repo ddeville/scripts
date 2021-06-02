@@ -20,8 +20,8 @@ treesitter.setup {
     "toml",
     "typescript",
     "yaml",
-  },
+  };
   highlight = {
-    enable = true,
-  },
+    enable = true;
+  };
 }
