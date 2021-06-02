@@ -1,6 +1,14 @@
 local nvim_lsp = require('lspconfig')
 
-local servers = { "rust_analyzer", "sourcekit", "clangd", "gopls", "pyright", "sumneko_lua", "tsserver" }
+local servers = {
+  "rust_analyzer",
+  "gopls",
+  "pyright",
+  "tsserver",
+  "clangd",
+  "sourcekit",
+  "sumneko_lua",
+}
 
 local on_attach = function(client, bufnr)
   -- Diagnostic settings
