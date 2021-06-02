@@ -88,11 +88,12 @@ local extra_config = {
         cargo_crate_dir or
         nvim_lsp.util.root_pattern("rust-project.json")(fname) or
         nvim_lsp.util.find_git_ancestor(fname)
-    end;
+    end,
     capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
       textDocument = {
         completion = {
           completionItem = {
+            -- We need snippets for Compe to fully support magic rust-analyzer
             snippetSupport = true,
             resolveSupport = {
               properties = {
