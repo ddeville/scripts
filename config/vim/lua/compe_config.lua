@@ -49,13 +49,13 @@ _G.s_tab_complete = function()
     return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
   end
 end
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true })
 
 -- To confirm completion, specifically useful for snippets
-vim.api.nvim_set_keymap("i", "<C-y>", "compe#confirm()", {expr = true, silent = true, noremap = true})
+vim.api.nvim_set_keymap("i", "<C-y>", "compe#confirm()", { expr = true, silent = true, noremap = true })
 
 -- To close the completion menu without making a selection
-vim.api.nvim_set_keymap("i", "<C-e>", "compe#close()", {expr = true, silent = true, noremap = true})
+vim.api.nvim_set_keymap("i", "<C-e>", "compe#close()", { expr = true, silent = true, noremap = true })
