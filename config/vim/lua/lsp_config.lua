@@ -131,7 +131,7 @@ local extra_config = {
         };
       };
     };
-  }
+  };
 }
 
 for _, lsp in ipairs(servers) do
