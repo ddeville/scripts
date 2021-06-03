@@ -1,5 +1,13 @@
 import inspect
 import sys
+try:
+    from typing import (
+        Callable,
+        Iterator,
+        List,
+    )
+except ImportError:
+    pass  # py2
 
 TASK_PREFIX = "task_"
 
@@ -57,7 +65,7 @@ def _get_tasks(config):
     tasks = {task.name: task for task in _extract_tasks()}
 
     def _inner_run_tasks(inner_tasks):
-        # type: (List[Manifest]) -> Iterator[_Task]
+        # type: (List[_Task]) -> Iterator[_Task]
         for task in inner_tasks:
             # check whether the dependencies of this task have already been run
             for name in task.dependencies:

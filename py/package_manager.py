@@ -3,6 +3,14 @@ try:
     from urllib.request import urlretrieve
 except ImportError:
     from urllib import urlretrieve  # type: ignore
+try:
+    from typing import (
+        Dict,
+        List,
+        Union,
+    )
+except ImportError:
+    pass  # py2
 
 from py.platform import (
     FREEBSD,
@@ -25,6 +33,15 @@ class PackageType(object):
     BREW = "brew"
     PACMAN = "pacman"
     PKG = "pkg"
+
+def install_packages(packages):
+    # type: (List[Union[str, Dict[PackageType, str]]]) -> None
+    package_manager = create_package_manager()
+    for package in packages:
+        if not isinstance(package, str):
+            package = package.get(package_manager.format())
+        if package:
+            package_manager.install_package(package)
 
 def create_package_manager():
     # type: () -> BasePackageManager

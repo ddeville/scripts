@@ -1,4 +1,8 @@
 import sys
+try:
+    from typing import Dict
+except ImportError:
+    pass  # py2
 
 MACOS = "macos"
 LINUX = "linux"

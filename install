@@ -12,6 +12,7 @@ except ImportError:
 from py.package_manager import (
     PackageType,
     create_package_manager,
+    install_packages,
 )
 from py.platform import (
     FREEBSD,
@@ -80,29 +81,11 @@ def task_install_package_manager():
 
 def task_install_packages():
     # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        package_manager = create_package_manager()
-        for package in PACKAGES:
-            if not isinstance(package, str):
-                package = package.get(package_manager.format())
-            if package:
-                package_manager.install_package(package)
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
+    return TaskManifest(cmd=lambda: install_packages(PACKAGES), tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
 def task_install_packages_full():
     # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        package_manager = create_package_manager()
-        for package in PACKAGES_FULL:
-            if not isinstance(package, str):
-                package = package.get(package_manager.format())
-            if package:
-                package_manager.install_package(package)
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
+    return TaskManifest(cmd=lambda: install_packages(PACKAGES_FULL), tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
 def task_update_shell():
     # type: () -> TaskManifest
