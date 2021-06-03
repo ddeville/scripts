@@ -64,6 +64,8 @@ call plug#begin("~/.vim-plug-plugins")
         nnoremap <Leader>s :GFiles?<CR>
         nnoremap <Leader>t :Tags<CR>
         nnoremap // :BLines<CR>
+    Plug 'machakann/vim-highlightedyank'
+        let g:highlightedyank_highlight_duration = -1
     Plug 'mhinz/vim-grepper'
         let g:grepper = {}
         let g:grepper.tools = ["rg", "git", "grep"]
