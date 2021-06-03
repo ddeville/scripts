@@ -13,8 +13,8 @@ local on_generic_client_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>a",  "<cmd>lua vim.lsp.buf.code_action()<CR>", key_opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>e",  "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", key_opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>q",  "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", key_opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d",        "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", key_opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d",        "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", key_opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "[g",        "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", key_opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "]g",        "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", key_opts)
 
   -- Diagnostic settings
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
