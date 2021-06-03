@@ -231,3 +231,8 @@ source <sfile>:h/init/functions.vim
 if has("nvim")
 lua require("config")
 endif
+
+" ==> THINGS THAT DEPEND ON SOURCED FILES
+
+" remove undo files which have not been modified for 30 days
+call FolderCleanup(&undodir, 30)
