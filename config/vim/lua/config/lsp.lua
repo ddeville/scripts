@@ -86,6 +86,7 @@ nvim_lsp.rust_analyzer.setup({
   settings = {
     ["rust-analyzer"] = {
       checkOnSave = {
+        enable = true;
         -- Build out of tree so that we don't cause cargo lock contention
         extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
       };
