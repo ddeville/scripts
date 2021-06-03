@@ -3,6 +3,14 @@ import os
 import shutil
 import subprocess
 import tempfile
+try:
+    from typing import (
+        Dict,
+        List,
+        Optional,
+    )
+except ImportError:
+    pass  # py2
 
 def command_path(cmd):
     # type: (str) -> Optional[str]
@@ -10,7 +18,7 @@ def command_path(cmd):
         with open(os.devnull, "w") as f:
             path = subprocess.check_output(["which", cmd], stderr=f).strip().decode()
             return path if os.path.exists(path) and os.access(path, os.X_OK) else None
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         return None
 
 def is_cmd_installed(cmd):
