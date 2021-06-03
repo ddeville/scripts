@@ -90,6 +90,10 @@ nvim_lsp.rust_analyzer.setup({
         -- Build out of tree so that we don't cause cargo lock contention
         extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
       };
+      procMacro = {
+        -- Enabling proc-macro seems to make things slower, maybe reassess later
+        enable = false;
+      };
     };
   };
   capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
