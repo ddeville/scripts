@@ -74,12 +74,12 @@ nvim_lsp.rust_analyzer.setup({
       cargo_workspace_dir = vim.fn.json_decode(cargo_metadata)["workspace_root"]
     end
     -- Order of preference:
-    --   * Current workspace Cargo.toml
     --   * Current crate Cargo.toml
+    --   * Current workspace Cargo.toml
     --   * Rust project root (for non Cargo projects)
     --   * Current git repository
-    return cargo_workspace_dir or
-      cargo_crate_dir or
+    return cargo_crate_dir or
+      cargo_workspace_dir or
       nvim_lsp.util.root_pattern("rust-project.json")(fname) or
       nvim_lsp.util.find_git_ancestor(fname)
   end;
