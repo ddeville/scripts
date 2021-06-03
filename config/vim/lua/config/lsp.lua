@@ -84,7 +84,12 @@ nvim_lsp.rust_analyzer.setup({
       nvim_lsp.util.find_git_ancestor(fname)
   end;
   settings = {
-    ["rust-analyzer"] = {};
+    ["rust-analyzer"] = {
+      checkOnSave = {
+        -- Build out of tree so that we don't cause cargo lock contention
+        extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
+      };
+    };
   };
   capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
     textDocument = {
