@@ -41,61 +41,32 @@ LITE = "lite"
 
 # Packages
 
-COMMON_PACKAGES = [
-    "cmake",
-    "fish",
-    "tmux",
-    "mosh",
-    "jq",
-    "htop",
-    "ripgrep",
-    "tree",
-    "vim",
-    "vifm",
-    "neovim",
+PACKAGES = [
     "bat",
     "exa",
+    "fish",
+    "htop",
+    "jq",
+    "mosh",
+    "neovim",
+    "ripgrep",
+    "tmux",
+    "vim",
+    {PackageType.BREW: "ctags", PackageType.PACMAN: "ctags", PackageType.DEB: "exuberant-ctags"},
+    {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
 ]
 
-COMMON_PACKAGES_FULL = [
-    "radare2",
+PACKAGES_FULL = [
+    "cmake",
+    "golang",
     "lazygit",
+    "ninja",
+    "radare2",
+    "vifm",
+    {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
+    {PackageType.PACMAN: "npm", PackageType.DEB: "npm"},
+    {PackageType.PACMAN: "ttf-anonymous-pro", PackageType.DEB: "ttf-anonymous-pro"},
 ]
-
-EXTRA_PACKAGES = {
-    PackageType.BREW: [
-        "ctags",
-        "fd",
-    ],
-    PackageType.PACMAN: [
-        "ctags",
-        "fd",
-    ],
-    PackageType.DEB: [
-        "exuberant-ctags",
-        "fd-find",
-    ],
-}
-
-EXTRA_PACKAGES_FULL = {
-    PackageType.BREW: [
-        "hyperfine",
-        "golang",
-        "node",
-    ],
-    PackageType.PACMAN: [
-        "ttf-anonymous-pro",
-        "golang",
-        "nodejs",
-        "npm",
-    ],
-    PackageType.DEB: [
-        "ttf-anonymous-pro",
-        "golang",
-        "nodejs",
-        "npm",
-    ],
-}
 
 # Tasks
 
@@ -112,8 +83,11 @@ def task_install_packages():
     def cmd():
         # type: () -> None
         package_manager = create_package_manager()
-        for package in COMMON_PACKAGES + EXTRA_PACKAGES.get(package_manager.format(), []):
-            package_manager.install_package(package)
+        for package in PACKAGES:
+            if not isinstance(package, str):
+                package = package.get(package_manager.format())
+            if package:
+                package_manager.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
@@ -122,8 +96,11 @@ def task_install_packages_full():
     def cmd():
         # type: () -> None
         package_manager = create_package_manager()
-        for package in COMMON_PACKAGES_FULL + EXTRA_PACKAGES_FULL.get(package_manager.format(), []):
-            package_manager.install_package(package)
+        for package in PACKAGES_FULL:
+            if not isinstance(package, str):
+                package = package.get(package_manager.format())
+            if package:
+                package_manager.install_package(package)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 

@@ -6,7 +6,7 @@ TASK_PREFIX = "task_"
 class ExecutorConfig(object):
     """The configuration to use when running tasks."""
     def __init__(self, module_name, tags):
-        # type: (str, List[str]): -> None
+        # type: (str, List[str]) -> None
         self.module_name = module_name
         self.tags = tags
 
