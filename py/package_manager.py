@@ -1,5 +1,8 @@
-import urllib
 import subprocess
+try:
+    from urllib.request import urlretrieve
+except ImportError:
+    from urllib import urlretrieve  # type: ignore
 
 from py.platform import (
     FREEBSD,
@@ -73,7 +76,7 @@ class BrewPackageManager(BasePackageManager):
             run_command(["brew", "update"])
         else:
             print("====> installing brew")
-            script_path, _ = urllib.urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
+            script_path, _ = urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
             run_command(["/usr/bin/ruby", script_path])
 
     def install_package(self, package):
