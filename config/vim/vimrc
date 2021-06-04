@@ -98,6 +98,18 @@ call plug#begin("~/.vim-plug-plugins")
     endif
 call plug#end()
 
+" enable syntax highlighting
+syntax enable
+
+" dark background is better
+set background=dark
+
+" setup base16 colorscheme
+if filereadable(expand("~/.vimrc_background"))
+    let base16colorspace = 256
+    source ~/.vimrc_background
+endif
+
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
 
@@ -158,7 +170,7 @@ set autoread
 set splitbelow
 set splitright
 
-" dont' add an extra space when joining lines
+" don't add an extra space when joining lines
 set nojoinspaces
 
 " no beeping
@@ -168,7 +180,7 @@ set vb t_vb=
 set shortmess+=c
 
 " trailing whitespace is bad
-highlight WhiteSpaceEOL ctermbg=red guibg=red
+highlight WhiteSpaceEOL guibg=Red ctermbg=Red
 autocmd InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
 autocmd InsertLeave * match WhiteSpaceEOL /\s\+$/
 
@@ -208,19 +220,7 @@ nnoremap <C-l> :nohl<CR><C-l>
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
-" ==> SYNTAX AND COLOR
-
-" enable syntax highlighting
-syntax enable
-
-" dark background is better
-set background=dark
-
-" setup base16 colorscheme
-if filereadable(expand("~/.vimrc_background"))
-    let base16colorspace = 256
-    source ~/.vimrc_background
-endif
+" ==> DIAGNOSTICS
 
 " diagnostic error messages in red
 highlight LspDiagnosticsDefaultError guifg=Red ctermfg=Red
