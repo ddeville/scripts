@@ -118,6 +118,13 @@ end
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
 
+# GOPATH for Dropbox server code
+if test -e "$HOME/src/server/go"
+    if not set -q GOPATH || not contains "$HOME/src/server/go" "$GOPATH"
+        set -x GOPATH $GOPATH "$HOME/src/server/go"
+    end
+end
+
 # abbreviations
 abbr -a cdd "cd .."
 abbr -a oo "open ."
