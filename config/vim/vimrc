@@ -101,18 +101,6 @@ call plug#end()
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
 
-" enable syntax highlighting
-syntax enable
-
-" dark background is better
-set background=dark
-
-" setup base16 colorscheme
-if filereadable(expand("~/.vimrc_background"))
-    let base16colorspace = 256
-    source ~/.vimrc_background
-endif
-
 " allow switching between buffers without saving first
 set hidden
 
@@ -222,6 +210,47 @@ vnoremap K :m '<-2<CR>gv=gv
 
 nnoremap <F8> :call ()<CR>
 
+" ==> SYNTAX AND COLOR
+
+" enable syntax highlighting
+syntax enable
+
+" dark background is better
+set background=dark
+
+" setup base16 colorscheme
+if filereadable(expand("~/.vimrc_background"))
+    let base16colorspace = 256
+    source ~/.vimrc_background
+endif
+
+" diagnostic error messages in red
+highlight LspDiagnosticsDefaultError guifg=Red ctermfg=Red
+highlight LspDiagnosticsVirtualTextError guifg=Red ctermfg=Red
+highlight LspDiagnosticsSignError guifg=Red ctermfg=Red
+highlight LspDiagnosticsUnderlineError guifg=Red ctermfg=Red
+" diagnostic warning messages in yellow
+highlight LspDiagnosticsDefaultWarning guifg=Yellow ctermfg=Yellow
+highlight LspDiagnosticsVirtualTextWarning guifg=Yellow ctermfg=Yellow
+highlight LspDiagnosticsSignWarning guifg=Yellow ctermfg=Yellow
+highlight LspDiagnosticsUnderlineWarning guifg=Red ctermfg=Red
+" diagnostic info messages in white
+highlight LspDiagnosticsDefaultInformation guifg=White ctermfg=White
+highlight LspDiagnosticsVirtualTextInformation guifg=White ctermfg=White
+highlight LspDiagnosticsSignInformation guifg=White ctermfg=White
+highlight LspDiagnosticsUnderlineInformation guifg=White ctermfg=White
+" diagnostic hint messages in gray
+highlight LspDiagnosticsDefaultHint guifg=Gray ctermfg=Gray
+highlight LspDiagnosticsVirtualTextHint guifg=Gray ctermfg=Gray
+highlight LspDiagnosticsSignHint guifg=Gray ctermfg=Gray
+highlight LspDiagnosticsUnderlineHint guifg=Gray ctermfg=Gray
+
+" configure sign column for diagnostic messages
+sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
+sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
+sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
+sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
+
 " ==> MORE CONFIGS
 
 " load more configs written in vimscript
@@ -232,7 +261,7 @@ if has("nvim")
 lua require("config")
 endif
 
-" ==> THINGS THAT DEPEND ON SOURCED FILES
+" ==> THINGS THAT DEPEND ON SOURCED CONFIG FILES
 
 " remove undo files which have not been modified for 30 days
 call FolderCleanup(&undodir, 30)
