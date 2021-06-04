@@ -134,6 +134,9 @@ alias gaaa="git add .; and git ci --amend"
 alias adp="arc diff --preview"
 alias adu="arc diff --update"
 
+# ctrl-y to accept autocomplete suggestion
+bind -M insert \cy accept-autosuggestion
+
 # setup `fzf`
 set -x FZF_TMUX 0
 set -x FZF_DEFAULT_OPTS "--height 40% --border --tabstop=4"
