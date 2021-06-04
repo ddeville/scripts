@@ -124,6 +124,8 @@ nvim_lsp.clangd.setup({
 
 nvim_lsp.sourcekit.setup({
   on_attach = generic_on_attach;
+  -- We use clangd for C/CPP/Objc
+  filetypes = { "swift" };
 })
 
 nvim_lsp.sumneko_lua.setup({
