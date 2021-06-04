@@ -93,6 +93,21 @@ nvim_lsp.rust_analyzer.setup({
 
 nvim_lsp.gopls.setup({
   on_attach = generic_on_attach;
+  cmd = { "gopls", "serve" };
+  root_dir = function(fname)
+    local mod = nvim_lsp.util.root_pattern("go.mod")(fname)
+    if mod ~= nil then
+      return mod
+    end
+    -- Pick the nearest GOPATH by default so that we don't create a million gopls instances
+    local gopath = os.getenv("GOPATH") or ""
+    for path in (gopath..":"):gmatch("(.-):") do
+      if nvim_lsp.util.path.is_descendant(path, fname) then
+        return path
+      end
+    end
+    return nvim_lsp.util.root_pattern(".git")(fname)
+  end;
 })
 
 nvim_lsp.pyright.setup({
