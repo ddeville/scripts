@@ -19,6 +19,9 @@ endif
 set undodir=$HOME/.vim/undo
 set undofile
 
+" attempt to determine the file type based on name and content
+filetype plugin indent on
+
 " vim-plug plugins
 call plug#begin("~/.vim-plug-plugins")
     " VIM & NEOVIM
@@ -79,20 +82,12 @@ call plug#begin("~/.vim-plug-plugins")
 
     " NEOVIM ONLY
 if has("nvim")
-    Plug 'hrsh7th/nvim-compe'
-    " vim-vsnip is necessary to support magic snippet like LSP completion
-    Plug 'hrsh7th/vim-vsnip'
+    Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
     Plug 'neovim/nvim-lspconfig'
+    Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    " popup and plenary are dependencies of telescope
-    Plug 'nvim-lua/popup.nvim'
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-telescope/telescope.nvim'
 endif
 call plug#end()
-
-" attempt to determine the file type based on name and content
-filetype plugin indent on
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
@@ -267,7 +262,6 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
 " load more configs written in vimscript
 source <sfile>:h/init/functions.vim
-source <sfile>:h/init/fugitive.vim
 
 " load more configs written in lua (for neovim only)
 if has("nvim")
