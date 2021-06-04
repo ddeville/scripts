@@ -5,21 +5,12 @@ endif
 
 set encoding=utf-8
 
-" set leader to space instead of the default backslash
-noremap <Space> <Nop>
-let mapleader = "\<Space>"
-
-" update and reload config
-command! Config execute ":edit $MYVIMRC"
-command! Reload execute "source ~/.vim/vimrc"
-
 " store swap and backup files under `~/.vim/backup`
 if !isdirectory($HOME . "/.vim/backup")
     call mkdir($HOME . "/.vim/backup", "p", 0700)
 endif
 set directory=$HOME/.vim/backup//
 set backupdir=$HOME/.vim/backup//
-set undodir=$HOME/.vim/backup//
 
 " permanent undo
 if !isdirectory($HOME . "/.vim/undo")
@@ -27,9 +18,6 @@ if !isdirectory($HOME . "/.vim/undo")
 endif
 set undodir=$HOME/.vim/undo
 set undofile
-
-" attempt to determine the file type based on name and content
-filetype plugin indent on
 
 " vim-plug plugins
 call plug#begin("~/.vim-plug-plugins")
@@ -97,6 +85,17 @@ call plug#begin("~/.vim-plug-plugins")
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     endif
 call plug#end()
+
+" attempt to determine the file type based on name and content
+filetype plugin indent on
+
+" set leader to space instead of the default backslash
+noremap <Space> <Nop>
+let mapleader = "\<Space>"
+
+" update and reload config
+command! Config execute ":edit $MYVIMRC"
+command! Reload execute "source ~/.vim/vimrc"
 
 " enable syntax highlighting
 syntax enable
@@ -190,6 +189,16 @@ let g:netrw_liststyle = 1
 let g:netrw_winsize = 85
 let g:netrw_browse_split = 0
 
+" search current selection in visual mode with */#
+function! s:VSetSearch()
+    let temp = @@
+    norm! gvy
+    let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+    let @@ = temp
+endfunction
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
+
 " ==> MAPPINGS
 
 " disable arrow keys
@@ -253,6 +262,7 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
 " load more configs written in vimscript
 source <sfile>:h/init/functions.vim
+source <sfile>:h/init/fugitive.vim
 
 " load more configs written in lua (for neovim only)
 if has("nvim")
