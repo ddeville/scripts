@@ -19,6 +19,10 @@ endif
 set undodir=$HOME/.vim/undo
 set undofile
 
+" set leader to space instead of the default backslash
+noremap <Space> <Nop>
+let mapleader = "\<Space>"
+
 " attempt to determine the file type based on name and content
 filetype plugin indent on
 
@@ -88,10 +92,6 @@ if has("nvim")
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
 call plug#end()
-
-" set leader to space instead of the default backslash
-noremap <Space> <Nop>
-let mapleader = "\<Space>"
 
 " update and reload config
 command! Config execute ":edit $MYVIMRC"
