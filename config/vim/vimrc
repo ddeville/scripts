@@ -218,17 +218,6 @@ imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
 
-" simpler normal mode mapping
-nnoremap <C-l> <Esc>
-inoremap <C-l> <Esc>
-vnoremap <C-l> <Esc>
-snoremap <C-l> <Esc>
-xnoremap <C-l> <Esc>
-cnoremap <C-l> <C-c>
-onoremap <C-l> <Esc>
-lnoremap <C-l> <Esc>
-tnoremap <C-l> <Esc>
-
 " map screen redraw to also turn off search highlighting
 nnoremap <C-l> :nohl<CR><C-l>
 
