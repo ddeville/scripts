@@ -254,17 +254,9 @@ sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
 sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
 sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
-" ==> MORE CONFIGS
-
-" load more configs written in vimscript
-source <sfile>:h/init/functions.vim
+" ==> LUA
 
 " load more configs written in lua (for neovim only)
 if has("nvim")
 lua require("config")
 endif
-
-" ==> THINGS THAT DEPEND ON SOURCED CONFIG FILES
-
-" remove undo files which have not been modified for 30 days
-call FolderCleanup(&undodir, 30)
