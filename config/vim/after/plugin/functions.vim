@@ -26,3 +26,6 @@ function FolderCleanup(path, days)
         echo "FolderCleanup(): Directory '" . l:path . "' not found"
     endif
 endfunction
+
+" remove undo files which have not been modified for 30 days
+call FolderCleanup(&undodir, 0)
