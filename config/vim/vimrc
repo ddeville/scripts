@@ -19,6 +19,9 @@ endif
 set undodir=$HOME/.vim/cache/undo
 set undofile
 
+" put everything inside the .vim directory
+set viminfo+=n~/.vim/viminfo
+
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
 let mapleader = "\<Space>"
@@ -27,7 +30,7 @@ let mapleader = "\<Space>"
 filetype plugin indent on
 
 " vim-plug plugins
-call plug#begin("~/.vim-plug-plugins")
+call plug#begin($HOME . "/.vim/cache/plug")
     " VIM & NEOVIM
     Plug 'chriskempson/base16-vim'
     Plug 'dag/vim-fish'
