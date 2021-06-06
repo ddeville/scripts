@@ -19,9 +19,6 @@ endif
 set undodir=$HOME/.vim/cache/undo
 set undofile
 
-" put everything inside the .vim directory
-set viminfo+=n~/.vim/viminfo
-
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
 let mapleader = "\<Space>"

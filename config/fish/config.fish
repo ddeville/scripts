@@ -1,6 +1,7 @@
 set -gx EDITOR nvim
 set -gx CLICOLOR 1
 set -gx GREP_OPTIONS "--color=auto"
+set -gx VIMINIT "source ~/.vim/vimrc"
 
 # setup the base16 shell and source the colors
 if status --is-interactive
