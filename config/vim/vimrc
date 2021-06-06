@@ -6,17 +6,17 @@ endif
 set encoding=utf-8
 
 " store swap and backup files under `~/.vim/backup`
-if !isdirectory($HOME . "/.vim/backup")
-    call mkdir($HOME . "/.vim/backup", "p", 0700)
+if !isdirectory($HOME . "/.vim/cache/backup")
+    call mkdir($HOME . "/.vim/cache/backup", "p", 0700)
 endif
-set directory=$HOME/.vim/backup//
-set backupdir=$HOME/.vim/backup//
+set directory=$HOME/.vim/cache/backup//
+set backupdir=$HOME/.vim/cache/backup//
 
 " permanent undo
-if !isdirectory($HOME . "/.vim/undo")
-    call mkdir($HOME . "/.vim/undo", "p", 0700)
+if !isdirectory($HOME . "/.vim/cache/undo")
+    call mkdir($HOME . "/.vim/cache/undo", "p", 0700)
 endif
-set undodir=$HOME/.vim/undo
+set undodir=$HOME/.vim/cache/undo
 set undofile
 
 " set leader to space instead of the default backslash
