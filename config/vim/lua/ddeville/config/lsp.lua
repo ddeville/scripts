@@ -110,9 +110,10 @@ nvim_lsp.gopls.setup({
   end;
 })
 
-nvim_lsp.pyright.setup({
-  on_attach = generic_on_attach;
-})
+-- TODO(damien): Fix this but right now it's spinning at 100% for hours on rSERVER...
+-- nvim_lsp.pyright.setup({
+--   on_attach = generic_on_attach;
+-- })
 
 nvim_lsp.tsserver.setup({
   on_attach = generic_on_attach;
