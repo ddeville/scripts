@@ -160,7 +160,7 @@ nvim_lsp.sumneko_lua.setup({
 vim.api.nvim_command([[
 autocmd BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter *.rs :lua
 require'lsp_extensions'.inlay_hints{
-  highlight = "LspDiagnosticsDefaultHint";
+  highlight = "SpecialComment";
   prefix = " ▸ ";
   aligned = false;
   only_current_line = false;
