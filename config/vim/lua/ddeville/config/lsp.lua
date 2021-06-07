@@ -154,3 +154,15 @@ nvim_lsp.sumneko_lua.setup({
     };
   };
 })
+
+-- Setup inlay hints for Rust, this needs to be aggressively refetched.
+vim.api.nvim_command([[
+autocmd BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter *.rs :lua
+require'lsp_extensions'.inlay_hints{
+  highlight = "Comment";
+  prefix = " >> ";
+  aligned = false;
+  only_current_line = false;
+  enabled = {"TypeHint", "ChainingHint", "ParameterHint"};
+}
+]])
