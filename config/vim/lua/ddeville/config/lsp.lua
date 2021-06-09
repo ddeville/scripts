@@ -1,4 +1,5 @@
 local nvim_lsp = require("lspconfig")
+local lsp_status = require("lsp-status")
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -12,7 +13,22 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   }
 )
 
-local set_keymaps = function(bufnr)
+lsp_status.register_progress()
+
+local function status_message()
+  if #vim.lsp.buf_get_clients(0) > 0 then
+    local msg = lsp_status.status_progress()
+    local space = math.floor(0.6 * vim.fn.winwidth(0))
+    if #msg > space then
+      msg = string.sub(msg, 1, space)
+    end
+    return msg
+  else
+    return ""
+  end
+end
+
+local function set_keymaps(bufnr)
   local function set_keymap(mode, key, cmd)
     vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
   end
@@ -30,7 +46,8 @@ local set_keymaps = function(bufnr)
   set_keymap("n", "]g",         "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>")
 end
 
-local generic_on_attach = function(client, bufnr)
+local function generic_on_attach(client, bufnr)
+  lsp_status.on_attach(client)
   set_keymaps(bufnr)
 end
 
@@ -72,23 +89,25 @@ nvim_lsp.rust_analyzer.setup({
       };
     };
   };
-  capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
-    textDocument = {
-      completion = {
-        completionItem = {
-          -- We need snippets for compe to fully support rust-analyzer magic
-          snippetSupport = true;
-          resolveSupport = {
-            properties = {
-              "documentation";
-              "detail";
-              "additionalTextEdits";
+  capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities,
+    vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
+      textDocument = {
+        completion = {
+          completionItem = {
+            -- We need snippets for compe to fully support rust-analyzer magic
+            snippetSupport = true;
+            resolveSupport = {
+              properties = {
+                "documentation";
+                "detail";
+                "additionalTextEdits";
+              };
             };
           };
         };
       };
-    };
-  });
+    })
+  );
 })
 
 nvim_lsp.gopls.setup({
@@ -108,25 +127,30 @@ nvim_lsp.gopls.setup({
     end
     return nvim_lsp.util.root_pattern(".git")(fname)
   end;
+  capabilities = lsp_status.capabilities;
 })
 
 -- TODO(damien): Fix this but right now it's spinning at 100% for hours on rSERVER...
 -- nvim_lsp.pyright.setup({
 --   on_attach = generic_on_attach;
+--   capabilities = lsp_status.capabilities;
 -- })
 
 nvim_lsp.tsserver.setup({
   on_attach = generic_on_attach;
+  capabilities = lsp_status.capabilities;
 })
 
 nvim_lsp.clangd.setup({
   on_attach = generic_on_attach;
+  capabilities = lsp_status.capabilities;
 })
 
 nvim_lsp.sourcekit.setup({
   on_attach = generic_on_attach;
   -- We use clangd for C/CPP/Objc
   filetypes = { "swift" };
+  capabilities = lsp_status.capabilities;
 })
 
 nvim_lsp.sumneko_lua.setup({
@@ -154,6 +178,7 @@ nvim_lsp.sumneko_lua.setup({
       };
     };
   };
+  capabilities = lsp_status.capabilities;
 })
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
@@ -167,3 +192,9 @@ require'lsp_extensions'.inlay_hints{
   enabled = { "TypeHint", "ChainingHint" };
 }
 ]])
+
+local M = {
+  status_message = status_message;
+}
+
+return M
