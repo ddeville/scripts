@@ -13,46 +13,39 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   }
 )
 
-lsp_status.register_progress()
+local function setup_client(name, config)
+  config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities or {})
 
-local function status_message()
-  if #vim.lsp.buf_get_clients(0) > 0 then
-    local msg = lsp_status.status_progress()
-    local space = math.floor(0.6 * vim.fn.winwidth(0))
-    if #msg > space then
-      msg = string.sub(msg, 1, space)
+  local custom_on_attach = config.on_attach
+  config.on_attach = function(client, bufnr)
+    lsp_status.on_attach(client)
+
+    local function set_keymap(mode, key, cmd)
+      vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
     end
-    return msg
-  else
-    return ""
+    set_keymap("n", "gd",         "<cmd>lua vim.lsp.buf.definition()<CR>")
+    set_keymap("n", "gr",         "<cmd>lua vim.lsp.buf.references()<CR>")
+    set_keymap("n", "gi",         "<cmd>lua vim.lsp.buf.implementation()<CR>")
+    set_keymap("n", "gy",         "<cmd>lua vim.lsp.buf.type_definition()<CR>")
+    set_keymap("n", "K",          "<cmd>lua vim.lsp.buf.hover()<CR>")
+    set_keymap("n", "<C-k>",      "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+    set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
+    set_keymap("n", "<leader>a",  "<cmd>lua vim.lsp.buf.code_action()<CR>")
+    set_keymap("n", "<leader>e",  "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>")
+    set_keymap("n", "<leader>q",  "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>")
+    set_keymap("n", "[g",         "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>")
+    set_keymap("n", "]g",         "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>")
+
+    -- Invoke the custom `on_attach` function for the client, if needed
+    if custom_on_attach then
+      custom_on_attach(client, bufnr)
+    end
   end
+
+  nvim_lsp[name].setup(config)
 end
 
-local function set_keymaps(bufnr)
-  local function set_keymap(mode, key, cmd)
-    vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
-  end
-  set_keymap("n", "gd",         "<cmd>lua vim.lsp.buf.definition()<CR>")
-  set_keymap("n", "gr",         "<cmd>lua vim.lsp.buf.references()<CR>")
-  set_keymap("n", "gi",         "<cmd>lua vim.lsp.buf.implementation()<CR>")
-  set_keymap("n", "gy",         "<cmd>lua vim.lsp.buf.type_definition()<CR>")
-  set_keymap("n", "K",          "<cmd>lua vim.lsp.buf.hover()<CR>")
-  set_keymap("n", "<C-k>",      "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-  set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
-  set_keymap("n", "<leader>a",  "<cmd>lua vim.lsp.buf.code_action()<CR>")
-  set_keymap("n", "<leader>e",  "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>")
-  set_keymap("n", "<leader>q",  "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>")
-  set_keymap("n", "[g",         "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>")
-  set_keymap("n", "]g",         "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>")
-end
-
-local function generic_on_attach(client, bufnr)
-  lsp_status.on_attach(client)
-  set_keymaps(bufnr)
-end
-
-nvim_lsp.rust_analyzer.setup({
-  on_attach = generic_on_attach;
+setup_client("rust_analyzer", {
   root_dir = function(fname)
     local cargo_crate_dir = nvim_lsp.util.root_pattern("Cargo.toml")(fname)
     -- Make sure that we run `cargo metadata` in the current project dir
@@ -89,29 +82,26 @@ nvim_lsp.rust_analyzer.setup({
       };
     };
   };
-  capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities,
-    vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
-      textDocument = {
-        completion = {
-          completionItem = {
-            -- We need snippets for compe to fully support rust-analyzer magic
-            snippetSupport = true;
-            resolveSupport = {
-              properties = {
-                "documentation";
-                "detail";
-                "additionalTextEdits";
-              };
+  capabilities = {
+    textDocument = {
+      completion = {
+        completionItem = {
+          -- We need snippets for compe to fully support rust-analyzer magic
+          snippetSupport = true;
+          resolveSupport = {
+            properties = {
+              "documentation";
+              "detail";
+              "additionalTextEdits";
             };
           };
         };
       };
-    })
-  );
+    };
+  };
 })
 
-nvim_lsp.gopls.setup({
-  on_attach = generic_on_attach;
+setup_client("gopls", {
   cmd = { "gopls", "serve" };
   root_dir = function(fname)
     local mod = nvim_lsp.util.root_pattern("go.mod")(fname)
@@ -131,30 +121,18 @@ nvim_lsp.gopls.setup({
 })
 
 -- TODO(damien): Fix this but right now it's spinning at 100% for hours on rSERVER...
--- nvim_lsp.pyright.setup({
---   on_attach = generic_on_attach;
---   capabilities = lsp_status.capabilities;
--- })
+-- setup_client("pyright", {})
 
-nvim_lsp.tsserver.setup({
-  on_attach = generic_on_attach;
-  capabilities = lsp_status.capabilities;
-})
+setup_client("tsserver", {})
 
-nvim_lsp.clangd.setup({
-  on_attach = generic_on_attach;
-  capabilities = lsp_status.capabilities;
-})
+setup_client("clangd", {})
 
-nvim_lsp.sourcekit.setup({
-  on_attach = generic_on_attach;
+setup_client("sourcekit", {
   -- We use clangd for C/CPP/Objc
   filetypes = { "swift" };
-  capabilities = lsp_status.capabilities;
 })
 
-nvim_lsp.sumneko_lua.setup({
-  on_attach = generic_on_attach;
+setup_client("sumneko_lua", {
   cmd = { "/opt/lsp/lua-language-server" };
   settings = {
     Lua = {
@@ -178,7 +156,6 @@ nvim_lsp.sumneko_lua.setup({
       };
     };
   };
-  capabilities = lsp_status.capabilities;
 })
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
@@ -192,6 +169,23 @@ require'lsp_extensions'.inlay_hints{
   enabled = { "TypeHint", "ChainingHint" };
 }
 ]])
+
+-- Add support for reportin LSP progress in the ligthline (see `LspStatus` in vimrc)
+lsp_status.register_progress()
+
+local function status_message()
+  if #vim.lsp.buf_get_clients(0) > 0 then
+    local msg = lsp_status.status_progress()
+    -- Try to prevent the status message from overflowing the moving all status items to the left.
+    local space = math.floor(0.6 * vim.fn.winwidth(0))
+    if #msg > space then
+      msg = string.sub(msg, 1, space)
+    end
+    return msg
+  else
+    return ""
+  end
+end
 
 local M = {
   status_message = status_message;
