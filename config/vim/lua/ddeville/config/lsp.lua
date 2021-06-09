@@ -170,7 +170,7 @@ require'lsp_extensions'.inlay_hints{
 }
 ]])
 
--- Add support for reportin LSP progress in the ligthline (see `LspStatus` in vimrc)
+-- Add support for reporting LSP progress in the ligthline (see `LspStatus` in vimrc)
 lsp_status.register_progress()
 
 local function status_message()
