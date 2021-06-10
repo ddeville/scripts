@@ -1,17 +1,6 @@
 local nvim_lsp = require("lspconfig")
 local lsp_status = require("lsp-status")
-
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics, {
-    signs = true;
-    underline = true;
-    virtual_text = {
-      spacing = 4;
-      severity_limit = "Hint";  -- Basically show all messages
-    };
-    update_in_insert = false;
-  }
-)
+local nvim_lightbulb = require("nvim-lightbulb")
 
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities or {})
@@ -158,9 +147,22 @@ setup_client("sumneko_lua", {
   };
 })
 
+-- Setup diagnostics
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    signs = true;
+    underline = true;
+    virtual_text = {
+      spacing = 4;
+      severity_limit = "Hint";  -- Basically show all messages
+    };
+    update_in_insert = false;
+  }
+)
+
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
 vim.api.nvim_command([[
-autocmd BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter *.rs :lua
+autocmd BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter *.rs lua
 require'lsp_extensions'.inlay_hints{
   highlight = "SpecialComment";
   prefix = " ▶ ";
@@ -186,6 +188,10 @@ local function status_message()
     return ""
   end
 end
+
+-- Display an indicator in the sign column when a code action is available
+vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
+vim.api.nvim_command("autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()")
 
 local M = {
   status_message = status_message;
