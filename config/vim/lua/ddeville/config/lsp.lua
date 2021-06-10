@@ -177,7 +177,7 @@ local function status_message()
   if #vim.lsp.buf_get_clients(0) > 0 then
     local msg = lsp_status.status_progress()
     -- Try to prevent the status message from overflowing the moving all status items to the left.
-    local space = math.floor(0.6 * vim.fn.winwidth(0))
+    local space = vim.fn.winwidth(0) - 70
     if #msg > space then
       msg = string.sub(msg, 1, space)
     end
