@@ -14,6 +14,7 @@ treesitter.setup {
     "java",
     "javascript",
     "json",
+    "kotlin",
     "lua",
     "python",
     "rust",
