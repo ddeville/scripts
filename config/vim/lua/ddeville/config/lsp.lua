@@ -1,6 +1,5 @@
 local nvim_lsp = require("lspconfig")
 local lsp_status = require("lsp-status")
-local nvim_lightbulb = require("nvim-lightbulb")
 
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities or {})
