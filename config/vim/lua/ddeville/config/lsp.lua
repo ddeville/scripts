@@ -65,8 +65,7 @@ setup_client("rust_analyzer", {
         extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
       };
       procMacro = {
-        -- Enabling proc-macro seems to make things slower, maybe reassess later
-        enable = false;
+        enable = true;
       };
     };
   };
