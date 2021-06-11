@@ -10,7 +10,7 @@ function fish_mode_prompt
             set_color f0c674
             echo '[N]'
         case visual
-            set_color cc6666 
+            set_color cc6666
             echo '[V]'
         end
         set_color normal
