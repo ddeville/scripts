@@ -222,8 +222,7 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
 " ==> LUA
 
-" load more configs written in lua (for neovim only)
+" load plugin config written in lua (for neovim only)
 if has("nvim")
   lua require("plugin")
-  lua require("ddeville")
 endif
