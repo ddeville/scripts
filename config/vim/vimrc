@@ -29,7 +29,7 @@ filetype plugin indent on
 " vim-plug plugins
 call plug#begin($HOME . "/.vim/cache/plug")
 
-  " VIM & NEOVIM
+  " vim & neovim
   Plug 'chriskempson/base16-vim'
   Plug 'dag/vim-fish'
   Plug 'fatih/vim-go'
@@ -50,7 +50,7 @@ call plug#begin($HOME . "/.vim/cache/plug")
   Plug 'tpope/vim-vinegar'
   Plug 'vifm/vifm.vim'
 
-  " NEOVIM ONLY
+  " neovim only
   if has("nvim")
     Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
     Plug 'kosayoda/nvim-lightbulb'
@@ -82,7 +82,7 @@ endif
 " shorten the delay to transition to normal mode after pressing escape
 set timeoutlen=1000 ttimeoutlen=0
 
-" you will have bad experience for lsp messages when it's default 4000.
+" lower how long it takes for cursor hold to kick off (for code actions for example)
 set updatetime=300
 
 " allow switching between buffers without saving first
@@ -94,13 +94,13 @@ set softtabstop=4
 set tabstop=4
 set expandtab
 
+" if no known file type keep the same indent as the current line
+set autoindent
+
 " set mouse support so that we can select text and tabs
 if has("mouse")
   set mouse=a
 endif
-
-" if no known file type keep the same indent as the current line
-set autoindent
 
 " backspace through anything in insert mode
 set backspace=indent,eol,start
@@ -162,16 +162,6 @@ let g:netrw_liststyle = 1
 let g:netrw_winsize = 85
 let g:netrw_browse_split = 0
 
-" search current selection in visual mode with */#
-function! s:VSetSearch()
-  let temp = @@
-  norm! gvy
-  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
-  let @@ = temp
-endfunction
-vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
-vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
-
 " ==> MAPPINGS
 
 " disable arrow keys
@@ -184,12 +174,22 @@ imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
 
-" map screen redraw to also turn off search highlighting
-nnoremap <C-l> :nohl<CR><C-l>
+" search current selection in visual mode with */#
+function! s:VSetSearch()
+  let temp = @@
+  norm! gvy
+  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @@ = temp
+endfunction
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 
 " move lines up and down when in visual mode
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+
+" map screen redraw to also turn off search highlighting
+nnoremap <C-l> :nohl<CR><C-l>
 
 " ==> DIAGNOSTICS
 
@@ -224,5 +224,5 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
 " load more configs written in lua (for neovim only)
 if has("nvim")
-lua require("ddeville")
+  lua require("ddeville")
 endif
