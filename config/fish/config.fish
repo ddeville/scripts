@@ -136,6 +136,7 @@ abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.
 
 # aliases
 alias e="nvim"
+alias realvim=(which vim)
 alias vim="nvim"
 alias ll="ls -lah"
 alias gaa="git add .; and git ci"
