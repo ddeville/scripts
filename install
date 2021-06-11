@@ -61,7 +61,6 @@ PACKAGES_FULL = [
     "golang",
     "lazygit",
     "radare2",
-    "vifm",
     {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
     {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
     {PackageType.PACMAN: "npm", PackageType.DEB: "npm"},
@@ -149,18 +148,13 @@ def task_update_dot_files():
             ("profile", ".profile"),
             ("tmux.conf", ".tmux.conf"),
             ("vim", ".vim"),
-            ("vim", os.path.join(".config", "nvim")),
+            ("alacritty", os.path.join(".config", "alacritty")),
+            ("bat", os.path.join(".config", "bat")),
             ("fish", os.path.join(".config", "fish")),
-            ("kitty", os.path.join(".config", "kitty")),
             ("htop", os.path.join(".config", "htop")),
-            ("bat", os.path.join(".config", "bat", "config")),
-            (os.path.join("vifm", "vifmrc"), os.path.join(".config", "vifm", "vifmrc")),
-            (os.path.join("vifm", "colors"), os.path.join(".config", "vifm", "colors")),
+            ("kitty", os.path.join(".config", "kitty")),
+            ("vim", os.path.join(".config", "nvim")),
         ]
-
-        # make sure that we create the various `.config/xxx` directories since they won't be here on new machines
-        create_dirs(os.path.join(dest_dir, ".config", "vifm"))
-        create_dirs(os.path.join(dest_dir, ".config", "bat"))
 
         print("====> linking dot files")
         for f1, f2 in links:

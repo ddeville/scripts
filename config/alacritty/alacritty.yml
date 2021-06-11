@@ -1,0 +1,14 @@
+# Font configuration
+font:
+  normal:
+    family: Anonymous Pro
+    style: Regular
+  size: 14.0
+  offset:
+    x: 0
+    y: 3
+  # Thin stroke font rendering (macOS only)
+  #
+  # Thin strokes are suitable for retina displays, but for non-retina screens
+  # it is recommended to set `use_thin_strokes` to `false`.
+  #use_thin_strokes: false
