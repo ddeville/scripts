@@ -48,7 +48,6 @@ call plug#begin($HOME . "/.vim/cache/plug")
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-unimpaired'
   Plug 'tpope/vim-vinegar'
-  Plug 'vifm/vifm.vim'
 
   " neovim only
   if has("nvim")
