@@ -15,7 +15,6 @@ from py.package_manager import (
     install_packages,
 )
 from py.platform import (
-    FREEBSD,
     LINUX,
     MACOS,
     get_current_platform,
@@ -37,7 +36,7 @@ from py.util import (
 )
 
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
-ALL_PLATFORMS = [MACOS, LINUX, FREEBSD]
+ALL_PLATFORMS = [MACOS, LINUX]
 LITE = "lite"
 
 # Packages
