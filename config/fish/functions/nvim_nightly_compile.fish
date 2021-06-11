@@ -32,7 +32,7 @@ function nvim_nightly_compile --description "Install the Nightly version of Neov
     # Build
     pushd {$tmp_dir}"/neovim-nightly"
     command echo "Building in " (pwd)
-    command make CMAKE_BUILD_TYPE=Release CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$install_path"
+    command make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$install_path"
     command make install
     popd
 
