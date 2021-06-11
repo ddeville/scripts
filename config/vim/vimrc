@@ -28,79 +28,39 @@ filetype plugin indent on
 
 " vim-plug plugins
 call plug#begin($HOME . "/.vim/cache/plug")
-    " VIM & NEOVIM
-    Plug 'chriskempson/base16-vim'
-    Plug 'dag/vim-fish'
-    Plug 'fatih/vim-go'
-        " we use nvim-lsp instead
-        let g:go_gopls_enabled = 0
-        let g:go_code_completion_enabled = 0
-        let g:go_def_mapping_enabled = 0
-        let g:go_diagnostics_enabled = 0
-        let g:go_echo_go_info = 0
-        let g:go_metalinter_enabled = 0
-        let g:go_fmt_autosave = 1
-    Plug 'itchyny/lightline.vim'
-        " don't show `-- INSERT --` since we have a fancy status line
-        set noshowmode
-        " update color scheme
-        let g:lightline =
-        \ {
-        \   "colorscheme": "wombat",
-        \   "active": {
-        \     "left": [["mode", "paste"], ["gitbranch", "readonly", "filename", "modified"], ["lsp_status"]],
-        \   },
-        \   "component_function": {
-        \     "gitbranch": "fugitive#Head",
-        \     "lsp_status": "LspStatus",
-        \   },
-        \ }
-    Plug 'junegunn/fzf', { 'dir': $HOME . '/.fzf', 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
-        let g:fzf_layout = { "down": "35%" }
-        " we use different commands in the shell
-        let $FZF_DEFAULT_COMMAND = "fd --type file --color=never --hidden --exclude .git"
-        nnoremap <Leader>; :Buffers<CR>
-        nnoremap ; :Buffers<CR>
-        nnoremap <Leader>o :Files<CR>
-        nnoremap <C-p> :Files<CR>
-        nnoremap <Leader>s :GFiles?<CR>
-        nnoremap <Leader>t :Tags<CR>
-        nnoremap // :BLines<CR>
-    Plug 'machakann/vim-highlightedyank'
-        let g:highlightedyank_highlight_duration = -1
-    Plug 'mhinz/vim-grepper'
-        let g:grepper = {}
-        let g:grepper.tools = ["rg", "git", "grep"]
-        let g:grepper.highlight = 1
-        nnoremap <Leader>f :Grepper -tool rg<CR>
-        nmap gs <plug>(GrepperOperator)
-        xmap gs <plug>(GrepperOperator)
-    Plug 'mhinz/vim-startify'
-    Plug 'rust-lang/rust.vim'
-        let g:rustfmt_autosave = 1
-        let g:rustfmt_emit_files = 1
-        let g:rustfmt_fail_silently = 0
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-eunuch'
-    Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-git'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-sleuth'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-unimpaired'
-    Plug 'tpope/vim-vinegar'
-    Plug 'vifm/vifm.vim'
 
-    " NEOVIM ONLY
+" VIM & NEOVIM
+Plug 'chriskempson/base16-vim'
+Plug 'dag/vim-fish'
+Plug 'fatih/vim-go'
+Plug 'itchyny/lightline.vim'
+Plug 'junegunn/fzf', { 'dir': $HOME . '/.fzf', 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
+Plug 'machakann/vim-highlightedyank'
+Plug 'mhinz/vim-grepper'
+Plug 'mhinz/vim-startify'
+Plug 'rust-lang/rust.vim'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-git'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-vinegar'
+Plug 'vifm/vifm.vim'
+
+" NEOVIM ONLY
 if has("nvim")
-    Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
-    Plug 'kosayoda/nvim-lightbulb'
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'nvim-lua/lsp_extensions.nvim'
-    Plug 'nvim-lua/lsp-status.nvim'
-    Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
+Plug 'kosayoda/nvim-lightbulb'
+Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/lsp_extensions.nvim'
+Plug 'nvim-lua/lsp-status.nvim'
+Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 endif
+
 call plug#end()
 
 " update and reload config
