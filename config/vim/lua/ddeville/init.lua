@@ -1,1 +1,1 @@
-require("ddeville/config")
+require("ddeville/plugin")
