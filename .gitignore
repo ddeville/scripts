@@ -1,4 +1,2 @@
 config/tmux/plugins
-config/vim/.netrwhist
-config/vim/cache/
-config/vim/view/
+config/vim/plugged

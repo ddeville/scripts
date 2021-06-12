@@ -19,6 +19,9 @@ endif
 set undodir=$XDG_CACHE_HOME/vim/undo//
 set undofile
 
+" get netrw to store its history in the cache folder
+let g:netrw_home = $XDG_CACHE_HOME . '/vim'
+
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
 let mapleader = "\<Space>"
@@ -27,7 +30,7 @@ let mapleader = "\<Space>"
 filetype plugin indent on
 
 " vim-plug plugins
-call plug#begin($HOME . "/.vim/cache/plug")
+call plug#begin($HOME . "/.vim/plugged")
 
   " vim & neovim
   Plug 'chriskempson/base16-vim'
