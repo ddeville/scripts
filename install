@@ -23,7 +23,9 @@ from py.task_executor import (
     ExecutorConfig,
     TaskManifest,
     print_all_tasks_for_config,
+    print_task_for_config,
     run_all_tasks_for_config,
+    run_task_for_config,
 )
 from py.util import (
     command_path,
@@ -146,13 +148,13 @@ def task_update_dot_files():
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
             ("profile", ".profile"),
-            ("tmux.conf", ".tmux.conf"),
             ("vim", ".vim"),
             ("alacritty", os.path.join(".config", "alacritty")),
             ("bat", os.path.join(".config", "bat")),
             ("fish", os.path.join(".config", "fish")),
             ("htop", os.path.join(".config", "htop")),
             ("kitty", os.path.join(".config", "kitty")),
+            ("tmux", os.path.join(".config", "tmux")),
             ("vim", os.path.join(".config", "nvim")),
         ]
 
@@ -197,7 +199,7 @@ def task_install_rustup():
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
     def cmd():
-        tpm_path = os.path.expanduser("~/.tmux/plugins/tpm")
+        tpm_path = os.path.expanduser("~/.config/tmux/plugins/tpm")
 
         # first install TPM itself if needed
         if not os.path.exists(tpm_path):
@@ -316,6 +318,7 @@ if __name__ == "__main__":
     parser.add_argument("action", choices=["list", "run"], help="whether to list the tasks or actually run them")
     parser.add_argument("-p", "--platform", action="store", help="the platform to use")
     parser.add_argument("-l", "--lite", action="store_true", help="whether a lite install should be performed")
+    parser.add_argument("-t", "--task", action="store", help="run a specific task")
     args = parser.parse_args()
 
     module_name = __name__
@@ -331,6 +334,12 @@ if __name__ == "__main__":
     config = ExecutorConfig(module_name, tags)
 
     if args.action == "list":
-        print_all_tasks_for_config(config)
+        if args.task:
+            print_task_for_config(config, args.task)
+        else:
+            print_all_tasks_for_config(config)
     elif args.action == "run":
-        run_all_tasks_for_config(config)
+        if args.task:
+            run_task_for_config(config, args.task)
+        else:
+            run_all_tasks_for_config(config)
