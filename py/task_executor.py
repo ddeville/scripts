@@ -32,11 +32,29 @@ def print_all_tasks_for_config(config):
     for counter, task in enumerate(_get_tasks(config)):
         sys.stdout.write("%d: %s\n" % (counter + 1, task.name))
 
+def print_task_for_config(config, task):
+    # type: (ExecutorConfig, str) -> None
+    """Print the name of the given task that would be run for a given config."""
+    for cur_task in _get_tasks(config):
+        if cur_task.name == task or TASK_PREFIX + cur_task.name == task:
+            sys.stdout.write("%s\n" % cur_task.name)
+            return
+    sys.stderr.write("Unknown task: %s" % task)
+
 def run_all_tasks_for_config(config):
     # type: (ExecutorConfig) -> None
     """Run all tasks that match the given config."""
     for task in _get_tasks(config):
         task.cmd()
+
+def run_task_for_config(config, task):
+    # type: (ExecutorConfig, str) -> None
+    """Run a specific task in the given config."""
+    for cur_task in _get_tasks(config):
+        if cur_task.name == task or TASK_PREFIX + cur_task.name == task:
+            cur_task.cmd()
+            return
+    sys.stderr.write("Unknown task: %s" % task)
 
 # Private
 
