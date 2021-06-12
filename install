@@ -294,22 +294,6 @@ def task_install_fonts():
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
-def task_install_xcode_themes():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        print("====> installing xcode themes")
-        themes_path = os.path.join(SCRIPTS_PATH, "macos", "xcode")
-        dest_path = os.path.join(os.path.expanduser("~"), "Library", "Developer", "Xcode", "UserData",
-                                 "FontAndColorThemes")
-        create_dirs(dest_path)
-        for theme in os.listdir(themes_path):
-            theme_path = os.path.join(themes_path, theme)
-            if not theme.startswith("."):
-                copy_file(theme_path, os.path.join(dest_path, theme))
-
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
-
 # Main
 
 if __name__ == "__main__":
