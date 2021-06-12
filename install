@@ -53,7 +53,6 @@ PACKAGES = [
     "neovim",
     "ripgrep",
     "tmux",
-    "vim",
     {PackageType.BREW: "ctags", PackageType.PACMAN: "ctags", PackageType.DEB: "exuberant-ctags"},
     {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
 ]
