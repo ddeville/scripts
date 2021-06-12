@@ -31,3 +31,9 @@ function fish_prompt
 
     echo -n -s $arrow ' '$hostname_:$cwd_ $repo_info $normal_color ' '
 end
+
+function fish_right_prompt
+    set_color $fish_color_autosuggestion
+    date "+%T"
+    set_color normal
+end
