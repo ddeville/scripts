@@ -142,7 +142,6 @@ def task_update_dot_files():
         links = [
             ("bash_profile", ".bash_profile"),
             ("bashrc", ".bashrc"),
-            ("ctags", ".ctags"),
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
             ("profile", ".profile"),
