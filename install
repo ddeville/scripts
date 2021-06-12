@@ -136,29 +136,31 @@ def task_update_dot_files():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
+        print("====> linking dot files")
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
-        dest_dir = os.path.expanduser("~")
 
+        home_dir = os.path.expanduser("~")
         links = [
-            ("bash_profile", ".bash_profile"),
-            ("bashrc", ".bashrc"),
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
-            ("profile", ".profile"),
-            ("vim", ".vim"),
-            ("alacritty", os.path.join(".config", "alacritty")),
-            ("bat", os.path.join(".config", "bat")),
-            ("fish", os.path.join(".config", "fish")),
-            ("git", os.path.join(".config", "git")),
-            ("htop", os.path.join(".config", "htop")),
-            ("kitty", os.path.join(".config", "kitty")),
-            ("tmux", os.path.join(".config", "tmux")),
-            ("vim", os.path.join(".config", "nvim")),
+            ("nvim", ".vim"),
         ]
-
-        print("====> linking dot files")
         for f1, f2 in links:
-            force_symlink(os.path.join(orig_dir, f1), os.path.join(dest_dir, f2))
+            force_symlink(os.path.join(orig_dir, f1), os.path.join(home_dir, f2))
+
+        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
+        xdg_links = [
+            "alacritty"
+            "bat",
+            "fish",
+            "git",
+            "htop",
+            "kitty",
+            "nvim",
+            "tmux",
+        ]
+        for f in xdg_links:
+            force_symlink(os.path.join(orig_dir, f), os.path.join(xdg_config_dir, f))
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
