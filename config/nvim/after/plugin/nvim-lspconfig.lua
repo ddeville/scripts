@@ -170,29 +170,9 @@ require'lsp_extensions'.inlay_hints{
 }
 ]])
 
--- Add support for reporting LSP progress in the ligthline (see `LspStatus` in vimrc)
+-- Add support for reporting LSP progress
 lsp_status.register_progress()
-
-local function status_message()
-  if #vim.lsp.buf_get_clients(0) > 0 then
-    local msg = lsp_status.status_progress()
-    -- Try to prevent the status message from overflowing and thus moving all status items to the left.
-    local space = vim.fn.winwidth(0) - 70
-    if #msg > space then
-      msg = string.sub(msg, 1, space)
-    end
-    return msg
-  else
-    return ""
-  end
-end
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
 vim.api.nvim_command("autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()")
-
-local M = {
-  status_message = status_message;
-}
-
-return M

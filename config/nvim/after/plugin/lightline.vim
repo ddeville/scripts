@@ -17,7 +17,13 @@ let g:lightline =
 " retrieve the LSP status so that we can show it in the lightline
 function! LspStatus() abort
   if has("nvim")
-    return luaeval("require('plugin/lsp').status_message()")
+    let l:msg = luaeval("require('lsp-status').status_progress()")
+    let l:space = winwidth(0) - 70
+    if strlen(msg) > space
+      return msg[0:space]
+    else
+      return msg
+    endif
   else
     return ""
   endif
