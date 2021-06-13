@@ -7,7 +7,7 @@ function fish_prompt
         end
 
         function _git_branch_name
-            echo (git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
+            echo (git symbolic-ref HEAD ^/dev/null | sed -e "s|^refs/heads/||")
         end
     end
 
@@ -16,24 +16,24 @@ function fish_prompt
     set -l red (set_color --bold red)
     set -l normal_color (set_color $fish_color_normal)
 
-    set -l arrow "$red➜ "
-    if [ $USER = 'root' ]
-        set arrow "$red# "
+    if test "$USER" = "root"
+        set prompt_sign "#"
+    else
+        set prompt_sign ">"
     end
 
     set -l cwd_ $cwd_color(basename (prompt_pwd))
     set -l hostname_ $yellow(hostname -s)
 
-    if [ (_is_git_repo) ]
+    if test (_is_git_repo)
         set -l repo_branch $red(_git_branch_name)
         set repo_info "$normal_color:($repo_branch$normal_color)"
     end
 
-    echo -n -s $arrow ' '$hostname_:$cwd_ $repo_info $normal_color ' '
+    echo -n -s $hostname_$normal_color:$cwd_ $repo_info $normal_color" "$normal_color$prompt_sign" "
 end
 
 function fish_right_prompt
-    set_color $fish_color_autosuggestion
-    date "+%T"
     set_color normal
+    date "+%T"
 end
