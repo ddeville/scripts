@@ -34,6 +34,7 @@ function fish_prompt
 end
 
 function fish_right_prompt
-    set_color normal
+    set_color brblack
     date "+%T"
+    set_color normal
 end
