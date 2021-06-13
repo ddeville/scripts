@@ -221,10 +221,3 @@ sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
 sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
 sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
 sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
-
-" ==> LUA
-
-" load plugin config written in lua (for neovim only)
-if has("nvim")
-  lua require("plugin")
-endif
