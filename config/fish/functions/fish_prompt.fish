@@ -12,8 +12,8 @@ function fish_prompt
     end
 
     set -l cwd_color (set_color --bold $fish_color_cwd)
-    set -l yellow (set_color --bold f0c674)
-    set -l red (set_color --bold cc6666)
+    set -l yellow (set_color --bold yellow)
+    set -l red (set_color --bold red)
     set -l normal_color (set_color $fish_color_normal)
 
     set -l arrow "$red➜ "
