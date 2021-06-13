@@ -10,7 +10,7 @@ function lsp_install --description "Install various LSP server for Neovim"
         return 1
     end
 
-    # If `all` was passed or `lsp_install` was invoked without arg, install all
+    # If `all` was passed install all
     if contains all $argv
         set install_all 1
     end
