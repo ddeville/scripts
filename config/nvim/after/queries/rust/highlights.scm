@@ -1,3 +1,4 @@
+; Used by treesitter
 [
   "mod"
   "use"
