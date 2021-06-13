@@ -11,9 +11,9 @@ function fish_prompt
         end
     end
 
-    set -l cwd_color (set_color --bold $fish_color_cwd)
-    set -l yellow (set_color --bold yellow)
-    set -l red (set_color --bold red)
+    set -l cwd_color (set_color $fish_color_cwd)
+    set -l yellow (set_color yellow)
+    set -l red (set_color red)
     set -l normal_color (set_color $fish_color_normal)
 
     if test "$USER" = "root"
