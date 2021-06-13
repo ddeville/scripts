@@ -1,4 +1,4 @@
-function lsp_install --description "Install various LSP server for Neovim"
+function lsp_install --description "Install various LSP servers for Neovim"
     if test -d $argv
         echo "Available servers:"
         echo "  * rust-analyzer"
