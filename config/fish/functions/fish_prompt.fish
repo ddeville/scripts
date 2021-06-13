@@ -31,6 +31,8 @@ function fish_prompt
     end
 
     echo -n -s $hostname_$normal_color:$cwd_ $repo_info $normal_color" "$normal_color$prompt_sign" "
+
+    set_color normal
 end
 
 function fish_right_prompt
