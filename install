@@ -154,12 +154,12 @@ def task_update_dot_files():
             force_symlink(os.path.join(orig_dir, f), os.path.join(xdg_config_dir, f))
 
         home_dir = os.path.expanduser("~")
-        links = [
+        legacy_links = [
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
             ("nvim", ".vim"),
         ]
-        for f1, f2 in links:
+        for f1, f2 in legacy_links:
             force_symlink(os.path.join(orig_dir, f1), os.path.join(home_dir, f2))
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
