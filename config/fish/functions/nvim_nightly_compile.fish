@@ -2,7 +2,7 @@
 #   macOS: `brew install ninja libtool automake cmake pkg-config gettext`
 #   linux: `sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip`
 
-function nvim_nightly_compile --description "Install the Nightly version of Neovim"
+function nvim_nightly_compile --description "Compile the Nightly version of Neovim"
     set install_path "/opt/nvim/nightly_compiled"
 
     # Create install path if needed
