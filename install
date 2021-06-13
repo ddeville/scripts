@@ -138,8 +138,9 @@ def task_update_dot_files():
         # type: () -> None
         print("====> linking dot files")
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
+        home_dir = os.path.expanduser("~")
+        xdg_config_dir = os.path.join(home_dir, ".config")
 
-        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
         xdg_links = [
             "alacritty",
             "bat",
@@ -153,7 +154,6 @@ def task_update_dot_files():
         for f in xdg_links:
             force_symlink(os.path.join(orig_dir, f), os.path.join(xdg_config_dir, f))
 
-        home_dir = os.path.expanduser("~")
         legacy_links = [
             ("hushlogin", ".hushlogin"),
             ("lldbinit", ".lldbinit"),
