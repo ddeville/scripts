@@ -12,7 +12,6 @@ except ImportError:
 from py.package_manager import (
     PackageType,
     create_package_manager,
-    install_packages,
 )
 from py.platform import (
     LINUX,
@@ -41,33 +40,6 @@ SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 ALL_PLATFORMS = [MACOS, LINUX]
 LITE = "lite"
 
-# Packages
-
-PACKAGES = [
-    "bat",
-    "exa",
-    "fish",
-    "htop",
-    "jq",
-    "mosh",
-    "neovim",
-    "ripgrep",
-    "tmux",
-    {PackageType.BREW: "ctags", PackageType.PACMAN: "ctags", PackageType.DEB: "exuberant-ctags"},
-    {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
-]
-
-PACKAGES_FULL = [
-    "cmake",
-    "golang",
-    "lazygit",
-    "radare2",
-    {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
-    {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
-    {PackageType.PACMAN: "npm", PackageType.DEB: "npm"},
-    {PackageType.PACMAN: "ttf-anonymous-pro", PackageType.DEB: "ttf-anonymous-pro"},
-]
-
 # Tasks
 
 def task_install_package_manager():
@@ -80,11 +52,40 @@ def task_install_package_manager():
 
 def task_install_packages():
     # type: () -> TaskManifest
-    return TaskManifest(cmd=lambda: install_packages(PACKAGES), tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
+    def cmd():
+        package_manager = create_package_manager()
+        package_manager.install_packages([
+            "bat",
+            "exa",
+            "fish",
+            "htop",
+            "jq",
+            "mosh",
+            "neovim",
+            "ripgrep",
+            "tmux",
+            {PackageType.BREW: "ctags", PackageType.PACMAN: "ctags", PackageType.DEB: "exuberant-ctags"},
+            {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
+        ])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
 def task_install_packages_full():
     # type: () -> TaskManifest
-    return TaskManifest(cmd=lambda: install_packages(PACKAGES_FULL), tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
+    def cmd():
+        package_manager = create_package_manager()
+        package_manager.install_packages([
+            "cmake",
+            "golang",
+            "lazygit",
+            "radare2",
+            {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
+            {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
+            {PackageType.PACMAN: "npm", PackageType.DEB: "npm"},
+            {PackageType.PACMAN: "ttf-anonymous-pro", PackageType.DEB: "ttf-anonymous-pro"},
+        ])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
 def task_update_shell():
     # type: () -> TaskManifest

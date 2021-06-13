@@ -34,15 +34,6 @@ class PackageType(object):
     PACMAN = "pacman"
     PKG = "pkg"
 
-def install_packages(packages):
-    # type: (List[Union[str, Dict[PackageType, str]]]) -> None
-    package_manager = create_package_manager()
-    for package in packages:
-        if not isinstance(package, str):
-            package = package.get(package_manager.format())
-        if package:
-            package_manager.install_package(package)
-
 def create_package_manager():
     # type: () -> BasePackageManager
     """Create a new package manager instance that is appropriate for the current platform."""
@@ -116,6 +107,14 @@ class BrewPackageManager(BasePackageManager):
             print("====> installing %s" % package)
             run_command(["brew", "install", package])
         run_command_no_output(["brew", "link", package])
+
+    def install_packages(self, packages):
+        # type: (List[Union[str, Dict[PackageType, str]]]) -> None
+        for package in packages:
+            if not isinstance(package, str):
+                package = package.get(self.format())
+            if package:
+                self.install_package(package)
 
     def format(self):
         # type: () -> str
