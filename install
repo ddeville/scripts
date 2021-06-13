@@ -140,7 +140,7 @@ def task_update_dot_files():
 
         xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
         xdg_links = [
-            "alacritty"
+            "alacritty",
             "bat",
             "fish",
             "git",
