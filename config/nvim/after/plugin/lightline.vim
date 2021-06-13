@@ -17,7 +17,7 @@ let g:lightline =
 " retrieve the LSP status so that we can show it in the lightline
 function! LspStatus() abort
   if has("nvim")
-    return luaeval("require('plugin/lsp').status_message()")
+    return luaeval("require('ddeville').lsp_status_message()")
   else
     return ""
   endif
