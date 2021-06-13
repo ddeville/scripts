@@ -3,7 +3,6 @@
 SETUVAR __fish_initialized:3100
 SETUVAR _fish_abbr_cdd:cd\x20\x2e\x2e
 SETUVAR _fish_abbr_con:tail\x20\x2d40\x20\x2df\x20/var/log/system\x2elog
-SETUVAR _fish_abbr_oo:open\x20\x2e
 SETUVAR _fish_abbr_topc:top\x20\x2do\x20cpu
 SETUVAR _fish_abbr_topm:top\x20\x2do\x20mem
 SETUVAR _fish_abbr_vpn:/opt/cisco/anyconnect/bin/vpn\x20\x2ds\x20connect\x20https\x3a//sjc\x2evpn\x2edropboxer\x2enet
