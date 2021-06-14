@@ -8,7 +8,6 @@ set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx XDG_CACHE_HOME "$HOME/.cache"
 set -gx XDG_DATA_HOME "$HOME/.local/share"
 
-source "$XDG_CONFIG_HOME/fish/config/colors.fish"
-source "$XDG_CONFIG_HOME/fish/config/path.fish"
-source "$XDG_CONFIG_HOME/fish/config/alias.fish"
-source "$XDG_CONFIG_HOME/fish/config/bindings.fish"
+if status --is-interactive
+    source "$XDG_CONFIG_HOME/base16-shell/profile_helper.fish"
+end
