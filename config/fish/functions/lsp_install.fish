@@ -37,28 +37,28 @@ function lsp_install --description "Install various LSP servers for Neovim"
     # Install!
 
     if contains rust-analyzer $argv || set -q install_all
-        rust_analyzer
+        _rust_analyzer
     end
     if contains clangd $argv || set -q install_all
-        clangd
+        _clangd
     end
     if contains gopls $argv || set -q install_all
-        gopls
+        _gopls
     end
     if contains tsserver $argv || set -q install_all
-        tsserver
+        _tsserver
     end
     if contains pyright $argv || set -q install_all
-        pyright
+        _pyright
     end
     if contains sumneko_lua $argv || set -q install_all
-        sumneko_lua
+        _sumneko_lua
     end
 
     popd $install_path
 end
 
-function rust_analyzer
+function _rust_analyzer
     echo "Installing rust-analyzer"
 
     set foldername "_rust-analyzer"
@@ -102,7 +102,7 @@ function rust_analyzer
     command ln -s $foldername/rust-analyzer $linkname
 end
 
-function clangd
+function _clangd
     echo "Installing clangd"
 
     set foldername "_clangd"
@@ -147,7 +147,7 @@ function clangd
     command ln -s $bin_path  $linkname
 end
 
-function gopls
+function _gopls
     echo "Installing gopls"
 
     if not type -q go
@@ -181,7 +181,7 @@ function gopls
     command ln -s $foldername/gopls $linkname
 end
 
-function tsserver
+function _tsserver
     echo "Installing tsserver"
 
     if not type -q npm
@@ -211,7 +211,7 @@ function tsserver
     command ln -s $foldername/node_modules/.bin/typescript-language-server $linkname
 end
 
-function pyright
+function _pyright
     echo "Installing pyright"
 
     if not type -q npm
@@ -241,7 +241,7 @@ function pyright
     command ln -s $foldername/node_modules/.bin/pyright-langserver $linkname
 end
 
-function sumneko_lua
+function _sumneko_lua
     echo "Installing sumneko_lua"
 
     if not type -q ninja
