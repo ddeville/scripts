@@ -10,8 +10,8 @@ alias adu "arc diff --update"
 alias oo "open ."
 
 # abbreviations
-abbr -a cdd "cd .."
-abbr -a con "tail -40 -f /var/log/system.log"
-abbr -a topc "top -o cpu"
-abbr -a topm "top -o mem"
-abbr -a vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.net"
+abbr -a -g cdd "cd .."
+abbr -a -g con "tail -40 -f /var/log/system.log"
+abbr -a -g topc "top -o cpu"
+abbr -a -g topm "top -o mem"
+abbr -a -g vpn "/opt/cisco/anyconnect/bin/vpn -s connect https://sjc.vpn.dropboxer.net"
