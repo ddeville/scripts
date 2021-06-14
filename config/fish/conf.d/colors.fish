@@ -9,6 +9,7 @@ set fish_color_error red
 set fish_color_escape yellow
 set fish_color_history_current --bold
 set fish_color_host normal
+set fish_color_host_remote normal
 set fish_color_match --background=brblue
 set fish_color_normal normal
 set fish_color_operator blue
