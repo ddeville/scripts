@@ -1,8 +1,3 @@
-# setup the base16 shell and source the colors
-if status --is-interactive
-    source "$XDG_CONFIG_HOME/base16-shell/profile_helper.fish"
-end
-
 set fish_color_autosuggestion magenta
 set fish_color_cancel -r
 set fish_color_command green

@@ -1,5 +1,5 @@
 # clean up existing path before resourcing it so that starting tmux doesn't end
-# up with duplicate entries in the path (and the default paths prepended to the
+# up with duplicated entries in the path (and the default paths prepended to the
 # front) - this is because this config file is loaded twice when starting tmux.
 if test -e "/usr/libexec/path_helper"
     set PATH ""
