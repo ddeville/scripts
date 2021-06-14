@@ -1,18 +1,18 @@
-function nvim_nightly --description "Install the Nightly version of Neovim, either by downloading it from Github of by compiling it"
+function nvim_nightly_install --description "Install the Nightly version of Neovim, either by downloading it from Github of by compiling it"
     switch $argv[1]
-        case install
-            _nvim_nightly_install
+        case download
+            _nvim_nightly_download
         case compile
             _nvim_nightly_compile
         case "*"
             echo "Available commands:"
-            echo "  * install"
+            echo "  * download"
             echo "  * compile"
             return 1
     end
 end
 
-function _nvim_nightly_install --description "Install the Nightly version of Neovim"
+function _nvim_nightly_download --description "Download the pre-built Nightly version of Neovim"
     set install_path "/opt/nvim/nightly_archived"
 
     # Create install path if needed
