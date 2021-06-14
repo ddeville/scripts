@@ -39,6 +39,7 @@ from py.util import (
 SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 ALL_PLATFORMS = [MACOS, LINUX]
 LITE = "lite"
+XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 
 # Tasks
 
@@ -119,7 +120,7 @@ def task_install_base16():
     def cmd():
         # type: () -> None
         for name, repo_url in repos:
-            path = os.path.expanduser(os.path.join("~", ".config", name))
+            path = os.path.join(XDG_CONFIG_HOME, name)
             # first remove the existing repo if it exists
             if os.path.exists(path):
                 print("====> deleting existing %s repo" % name)
@@ -136,8 +137,6 @@ def task_update_dot_files():
         # type: () -> None
         print("====> linking dot files")
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
-        home_dir = os.path.expanduser("~")
-        xdg_config_dir = os.path.join(home_dir, ".config")
 
         xdg_links = [
             "alacritty",
@@ -150,7 +149,7 @@ def task_update_dot_files():
             "tmux",
         ]
         for f in xdg_links:
-            force_symlink(os.path.join(orig_dir, f), os.path.join(xdg_config_dir, f))
+            force_symlink(os.path.join(orig_dir, f), os.path.join(XDG_CONFIG_HOME, f))
 
         legacy_links = [
             ("hushlogin", ".hushlogin"),
@@ -158,7 +157,7 @@ def task_update_dot_files():
             ("nvim", ".vim"),
         ]
         for f1, f2 in legacy_links:
-            force_symlink(os.path.join(orig_dir, f1), os.path.join(home_dir, f2))
+            force_symlink(os.path.join(orig_dir, f1), os.path.join(os.path.expanduser("~"), f2))
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
@@ -197,7 +196,7 @@ def task_install_rustup():
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
     def cmd():
-        tpm_path = os.path.expanduser("~/.config/tmux/plugins/tpm")
+        tpm_path = os.path.join(XDG_CONFIG_HOME, "tmux", "plugins", "tpm")
 
         # first install TPM itself if needed
         if not os.path.exists(tpm_path):
