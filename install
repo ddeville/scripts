@@ -60,11 +60,9 @@ def task_install_packages():
             "fish",
             "htop",
             "jq",
-            "mosh",
             "neovim",
             "ripgrep",
             "tmux",
-            {PackageType.BREW: "ctags", PackageType.PACMAN: "ctags", PackageType.DEB: "exuberant-ctags"},
             {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
         ])
 
