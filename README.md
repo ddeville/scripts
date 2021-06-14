@@ -18,7 +18,7 @@ A few requirements:
 Things to do:
 
 - Add the rust source and linters to the rustup install: `rustup component add rust-src rustfmt clippy`.
-- Install the nightly Neovim (by running either `nvim_nightly_install` or `nvim_nightly_compile`).
+- Install the nightly Neovim by running `nvim_nightly_install`.
 - Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
     - `python2 -m pip install --upgrade pynvim`
     - `python3 -m pip install --upgrade pynvim`
