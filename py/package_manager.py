@@ -74,6 +74,14 @@ class BasePackageManager(object):
         """The package format, mostly for Linux."""
         raise NotImplementedError()
 
+    def install_packages(self, packages):
+        # type: (List[Union[str, Dict[PackageType, str]]]) -> None
+        for package in packages:
+            if not isinstance(package, str):
+                package = package.get(self.format())
+            if package:
+                self.install_package(package)
+
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
 
@@ -107,14 +115,6 @@ class BrewPackageManager(BasePackageManager):
             print("====> installing %s" % package)
             run_command(["brew", "install", package])
         run_command_no_output(["brew", "link", package])
-
-    def install_packages(self, packages):
-        # type: (List[Union[str, Dict[PackageType, str]]]) -> None
-        for package in packages:
-            if not isinstance(package, str):
-                package = package.get(self.format())
-            if package:
-                self.install_package(package)
 
     def format(self):
         # type: () -> str
