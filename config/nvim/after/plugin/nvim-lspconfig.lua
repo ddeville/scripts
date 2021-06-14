@@ -1,5 +1,6 @@
 local nvim_lsp = require("lspconfig")
 local lsp_status = require("lsp-status")
+local util = require("ddeville/util")
 
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities or {})
@@ -159,20 +160,22 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
-vim.api.nvim_command([[
-autocmd BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter *.rs lua
-require'lsp_extensions'.inlay_hints{
-  highlight = "SpecialComment";
-  prefix = " ▶ ";
-  aligned = false;
-  only_current_line = false;
-  enabled = { "TypeHint", "ChainingHint" };
-}
-]])
+util.create_augroup("rust_inlay_hints", { {
+  "BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter",
+  "*.rs",
+  "lua",
+  [[require'lsp_extensions'.inlay_hints{
+    highlight = "SpecialComment";
+    prefix = " ▶ ";
+    aligned = false;
+    only_current_line = false;
+    enabled = { "TypeHint", "ChainingHint" };
+  }]],
+} })
 
 -- Add support for reporting LSP progress
 lsp_status.register_progress()
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
-vim.api.nvim_command("autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()")
+util.create_augroup("code_action_lightbuld", { {"CursorHold,CursorHoldI" , "*", "lua require'nvim-lightbulb'.update_lightbulb()"} })

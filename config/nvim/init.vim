@@ -158,8 +158,11 @@ set shortmess+=c
 
 " trailing whitespace is bad
 highlight WhiteSpaceEOL guibg=Red ctermbg=Red
+augroup trialing_whitespace
+autocmd!
 autocmd InsertEnter * match WhiteSpaceEOL /\s\+\%#\@<!$/
 autocmd InsertLeave * match WhiteSpaceEOL /\s\+$/
+augroup END
 
 " netrw
 let g:netrw_localrmdir = "rm -r"
