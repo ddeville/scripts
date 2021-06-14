@@ -1,3 +1,5 @@
+# NOTE: Remember to add to completions when adding a new server type
+
 function lsp_install --description "Install various LSP servers for Neovim"
     if test -d $argv
         echo "Available servers:"
