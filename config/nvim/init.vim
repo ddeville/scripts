@@ -72,6 +72,9 @@ command! Reload execute "source ~/.vim/vimrc"
 " enable syntax highlighting
 syntax enable
 
+" syntax highlighting for embedded lua code in vim files
+let g:vimsyn_embed = 'l'
+
 " dark background is better
 set background=dark
 
