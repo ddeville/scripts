@@ -16,7 +16,7 @@ let g:lightline =
 
 " retrieve the LSP status so that we can show it in the lightline
 function! LspStatus() abort
-  if has("nvim") && luaeval("not vim.tbl_isempty(vim.lsp.buf_get_clients(0))")
+  if has("nvim-0.5") && luaeval("not vim.tbl_isempty(vim.lsp.buf_get_clients(0))")
     let l:msg = luaeval("require('lsp-status').status_progress()")
     " lsp-status seems to double encode the % signs so fix that here
     let l:msg = substitute(l:msg, "%%", "%", "")

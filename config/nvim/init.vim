@@ -53,7 +53,7 @@ call plug#begin($HOME . "/.vim/plugged")
   Plug 'tpope/vim-vinegar'
 
   " neovim only
-  if has("nvim")
+  if has("nvim-0.5")
     Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
     Plug 'kosayoda/nvim-lightbulb'
     Plug 'neovim/nvim-lspconfig'
