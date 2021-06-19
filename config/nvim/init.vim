@@ -67,7 +67,7 @@ call plug#end()
 
 " update and reload config
 command! Config execute ":edit $MYVIMRC"
-command! Reload execute "source ~/.vim/vimrc"
+command! Reload execute "source $MYVIMRC"
 
 " enable syntax highlighting
 syntax enable
