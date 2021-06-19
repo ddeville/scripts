@@ -1,13 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import os
 import shutil
 
-try:
-    from urllib.request import urlretrieve
-except ImportError:
-    from urllib import urlretrieve  # type: ignore
+from urllib.request import urlretrieve
 
 from py.package_manager import (
     PackageType,
@@ -43,17 +40,15 @@ XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 
 # Tasks
 
-def task_install_package_manager():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_package_manager() -> TaskManifest:
+    def cmd() -> None:
         package_manager = create_package_manager()
         package_manager.install()
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=[])
 
-def task_install_packages():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_packages() -> TaskManifest:
+    def cmd() -> None:
         package_manager = create_package_manager()
         package_manager.install_packages([
             "bat",
@@ -69,9 +64,8 @@ def task_install_packages():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
-def task_install_packages_full():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_packages_full() -> TaskManifest:
+    def cmd() -> None:
         package_manager = create_package_manager()
         package_manager.install_packages([
             "cmake",
@@ -86,10 +80,8 @@ def task_install_packages_full():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["install_package_manager"])
 
-def task_update_shell():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
+def task_update_shell() -> TaskManifest:
+    def cmd() -> None:
         shell_path = command_path("fish")
         assert shell_path is not None, "Cannot find shell path"
 
@@ -112,13 +104,11 @@ def task_update_shell():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "install_packages_full"])
 
-def task_install_base16():
-    # type: () -> TaskManifest
+def task_install_base16() -> TaskManifest:
     repos = [
         ("base16-shell", "https://github.com/chriskempson/base16-shell.git"),
     ]
-    def cmd():
-        # type: () -> None
+    def cmd() -> None:
         for name, repo_url in repos:
             path = os.path.join(XDG_CONFIG_HOME, name)
             # first remove the existing repo if it exists
@@ -131,10 +121,8 @@ def task_install_base16():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_shell"])
 
-def task_update_dot_files():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
+def task_update_dot_files() -> TaskManifest:
+    def cmd() -> None:
         print("====> linking dot files")
         orig_dir = os.path.join(SCRIPTS_PATH, "config")
 
@@ -161,9 +149,8 @@ def task_update_dot_files():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
-def task_install_pyenv():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_pyenv() -> TaskManifest:
+    def cmd() -> None:
         if is_cmd_installed("pyenv"):
             print("====> updating pyenv")
             run_command(["pyenv", "update"])
@@ -179,9 +166,8 @@ def task_install_pyenv():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
-def task_install_rustup():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_rustup() -> TaskManifest:
+    def cmd() -> None:
         if is_cmd_installed("rustup"):
             print("====> updating rustup")
             run_command(["rustup", "self", "update"])
@@ -193,9 +179,8 @@ def task_install_rustup():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 
-def task_update_tmux_plugins():
-    # type: () -> TaskManifest
-    def cmd():
+def task_update_tmux_plugins() -> TaskManifest:
+    def cmd() -> None:
         tpm_path = os.path.join(XDG_CONFIG_HOME, "tmux", "plugins", "tpm")
 
         # first install TPM itself if needed
@@ -210,9 +195,8 @@ def task_update_tmux_plugins():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files"])
 
-def task_update_vim_plugins():
-    # type: () -> TaskManifest
-    def cmd():
+def task_update_vim_plugins() -> TaskManifest:
+    def cmd() -> None:
         print("====> updating vim plugins")
         # update vim-plug itself
         run_command(["nvim", "+PlugUpgrade", "+qall"])
@@ -221,10 +205,8 @@ def task_update_vim_plugins():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files", "install_rustup"])
 
-def task_update_library_visibility():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
+def task_update_library_visibility() -> TaskManifest:
+    def cmd() -> None:
         print("====> updating ~/Library visibility")
         nohidden_flag = 1 << 15
         library_path = os.path.expanduser("~/Library")
@@ -233,14 +215,11 @@ def task_update_library_visibility():
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
-def task_update_system_preferences():
-    # type: () -> TaskManifest
-    def update_prefs(key, val, domain="NSGlobalDomain"):
-        # type: (str, str, str) -> None
+def task_update_system_preferences() -> TaskManifest:
+    def update_prefs(key: str, val: str, domain:str = "NSGlobalDomain") -> None:
         run_command(["defaults", "write", domain, key, val])
 
-    def cmd():
-        # type: () -> None
+    def cmd() -> None:
         print("====> updating system preferences")
         update_prefs("NSShowAppCentricOpenPanelInsteadOfUntitledFile", "0")
         update_prefs("NSQuitAlwaysKeepsWindows", "1")
@@ -268,19 +247,16 @@ def task_update_system_preferences():
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
-def task_update_iterm_sync_folder_prefs():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
+def task_update_iterm_sync_folder_prefs() -> TaskManifest:
+    def cmd() -> None:
         print("====> updating iterm preferences")
         run_command(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
             os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
     return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
 
-def task_install_fonts():
-    # type: () -> TaskManifest
-    def cmd():
+def task_install_fonts() -> TaskManifest:
+    def cmd() -> None:
         print("====> installing fonts")
         fonts_path = os.path.join(SCRIPTS_PATH, "fonts")
         dest_path = os.path.join(os.path.expanduser("~"), "Library", "Fonts")
