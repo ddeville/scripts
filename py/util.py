@@ -3,17 +3,14 @@ import os
 import shutil
 import subprocess
 import tempfile
-try:
-    from typing import (
-        Dict,
-        List,
-        Optional,
-    )
-except ImportError:
-    pass  # py2
 
-def command_path(cmd):
-    # type: (str) -> Optional[str]
+from typing import (
+    Dict,
+    List,
+    Optional,
+)
+
+def command_path(cmd: str) -> Optional[str]:
     try:
         with open(os.devnull, "w") as f:
             path = subprocess.check_output(["which", cmd], stderr=f).strip().decode()
@@ -21,30 +18,25 @@ def command_path(cmd):
     except subprocess.CalledProcessError:
         return None
 
-def is_cmd_installed(cmd):
-    # type: (str) -> bool
+def is_cmd_installed(cmd: str) -> bool:
     return command_path(cmd) is not None
 
-def run_command(cmd, env=None):
-    # type: (List[str], Optional[Dict[str, str]]) -> None
-    env = os.environ if env is None else env
-    subprocess.check_call(cmd, env=env)
+def run_command(cmd: List[str], env: Optional[Dict[str, str]] = None) -> None:
+    environ = os.environ if env is None else env
+    subprocess.check_call(cmd, env=environ)
 
-def run_command_no_output(cmd, env=None):
-    # type: (List[str], Optional[Dict[str, str]]) -> None
+def run_command_no_output(cmd: List[str], env: Optional[Dict[str, str]] = None) -> None:
     with open(os.devnull, "w") as f:
-        env = os.environ if env is None else env
-        subprocess.check_call(cmd, env=env, stderr=f, stdout=f)
+        environ = os.environ if env is None else env
+        subprocess.check_call(cmd, env=environ, stderr=f, stdout=f)
 
-def run_script_as_root(script):
-    # type: (str) -> None
+def run_script_as_root(script: str) -> None:
     with tempfile.NamedTemporaryFile() as fw:
         fw.write(script.encode("utf-8"))
         fw.flush()
         subprocess.check_call(["sudo", "sh", "-e", fw.name])
 
-def force_symlink(path1, path2):
-    # type: (str, str) -> None
+def force_symlink(path1: str, path2: str) -> None:
     try:
         os.symlink(path1, path2)
     except OSError as e:
@@ -57,16 +49,14 @@ def force_symlink(path1, path2):
         else:
             raise
 
-def create_dirs(path):
-    # type: (str) -> None
+def create_dirs(path: str) -> None:
     try:
         os.makedirs(path)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 
-def copy_file(orig, dest, isdir=False):
-    # type: (str, str, bool) -> None
+def copy_file(orig: str, dest: str, isdir: bool = False) -> None:
     try:
         if isdir:
             shutil.copytree(orig, dest)
