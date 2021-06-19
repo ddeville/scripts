@@ -228,6 +228,7 @@ sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
 sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
 sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 
+" load main lua plugin
 if has("nvim-0.5")
   lua require("ddeville")
 end
