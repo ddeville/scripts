@@ -1,7 +1,6 @@
 set -gx EDITOR nvim
 set -gx CLICOLOR 1
 set -gx GREP_OPTIONS "--color=auto"
-set -gx VIMINIT "source ~/.vim/vimrc"
 
 if not set -q XDG_CONFIG_HOME
     set -gx XDG_CONFIG_HOME "$HOME/.config"
@@ -16,7 +15,9 @@ if not set -q XDG_STATE_HOME
     set -gx XDG_STATE_HOME "$HOME/.local/state"
 end
 
+set -gx VIMINIT "source ~/.vim/vimrc"
 set -gx MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
+set -gx PYENV_SHELL fish
 
 set -l base16_path "$XDG_CONFIG_HOME/base16-shell/profile_helper.fish"
 if status --is-interactive && test -e $base16_path
