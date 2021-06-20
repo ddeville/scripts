@@ -12,6 +12,9 @@ end
 if not set -q XDG_DATA_HOME
     set -gx XDG_DATA_HOME "$HOME/.local/share"
 end
+if not set -q XDG_STATE_HOME
+    set -gx XDG_STATE_HOME "$HOME/.local/state"
+end
 
 set -gx MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
 
