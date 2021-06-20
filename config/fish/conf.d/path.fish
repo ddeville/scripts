@@ -7,61 +7,53 @@ if test -e "/usr/libexec/path_helper"
 end
 
 # set up a list to collect the new path entries
-set -l PATH_ENTRIES
+set PATH_ENTRIES
+
+function add_to_path
+    set -l p $argv[1]
+    if test -e $p; and not contains $p $PATH_ENTRIES
+        set PATH_ENTRIES $PATH_ENTRIES $p
+    end
+end
 
 # make sure that this is before anything in the path (it overwrite others)
-if test -e "$HOME/.pyenv/bin"
-    if test -e "$HOME/.pyenv/shims"
-        set PATH_ENTRIES $PATH_ENTRIES "$HOME/.pyenv/shims"
-    end
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.pyenv/bin"
-    set -x PYENV_SHELL fish
-end
+add_to_path "$HOME/.pyenv/bin"
+add_to_path "$HOME/.pyenv/shims"
+
 # add the dropbox overrides before the rest (if this is a dropbox machine)
-if test -e "/opt/dropbox-override/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/dropbox-override/bin"
-end
-# we build neovim nightly in there
-if test -e "/opt/nvim/nightly_compiled"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_compiled/bin"
-end
-# we install neovim nightly in there
-if test -e "/opt/nvim/nightly_archived"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/nvim/nightly_archived/bin"
-end
+add_to_path "/opt/dropbox-override/bin"
+
+# we build and archive neovim nightly in there (prefer compiled over archived)
+add_to_path "/opt/nvim/nightly_compiled/bin"
+add_to_path "/opt/nvim/nightly_archived/bin"
+
 # we install the lsp server binaries in there
-if test -e "/opt/lsp"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/lsp"
-end
+add_to_path "/opt/lsp"
+
 # brew install its stuff there on M1 macs
-if test -e "/opt/homebrew/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "/opt/homebrew/bin"
-end
+add_to_path "/opt/homebrew/bin"
+
 # these can come afterwards, it's cool
-if test -e "$HOME/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/bin"
+add_to_path "$HOME/bin"
+
+if [ (uname -s) = "Darwin" ]
+    add_to_path "$HOME/scripts/macos/bin"
 end
-if [ (uname -s) = "Darwin" ]; and test -e "$HOME/scripts/macos/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/macos/bin"
+
+add_to_path "$HOME/scripts/bin"
+add_to_path "$HOME/.cargo/bin"
+add_to_path "$HOME/.fzf/bin"
+
+# check whether xcode is installed and add its bin dir to the path if so
+if which xcode-select > /dev/null 2>&1; and set -l XC (xcode-select --print-path)
+    add_to_path "$XC/usr/bin"
 end
-if test -e "$HOME/scripts/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/scripts/bin"
-end
-if test -e "$HOME/.cargo/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.cargo/bin"
-end
-if test -e "$HOME/.fzf/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$HOME/.fzf/bin"
-end
-if which xcode-select > /dev/null 2>&1; and set XCODE (xcode-select --print-path); and test -e "$XCODE/usr/bin"
-    set PATH_ENTRIES $PATH_ENTRIES "$XCODE/usr/bin"
-end
-if test -e "/usr/local/sbin"
-    set PATH_ENTRIES $PATH_ENTRIES "/usr/local/sbin"
-end
+
+add_to_path "/usr/local/sbin"
 
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
+set -e PATH_ENTRIES
 
 # GOPATH for Dropbox server code
 if test -e "$HOME/src/server/go"
