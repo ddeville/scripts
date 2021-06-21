@@ -4,7 +4,7 @@ A bunch of scripts/configs I use on every machine I set up.
 
 A few requirements:
 
-- `python3` - 3.6 or later
+- `python` - at least 2.7.10, ideally 3.6+
 - `git` - to clone this repo
 - `sudo` - so that the current user can install packages
 - if on MacOS, install [iTerm2](https://www.iterm2.com/downloads.html)
