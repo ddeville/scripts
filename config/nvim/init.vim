@@ -7,9 +7,11 @@ set encoding=utf-8
 
 " make sure that the env variable is set (or pick the default value)
 let s:xdg_state_home = $XDG_STATE_HOME
-if empty(s:xdg_state_home)
+if empty($XDG_STATE_HOME)
   let s:xdg_state_home = $HOME . "/.local/state"
 endif
+
+echo s:xdg_state_home
 
 " store swap and backup files under XDG state dir
 if !isdirectory(s:xdg_state_home . "/vim/backup")
