@@ -5,24 +5,31 @@ endif
 
 set encoding=utf-8
 
-if !empty($XDG_STATE_HOME)
-  " store swap and backup files under XDG state dir
-  if !isdirectory($XDG_STATE_HOME . "/vim/backup")
-    call mkdir($XDG_STATE_HOME . "/vim/backup", "p", 0700)
-  endif
-  set directory=$XDG_STATE_HOME/vim/backup//
-  set backupdir=$XDG_STATE_HOME/vim/backup//
-
-  " permanent undo
-  if !isdirectory($XDG_STATE_HOME . "/vim/undo")
-    call mkdir($XDG_STATE_HOME . "/vim/undo", "p", 0700)
-  endif
-  set undodir=$XDG_STATE_HOME/vim/undo//
-  set undofile
-
-  " get netrw to store its history in the XDG state dir
-  let g:netrw_home = $XDG_STATE_HOME . '/vim'
+" make sure that the env variable is set (or pick the default value)
+let s:xdg_state_home = $XDG_STATE_HOME
+if empty(s:xdg_state_home)
+  let s:xdg_state_home = $HOME . "/.local/state"
 endif
+
+" store swap and backup files under XDG state dir
+if !isdirectory(s:xdg_state_home . "/vim/backup")
+  call mkdir(s:xdg_state_home . "/vim/backup", "p", 0700)
+endif
+set directory=s:xdg_state_home/vim/backup//
+set backupdir=s:xdg_state_home/vim/backup//
+
+" permanent undo
+if !isdirectory(s:xdg_state_home . "/vim/undo")
+  call mkdir(s:xdg_state_home . "/vim/undo", "p", 0700)
+endif
+set undodir=s:xdg_state_home/vim/undo//
+set undofile
+
+" get netrw to store its history in the XDG state dir
+let g:netrw_home = s:xdg_state_home . '/vim'
+
+" we don't need to pollute the script scope with this variable anymore
+unlet s:xdg_state_home
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
