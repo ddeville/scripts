@@ -1,13 +1,5 @@
 import subprocess
 
-from enum import Enum
-from typing import (
-    Dict,
-    List,
-    Union,
-)
-from urllib.request import urlretrieve
-
 from py.platform import (
     FREEBSD,
     LINUX,
@@ -15,45 +7,61 @@ from py.platform import (
     get_current_platform,
     is_linux_distro,
 )
+from py.typing import (
+    Dict,
+    List,
+    Union,
+)
 from py.util import (
     command_path,
+    download_file,
     is_cmd_installed,
     run_command,
     run_command_no_output,
 )
 
-class PackageType(Enum):
+class PackageName(object):
+    def __init__(self, name):
+        # type: (str) -> None
+        self.name = name
+
+class PackageType(object):
     """An "enum" of package types."""
-    DEB = "deb"
-    RPM = "rpm"
-    BREW = "brew"
-    PACMAN = "pacman"
-    PKG = "pkg"
+    DEB = PackageName("deb")
+    RPM = PackageName("rpm")
+    BREW = PackageName("brew")
+    PACMAN = PackageName("pacman")
+    PKG = PackageName("pkg")
 
 class BasePackageManager(object):
     """A package manager, that can be used to install packages on the current system."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         """Install or update the package manager itself (if needed)."""
         raise NotImplementedError()
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         """Install or update a given package."""
         raise NotImplementedError()
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         """The package type."""
         raise NotImplementedError()
 
-    def install_packages(self, packages: List[Union[str, Dict[PackageType, str]]]) -> None:
+    def install_packages(self, packages):
+        # type: (List[Union[str, Dict[PackageName, str]]]) -> None
         for package in packages:
-            if isinstance(package, Dict):
+            if isinstance(package, dict):
                 package = package.get(self.package_type)
             if package:
                 self.install_package(package)
 
-def create_package_manager() -> BasePackageManager:
+def create_package_manager():
+    # type: () -> BasePackageManager
     """Create a new package manager instance that is appropriate for the current platform."""
     plat = get_current_platform()
 
@@ -74,16 +82,18 @@ def create_package_manager() -> BasePackageManager:
 class BrewPackageManager(BasePackageManager):
     """The brew package manager for use on MacOS."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         if is_cmd_installed("brew"):
             print("====> updating brew")
             run_command(["brew", "update"])
         else:
             print("====> installing brew")
-            script_path, _ = urlretrieve("https://raw.githubusercontent.com/Homebrew/install/master/install")
+            script_path = download_file("https://raw.githubusercontent.com/Homebrew/install/master/install")
             run_command(["/usr/bin/ruby", script_path])
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         try:
             print("====> checking status of %s" % package)
             run_command(["brew", "ls", "--versions", package])
@@ -106,64 +116,77 @@ class BrewPackageManager(BasePackageManager):
         run_command_no_output(["brew", "link", package])
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         return PackageType.BREW
 
 class AptPackageManager(BasePackageManager):
     """The APT package manager to use on Debian and derivatives."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         print("====> updating apt")
         run_command(["sudo", "apt-get", "update"])
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         print("====> installing %s" % package)
         run_command(["sudo", "apt-get", "upgrade", "--yes", package])
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         return PackageType.DEB
 
 class DnfPackageManager(BasePackageManager):
     """The DNF package manager to use on Fedora and derivatives."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         pass
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         print("====> installing %s" % package)
         run_command(["sudo", "dnf", "install", "--best", "--assumeyes", package])
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         return PackageType.RPM
 
 class PacmanPackageManager(BasePackageManager):
     """The Pacman package manager to use on Arch."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         print("====> updating pacman")
         run_command(["sudo", "pacman", "-Syy"])
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         print("====> installing %s" % package)
         run_command(["sudo", "pacman", "-S", package])
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         return PackageType.PACMAN
 
 class PkgPackageManager(BasePackageManager):
     """The PKG package manager to use on FreeBSD."""
 
-    def install(self) -> None:
+    def install(self):
+        # type: () -> None
         print("====> updating pkg")
         run_command(["sudo", "pkg", "update"])
 
-    def install_package(self, package: str) -> None:
+    def install_package(self, package):
+        # type: (str) -> None
         print("====> installing %s" % package)
         run_command(["sudo", "pkg", "install", "--yes", package])
 
     @property
-    def package_type(self) -> PackageType:
+    def package_type(self):
+        # type: () -> PackageName
         return PackageType.PKG

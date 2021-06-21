@@ -1,7 +1,7 @@
 import inspect
 import sys
 
-from typing import (
+from py.typing import (
     Callable,
     Iterator,
     List,
@@ -11,23 +11,27 @@ TASK_PREFIX = "task_"
 
 class ExecutorConfig(object):
     """The configuration to use when running tasks."""
-    def __init__(self, module_name: str, tags: List[str]) -> None:
+    def __init__(self, module_name, tags):
+        # type: (str, List[str]) -> None
         self.module_name = module_name
         self.tags = tags
 
 class TaskManifest(object):
     """Each task should return an instance of this class."""
-    def __init__(self, cmd: Callable[[], None], tags: List[str], dependencies: List[str]) -> None:
+    def __init__(self, cmd, tags, dependencies):
+        # type: (Callable[[], None], List[str], List[str]) -> None
         self.cmd = cmd
         self.tags = tags
         self.dependencies = dependencies
 
-def print_all_tasks_for_config(config: ExecutorConfig) -> None:
+def print_all_tasks_for_config(config):
+    # type: (ExecutorConfig) -> None
     """Print the name of the tasks that would be run for a given config."""
     for counter, task in enumerate(_get_tasks(config)):
         sys.stdout.write("%d: %s\n" % (counter + 1, task.name))
 
-def print_task_for_config(config: ExecutorConfig, task: str) -> None:
+def print_task_for_config(config, task):
+    # type: (ExecutorConfig, str) -> None
     """Print the name of the given task that would be run for a given config."""
     for cur_task in _get_tasks(config):
         if cur_task.name == task or TASK_PREFIX + cur_task.name == task:
@@ -35,12 +39,14 @@ def print_task_for_config(config: ExecutorConfig, task: str) -> None:
             return
     sys.stderr.write("Unknown task: %s" % task)
 
-def run_all_tasks_for_config(config: ExecutorConfig) -> None:
+def run_all_tasks_for_config(config):
+    # type: (ExecutorConfig) -> None
     """Run all tasks that match the given config."""
     for task in _get_tasks(config):
         task.cmd()
 
-def run_task_for_config(config: ExecutorConfig, task: str) -> None:
+def run_task_for_config(config, task):
+    # type: (ExecutorConfig, str) -> None
     """Run a specific task in the given config."""
     for cur_task in _get_tasks(config):
         if cur_task.name == task or TASK_PREFIX + cur_task.name == task:
@@ -52,14 +58,17 @@ def run_task_for_config(config: ExecutorConfig, task: str) -> None:
 
 class _Task(object):
     """A concrete instance of a task, ready to be run."""
-    def __init__(self, name: str, cmd: Callable[[], None], dependencies: List[str]) -> None:
+    def __init__(self, name, cmd, dependencies):
+        # type: (str, Callable[[], None], List[str]) -> None
         self.name = name
         self.cmd = cmd
         self.dependencies = dependencies
 
-def _get_tasks(config: ExecutorConfig) -> Iterator[_Task]:
+def _get_tasks(config):
+    # type: (ExecutorConfig) -> Iterator[_Task]
     """Retrieve all tasks that match the given config and order them based on dependencies."""
-    def _extract_tasks() -> Iterator[_Task]:
+    def _extract_tasks():
+        # type: () -> Iterator[_Task]
         for name, func in list(inspect.getmembers(sys.modules[config.module_name], inspect.isfunction)):
             if name.startswith(TASK_PREFIX):
                 manifest = func()
@@ -71,7 +80,8 @@ def _get_tasks(config: ExecutorConfig) -> Iterator[_Task]:
     # keep track of the remaining tasks, as a dictionary for fast lookup by name
     tasks = {task.name: task for task in _extract_tasks()}
 
-    def _inner_run_tasks(inner_tasks: List[_Task]) -> Iterator[_Task]:
+    def _inner_run_tasks(inner_tasks):
+        # type: (List[_Task]) -> Iterator[_Task]
         for task in inner_tasks:
             # check whether the dependencies of this task have already been run
             for name in task.dependencies:
