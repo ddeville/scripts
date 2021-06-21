@@ -16,7 +16,7 @@ function add_to_path
     end
 end
 
-# make sure that this is before anything in the path (it overwrite others)
+# make sure that this is before anything in the path (it overwrites others)
 add_to_path "$HOME/.pyenv/bin"
 add_to_path "$HOME/.pyenv/shims"
 
