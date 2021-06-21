@@ -37,6 +37,7 @@ SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))
 ALL_PLATFORMS = [MACOS, LINUX]
 LITE = "lite"
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+XDG_DATA_HOME = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
 
 # Tasks
 
@@ -109,8 +110,9 @@ def task_install_base16() -> TaskManifest:
         ("base16-shell", "https://github.com/chriskempson/base16-shell.git"),
     ]
     def cmd() -> None:
+        create_dirs(XDG_DATA_HOME)
         for name, repo_url in repos:
-            path = os.path.join(XDG_CONFIG_HOME, name)
+            path = os.path.join(XDG_DATA_HOME, name)
             # first remove the existing repo if it exists
             if os.path.exists(path):
                 print("====> deleting existing %s repo" % name)
