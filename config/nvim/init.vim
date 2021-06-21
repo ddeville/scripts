@@ -5,22 +5,24 @@ endif
 
 set encoding=utf-8
 
-" store swap and backup files under XDG state dir
-if !isdirectory($XDG_STATE_HOME . "/vim/backup")
-  call mkdir($XDG_STATE_HOME . "/vim/backup", "p", 0700)
-endif
-set directory=$XDG_STATE_HOME/vim/backup//
-set backupdir=$XDG_STATE_HOME/vim/backup//
+if !empty($XDG_STATE_HOME)
+  " store swap and backup files under XDG state dir
+  if !isdirectory($XDG_STATE_HOME . "/vim/backup")
+    call mkdir($XDG_STATE_HOME . "/vim/backup", "p", 0700)
+  endif
+  set directory=$XDG_STATE_HOME/vim/backup//
+  set backupdir=$XDG_STATE_HOME/vim/backup//
 
-" permanent undo
-if !isdirectory($XDG_STATE_HOME . "/vim/undo")
-  call mkdir($XDG_STATE_HOME . "/vim/undo", "p", 0700)
-endif
-set undodir=$XDG_STATE_HOME/vim/undo//
-set undofile
+  " permanent undo
+  if !isdirectory($XDG_STATE_HOME . "/vim/undo")
+    call mkdir($XDG_STATE_HOME . "/vim/undo", "p", 0700)
+  endif
+  set undodir=$XDG_STATE_HOME/vim/undo//
+  set undofile
 
-" get netrw to store its history in the XDG state dir
-let g:netrw_home = $XDG_STATE_HOME . '/vim'
+  " get netrw to store its history in the XDG state dir
+  let g:netrw_home = $XDG_STATE_HOME . '/vim'
+endif
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
