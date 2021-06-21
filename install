@@ -124,7 +124,6 @@ def task_install_base16() -> TaskManifest:
 def task_update_dot_files() -> TaskManifest:
     def cmd() -> None:
         print("====> linking dot files")
-        orig_dir = os.path.join(SCRIPTS_PATH, "config")
 
         xdg_links = [
             "alacritty",
@@ -137,7 +136,10 @@ def task_update_dot_files() -> TaskManifest:
             "tmux",
         ]
         for f in xdg_links:
-            force_symlink(os.path.join(orig_dir, f), os.path.join(XDG_CONFIG_HOME, f))
+            force_symlink(
+                os.path.join(SCRIPTS_PATH, "config", f),
+                os.path.join(XDG_CONFIG_HOME, f)
+            )
 
         legacy_links = [
             ("hushlogin", ".hushlogin"),
@@ -145,7 +147,10 @@ def task_update_dot_files() -> TaskManifest:
             ("nvim", ".vim"),
         ]
         for f1, f2 in legacy_links:
-            force_symlink(os.path.join(orig_dir, f1), os.path.join(os.path.expanduser("~"), f2))
+            force_symlink(
+                os.path.join(SCRIPTS_PATH, "config", f1),
+                os.path.join(os.path.expanduser("~"), f2)
+            )
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
