@@ -9,7 +9,7 @@ try:
 except ImportError:
     from urllib import urlretrieve  # type: ignore  # py2
 
-from py.types import (
+from py.typing import (
     Dict,
     List,
     Optional,
