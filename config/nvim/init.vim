@@ -11,20 +11,18 @@ if empty($XDG_STATE_HOME)
   let s:xdg_state_home = $HOME . "/.local/state"
 endif
 
-echo s:xdg_state_home
-
 " store swap and backup files under XDG state dir
 if !isdirectory(s:xdg_state_home . "/vim/backup")
   call mkdir(s:xdg_state_home . "/vim/backup", "p", 0700)
 endif
-set directory=s:xdg_state_home/vim/backup//
-set backupdir=s:xdg_state_home/vim/backup//
+let &directory = s:xdg_state_home . "/vim/backup//"
+let &backupdir = s:xdg_state_home . "/vim/backup//"
 
 " permanent undo
 if !isdirectory(s:xdg_state_home . "/vim/undo")
   call mkdir(s:xdg_state_home . "/vim/undo", "p", 0700)
 endif
-set undodir=s:xdg_state_home/vim/undo//
+let &undodir = s:xdg_state_home . "/vim/undo//"
 set undofile
 
 " get netrw to store its history in the XDG state dir
