@@ -56,6 +56,7 @@ call plug#begin($HOME . "/.vim/plugged")
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-git'
   Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-rhubarb'
   Plug 'tpope/vim-sleuth'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-unimpaired'
