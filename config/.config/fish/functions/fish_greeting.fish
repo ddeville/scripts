@@ -1,6 +1,5 @@
 function fish_greeting
-    set_color brblack
-    echo "
+    echo (set_color brblack)"
      /\     /\\
     {  `---'  }
     {  O   O  }
@@ -15,7 +14,6 @@ function fish_greeting
 
      Did I hear fish? Meow!
 "
-    echo
 
     set -l l_color (set_color normal; set_color --bold white)
     set -l r_color (set_color normal; set_color green)
