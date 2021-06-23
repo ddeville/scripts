@@ -27,6 +27,9 @@ function fish_greeting
         echo -n $l_color" Uptime: "
         echo $r_color(uptime | sed -E 's/.*(up.*), [[:digit:]]+ user.*/\1/')
 
+        echo -n $l_color" Disk usage: "
+        echo $r_color(df -H | grep '/System/Volumes/Data$' | awk '{printf "%s available (%s)\n", $4, $5}')
+
         echo -n $l_color" Hostname: "
         echo $r_color(uname -n)
     else
