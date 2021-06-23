@@ -26,7 +26,6 @@ from py.util import (
     copy_file,
     create_dirs,
     download_file,
-    force_symlink,
     is_cmd_installed,
     run_command,
     run_script_as_root,
