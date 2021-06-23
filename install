@@ -151,7 +151,7 @@ def task_update_dot_files():
         ]
         for f in xdg_links:
             force_symlink(
-                os.path.join(SCRIPTS_PATH, "config", f),
+                os.path.join(SCRIPTS_PATH, "config", ".config", f),
                 os.path.join(XDG_CONFIG_HOME, f)
             )
 
