@@ -50,11 +50,8 @@ class BasePackageManager(object):
 
     def install_packages(self, packages):
         # type: (List[Union[str, Dict[PackageName, str]]]) -> None
-        for package in packages:
-            if isinstance(package, dict):
-                package = package.get(self.package_type)
-            if package:
-                self.install_package(package)
+        for package in _filter_packages(packages, self.package_type):
+            self.install_package(package)
 
 def create_package_manager():
     # type: () -> BasePackageManager
@@ -186,3 +183,13 @@ class PkgPackageManager(BasePackageManager):
     def package_type(self):
         # type: () -> PackageName
         return PackageType.PKG
+
+def _filter_packages(packages, name):
+    # type: (List[Union[str, Dict[PackageName, str]]], PackageName) -> List[str]
+    ret = []
+    for package in packages:
+        if isinstance(package, dict):
+            package = package.get(name)
+        if package:
+            ret.append(package)
+    return ret
