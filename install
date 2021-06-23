@@ -149,14 +149,16 @@ def task_install_pyenv():
             print("====> updating pyenv")
             run_command(["pyenv", "update"])
         else:
-            pyenv_path = os.path.expanduser("~/.pyenv")
+            pyenv_path = os.path.join(XDG_DATA_HOME, "pyenv")
             if os.path.exists(pyenv_path):
                 print("====> deleting existing pyenv install")
                 shutil.rmtree(pyenv_path)
             print("====> installing pyenv")
             pyenv_installer_path = "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
             script_path = download_file(pyenv_installer_path)
-            run_command(["bash", script_path])
+            env = os.environ.copy()
+            env["PYENV_ROOT"] = pyenv_path
+            run_command(["bash", script_path], env=env)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
 

@@ -1,3 +1,25 @@
+# XDG Base Directory Specification
+if not set -q XDG_CONFIG_HOME
+    set -gx XDG_CONFIG_HOME "$HOME/.config"
+end
+command mkdir -p $XDG_CONFIG_HOME
+
+if not set -q XDG_CACHE_HOME
+    set -gx XDG_CACHE_HOME "$HOME/.cache"
+end
+command mkdir -p $XDG_CACHE_HOME
+
+if not set -q XDG_DATA_HOME
+    set -gx XDG_DATA_HOME "$HOME/.local/share"
+end
+
+command mkdir -p $XDG_DATA_HOME
+
+if not set -q XDG_STATE_HOME
+    set -gx XDG_STATE_HOME "$HOME/.local/state"
+end
+command mkdir -p $XDG_STATE_HOME
+
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
 # front) - this is because this config file is loaded twice when starting tmux.
@@ -17,8 +39,8 @@ function add_to_path
 end
 
 # make sure that this is before anything in the path (it overwrites others)
-add_to_path "$HOME/.pyenv/bin"
-add_to_path "$HOME/.pyenv/shims"
+add_to_path "$XDG_DATA_HOME/pyenv/bin"
+add_to_path "$XDG_DATA_HOME/pyenv/shims"
 
 # add the dropbox overrides before the rest (if this is a dropbox machine)
 add_to_path "/opt/dropbox-override/bin"
@@ -62,3 +84,5 @@ if test -e "$HOME/src/server/go"
         set -x GOPATH $GOPATH "$HOME/src/server/go"
     end
 end
+
+set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
