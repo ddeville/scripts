@@ -3,13 +3,15 @@
     email = damien@ddeville.me
 [core]
     editor = nvim
-	excludesfile = ~/.config/git/gitignore_global
+    excludesfile = ~/.config/git/gitignore_global
 [diff]
-    tool = vimdiff
+    tool = nvim -d
+    algorithm = patience
+    compactionHeuristic = true
 [difftool]
     prompt = false
 [merge]
-    tool = vimdiff
+    tool = nvim -d
     conflictstyle = diff3
 [mergetool]
     prompt = false
