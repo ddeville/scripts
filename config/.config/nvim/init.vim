@@ -5,7 +5,12 @@ endif
 
 set encoding=utf-8
 
-" make sure that the env variable is set (or pick the default value)
+" make sure that the env variables are set (or pick the default value)
+let s:xdg_config_home = $XDG_CONFIG_HOME
+if empty($XDG_CONFIG_HOME)
+  let s:xdg_config_home = $HOME . "/.config"
+endif
+
 let s:xdg_state_home = $XDG_STATE_HOME
 if empty($XDG_STATE_HOME)
   let s:xdg_state_home = $HOME . "/.local/state"
@@ -28,9 +33,6 @@ set undofile
 " get netrw to store its history in the XDG state dir
 let g:netrw_home = s:xdg_state_home . '/vim'
 
-" we don't need to pollute the script scope with this variable anymore
-unlet s:xdg_state_home
-
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
 let mapleader = "\<Space>"
@@ -39,7 +41,7 @@ let mapleader = "\<Space>"
 filetype plugin indent on
 
 " vim-plug plugins
-call plug#begin($HOME . "/.vim/plugged")
+call plug#begin(s:xdg_config_home . "/nvim/plugged")
 
   " vim & neovim
   Plug 'chriskempson/base16-vim'
@@ -242,3 +244,7 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 if has("nvim-0.5")
   lua require("ddeville")
 end
+
+" we don't need to pollute the script scope with these variables anymore
+unlet s:xdg_state_home
+unlet s:xdg_config_home
