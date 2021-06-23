@@ -11,27 +11,27 @@ if empty($XDG_CONFIG_HOME)
   let s:xdg_config_home = $HOME . "/.config"
 endif
 
-let s:xdg_state_home = $XDG_STATE_HOME
-if empty($XDG_STATE_HOME)
-  let s:xdg_state_home = $HOME . "/.local/state"
+let s:xdg_data_home = $XDG_DATA_HOME
+if empty($XDG_DATA_HOME)
+  let s:xdg_data_home = $HOME . "/.local/state"
 endif
 
 " store swap and backup files under XDG state dir
-if !isdirectory(s:xdg_state_home . "/vim/backup")
-  call mkdir(s:xdg_state_home . "/vim/backup", "p", 0700)
+if !isdirectory(s:xdg_data_home . "/vim/backup")
+  call mkdir(s:xdg_data_home . "/vim/backup", "p", 0700)
 endif
-let &directory = s:xdg_state_home . "/vim/backup//"
-let &backupdir = s:xdg_state_home . "/vim/backup//"
+let &directory = s:xdg_data_home . "/vim/backup//"
+let &backupdir = s:xdg_data_home . "/vim/backup//"
 
 " permanent undo
-if !isdirectory(s:xdg_state_home . "/vim/undo")
-  call mkdir(s:xdg_state_home . "/vim/undo", "p", 0700)
+if !isdirectory(s:xdg_data_home . "/vim/undo")
+  call mkdir(s:xdg_data_home . "/vim/undo", "p", 0700)
 endif
-let &undodir = s:xdg_state_home . "/vim/undo//"
+let &undodir = s:xdg_data_home . "/vim/undo//"
 set undofile
 
 " get netrw to store its history in the XDG state dir
-let g:netrw_home = s:xdg_state_home . '/vim'
+let g:netrw_home = s:xdg_data_home . '/vim'
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
@@ -246,5 +246,5 @@ if has("nvim-0.5")
 end
 
 " we don't need to pollute the script scope with these variables anymore
-unlet s:xdg_state_home
+unlet s:xdg_data_home
 unlet s:xdg_config_home
