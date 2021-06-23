@@ -1,6 +1,6 @@
 import sys
 
-from py.typing import Dict
+from py.typing import *
 
 MACOS = "macos"
 LINUX = "linux"

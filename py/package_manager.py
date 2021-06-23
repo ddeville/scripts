@@ -7,11 +7,7 @@ from py.platform import (
     get_current_platform,
     is_linux_distro,
 )
-from py.typing import (
-    Dict,
-    List,
-    Union,
-)
+from py.typing import *
 from py.util import (
     command_path,
     download_file,

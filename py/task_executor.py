@@ -1,11 +1,7 @@
 import inspect
 import sys
 
-from py.typing import (
-    Callable,
-    Iterator,
-    List,
-)
+from py.typing import *
 
 TASK_PREFIX = "task_"
 
