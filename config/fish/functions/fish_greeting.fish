@@ -15,5 +15,19 @@ function fish_greeting
 
      Did I hear fish? Meow!
 "
-    set_color normal
+    echo
+
+    set -l l_color (set_color normal; set_color --bold white)
+    set -l r_color (set_color normal; set_color green)
+
+    echo -n $l_color" OS: "
+    echo $r_color(uname -rs)
+
+    echo -n $l_color" Uptime: "
+    echo $r_color(uptime -p)
+
+    echo -n $l_color" Hostname: "
+    echo $r_color(uname -n)
+
+    echo
 end
