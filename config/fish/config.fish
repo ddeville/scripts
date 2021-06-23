@@ -22,7 +22,6 @@ command mkdir -p $XDG_STATE_HOME
 
 set -gx EDITOR nvim
 set -gx CLICOLOR 1
-set -gx GREP_OPTIONS "--color=auto"
 set -gx VIMINIT "source ~/.vim/vimrc"
 set -gx MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
 set -gx PYENV_SHELL fish
