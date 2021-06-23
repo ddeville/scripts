@@ -25,10 +25,10 @@ function fish_greeting
         echo $l_color" User:       "$r_color(id -un)
         echo $l_color" Hostname:   "$r_color(uname -n)
     else
-        echo $l_color" OS:       "$r_color(uname -rs)
-        echo $l_color" Uptime:   "$r_color(uptime -p)
-        echo $l_color" User:     "$r_color(id -un)
-        echo $l_color" Hostname: "$r_color(uname -n)
+        echo $l_color" OS:         "$r_color(uname -rs)
+        echo $l_color" Uptime:     "$r_color(uptime -p)
+        echo $l_color" User:       "$r_color(id -un)
+        echo $l_color" Hostname:   "$r_color(uname -n)
     end
 
     echo
