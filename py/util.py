@@ -9,11 +9,7 @@ try:
 except ImportError:
     from urllib import urlretrieve  # type: ignore  # py2
 
-from py.typing import (
-    Dict,
-    List,
-    Optional,
-)
+from py.typing import *
 
 def command_path(cmd):
     # type: (str) -> Optional[str]
