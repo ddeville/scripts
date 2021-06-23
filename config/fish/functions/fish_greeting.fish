@@ -23,11 +23,11 @@ function fish_greeting
     echo -n $l_color" OS: "
     echo $r_color(uname -rs)
 
-    echo -n $l_color" Uptime: "
-    echo $r_color(uptime -p)
-
     echo -n $l_color" Hostname: "
     echo $r_color(uname -n)
+
+    echo -n $l_color" Uptime: "
+    echo $r_color(uptime)
 
     echo
 end
