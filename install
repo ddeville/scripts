@@ -138,33 +138,7 @@ def task_update_dot_files():
     def cmd():
         # type: () -> None
         print("====> linking dot files")
-
-        xdg_links = [
-            "alacritty",
-            "bat",
-            "fish",
-            "git",
-            "htop",
-            "kitty",
-            "nvim",
-            "tmux",
-        ]
-        for f in xdg_links:
-            force_symlink(
-                os.path.join(SCRIPTS_PATH, "config", ".config", f),
-                os.path.join(XDG_CONFIG_HOME, f)
-            )
-
-        legacy_links = [
-            ("hushlogin", ".hushlogin"),
-            ("lldbinit", ".lldbinit"),
-            ("nvim", ".vim"),
-        ]
-        for f1, f2 in legacy_links:
-            force_symlink(
-                os.path.join(SCRIPTS_PATH, "config", f1),
-                os.path.join(os.path.expanduser("~"), f2)
-            )
+        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "config"), "-t", os.path.expanduser("~"), ".", "-v"])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
 
