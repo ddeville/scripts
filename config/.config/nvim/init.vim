@@ -6,32 +6,30 @@ endif
 set encoding=utf-8
 
 " make sure that the env variables are set (or pick the default value)
-let s:xdg_config_home = $XDG_CONFIG_HOME
 if empty($XDG_CONFIG_HOME)
-  let s:xdg_config_home = $HOME . "/.config"
+  let $XDG_CONFIG_HOME = $HOME . "/.config"
 endif
 
-let s:xdg_data_home = $XDG_DATA_HOME
 if empty($XDG_DATA_HOME)
-  let s:xdg_data_home = $HOME . "/.local/state"
+  let $XDG_DATA_HOME = $HOME . "/.local/state"
 endif
 
 " store swap and backup files under XDG state dir
-if !isdirectory(s:xdg_data_home . "/vim/backup")
-  call mkdir(s:xdg_data_home . "/vim/backup", "p", 0700)
+if !isdirectory($XDG_DATA_HOME . "/vim/backup")
+  call mkdir($XDG_DATA_HOME . "/vim/backup", "p", 0700)
 endif
-let &directory = s:xdg_data_home . "/vim/backup//"
-let &backupdir = s:xdg_data_home . "/vim/backup//"
+let &directory = $XDG_DATA_HOME . "/vim/backup//"
+let &backupdir = $XDG_DATA_HOME . "/vim/backup//"
 
 " permanent undo
-if !isdirectory(s:xdg_data_home . "/vim/undo")
-  call mkdir(s:xdg_data_home . "/vim/undo", "p", 0700)
+if !isdirectory($XDG_DATA_HOME . "/vim/undo")
+  call mkdir($XDG_DATA_HOME . "/vim/undo", "p", 0700)
 endif
-let &undodir = s:xdg_data_home . "/vim/undo//"
+let &undodir = $XDG_DATA_HOME . "/vim/undo//"
 set undofile
 
 " get netrw to store its history in the XDG state dir
-let g:netrw_home = s:xdg_data_home . '/vim'
+let g:netrw_home = $XDG_DATA_HOME . '/vim'
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
@@ -41,14 +39,14 @@ let mapleader = "\<Space>"
 filetype plugin indent on
 
 " vim-plug plugins
-call plug#begin(s:xdg_config_home . "/nvim/plugged")
+call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
 
   " vim & neovim
   Plug 'chriskempson/base16-vim'
   Plug 'dag/vim-fish'
   Plug 'fatih/vim-go'
   Plug 'itchyny/lightline.vim'
-  Plug 'junegunn/fzf', { 'dir': $HOME . '/.fzf', 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/fzf', { 'dir': $XDG_DATA_HOME . '/fzf', 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
   Plug 'machakann/vim-highlightedyank'
   Plug 'mhinz/vim-grepper'
   Plug 'mhinz/vim-startify'
@@ -244,7 +242,3 @@ sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 if has("nvim-0.5")
   lua require("ddeville")
 end
-
-" we don't need to pollute the script scope with these variables anymore
-unlet s:xdg_data_home
-unlet s:xdg_config_home

@@ -20,6 +20,11 @@ if not set -q XDG_STATE_HOME
 end
 command mkdir -p $XDG_STATE_HOME
 
+set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
+set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
+set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
+set -x FZF_HOME "$XDG_DATA_HOME/fzf"
+
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
 # front) - this is because this config file is loaded twice when starting tmux.
@@ -39,8 +44,8 @@ function add_to_path
 end
 
 # make sure that this is before anything in the path (it overwrites others)
-add_to_path "$XDG_DATA_HOME/pyenv/bin"
-add_to_path "$XDG_DATA_HOME/pyenv/shims"
+add_to_path "$PYENV_ROOT/bin"
+add_to_path "$PYENV_ROOT/shims"
 
 # add the dropbox overrides before the rest (if this is a dropbox machine)
 add_to_path "/opt/dropbox-override/bin"
@@ -61,11 +66,11 @@ add_to_path "$HOME/bin"
 if [ (uname -s) = "Darwin" ]
     add_to_path "$HOME/scripts/macos/bin"
 end
-
 add_to_path "$HOME/scripts/bin"
-add_to_path "$HOME/.cargo/bin"
-add_to_path "$HOME/.fzf/bin"
+
 add_to_path "$HOME/.local/bin"
+add_to_path "$CARGO_HOME/bin"
+add_to_path "$FZF_HOME/bin"
 
 # check whether xcode is installed and add its bin dir to the path if so
 if which xcode-select > /dev/null 2>&1; and set -l XC (xcode-select --print-path)
@@ -84,5 +89,3 @@ if test -e "$HOME/src/server/go"
         set -x GOPATH $GOPATH "$HOME/src/server/go"
     end
 end
-
-set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"

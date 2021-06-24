@@ -172,7 +172,10 @@ def task_install_rustup():
         else:
             print("====> install rustup")
             script_path = download_file("https://sh.rustup.rs")
-            run_command(["sh", script_path, "-y", "--no-modify-path"])
+            env = os.environ.copy()
+            env["CARGO_HOME"] = os.path.join(XDG_DATA_HOME, "cargo")
+            env["RUSTUP_HOME"] = os.path.join(XDG_DATA_HOME, "rustup")
+            run_command(["sh", script_path, "-y", "--no-modify-path"], env=env)
         pass
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
