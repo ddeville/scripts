@@ -38,7 +38,7 @@ command mkdir -p "$XDG_STATE_HOME/node"
 # less
 set -x LESSKEY "$XDG_CONFIG_HOME/less/lesskey"
 set -x LESSHISTFILE "$XDG_STATE_HOME/less/history"
-command mkdir -p "$XDG_CONFIG_HOME/less"
+command mkdir -p "$XDG_STATE_HOME/less"
 # bash
 set -x HISTFILE "$XDG_STATE_HOME/bash/history"
 command mkdir -p "$XDG_STATE_HOME/bash"
