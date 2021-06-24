@@ -55,6 +55,7 @@ def task_install_packages():
         package_manager = create_package_manager()
         package_manager.install_packages([
             "bat",
+            "curl",
             "exa",
             "fish",
             "htop",
