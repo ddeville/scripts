@@ -96,7 +96,7 @@ let g:vimsyn_embed = 'l'
 set background=dark
 
 " setup base16 colorscheme
-if filereadable(expand("~/.vimrc_background"))
+if filereadable(expand($XDG_STATE_HOME . "/base16/vimrc_background"))
   let base16colorspace = 256
   source ~/.vimrc_background
 endif
