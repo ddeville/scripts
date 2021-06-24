@@ -20,10 +20,13 @@ if not set -q XDG_STATE_HOME
 end
 command mkdir -p $XDG_STATE_HOME
 
+# application specific env variables to enforce XDG
 set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x FZF_HOME "$XDG_DATA_HOME/fzf"
+set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
+set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
 
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
