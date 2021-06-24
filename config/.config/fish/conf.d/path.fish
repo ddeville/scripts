@@ -12,7 +12,6 @@ command mkdir -p $XDG_CACHE_HOME
 if not set -q XDG_DATA_HOME
     set -gx XDG_DATA_HOME "$HOME/.local/share"
 end
-
 command mkdir -p $XDG_DATA_HOME
 
 if not set -q XDG_STATE_HOME
@@ -21,12 +20,23 @@ end
 command mkdir -p $XDG_STATE_HOME
 
 # application specific env variables to enforce XDG
+# vim
+set -x VIMINIT "source $XDG_CONFIG_HOME/nvim/init.vim"
+set -x MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
+# pyenv
 set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
+# rust
 set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
+# fzf
 set -x FZF_HOME "$XDG_DATA_HOME/fzf"
+# node
+set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/repl_history"
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
 set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
+# less
+set -x LESSKEY "$XDG_CONFIG_HOME/less/lesskey"
+set -x LESSHISTFILE "$XDG_STATE_HOME/less/history"
 
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
