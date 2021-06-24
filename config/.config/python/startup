@@ -14,7 +14,7 @@ except OSError as e:
 
 try:
     readline.read_history_file(HISTORY_PATH)
-    readline.set_history_length(1000)
+    readline.set_history_length(10000)
 except FileNotFoundError:
     pass
 
