@@ -76,7 +76,6 @@ def task_install_packages_full():
         package_manager.install_packages([
             "cmake",
             "golang",
-            "lazygit",
             "radare2",
             {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
             {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
