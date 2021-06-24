@@ -5,8 +5,6 @@ alias vim "nvim"
 alias ll "exa -la"
 alias gaa "git add .; and git ci"
 alias gaaa "git add .; and git ci --amend"
-alias adp "arc diff --preview"
-alias adu "arc diff --update"
 alias oo "open ."
 
 # abbreviations
