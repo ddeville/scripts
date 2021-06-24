@@ -44,3 +44,5 @@ command mkdir -p "$XDG_STATE_HOME/less"
 # bash
 set -x HISTFILE "$XDG_STATE_HOME/bash/history"
 command mkdir -p "$XDG_STATE_HOME/bash"
+# base16
+set -x BASE16_STATE_DIR "$XDG_STATE_HOME/base16"
