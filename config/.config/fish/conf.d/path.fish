@@ -30,12 +30,14 @@ add_to_path "/opt/nvim/nightly_archived/bin"
 # we install the lsp server binaries in there
 add_to_path "/opt/lsp"
 
-# these can come afterwards, it's cool
+# various user binaries
 add_to_path "$HOME/.local/bin"
 if [ (uname -s) = "Darwin" ]
     add_to_path "$HOME/scripts/macos/bin"
 end
 add_to_path "$HOME/scripts/bin"
+
+# cargo can install binaries and fzf likes to live in its own folder
 add_to_path "$CARGO_HOME/bin"
 add_to_path "$FZF_HOME/bin"
 
@@ -47,15 +49,10 @@ end
 # brew install its stuff there on M1 macs
 add_to_path "/opt/homebrew/bin"
 
+# this one is in `/etc/paths` but some binaries get installed there
 add_to_path "/usr/local/sbin"
 
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
 set -e PATH_ENTRIES
-
-# GOPATH for Dropbox server code
-if test -e "$HOME/src/server/go"
-    if not set -q GOPATH || not contains "$HOME/src/server/go" "$GOPATH"
-        set -x GOPATH $GOPATH "$HOME/src/server/go"
-    end
-end
+functions -e add_to_path
