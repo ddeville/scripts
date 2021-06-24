@@ -24,8 +24,9 @@ command mkdir -p $XDG_STATE_HOME
 # vim
 set -x VIMINIT "source $XDG_CONFIG_HOME/nvim/init.vim"
 set -x MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
-# pyenv
+# python
 set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
+set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
 # rust
 set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
