@@ -31,12 +31,17 @@ set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 # fzf
 set -x FZF_HOME "$XDG_DATA_HOME/fzf"
 # node
-set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/repl_history"
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
 set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
+set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/repl_history"
+command mkdir -p "$XDG_STATE_HOME/node"
 # less
 set -x LESSKEY "$XDG_CONFIG_HOME/less/lesskey"
 set -x LESSHISTFILE "$XDG_STATE_HOME/less/history"
+command mkdir -p "$XDG_CONFIG_HOME/less"
+# bash
+set -x HISTFILE "$XDG_STATE_HOME/bash/history"
+command mkdir -p "$XDG_STATE_HOME/bash"
 
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
