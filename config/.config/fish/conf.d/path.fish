@@ -30,18 +30,12 @@ add_to_path "/opt/nvim/nightly_archived/bin"
 # we install the lsp server binaries in there
 add_to_path "/opt/lsp"
 
-# brew install its stuff there on M1 macs
-add_to_path "/opt/homebrew/bin"
-
 # these can come afterwards, it's cool
-add_to_path "$HOME/bin"
-
+add_to_path "$HOME/.local/bin"
 if [ (uname -s) = "Darwin" ]
     add_to_path "$HOME/scripts/macos/bin"
 end
 add_to_path "$HOME/scripts/bin"
-
-add_to_path "$HOME/.local/bin"
 add_to_path "$CARGO_HOME/bin"
 add_to_path "$FZF_HOME/bin"
 
@@ -49,6 +43,9 @@ add_to_path "$FZF_HOME/bin"
 if which xcode-select > /dev/null 2>&1; and set -l XC (xcode-select --print-path)
     add_to_path "$XC/usr/bin"
 end
+
+# brew install its stuff there on M1 macs
+add_to_path "/opt/homebrew/bin"
 
 add_to_path "/usr/local/sbin"
 
