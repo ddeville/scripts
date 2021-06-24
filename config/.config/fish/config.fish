@@ -1,7 +1,5 @@
 set -gx EDITOR nvim
 set -gx CLICOLOR 1
-set -gx VIMINIT "source ~/.vim/vimrc"
-set -gx MYVIMRC "$XDG_CONFIG_HOME/nvim/init.vim"
 set -gx PYENV_SHELL fish
 
 set -l base16_path "$XDG_DATA_HOME/base16-shell/profile_helper.fish"
