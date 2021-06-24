@@ -98,7 +98,7 @@ set background=dark
 " setup base16 colorscheme
 if filereadable(expand($XDG_STATE_HOME . "/base16/vimrc_background"))
   let base16colorspace = 256
-  source ~/.vimrc_background
+  source $XDG_STATE_HOME/base16/vimrc_background
 endif
 
 " shorten the delay to transition to normal mode after pressing escape
