@@ -2,7 +2,7 @@
 alias e "nvim"
 alias realvim (which vim)
 alias vim "nvim"
-alias ll "ls -lah"
+alias ll "exa -la"
 alias gaa "git add .; and git ci"
 alias gaaa "git add .; and git ci --amend"
 alias adp "arc diff --preview"
