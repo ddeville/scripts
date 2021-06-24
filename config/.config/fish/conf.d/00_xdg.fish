@@ -35,7 +35,7 @@ set -x FZF_HOME "$XDG_DATA_HOME/fzf"
 # node
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
 set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
-set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/repl_history"
+set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/history"
 command mkdir -p "$XDG_STATE_HOME/node"
 # less
 set -x LESSKEY "$XDG_CONFIG_HOME/less/lesskey"
