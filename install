@@ -23,7 +23,6 @@ from py.task_executor import (
 )
 from py.util import (
     command_path,
-    copy_file,
     create_dirs,
     download_file,
     is_cmd_installed,
