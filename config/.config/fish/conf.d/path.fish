@@ -23,11 +23,8 @@ add_to_path "$PYENV_ROOT/shims"
 # add the dropbox overrides before the rest (if this is a dropbox machine)
 add_to_path "/opt/dropbox-override/bin"
 
-# we build and archive neovim nightly in there (prefer compiled over archived)
-add_to_path "/opt/nvim/nightly_compiled/bin"
-add_to_path "/opt/nvim/nightly_archived/bin"
-
-# we install the lsp server binaries in there
+# customly built packages
+add_to_path "/opt/nvim/nightly/bin"
 add_to_path "/opt/lsp"
 
 # various user binaries
