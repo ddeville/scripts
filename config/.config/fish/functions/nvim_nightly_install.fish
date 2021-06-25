@@ -15,17 +15,9 @@ end
 set NVIM_INSTALL_PATH "/opt/nvim/nightly"
 
 function _nvim_nightly_prebuilt --description "Download the pre-built Nightly version of Neovim"
-    # Create install path if needed
-    if not test -e $NVIM_INSTALL_PATH
-        echo "Creating install folder"
-        command sudo mkdir -p $NVIM_INSTALL_PATH
-        command sudo chown $USER $NVIM_INSTALL_PATH
-    end
-
-    # Make sure it's a folder with the right permissions
-    if not test -e $NVIM_INSTALL_PATH; or not test -d $NVIM_INSTALL_PATH; or not test -O $NVIM_INSTALL_PATH
-        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
-        return 1
+    _setup
+    if test $status -ne 0
+        return $status
     end
 
     # Get the download URL for the nightly package for the current platform
@@ -54,8 +46,6 @@ function _nvim_nightly_prebuilt --description "Download the pre-built Nightly ve
     # Check whether it is a new version
     set new_version (command {$tmp_dir}"/"{$foldername}"/bin/nvim" --version | head -n 1)
     if test -e {$NVIM_INSTALL_PATH}"/bin/nvim"
-        echo "IT EXISTS!!!"
-        echo {$NVIM_INSTALL_PATH}"/bin/nvim"
         set cur_version (command {$NVIM_INSTALL_PATH}"/bin/nvim" --version | head -n 1)
 
         if test $cur_version = $new_version
@@ -81,17 +71,9 @@ end
 #   linux: `sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip`
 
 function _nvim_nightly_compile --description "Compile the Nightly version of Neovim"
-    # Create install path if needed
-    if not test -e $NVIM_INSTALL_PATH
-        echo "Creating install folder"
-        command sudo mkdir -p $NVIM_INSTALL_PATH
-        command sudo chown $USER $NVIM_INSTALL_PATH
-    end
-
-    # Make sure it's a folder with the right permissions
-    if not test -e $NVIM_INSTALL_PATH; or not test -d $NVIM_INSTALL_PATH; or not test -O $NVIM_INSTALL_PATH
-        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
-        return 1
+    _setup
+    if test $status -ne 0
+        return $status
     end
 
     # Download the archive to a temp directory
@@ -114,6 +96,21 @@ function _nvim_nightly_compile --description "Compile the Nightly version of Neo
 
     # Cleanup
     command rm -rf {$tmp_dir}
+end
+
+function _setup
+    # Create install path if needed
+    if not test -e $NVIM_INSTALL_PATH
+        echo "Creating install folder"
+        command sudo mkdir -p $NVIM_INSTALL_PATH
+        command sudo chown $USER $NVIM_INSTALL_PATH
+    end
+
+    # Make sure it's a folder with the right permissions
+    if not test -e $NVIM_INSTALL_PATH; or not test -d $NVIM_INSTALL_PATH; or not test -O $NVIM_INSTALL_PATH
+        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
+        return 1
+    end
 end
 
 set -e NVIM_INSTALL_PATH
