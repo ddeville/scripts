@@ -28,7 +28,7 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 
 killall Dock
 
-defaults write com.googlecode.iterm2 PrefsCustomFolder ~/scripts/macos/iterm
+defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
 
 FONTS_DIR="$HOME/Library/Fonts"
 if [ ! -d "$FONTS_DIR/Anonymous Pro" ]

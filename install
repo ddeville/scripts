@@ -185,6 +185,18 @@ def task_install_rustup():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["run_stow"])
 
+def task_update_nvim_plugins():
+    # type: () -> TaskManifest
+    def cmd():
+        # type: () -> None
+        print("====> updating vim plugins")
+        # update vim-plug itself
+        run_command(["nvim", "+PlugUpgrade", "+qall"])
+        # install or update all plugins
+        run_command(["nvim", "+PlugUpdate", "+qall"])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow", "install_rustup"])
+
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
     def cmd():
@@ -202,18 +214,6 @@ def task_update_tmux_plugins():
         run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow"])
-
-def task_update_nvim_plugins():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        print("====> updating vim plugins")
-        # update vim-plug itself
-        run_command(["nvim", "+PlugUpgrade", "+qall"])
-        # install or update all plugins
-        run_command(["nvim", "+PlugUpdate", "+qall"])
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow", "install_rustup"])
 
 # Main
 
