@@ -24,3 +24,4 @@ What to do after running the `install` script:
     - `python3 -m pip install --upgrade pynvim`
     - `npm install -g neovim`
 - Install the various LSP servers by running `lsp_install`.
+- Rehash the `pyenv` shims by running `pyenv rehash shell` (and install latest python version)
