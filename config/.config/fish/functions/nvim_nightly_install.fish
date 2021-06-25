@@ -112,5 +112,3 @@ function _setup
         return 1
     end
 end
-
-set -e NVIM_INSTALL_PATH
