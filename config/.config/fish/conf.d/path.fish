@@ -25,7 +25,7 @@ add_to_path "/opt/dropbox-override/bin"
 
 # customly built packages
 add_to_path "/opt/nvim/nightly/bin"
-add_to_path "/opt/lsp"
+add_to_path "/opt/lsp/bin"
 
 # various user binaries
 add_to_path "$HOME/.local/bin"

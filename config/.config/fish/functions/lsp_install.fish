@@ -31,6 +31,8 @@ function lsp_install --description "Install various LSP servers for Neovim"
         return 1
     end
 
+    command mkdir -p $install_path"/bin"
+
     pushd $install_path
 
 
@@ -62,7 +64,7 @@ function _rust_analyzer
     echo "Installing rust-analyzer"
 
     set foldername "_rust-analyzer"
-    set linkname "rust-analyzer"
+    set linkname "bin/rust-analyzer"
 
     if test -e $foldername
         command rm -rf $foldername
@@ -99,14 +101,14 @@ function _rust_analyzer
 
     popd $foldername
 
-    command ln -s $foldername/rust-analyzer $linkname
+    command ln -s ../$foldername/rust-analyzer $linkname
 end
 
 function _clangd
     echo "Installing clangd"
 
     set foldername "_clangd"
-    set linkname "clangd"
+    set linkname "bin/clangd"
 
     if test -e $foldername
         command rm -rf $foldername
@@ -144,7 +146,7 @@ function _clangd
     set bin_path $foldername"/clangd_"$version_name"/bin/clangd"
     command chmod +x $bin_path
 
-    command ln -s $bin_path  $linkname
+    command ln -s ../$bin_path  $linkname
 end
 
 function _gopls
@@ -156,7 +158,7 @@ function _gopls
     end
 
     set foldername "_gopls"
-    set linkname "gopls"
+    set linkname "bin/gopls"
 
     if test -e $foldername
         chmod -R 700 $foldername  # some go files in `pkg/` are not writable...
@@ -178,7 +180,7 @@ function _gopls
 
     popd $foldername
 
-    command ln -s $foldername/gopls $linkname
+    command ln -s ../$foldername/gopls $linkname
 end
 
 function _tsserver
@@ -190,7 +192,7 @@ function _tsserver
     end
 
     set foldername "_tsserver"
-    set linkname "typescript-language-server"
+    set linkname "bin/typescript-language-server"
 
     if test -e $foldername
         command rm -rf $foldername
@@ -208,7 +210,7 @@ function _tsserver
 
     popd $foldername
 
-    command ln -s $foldername/node_modules/.bin/typescript-language-server $linkname
+    command ln -s ../$foldername/node_modules/.bin/typescript-language-server $linkname
 end
 
 function _pyright
@@ -220,7 +222,7 @@ function _pyright
     end
 
     set foldername "_pyright"
-    set linkname "pyright-langserver"
+    set linkname "bin/pyright-langserver"
 
     if test -e $foldername
         command rm -rf $foldername
@@ -238,7 +240,7 @@ function _pyright
 
     popd $foldername
 
-    command ln -s $foldername/node_modules/.bin/pyright-langserver $linkname
+    command ln -s ../$foldername/node_modules/.bin/pyright-langserver $linkname
 end
 
 function _sumneko_lua
@@ -250,7 +252,7 @@ function _sumneko_lua
     end
 
     set foldername "_lua"
-    set linkname "lua-language-server"
+    set linkname "bin/lua-language-server"
 
     if test -e $foldername
         command rm -rf $foldername
@@ -301,5 +303,5 @@ function _sumneko_lua
 
     popd $foldername
 
-    command ln -s $curpath/lua $linkname
+    command ln -s ../$foldername/lua $linkname
 end
