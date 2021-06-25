@@ -32,12 +32,6 @@ add_to_path "/opt/lsp"
 
 # various user binaries
 add_to_path "$HOME/.local/bin"
-if [ (uname -s) = "Darwin" ]
-    add_to_path "$HOME/scripts/macos/bin"
-end
-add_to_path "$HOME/scripts/bin"
-
-# cargo can install binaries and fzf likes to live in its own folder
 add_to_path "$CARGO_HOME/bin"
 add_to_path "$FZF_HOME/bin"
 
@@ -48,9 +42,6 @@ end
 
 # brew install its stuff there on M1 macs
 add_to_path "/opt/homebrew/bin"
-
-# this one is in `/etc/paths` but some binaries get installed there
-add_to_path "/usr/local/sbin"
 
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
