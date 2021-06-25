@@ -1,14 +1,44 @@
-# Font configuration
+live_config_reload: true
+
+env:
+  TERM: alacritty
+
+working_directory: ~
+
+scrolling:
+  history: 100000
+
+window:
+  startup_mode: Windowed
+  decorations: full
+  dimensions:
+    columns: 100
+    lines: 40
+  title: Alacritty
+  dynamic_title: false
+  dynamic_padding: true
+  gtk_theme_variant: dark
+
 font:
   normal:
     family: Anonymous Pro
     style: Regular
   size: 14.0
   offset:
-    x: 0
-    y: 3
-  # Thin stroke font rendering (macOS only)
-  #
-  # Thin strokes are suitable for retina displays, but for non-retina screens
-  # it is recommended to set `use_thin_strokes` to `false`.
-  #use_thin_strokes: false
+    x: 1
+    y: 4
+  # use_thin_strokes: true
+
+cursor:
+  style: Block
+  unfocused_hollow: true
+
+colors:
+  cursor:
+    text: CellBackground
+    cursor: CellForeground
+
+bell:
+  duration: 0
+  command: None
+
