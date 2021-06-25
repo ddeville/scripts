@@ -112,6 +112,20 @@ def task_update_shell():
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "install_packages_full"])
 
+def task_run_stow():
+    # type: () -> TaskManifest
+    def cmd():
+        # type: () -> None
+        print("====> running stow")
+        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "config"), "-t", os.path.expanduser("~"), ".", "-v"])
+
+        create_dirs(XDG_BIN_HOME)
+        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
+        if get_current_platform() == MACOS:
+            run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "macos", "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
+
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_shell"])
+
 def task_install_base16():
     # type: () -> TaskManifest
     repos = [
@@ -130,21 +144,7 @@ def task_install_base16():
             print("====> installing %s repo" % name)
             run_command(["git", "clone", repo_url, path])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_shell"])
-
-def task_update_dot_files():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        print("====> running stow")
-        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "config"), "-t", os.path.expanduser("~"), ".", "-v"])
-
-        create_dirs(XDG_BIN_HOME)
-        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
-        if get_current_platform() == MACOS:
-            run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "macos", "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_base16"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow"])
 
 def task_install_pyenv():
     # type: () -> TaskManifest
@@ -165,7 +165,7 @@ def task_install_pyenv():
             env["PYENV_ROOT"] = pyenv_path
             run_command(["bash", script_path], env=env)
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["run_stow"])
 
 def task_install_rustup():
     # type: () -> TaskManifest
@@ -183,7 +183,7 @@ def task_install_rustup():
             run_command(["sh", script_path, "-y", "--no-modify-path"], env=env)
         pass
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["run_stow"])
 
 def task_update_tmux_plugins():
     # type: () -> TaskManifest
@@ -201,7 +201,7 @@ def task_update_tmux_plugins():
         run_command([os.path.join(tpm_path, "bin", "install_plugins")])
         run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow"])
 
 def task_update_vim_plugins():
     # type: () -> TaskManifest
@@ -213,7 +213,7 @@ def task_update_vim_plugins():
         # install or update all plugins
         run_command(["nvim", "+PlugUpdate", "+qall"])
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_dot_files", "install_rustup"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow", "install_rustup"])
 
 def task_update_library_visibility():
     # type: () -> TaskManifest
@@ -225,7 +225,7 @@ def task_update_library_visibility():
         library_stat = os.stat(library_path)
         os.chflags(library_path, library_stat.st_flags & ~nohidden_flag)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["run_stow"])
 
 def task_update_system_preferences():
     # type: () -> TaskManifest
@@ -260,7 +260,7 @@ def task_update_system_preferences():
         # update_prefs("wvous-tr-corner", "2", "com.apple.dock")
         # update_prefs("wvous-tr-modifier", "0", "com.apple.dock")
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["run_stow"])
 
 def task_update_iterm_sync_folder_prefs():
     # type: () -> TaskManifest
@@ -270,7 +270,7 @@ def task_update_iterm_sync_folder_prefs():
         run_command(["defaults", "write", "com.googlecode.iterm2", "PrefsCustomFolder",
             os.path.join(SCRIPTS_PATH, "macos", "iterm")])
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["run_stow"])
 
 def task_install_fonts():
     # type: () -> TaskManifest
@@ -285,7 +285,7 @@ def task_install_fonts():
             if os.path.isdir(font_path) and not folder.startswith("."):
                 copy_file(font_path, os.path.join(dest_path, folder), True)
 
-    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["update_dot_files"])
+    return TaskManifest(cmd=cmd, tags=[MACOS], dependencies=["run_stow"])
 
 # Main
 
