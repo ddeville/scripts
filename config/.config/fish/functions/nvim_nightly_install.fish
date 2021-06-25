@@ -12,19 +12,19 @@ function nvim_nightly_install --description "Install the Nightly version of Neov
     end
 end
 
-function _nvim_nightly_prebuilt --description "Download the pre-built Nightly version of Neovim"
-    set install_path "/opt/nvim/nightly_archived"
+set NVIM_INSTALL_PATH "/opt/nvim/nightly"
 
+function _nvim_nightly_prebuilt --description "Download the pre-built Nightly version of Neovim"
     # Create install path if needed
-    if not test -e $install_path
+    if not test -e $NVIM_INSTALL_PATH
         echo "Creating install folder"
-        command sudo mkdir -p $install_path
-        command sudo chown $USER $install_path
+        command sudo mkdir -p $NVIM_INSTALL_PATH
+        command sudo chown $USER $NVIM_INSTALL_PATH
     end
 
     # Make sure it's a folder with the right permissions
-    if not test -e $install_path; or not test -d $install_path; or not test -O $install_path
-        echo "Make sure that" $install_path "is a directory and is owned by" $USER
+    if not test -e $NVIM_INSTALL_PATH; or not test -d $NVIM_INSTALL_PATH; or not test -O $NVIM_INSTALL_PATH
+        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
         return 1
     end
 
@@ -53,8 +53,10 @@ function _nvim_nightly_prebuilt --description "Download the pre-built Nightly ve
 
     # Check whether it is a new version
     set new_version (command {$tmp_dir}"/"{$foldername}"/bin/nvim" --version | head -n 1)
-    if test -e {$install_path}"/bin/nvim"
-        set cur_version (command {$install_path}"/bin/nvim" --version | head -n 1)
+    if test -e {$NVIM_INSTALL_PATH}"/bin/nvim"
+        echo "IT EXISTS!!!"
+        echo {$NVIM_INSTALL_PATH}"/bin/nvim"
+        set cur_version (command {$NVIM_INSTALL_PATH}"/bin/nvim" --version | head -n 1)
 
         if test $cur_version = $new_version
             echo "Version" $cur_version "is already installed"
@@ -66,9 +68,9 @@ function _nvim_nightly_prebuilt --description "Download the pre-built Nightly ve
 
     # Delete the existing install and move the new one over
     echo "Installing" $new_version
-    command touch {$install_path}"/sentinel"
-    command rm -rf {$install_path}"/"*
-    command mv {$tmp_dir}"/"{$foldername}"/"* $install_path
+    command touch {$NVIM_INSTALL_PATH}"/sentinel"
+    command rm -rf {$NVIM_INSTALL_PATH}"/"*
+    command mv {$tmp_dir}"/"{$foldername}"/"* $NVIM_INSTALL_PATH
 
     # Cleanup
     command rm -r {$tmp_dir}"/"{$foldername}
@@ -79,18 +81,16 @@ end
 #   linux: `sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip`
 
 function _nvim_nightly_compile --description "Compile the Nightly version of Neovim"
-    set install_path "/opt/nvim/nightly_compiled"
-
     # Create install path if needed
-    if not test -e $install_path
+    if not test -e $NVIM_INSTALL_PATH
         echo "Creating install folder"
-        command sudo mkdir -p $install_path
-        command sudo chown $USER $install_path
+        command sudo mkdir -p $NVIM_INSTALL_PATH
+        command sudo chown $USER $NVIM_INSTALL_PATH
     end
 
     # Make sure it's a folder with the right permissions
-    if not test -e $install_path; or not test -d $install_path; or not test -O $install_path
-        echo "Make sure that" $install_path "is a directory and is owned by" $USER
+    if not test -e $NVIM_INSTALL_PATH; or not test -d $NVIM_INSTALL_PATH; or not test -O $NVIM_INSTALL_PATH
+        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
         return 1
     end
 
@@ -108,10 +108,12 @@ function _nvim_nightly_compile --description "Compile the Nightly version of Neo
     # Build
     pushd {$tmp_dir}"/neovim-nightly"
     command echo "Building in " (pwd)
-    command make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$install_path"
+    command make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$NVIM_INSTALL_PATH"
     command make install
     popd
 
     # Cleanup
     command rm -rf {$tmp_dir}
 end
+
+set -e NVIM_INSTALL_PATH
