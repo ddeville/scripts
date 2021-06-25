@@ -56,7 +56,6 @@ def task_install_packages():
         package_manager = create_package_manager()
         package_manager.install_packages([
             "bat",
-            "curl",
             "exa",
             "fish",
             "htop",
@@ -65,12 +64,13 @@ def task_install_packages():
             "ripgrep",
             "stow",
             "tmux",
+            {PackageType.PACMAN: "curl", PackageType.DEB: "curl"},
             {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
         ])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
 
-def task_install_packages_full():
+def task_install_extra_packages():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
@@ -110,7 +110,7 @@ def task_update_shell():
         else:
             print("====> fish is already default shell")
 
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "install_packages_full"])
+    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_packages", "install_extra_packages"])
 
 def task_run_stow():
     # type: () -> TaskManifest
