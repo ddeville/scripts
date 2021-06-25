@@ -2,7 +2,7 @@
 
 ## Preferences
 
-Run `setup_prefs`.
+Run `setup_macos_prefs`.
 
 ## Apps to install
 
