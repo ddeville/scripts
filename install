@@ -116,12 +116,7 @@ def task_run_stow():
     def cmd():
         # type: () -> None
         print("====> running stow")
-        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "config"), "-t", os.path.expanduser("~"), ".", "-v"])
-
-        create_dirs(XDG_BIN_HOME)
-        run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
-        if get_current_platform() == MACOS:
-            run_command(["stow", "-d", os.path.join(SCRIPTS_PATH, "macos", "bin"), "-t", XDG_BIN_HOME, ".", "-v"])
+        run_command([os.path.join(SCRIPTS_PATH, "bin", "stow_config")])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["update_shell"])
 
