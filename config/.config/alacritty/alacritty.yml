@@ -38,7 +38,7 @@ cursor:
 colors:
   cursor:
     text: CellBackground
-    cursor: CellForeground
+    cursor: "#d5ba9b"
 
 draw_bold_text_with_bright_colors: false
 
