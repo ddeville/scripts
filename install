@@ -35,7 +35,6 @@ ALL_PLATFORMS = [MACOS, LINUX]
 LITE = "lite"
 XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 XDG_DATA_HOME = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
-XDG_BIN_HOME = os.path.expanduser("~/.local/bin")
 
 # Tasks
 
