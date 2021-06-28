@@ -64,6 +64,7 @@ def task_install_packages():
             "tmux",
             {PackageType.PACMAN: "curl", PackageType.DEB: "curl"},
             {PackageType.BREW: "fd", PackageType.PACMAN: "fd", PackageType.DEB: "fd-find"},
+            {PackageType.PACMAN: "inetutils"},
         ])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["install_package_manager"])
@@ -75,7 +76,7 @@ def task_install_extra_packages():
         package_manager = create_package_manager()
         package_manager.install_packages([
             "cmake",
-            "golang",
+            {PackageType.BREW: "golang", PackageType.PACMAN: "go", PackageType.DEB: "golang"},
             {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
             {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
             {PackageType.PACMAN: "npm", PackageType.DEB: "npm"},
