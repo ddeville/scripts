@@ -121,7 +121,7 @@ setup_client("sourcekit", {
 })
 
 setup_client("sumneko_lua", {
-  cmd = { "/opt/lsp/lua-language-server" };
+  cmd = { "/opt/lsp/bin/lua-language-server" };
   settings = {
     Lua = {
       runtime = {
