@@ -159,7 +159,7 @@ class PacmanPackageManager(BasePackageManager):
     def install_package(self, package):
         # type: (str) -> None
         print("====> installing %s" % package)
-        run_command(["sudo", "pacman", "-S", package])
+        run_command(["sudo", "pacman", "-S", package, "--noconfirm", "--needed"])
 
     @property
     def package_type(self):
