@@ -3,11 +3,11 @@ function fish_prompt
         set -g __fish_git_functions_defined
 
         function _is_git_repo
-            git rev-parse --is-inside-work-tree ^/dev/null
+            git rev-parse --is-inside-work-tree 2>/dev/null
         end
 
         function _git_branch_name
-            echo (git symbolic-ref HEAD ^/dev/null | sed -e "s|^refs/heads/||")
+            echo (git symbolic-ref HEAD 2>/dev/null | sed -e "s|^refs/heads/||")
         end
     end
 
