@@ -66,7 +66,7 @@ setup_client("rust_analyzer", {
         extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
       };
       procMacro = {
-        enable = true;
+        enable = false;
       };
     };
   };
@@ -160,6 +160,7 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
+--[==[
 util.create_augroup("rust_inlay_hints", { {
   "BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter",
   "*.rs",
@@ -172,6 +173,7 @@ util.create_augroup("rust_inlay_hints", { {
     enabled = { "TypeHint", "ChainingHint" };
   }]],
 } })
+--]==]
 
 -- Add support for reporting LSP progress
 lsp_status.register_progress()
