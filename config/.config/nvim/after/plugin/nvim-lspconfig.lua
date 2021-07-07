@@ -160,20 +160,18 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
---[==[
 util.create_augroup("rust_inlay_hints", { {
   "BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter",
   "*.rs",
   "lua",
   [[require'lsp_extensions'.inlay_hints{
-    highlight = "SpecialComment";
+    highlight = "Comment";
     prefix = " ▶ ";
     aligned = false;
     only_current_line = false;
     enabled = { "TypeHint", "ChainingHint" };
   }]],
 } })
---]==]
 
 -- Add support for reporting LSP progress
 lsp_status.register_progress()
