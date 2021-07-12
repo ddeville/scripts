@@ -65,6 +65,9 @@ setup_client("rust_analyzer", {
         -- Build out of tree so that we don't cause cargo lock contention
         extraArgs = { "--target-dir", "/tmp/rust-analyzer-check" };
       };
+      cargo = {
+        autoreload = true;
+      };
       procMacro = {
         enable = false;
       };
