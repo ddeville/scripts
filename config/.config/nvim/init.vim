@@ -54,7 +54,6 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
   Plug 'fatih/vim-go'
   Plug 'itchyny/lightline.vim'
   Plug 'junegunn/fzf', { 'dir': $XDG_DATA_HOME . '/fzf', 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
-  Plug 'machakann/vim-highlightedyank'
   Plug 'mhinz/vim-grepper'
   Plug 'mhinz/vim-startify'
   Plug 'rust-lang/rust.vim'
@@ -186,6 +185,11 @@ let g:netrw_localrmdir = "rm -r"
 let g:netrw_liststyle = 1
 let g:netrw_winsize = 85
 let g:netrw_browse_split = 0
+
+" highlight on yank
+if has("nvim-0.5")
+  autocmd TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=250, on_visual=true}
+end
 
 " ==> MAPPINGS
 
