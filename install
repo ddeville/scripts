@@ -76,6 +76,7 @@ def task_install_extra_packages():
         package_manager = create_package_manager()
         package_manager.install_packages([
             "cmake",
+            {PackageType.BREW: "robotsandpencils/made/xcodes"},
             {PackageType.BREW: "golang", PackageType.PACMAN: "go", PackageType.DEB: "golang"},
             {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
             {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
