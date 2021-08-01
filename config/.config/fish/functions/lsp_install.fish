@@ -247,7 +247,7 @@ function _sumneko_lua
     echo "Installing sumneko_lua"
 
     if not type -q ninja
-        echo "The numseko_lua language server requires Ninja to be installed"
+        echo "The sumneko_lua language server requires Ninja to be installed"
         return 1
     end
 
