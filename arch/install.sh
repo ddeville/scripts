@@ -32,8 +32,9 @@ pacman -S --needed \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack sof-firmware \
     acpi acpi_call acpid \
     mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
-    xorg lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings \
-    flatpak alacritty firefox \
+    xorg xorg-xinit bspwm sxhkd dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings \
+    flatpak alacritty firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd \
+    ttf-anonymous-pro, terminus-font
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
