@@ -1,0 +1,36 @@
+# to see available disks
+lsblk
+
+# to create partitions
+# use `n` to make a new partition and eventually `w` to write them.
+# make 3 partitions
+#   - 1. EFI:   +250M   ef00
+#   - 2. Swap:  +4G     8200
+#   - 3. Root:          8300
+gdisk /dev/XXX
+
+# to format partitions
+mkfs.vfat /dev/XXX1
+mkswap /dev/XXX2
+swapon /dev/XXX2
+mkfs.ext4 /dev/XXX3
+
+# to mount partitions
+mount /dev/XXX3 /mnt
+mkdir -p /mnt/boot/efi
+mount /dev/XXX1 /mnt/boot/efi
+
+# to install arch
+pacstrap /mnt base linux linux-firmware amd-ucode git vim
+
+# to create file system table
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# add `amdgpu` to `MODULES`
+vim /etc/mkinitcpio.conf
+mkinitcpio -p linux
+
+# move into new install
+arch-chroot /mnt
+
+# clone repo and run install script
