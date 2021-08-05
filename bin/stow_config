@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p $HOME/.local/bin
+
 stow -d $HOME/scripts/config -t $HOME . -v
 stow -d $HOME/scripts/bin -t $HOME/.local/bin . -v
 
