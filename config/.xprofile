@@ -1,2 +1,4 @@
-xrandr --output DisplayPort-1 --dpi 144
+xrandr --output DisplayPort-0 --mode 3840x2160 --dpi 144 --pos 0x1280 --primary
+xrandr --output DisplayPort-1 --mode 3840x2160 --dpi 144 --pos 3840x0 --rotate right
+
 xset r rate 180 50
