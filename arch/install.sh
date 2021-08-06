@@ -34,7 +34,7 @@ pacman -S --needed \
     mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
     xorg xorg-xinit bspwm sxhkd dmenu rofi lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance \
     flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd \
-    ttf-anonymous-pro, terminus-font
+    ttf-anonymous-pro, terminus-font, papirus-icon-theme
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
