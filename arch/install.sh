@@ -54,4 +54,6 @@ useradd -m damien
 passwd damien
 echo "damien ALL=(ALL) ALL" >> /etc/sudoers.d/damien
 
+# TODO(damien): Install yay + polybar google-chrome dropbox 1password
+
 printf "\e[1;32mDone! Type exit, umount -a and reboot.\e[0m"
