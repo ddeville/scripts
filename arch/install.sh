@@ -32,7 +32,7 @@ pacman -S --needed \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack sof-firmware \
     acpi acpi_call acpid \
     mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
-    xorg xorg-xinit bspwm sxhkd dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings \
+    xorg xorg-xinit bspwm sxhkd dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance \
     flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd \
     ttf-anonymous-pro, terminus-font
 
