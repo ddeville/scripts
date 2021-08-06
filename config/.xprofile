@@ -1,0 +1,2 @@
+xrandr --output DisplayPort-1 --dpi 144
+xset r rate 180 50
