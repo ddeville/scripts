@@ -24,10 +24,10 @@ line-size = 2
 padding = 1
 module-margin = 1
 
-; font-0 = "Noto Sans Mono:size=10;1"
-; font-1 = "Noto Sans Mono:size=10;1"
-; font-2 = "Noto Sans Symbols:size=10;1"
-; font-3 = "Noto Sans Symbols2:size=10;1"
+; font-0 = "Noto Sans Mono:size=12;1"
+; font-1 = "Noto Sans Mono:size=12;1"
+; font-2 = "Noto Sans Symbols:size=12;1"
+; font-3 = "Noto Sans Symbols2:size=12;1"
 
 modules-left = date bspwm xwindow
 modules-center =
@@ -41,7 +41,31 @@ wm-restack = bspwm
 
 [bar/term]
 monitor = DisplayPort-1
-inherit = bar/main
+width = 100%
+height = 54
+dpi = 144
+radius = 6.0
+fixed-center = false
+bottom = true
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+border-size = 0
+line-size = 2
+padding = 1
+module-margin = 1
+
+; font-0 = "Noto Sans Mono:size=10;1"
+; font-1 = "Noto Sans Mono:size=10;1"
+; font-2 = "Noto Sans Symbols:size=10;1"
+; font-3 = "Noto Sans Symbols2:size=10;1"
+
+modules-left = date bspwm xwindow
+modules-center =
+modules-right = eth1 cpu memory
+
+wm-restack = bspwm
 
 [global/wm]
 margin-top = 0
@@ -52,9 +76,9 @@ label = %title:0:30:...%
 
 [module/bspwm]
 type = internal/bspwm
-pin-workspaces = false
-enable-click = false
-enable-scroll = false
+pin-workspaces = true
+enable-click = true
+enable-scroll = true
 
 label-focused = " %name% "
 label-focused-underline = #fba922

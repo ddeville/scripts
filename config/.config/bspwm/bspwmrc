@@ -1,24 +1,29 @@
 #!/bin/sh
 
+# kill the current running instances
 pgrep -x sxhkd > /dev/null || sxhkd &
-nitrogen --restore &
-~/.config/polybar/launch.sh &
 
+# kick off ssh-agent and set some options
 eval $(ssh-agent)
 xsetroot -cursor_name left_ptr
+
+# set up nitrogen
 nitrogen --restore &
 
-bspc monitor -d I II III IV V VI VII VIII IX X
+# set up polybar
+killall -q polybar
+while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+polybar main &
+polybar term &
 
-bspc config border_width        2
-bspc config window_gap          8
+bspc monitor DisplayPort-0 -d web a b c dbx
+bspc monitor DisplayPort-1 -d code:8
 
-bspc config split_ratio          0.52
-bspc config borderless_monocle   true
-bspc config gapless_monocle      true
+bspc config border_width 2
+bspc config window_gap 0
+bspc config focused_border_color \#ff8c00
+bspc config split_ratio 0.52
+bspc config borderless_monocle true
+bspc config gapless_monocle true
 
-bspc rule -a Gimp desktop='^8' state=floating follow=on
-bspc rule -a Chromium desktop='^2'
-bspc rule -a mplayer2 state=floating
-bspc rule -a Kupfer.py focus=on
-bspc rule -a Screenkey manage=off
+bspc rule -a firefox desktop='web' follow=on
