@@ -31,6 +31,7 @@ pacman -S --needed \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack sof-firmware \
     acpi acpi_call acpid \
+    libvncserver remmina \
     mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
     xorg xorg-xinit bspwm sxhkd dmenu rofi slock lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance \
     flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd \
