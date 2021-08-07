@@ -8,7 +8,7 @@ super + backslash
 
 # program launcher
 super + @space
-	rofi -show drun
+	rofi -show drun -m -4
 
 # lock
 super + shift + s
