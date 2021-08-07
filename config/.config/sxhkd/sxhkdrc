@@ -14,12 +14,13 @@ super + @space
 super + shift + l
 	slock
 
-# focus or send to the given desktop
-super + {_,shift + }{1-9}
-	bspc {desktop -f,node -d} '^{1-9}'
+# focus the given desktop
+super + {1-9,0}
+	bspc desktop -f '^{1-9,10}'
 
-super + 0
-	bspc desktop -f '^5'
+# send a window to a given desktop and move to it
+super + shift + {1-9,0}
+	bspc node -d '^{1-9,10}' --follow
 
 # make sxhkd reload its configuration files:
 super + Escape
