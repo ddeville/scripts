@@ -9,25 +9,7 @@ alert = #bd2c40
 
 [bar/main]
 monitor = DisplayPort-0
-width = 100%
-height = 48
-dpi = 144
-radius = 6.0
-fixed-center = false
-bottom = true
-
-background = ${colors.background}
-foreground = ${colors.foreground}
-
-border-size = 5
-line-size = 2
-padding = 1
-module-margin = 1
-
-font-0 = "Noto Sans Mono:size=10;1"
-font-1 = "Noto Sans Mono:size=10;1"
-font-2 = "Noto Sans Symbols:size=10;1"
-font-3 = "Noto Sans Symbols2:size=10;1"
+inherit = bar/shared
 
 modules-left = date bspwm xwindow
 modules-center =
@@ -37,33 +19,34 @@ tray-position = right
 tray-padding = 2
 tray-maxsize = 24
 
-wm-restack = bspwm
-
 [bar/term]
 monitor = DisplayPort-1
+inherit = bar/shared
+
+modules-left = date bspwm xwindow
+modules-center =
+modules-right = eth1 cpu memory
+
+[bar/shared]
 width = 100%
 height = 48
 dpi = 144
-radius = 6.0
+radius = 0.0
 fixed-center = false
 bottom = true
-
-background = ${colors.background}
-foreground = ${colors.foreground}
 
 border-size = 5
 line-size = 2
 padding = 1
 module-margin = 1
 
+background = ${colors.background}
+foreground = ${colors.foreground}
+
 font-0 = "Noto Sans Mono:size=10;1"
 font-1 = "Noto Sans Mono:size=10;1"
 font-2 = "Noto Sans Symbols:size=10;1"
 font-3 = "Noto Sans Symbols2:size=10;1"
-
-modules-left = date bspwm xwindow
-modules-center =
-modules-right = eth1 cpu memory
 
 wm-restack = bspwm
 
@@ -72,11 +55,11 @@ margin-top = 0
 
 [module/xwindow]
 type = internal/xwindow
-label = %title:0:30:...%
+label = %title:0:60:...%
 
 [module/bspwm]
 type = internal/bspwm
-pin-workspaces = false
+pin-workspaces = true
 enable-click = true
 enable-scroll = true
 
