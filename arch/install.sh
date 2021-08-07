@@ -34,7 +34,7 @@ pacman -S --needed \
     libvncserver remmina \
     mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
     xorg xorg-xinit bspwm sxhkd dmenu rofi slock lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance \
-    flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd \
+    flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd sxiv mupdf \
     ttf-anonymous-pro terminus-font noto-fonts noto-fonts-emoji papirus-icon-theme \
     go ninja nodejs npm
 
