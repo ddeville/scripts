@@ -10,6 +10,10 @@ super + backslash
 super + @space
 	rofi -show drun
 
+# lock
+super + l
+	slock
+
 # focus or send to the given desktop
 super + {_,shift + }{1-9}
 	bspc {desktop -f,node -d} '^{1-9}'
