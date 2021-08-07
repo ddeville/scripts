@@ -10,7 +10,7 @@ alert = #bd2c40
 [bar/main]
 monitor = DisplayPort-0
 width = 100%
-height = 54
+height = 48
 dpi = 144
 radius = 6.0
 fixed-center = false
@@ -24,10 +24,10 @@ line-size = 2
 padding = 1
 module-margin = 1
 
-; font-0 = "Noto Sans Mono:size=12;1"
-; font-1 = "Noto Sans Mono:size=12;1"
-; font-2 = "Noto Sans Symbols:size=12;1"
-; font-3 = "Noto Sans Symbols2:size=12;1"
+font-0 = "Noto Sans Mono:size=10;1"
+font-1 = "Noto Sans Mono:size=10;1"
+font-2 = "Noto Sans Symbols:size=10;1"
+font-3 = "Noto Sans Symbols2:size=10;1"
 
 modules-left = date bspwm xwindow
 modules-center =
@@ -42,7 +42,7 @@ wm-restack = bspwm
 [bar/term]
 monitor = DisplayPort-1
 width = 100%
-height = 54
+height = 48
 dpi = 144
 radius = 6.0
 fixed-center = false
@@ -56,10 +56,10 @@ line-size = 2
 padding = 1
 module-margin = 1
 
-; font-0 = "Noto Sans Mono:size=10;1"
-; font-1 = "Noto Sans Mono:size=10;1"
-; font-2 = "Noto Sans Symbols:size=10;1"
-; font-3 = "Noto Sans Symbols2:size=10;1"
+font-0 = "Noto Sans Mono:size=10;1"
+font-1 = "Noto Sans Mono:size=10;1"
+font-2 = "Noto Sans Symbols:size=10;1"
+font-3 = "Noto Sans Symbols2:size=10;1"
 
 modules-left = date bspwm xwindow
 modules-center =
