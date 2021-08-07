@@ -11,7 +11,7 @@ super + @space
 	rofi -show drun
 
 # lock
-super + shift + l
+super + shift + s
 	slock
 
 # focus the given desktop
