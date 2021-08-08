@@ -24,19 +24,14 @@ pacman -Syy
 pacman -S --needed \
     grub efibootmgr os-prober \
     xf86-video-amdgpu \
-    base-devel linux-headers man-db man-pages \
+    base-devel linux-headers man-db man-pages git vim python \
     xdg-user-dirs xdg-utils dialog \
     networkmanager network-manager-applet \
     openssh rsync openbsd-netcat iptables ipset firewalld \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack sof-firmware \
     acpi acpi_call acpid \
-    libvncserver remmina \
-    mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g \
-    xorg xorg-xinit bspwm sxhkd dmenu rofi slock lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance \
-    flatpak alacritty nautilus firefox neofetch neovim stow bat exa fish htop jq ripgrep tmux curl fd sxiv mupdf \
-    ttf-anonymous-pro terminus-font noto-fonts noto-fonts-emoji papirus-icon-theme \
-    go ninja nodejs npm
+    mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
@@ -49,12 +44,9 @@ systemctl enable avahi-daemon
 systemctl enable fstrim.timer
 systemctl enable firewalld
 systemctl enable acpid
-systemctl enable lightdm
 
 useradd -m damien
 passwd damien
 echo "damien ALL=(ALL) ALL" >> /etc/sudoers.d/damien
-
-# TODO(damien): Install yay + polybar google-chrome dropbox 1password
 
 printf "\e[1;32mDone! Type exit, umount -a and reboot.\e[0m"
