@@ -10,6 +10,9 @@ xsetroot -cursor_name left_ptr
 # set up nitrogen
 nitrogen --restore &
 
+# tweak screen color to be easier on eyes
+redshift -P -O 4500
+
 # set up polybar
 killall -q polybar
 while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
