@@ -26,7 +26,7 @@ bspc config split_ratio 0.52
 bspc config borderless_monocle false
 bspc config gapless_monocle false
 
-bspc rule -a firefox desktop='web' follow=on
+bspc rule -a firefox-developer-edition desktop='web' follow=on
 bspc rule -a Google-chrome desktop='dbx' follow=on
 bspc rule -a Slack desktop='dbx' follow=on
 bspc rule -a zoom desktop='dbx' follow=on

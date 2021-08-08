@@ -4,7 +4,7 @@ super + Return
 
 # browser
 super + backslash
-	firefox
+	firefox-developer-edition
 
 # program launcher
 super + @space
