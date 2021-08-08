@@ -8,11 +8,11 @@ if [ -f /etc/X11/xinit/.Xmodmap ]; then
   xmodmap /etc/X11/xinit/.Xmodmap
 fi
 
-if [ -f "$HOME/.Xresources" ]; then
+if [ -e "$HOME/.Xresources" ]; then
   xrdb -merge "$HOME/.Xresources"
 fi
 
-if [ -f "$HOME/.Xmodmap" ]; then
+if [ -e "$HOME/.Xmodmap" ]; then
   xmodmap "$HOME/.Xmodmap"
 fi
 
