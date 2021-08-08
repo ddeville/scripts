@@ -8,7 +8,7 @@ sudo pacman -S --needed \
     flatpak nautilus redshift firefox-developer-edition neofetch dmenu rofi sxiv mupdf \
     libvncserver remmina \
     alacritty neovim stow bat exa fish htop jq ripgrep tmux curl fd go ninja nodejs npm \
-    ttf-anonymous-pro xorg-fonts-misc terminus-font noto-fonts noto-fonts-emoji
+    ttf-anonymous-pro xorg-fonts-misc terminus-font noto-fonts noto-fonts-emoji ttf-dejavu ttf-liberation
 
 sudo systemctl enable lightdm
 
@@ -21,4 +21,5 @@ popd
 popd
 
 yay -S --needed \
-    polybar google-chrome dropbox 1password ttf-unifont otf-public-sans
+    polybar google-chrome dropbox 1password \
+    ttf-unifont otf-public-sans
