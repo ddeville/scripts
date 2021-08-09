@@ -12,11 +12,12 @@ monitor = DisplayPort-0
 inherit = bar/shared
 modules-left = date bspwm xwindow
 modules-center =
-modules-right = network temperature cpu memory filesystem pulseaudio powermenu
+modules-right = network temperature cpu memory filesystem pulseaudio dunst powermenu
 tray-position = right
 tray-padding = 4
 tray-maxsize = 28
 tray-background = ${colors.background-alt}
+enable-ipc = true
 
 [bar/term]
 monitor = DisplayPort-1
@@ -37,7 +38,7 @@ separator = |
 border-size = 5
 line-size = 3
 padding = 1
-module-margin = 2
+module-margin = 1
 background = ${colors.background}
 foreground = ${colors.foreground}
 font-0 = "Noto Sans Mono:size=10;1"
@@ -169,12 +170,19 @@ bar-volume-empty = ─
 bar-volume-empty-font = 2
 bar-volume-empty-foreground = ${colors.foreground-alt}
 
+[module/dunst]
+type = custom/ipc
+initial = 1
+format-foreground = #fba922
+hook-0 = echo "%{A1:dunstctl set-paused true && polybar-msg hook dunst 2:}%{A}" &
+hook-1 = echo "%{A1:dunstctl set-paused false && polybar-msg hook dunst 1:}%{A}" &
+
 [module/powermenu]
 type = custom/menu
 expand-right = true
 format-spacing = 1
 label-open = 
-label-open-foreground = ${colors.foreground}
+label-open-foreground = ${colors.alert}
 label-close = cancel
 label-close-foreground = ${colors.secondary}
 label-separator = |
