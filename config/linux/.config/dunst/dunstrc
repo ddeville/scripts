@@ -295,7 +295,7 @@
 [urgency_low]
     msg_urgency = low
     background = "#3c3836"
-    foreground = "#665c54"
+    foreground = "#a89d94"
 
 [urgency_normal]
     msg_urgency = normal
