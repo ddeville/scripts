@@ -12,9 +12,9 @@ monitor = DisplayPort-0
 inherit = bar/shared
 modules-left = date bspwm xwindow
 modules-center =
-modules-right = network cpu temperature memory filesystem pulseaudio powermenu
+modules-right = network temperature cpu memory filesystem pulseaudio powermenu
 tray-position = right
-tray-padding = 2
+tray-padding = 4
 tray-maxsize = 28
 tray-background = ${colors.background-alt}
 
@@ -26,6 +26,7 @@ modules-center =
 modules-right = pacman-updates aur-updates
 
 [bar/shared]
+wm-restack = bspwm
 width = 100%
 height = 48
 dpi = 144
@@ -34,9 +35,9 @@ fixed-center = false
 bottom = true
 separator = |
 border-size = 5
-line-size = 2
+line-size = 3
 padding = 1
-module-margin = 1
+module-margin = 2
 background = ${colors.background}
 foreground = ${colors.foreground}
 font-0 = "Noto Sans Mono:size=10;1"
@@ -46,7 +47,6 @@ font-3 = "Noto Sans Symbols2:size=10;1"
 font-4 = "Font Awesome 5 Free:size=12;1"
 font-5 = "Font Awesome 5 Free Solid:size=12;1"
 font-6 = "Font Awesome 5 Brands:size=12;1"
-wm-restack = bspwm
 
 [global/wm]
 margin-top = 0
@@ -84,21 +84,15 @@ format-prefix = "    "
 format-prefix-foreground = ${colors.foreground-alt}
 label = "%title:0:60:...%"
 
-[module/cpu]
-type = internal/cpu
-interval = 1
-format-prefix = " "
-format-prefix-foreground = ${colors.foreground-alt}
-format-underline = #f90000
-label = %percentage:2%%
-
-[module/memory]
-type = internal/memory
-interval = 1
-format-prefix = ""
-format-prefix-foreground = ${colors.foreground-alt}
-format-underline = #4bffdc
-label = %percentage_used:2%%
+[module/network]
+type = internal/network
+interface = enp4s0
+interval = 1.0
+format-connected-underline = #55aa55
+format-connected-prefix = " "
+format-connected-prefix-foreground = ${colors.foreground-alt}
+label-connected = " %upspeed%  %downspeed%"
+format-disconnected =
 
 [module/temperature]
 type = internal/temperature
@@ -118,6 +112,22 @@ ramp-1 = 
 ramp-2 = 
 ramp-foreground = ${colors.foreground-alt}
 
+[module/cpu]
+type = internal/cpu
+interval = 1
+format-prefix = " "
+format-prefix-foreground = ${colors.foreground-alt}
+format-underline = #f90000
+label = %percentage:2%%
+
+[module/memory]
+type = internal/memory
+interval = 1
+format-prefix = ""
+format-prefix-foreground = ${colors.foreground-alt}
+format-underline = #f50a4d
+label = %percentage_used:2%%
+
 [module/filesystem]
 type = internal/fs
 mount-0 = /
@@ -125,30 +135,19 @@ interval = 25
 format-mounted = <label-mounted>
 format-mounted-prefix = " "
 format-mounted-prefix-foreground = ${colors.foreground-alt}
-format-mounted-underline = #f90000
+format-mounted-underline = #55aa55
 label-mounted = %free%
-
-[module/network]
-type = internal/network
-interface = enp4s0
-interval = 1.0
-format-connected-underline = #55aa55
-format-connected-prefix = " "
-format-connected-prefix-foreground = ${colors.foreground-alt}
-label-connected = " %upspeed%  %downspeed%"
-format-disconnected =
 
 [module/pulseaudio]
 type = internal/pulseaudio
 format-volume = <ramp-volume> <label-volume> <bar-volume>
 use-ui-max = false
 interval = 1
-format-volume-prefix = " "
-format-volume-prefix-foreground = ${colors.foreground-alt}
 label-volume = %percentage%%
 label-volume-foreground = ${colors.foreground}
 label-muted = 
 label-muted-foreground =  ${colors.foreground-alt}
+ramp-volume-foreground = ${colors.foreground-alt}
 ramp-volume-0 = 
 ramp-volume-1 = 
 ramp-volume-2 = 
