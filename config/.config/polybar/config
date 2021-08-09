@@ -10,22 +10,20 @@ alert = #bd2c40
 [bar/main]
 monitor = DisplayPort-0
 inherit = bar/shared
-
 modules-left = date bspwm xwindow
 modules-center =
-modules-right = pulseaudio eth1 cpu memory temperature powermenu
-
+modules-right = cpu memory temperature filesystem network pulseaudio powermenu
 tray-position = right
 tray-padding = 2
-tray-maxsize = 24
+tray-maxsize = 28
+tray-background = ${colors.background-alt}
 
 [bar/term]
 monitor = DisplayPort-1
 inherit = bar/shared
-
 modules-left = date bspwm
 modules-center =
-modules-right = eth1 cpu memory
+modules-right = pacman-updates aur-updates
 
 [bar/shared]
 width = 100%
@@ -34,123 +32,128 @@ dpi = 144
 radius = 0.0
 fixed-center = false
 bottom = true
-
+separator = |
 border-size = 5
 line-size = 2
 padding = 1
 module-margin = 1
-
 background = ${colors.background}
 foreground = ${colors.foreground}
-
 font-0 = "Noto Sans Mono:size=10;1"
 font-1 = "Noto Sans Mono:size=10;1"
 font-2 = "Noto Sans Symbols:size=10;1"
 font-3 = "Noto Sans Symbols2:size=10;1"
-
+font-4 = "Font Awesome 5 Free:size=12;1"
+font-5 = "Font Awesome 5 Free Solid:size=12;1"
+font-6 = "Font Awesome 5 Brands:size=12;1"
 wm-restack = bspwm
 
 [global/wm]
 margin-top = 0
 
-[module/xwindow]
-type = internal/xwindow
-label = %title:0:60:...%
+[settings]
+screenchange-reload = true
+
+[module/date]
+type = internal/date
+interval = 5
+date = "%a %b %d"
+time = %I:%M%p
+label = %date% %time%
+format-prefix = " "
+format-prefix-foreground = ${colors.foreground-alt}
+format-underline = #0a6cf5
 
 [module/bspwm]
 type = internal/bspwm
 pin-workspaces = true
 enable-click = true
 enable-scroll = true
-
 label-focused = " %name% "
 label-focused-underline = #fba922
-
 label-occupied = " %name% "
 label-occupied-foreground = #ffaa00
-
 label-urgent = " %name% "
 label-urgent-underline = #9b0a20
-
 label-empty = " %name% "
 label-empty-foreground = #555555
 
+[module/xwindow]
+type = internal/xwindow
+format-prefix = "    "
+format-prefix-foreground = ${colors.foreground-alt}
+label = "%title:0:60:...%"
+
 [module/cpu]
 type = internal/cpu
-interval = 2
-format-prefix = "💻 "
+interval = 1
+format-prefix = " "
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = #f90000
 label = %percentage:2%%
 
 [module/memory]
 type = internal/memory
-interval = 2
-format-prefix = "🗍 "
+interval = 1
+format-prefix = ""
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = #4bffdc
 label = %percentage_used:2%%
 
-[module/eth1]
-type = internal/network
-interface = enp4s0
-interval = 3.0
-
-format-connected-underline = #55aa55
-format-connected-prefix = "🖧 "
-format-connected-prefix-foreground = ${colors.foreground-alt}
-label-connected = %local_ip%
-
-format-disconnected =
-
-[module/date]
-type = internal/date
-interval = 5
-
-date = "%a %d"
-date-alt = %a %b %d
-
-time = %I:%M
-time-alt = %I:%M%p
-
-format-prefix =
-format-prefix-foreground = ${colors.foreground-alt}
-format-underline = #0a6cf5
-
-label = %date% %time%
-
 [module/temperature]
 type = internal/temperature
+interval = 1
 thermal-zone = 0
+base-temperature = 20
 warn-temperature = 60
-
 format = <ramp> <label>
 format-underline = #f50a4d
 format-warn = <ramp> <label-warn>
 format-warn-underline = ${self.format-underline}
-
-label = %temperature-c%
-label-warn = %temperature-c%
+label = %temperature-f%
+label-warn = %temperature-f%
 label-warn-foreground = ${colors.secondary}
-
-ramp-0 = 
-ramp-1 = 
-ramp-2 = 
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
 ramp-foreground = ${colors.foreground-alt}
+
+[module/filesystem]
+type = internal/fs
+mount-0 = /
+interval = 25
+format-mounted = <label-mounted>
+format-mounted-prefix = " "
+format-mounted-prefix-foreground = ${colors.foreground-alt}
+format-mounted-underline = #f90000
+label-mounted = %free%
+
+[module/network]
+type = internal/network
+interface = enp4s0
+interval = 1.0
+format-connected-underline = #55aa55
+format-connected-prefix = " "
+format-connected-prefix-foreground = ${colors.foreground-alt}
+label-connected = " %upspeed%  %downspeed%"
+format-disconnected =
 
 [module/pulseaudio]
 type = internal/pulseaudio
-
-format-volume = <label-volume> <bar-volume>
+format-volume = <ramp-volume> <label-volume> <bar-volume>
 use-ui-max = false
 interval = 1
-label-volume = 🔊 %percentage%%
-label-volume-foreground = ${root.foreground}
-
-label-muted = 🔇 muted
-label-muted-foreground = #666
-
-bar-volume-width = 12
+format-volume-prefix = " "
+format-volume-prefix-foreground = ${colors.foreground-alt}
+label-volume = %percentage%%
+label-volume-foreground = ${colors.foreground}
+label-muted = 
+label-muted-foreground =  ${colors.foreground-alt}
+ramp-volume-0 = 
+ramp-volume-1 = 
+ramp-volume-2 = 
+click-right = pavucontrol
+bar-volume-width = 10
 bar-volume-foreground-0 = #55aa55
 bar-volume-foreground-1 = #55aa55
 bar-volume-foreground-2 = #55aa55
@@ -169,34 +172,37 @@ bar-volume-empty-foreground = ${colors.foreground-alt}
 
 [module/powermenu]
 type = custom/menu
-
 expand-right = true
-
 format-spacing = 1
-
-label-open = ⏻
-label-open-foreground = ${colors.secondary}
-label-close =  cancel
+label-open = 
+label-open-foreground = ${colors.foreground}
+label-close = cancel
 label-close-foreground = ${colors.secondary}
 label-separator = |
 label-separator-foreground = ${colors.foreground-alt}
-
 menu-0-0 = reboot
-menu-0-0-exec = menu-open-1
+menu-0-0-exec = systemctl reboot
 menu-0-1 = power off
-menu-0-1-exec = menu-open-2
+menu-0-1-exec = systemctl poweroff
 
-menu-1-0 = cancel
-menu-1-0-exec = menu-open-0
-menu-1-1 = reboot
-menu-1-1-exec = sudo reboot
+[module/pacman-updates]
+type = custom/script
+exec = checkupdates | wc -l
+interval = 1200
+label = Pacman: %output%
+format-foreground = ${colors.foreground}
+format-prefix = " "
+format-prefix-foreground = ${colors.alert}
+format-underline = #55aa55
 
-menu-2-0 = power off
-menu-2-0-exec = sudo poweroff
-menu-2-1 = cancel
-menu-2-1-exec = menu-open-0
-
-[settings]
-screenchange-reload = true
+[module/aur-updates]
+type = custom/script
+exec = yay -Qua | wc -l
+interval = 1200
+label = AUR: %output%
+format-foreground = ${colors.foreground}
+format-prefix = " "
+format-prefix-foreground = ${colors.alert}
+format-underline = #55aa55
 
 ; vim:ft=dosini
