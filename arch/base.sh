@@ -27,7 +27,7 @@ pacman -S --needed \
     base-devel linux-headers man-db man-pages git vim python pacman-contrib \
     xdg-user-dirs xdg-utils dialog \
     networkmanager network-manager-applet \
-    openssh rsync openbsd-netcat iptables ipset firewalld \
+    openssh rsync openbsd-netcat iptables ipset firewalld gnupg \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol sof-firmware \
     acpi acpi_call acpid \
