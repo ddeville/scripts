@@ -8,7 +8,8 @@ sudo pacman -S --needed \
     flatpak dunst nautilus redshift firefox-developer-edition neofetch dmenu rofi sxiv mupdf \
     libvncserver remmina \
     alacritty neovim stow bat exa fish htop jq ripgrep tmux curl fd go ninja nodejs npm \
-    ttf-anonymous-pro xorg-fonts-misc terminus-font noto-fonts noto-fonts-emoji ttf-dejavu ttf-liberation
+    ttf-anonymous-pro xorg-fonts-misc terminus-font noto-fonts noto-fonts-emoji ttf-dejavu ttf-liberation \
+    faenza-icon-theme papirus-icon-theme
 
 sudo systemctl enable lightdm
 
