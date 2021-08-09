@@ -22,4 +22,4 @@ popd
 
 yay -S --needed \
     polybar google-chrome dropbox 1password \
-    ttf-unifont otf-public-sans
+    ttf-unifont otf-public-sans ttf-font-awesome
