@@ -15,12 +15,20 @@ super + shift + s
 	slock
 
 # focus the given desktop
-super + {1-9,0}
-	bspc desktop -f '^{1-9,10}'
+super + {1-8}
+	bspc desktop -f '^{1-8}'
+super + 9
+	bspc desktop -f 'code'
+super + 0
+	bspc desktop -f 'dbx-code'
 
 # send a window to a given desktop and move to it
-super + shift + {1-9,0}
-	bspc node -d '^{1-9,10}' --follow
+super + shift + {1-8}
+	bspc node -d '^{1-8}' --follow
+super + shift + 9
+	bspc node -d 'code' --follow
+super + shift + 0
+	bspc node -d 'dbx-code' --follow
 
 # make sxhkd reload its configuration files:
 super + Escape
