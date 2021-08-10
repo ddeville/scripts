@@ -1,4 +1,19 @@
+! Turn CapsLock into Control, Control into Super_L and Control_L as Super_L
+! This is because:
+!   1. I have always used CapsLock as Control on the command line
+!   2. I have used macs forever and have that Command key wired in my fingers
+!   3. We need a key to act as Super mod for the window manager (Control_L here)
+
 clear lock
 clear control
+clear mod4
+
+! Set Left Control to Left Super
+keycode 37 = Super_L
+! Set Caps Lock to Left Control
 keycode 66 = Control_L
+! Set Left Super to Left Control
+keycode 133 = Control_L
+
 add control = Control_L Control_R
+add mod4 = Super_L Super_R

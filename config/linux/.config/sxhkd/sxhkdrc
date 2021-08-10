@@ -10,6 +10,9 @@ super + backslash
 super + @space
 	rofi -show drun -m -1
 
+ctrl + @space
+	rofi -show drun -m -1
+
 # lock
 super + shift + s
 	slock
