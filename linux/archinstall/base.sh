@@ -31,7 +31,7 @@ pacman -S --needed \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol sof-firmware \
     acpi acpi_call acpid \
-    mtools dosfstools gvfs gvfs-smb nfs-utils ntfs-3g
+    mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
