@@ -2,6 +2,9 @@
 
 xset r rate 180 50
 
+if [ -f /etc/X11/xinit/.Xmodmap ]; then
+  xmodmap /etc/X11/xinit/.Xmodmap
+fi
 if [ -e "$HOME/.Xmodmap" ]; then
   xmodmap "$HOME/.Xmodmap"
 fi
