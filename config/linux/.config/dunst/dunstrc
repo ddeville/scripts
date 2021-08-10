@@ -283,15 +283,6 @@
     mouse_middle_click = close_current
     mouse_right_click = close_all
 
-[shortcuts]
-    # Close notification. Equivalent dunstctl command:
-    # dunstctl close
-    close = ctrl+period
-
-    # Close all notifications. Equivalent dunstctl command:
-    # dunstctl close-all
-    close_all = ctrl+shift+period
-
 [urgency_low]
     msg_urgency = low
     background = "#3c3836"

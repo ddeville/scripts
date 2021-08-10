@@ -113,3 +113,11 @@ XF86AudioPrev
 	playerctl --player=spotify previous
 XF86AudioNext
 	playerctl --player=spotify next
+
+# Dunst
+ctrl + period
+	dunstctl close
+ctrl + shift + period
+	dunstctl close-all
+ctrl + alt + period
+	dunstctl history-pop
