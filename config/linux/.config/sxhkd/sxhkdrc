@@ -9,7 +9,8 @@ super + backslash
 # program launcher
 super + @space
 	rofi -show drun -m -1
-
+super + d
+	rofi -show drun -m -1
 ctrl + @space
 	rofi -show drun -m -1
 
