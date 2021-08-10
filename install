@@ -196,7 +196,8 @@ def task_update_tmux_plugins():
     # type: () -> TaskManifest
     def cmd():
         # type: () -> None
-        tpm_path = os.path.join(XDG_CONFIG_HOME, "tmux", "plugins", "tpm")
+        plugins_path = os.path.join(XDG_CONFIG_HOME, "tmux", "plugins")
+        tpm_path = os.path.join(plugins_path, "tpm")
 
         # first install TPM itself if needed
         if not os.path.exists(tpm_path):
@@ -205,8 +206,10 @@ def task_update_tmux_plugins():
 
         # and update the plugins
         print("====> updating tmux plugins")
-        run_command([os.path.join(tpm_path, "bin", "install_plugins")])
-        run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"])
+        env = os.environ.copy()
+        env["TMUX_PLUGIN_MANAGER_PATH"] = plugins_path
+        run_command([os.path.join(tpm_path, "bin", "install_plugins")], env=env)
+        run_command([os.path.join(tpm_path, "bin", "update_plugins"), "all"], env=env)
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow"])
 
