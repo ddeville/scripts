@@ -57,4 +57,7 @@ sudo -u damien -H sh -c "cd \$(mktemp -d -t yay-XXXXXXXXXX); \
     git clone https://aur.archlinux.org/yay-git.git; \
     makepkg -si;"
 
+sudo -u damien -H sh -c "git clone https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
+sudo -u damien -H sh -c "git clone https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
+
 printf "\e[1;32mDone! Type exit, umount -a and reboot.\e[0m"

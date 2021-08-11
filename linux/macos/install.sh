@@ -18,9 +18,9 @@ chsh -s $brew_path/fish
 
 mkdir -p $HOME/.local/share
 
-export CARGO_HOME=$HOME/.local/share/cargo
-export RUSTUP_HOME=$HOME/.local/share/rustup
+export CARGO_HOME=~/.local/share/cargo
+export RUSTUP_HOME=~/.local/share/rustup
 curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 
-git clone https://github.com/ddeville/base16-shell.git $HOME/.local/share/base16-shell
-git clone https://github.com/tmux-plugins/tpm $HOME/scripts/config/common/.config/tmux/plugins/tpm
+git clone https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell
+git clone https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm
