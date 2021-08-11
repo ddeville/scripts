@@ -31,7 +31,7 @@ Also manually install iTerm2 and whatever other GUI programs.
 - Install the various LSP servers by running `lsp_install`.
 - Rehash the `pyenv` shims by running `pyenv rehash shell` (and install latest python version).
 
-## Maintainance
+## Maintenance
 
 - Periodically update the shell plugins by running `update-shell-plugins`.
 - Periodically update the LSP binaries by running `lsp_install`.
