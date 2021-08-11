@@ -23,3 +23,4 @@ export RUSTUP_HOME=$HOME/.local/share/rustup
 curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 
 git clone https://github.com/ddeville/base16-shell.git $HOME/.local/share/base16-shell
+git clone https://github.com/tmux-plugins/tpm $HOME/scripts/config/common/.config/tmux/plugins/tpm
