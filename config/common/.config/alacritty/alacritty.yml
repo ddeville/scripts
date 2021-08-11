@@ -25,6 +25,9 @@ font:
   normal:
     family: Anonymous Pro
     style: Regular
+  bold:
+    family: Anonymous Pro
+    style: Regular
   size: 12
   offset:
     y: 3
