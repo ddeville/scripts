@@ -24,14 +24,16 @@ pacman -Syy
 pacman -S --needed \
     grub efibootmgr os-prober \
     xf86-video-amdgpu \
-    base-devel linux-headers man-db man-pages git vim python pacman-contrib \
+    base-devel linux-headers man-db man-pages git pacman-contrib \
     xdg-user-dirs xdg-utils dialog \
     networkmanager network-manager-applet \
     openssh rsync openbsd-netcat iptables ipset firewalld gnupg \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol sof-firmware \
     acpi acpi_call acpid \
-    mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g
+    mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g \
+    vim neovim stow bat exa fish htop jq ripgrep tmux curl fd \
+    cmake ninja python rustup go nodejs npm pyenv docker
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
