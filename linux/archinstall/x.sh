@@ -13,14 +13,6 @@ sudo pacman -S --needed \
 
 sudo systemctl enable lightdm
 
-tmp_dir=$(mktemp -d -t yay-XXXXXXXXXX)
-pushd $tmp_dir
-git clone https://aur.archlinux.org/yay-git.git
-pushd yay-git
-makepkg -si
-popd
-popd
-
 yay -S --needed \
     polybar google-chrome 1password spotify slack discord \
     dropbox nautilus-dropbox dropbox-cli \

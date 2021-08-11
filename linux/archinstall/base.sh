@@ -49,4 +49,8 @@ useradd -m damien
 passwd damien
 echo "damien ALL=(ALL) ALL" >> /etc/sudoers.d/damien
 
+sudo -u damien -H sh -c "cd \$(mktemp -d -t yay-XXXXXXXXXX); \
+    git clone https://aur.archlinux.org/yay-git.git; \
+    makepkg -si;"
+
 printf "\e[1;32mDone! Type exit, umount -a and reboot.\e[0m"
