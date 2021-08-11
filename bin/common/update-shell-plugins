@@ -1,0 +1,8 @@
+#!/bin/sh
+
+nvim +PlugUpgrade +qall
+nvim +PlugUpdate +qall
+
+export TMUX_PLUGIN_MANAGER_PATH=$HOME/.config/tmux/plugins
+$HOME/.config/tmux/plugins/tpm/bin/install_plugins
+$HOME/.config/tmux/plugins/tpm/bin/update_plugins all
