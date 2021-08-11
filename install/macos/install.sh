@@ -9,9 +9,11 @@ else
     brew_path=/usr/local/bin
 fi
 
+$brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
     bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja \
-    pyenv golang node robotsandpencils/made/xcodes
+    pyenv golang node robotsandpencils/made/xcodes \
+    font-anonymous-pro
 
 echo $brew_path/fish >> /etc/shells
 chsh -s $brew_path/fish
