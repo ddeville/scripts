@@ -9,8 +9,7 @@ sudo pacman -S --needed \
     libvncserver remmina \
     alacritty neovim stow bat exa fish htop jq ripgrep tmux curl fd go ninja nodejs npm \
     faenza-icon-theme papirus-icon-theme \
-    ttf-anonymous-pro xorg-fonts-misc terminus-font noto-fonts noto-fonts-emoji ttf-dejavu ttf-liberation \
-    inter-font ttf-linux-libertine gnu-free-fonts ttf-bitstream-vera tex-gyre-fonts
+    ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji tex-gyre-fonts gnu-free-fonts xorg-fonts-misc
 
 sudo systemctl enable lightdm
 
@@ -25,4 +24,4 @@ popd
 yay -S --needed \
     polybar google-chrome 1password \
     dropbox nautilus-dropbox dropbox-cli \
-    ttf-unifont otf-public-sans ttf-font-awesome ttf-mac-fonts ttf-nunito montserrat-font-ttf font-bh-ttf libertinus-font
+    ttf-nunito montserrat-font-ttf otf-public-sans ttf-mac-fonts ttf-font-awesome
