@@ -33,4 +33,5 @@ mkinitcpio -p linux
 # move into new install
 arch-chroot /mnt
 
-# clone repo and run install script
+# clone repo and run `base.sh` script
+# login as user and run `x.sh` and `progs.sh` scripts
