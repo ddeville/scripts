@@ -32,7 +32,7 @@ pacman -S --needed \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol sof-firmware \
     acpi acpi_call acpid \
     mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g \
-    vim neovim stow bat exa fish htop jq ripgrep tmux curl fd \
+    fish vim neovim stow bat exa htop jq ripgrep tmux curl fd \
     cmake ninja python rustup go nodejs npm pyenv docker
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
@@ -50,6 +50,8 @@ systemctl enable acpid
 useradd -m damien
 passwd damien
 echo "damien ALL=(ALL) ALL" >> /etc/sudoers.d/damien
+
+sudo -u damien -H sh -c "chsh -s /usr/bin/fish"
 
 sudo -u damien -H sh -c "cd \$(mktemp -d -t yay-XXXXXXXXXX); \
     git clone https://aur.archlinux.org/yay-git.git; \
