@@ -9,3 +9,6 @@ x-scheme-handler/http=firefox-developer-edition.desktop
 x-scheme-handler/https=firefox-developer-edition.desktop
 text/html=firefox-developer-edition.desktop
 text/plain=nvim.desktop
+
+[Added Associations]
+text/plain=vim.desktop
