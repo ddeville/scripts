@@ -18,7 +18,6 @@ end
 
 # make sure that this is before anything in the path (it overwrites others)
 add_to_path "$PYENV_ROOT/shims"
-add_to_path "$PYENV_ROOT/bin"
 
 # add the dropbox overrides before the rest (if this is a dropbox machine)
 add_to_path "/opt/dropbox-override/bin"

@@ -77,6 +77,7 @@ def task_install_extra_packages():
         package_manager.install_packages([
             "cmake",
             {PackageType.BREW: "robotsandpencils/made/xcodes"},
+            {PackageType.BREW: "pyenv", PackageType.PACMAN: "pyenv"},
             {PackageType.BREW: "golang", PackageType.PACMAN: "go", PackageType.DEB: "golang"},
             {PackageType.BREW: "ninja", PackageType.PACMAN: "ninja", PackageType.DEB: "ninja-build"},
             {PackageType.BREW: "node", PackageType.PACMAN: "nodejs", PackageType.DEB: "nodejs"},
@@ -140,27 +141,6 @@ def task_install_base16():
             run_command(["git", "clone", repo_url, path])
 
     return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS + [LITE], dependencies=["run_stow"])
-
-def task_install_pyenv():
-    # type: () -> TaskManifest
-    def cmd():
-        # type: () -> None
-        if is_cmd_installed("pyenv"):
-            print("====> updating pyenv")
-            run_command(["pyenv", "update"])
-        else:
-            pyenv_path = os.path.join(XDG_DATA_HOME, "pyenv")
-            if os.path.exists(pyenv_path):
-                print("====> deleting existing pyenv install")
-                shutil.rmtree(pyenv_path)
-            print("====> installing pyenv")
-            pyenv_installer_path = "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
-            script_path = download_file(pyenv_installer_path)
-            env = os.environ.copy()
-            env["PYENV_ROOT"] = pyenv_path
-            run_command(["bash", script_path], env=env)
-
-    return TaskManifest(cmd=cmd, tags=ALL_PLATFORMS, dependencies=["run_stow"])
 
 def task_install_rustup():
     # type: () -> TaskManifest
