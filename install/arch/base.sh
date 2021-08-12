@@ -26,7 +26,7 @@ pacman -S --needed \
     xf86-video-amdgpu \
     base-devel linux-headers man-db man-pages git pacman-contrib \
     xdg-user-dirs xdg-utils dialog terminus-font \
-    networkmanager network-manager-applet \
+    networkmanager network-manager-applet libvncserver \
     openssh rsync openbsd-netcat iptables ipset firewalld gnupg \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pavucontrol sof-firmware \
