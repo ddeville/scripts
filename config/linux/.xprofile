@@ -17,4 +17,5 @@ xrdb -merge <(echo "*dpi: $dpi")
 xset r rate 180 50
 xsetroot -cursor_name left_ptr
 
-eval $(ssh-agent)
+eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
+export SSH_AUTH_SOCK
