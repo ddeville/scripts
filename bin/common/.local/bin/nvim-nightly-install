@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+
+set -eu
+
+NVIM_INSTALL_PATH="/opt/nvim/nightly"
+
+function _setup {
+    # Create install path if needed
+    if [ ! -d $NVIM_INSTALL_PATH ]; then
+        echo "Creating install folder"
+        sudo mkdir -p $NVIM_INSTALL_PATH
+        sudo chown $USER $NVIM_INSTALL_PATH
+    fi
+
+    # Make sure it's a folder with the right permissions
+    if [ ! -d $NVIM_INSTALL_PATH ] || [ -f $NVIM_INSTALL_PATH ] || [ ! -O $NVIM_INSTALL_PATH ]; then
+        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
+        exit 1
+    fi
+}
+
+function _nvim_nightly_prebuilt {
+    _setup
+
+    # Get the download URL for the nightly package for the current platform
+    if [ "$(uname)" = "Darwin" ]; then
+        filename="nvim-macos.tar.gz"
+        foldername="nvim-osx64"
+    elif [ "$(uname)" = "Linux" ]; then
+        filename="nvim-linux64.tar.gz"
+        foldername="nvim-linux64"
+    else
+        echo "Unsupported platform:" "$(uname)"
+        exit 1
+    fi
+    url="https://github.com/neovim/neovim/releases/download/nightly/$filename"
+
+    # Download the archive to a temp directory
+    tmp_dir="$(mktemp -d)"
+    tmp_path="$tmp_dir/$filename"
+    echo "Downloading $url to $tmp_path"
+    curl -L --url "$url" --output "$tmp_path"
+
+    # Extract the archive
+    tar xzvf "$tmp_path" -C "$tmp_dir"
+    rm "$tmp_path"
+
+    # Check whether it is a new version
+    new_version="$($tmp_dir/$foldername/bin/nvim --version | head -n 1)"
+    if [ -f "$NVIM_INSTALL_PATH/bin/nvim" ]; then
+        cur_version="$($NVIM_INSTALL_PATH/bin/nvim --version | head -n 1)"
+
+        if [[ "$cur_version" == "$new_version" ]]; then
+            echo "Version $cur_version is already installed"
+            # Cleanup
+            rm -rf "$tmp_dir/$foldername"
+            exit 0
+        fi
+    fi
+
+    # Delete the existing install and move the new one over
+    echo "Installing $new_version"
+    touch "$NVIM_INSTALL_PATH/sentinel"
+    rm -rf "$NVIM_INSTALL_PATH/"*
+    mv "$tmp_dir/$foldername/"* $NVIM_INSTALL_PATH
+
+    # Cleanup
+    rm -r "$tmp_dir/$foldername"
+}
+
+# Prerequisites:
+#   macOS: `brew install ninja libtool automake cmake pkg-config gettext`
+#   linux: `sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip`
+
+function _nvim_nightly_compile {
+    _setup
+
+    # Download the archive to a temp directory
+    url="https://github.com/neovim/neovim/archive/nightly.tar.gz"
+    tmp_dir="$(mktemp -d)"
+    tmp_path="$tmp_dir/neovim-nightly.tar.gz"
+    echo "Downloading $url to $tmp_path"
+    curl -L --url "$url" --output "$tmp_path"
+
+    # Extract the archive
+    tar xzvf "$tmp_path" -C "$tmp_dir"
+    rm "$tmp_path"
+
+    # Build
+    pushd "$tmp_dir/neovim-nightly"
+    echo "Building in $(pwd)"
+    make CMAKE_BUILD_TYPE=Release CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$NVIM_INSTALL_PATH"
+    make install
+    popd
+
+    # Cleanup
+    rm -rf "$tmp_dir"
+}
+
+case ${1-none} in
+    prebuilt)
+        _nvim_nightly_prebuilt
+        ;;
+    compile)
+        _nvim_nightly_compile
+        ;;
+    *)
+        echo "Available commands"
+        echo "  * prebuilt"
+        echo "  * compile"
+        exit 1
+        ;;
+esac
