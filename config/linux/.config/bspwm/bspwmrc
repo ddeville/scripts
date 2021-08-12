@@ -3,10 +3,6 @@
 # kill the current running instances
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-# kick off ssh-agent and set some options
-eval $(ssh-agent)
-xsetroot -cursor_name left_ptr
-
 # set up nitrogen
 nitrogen --restore &
 
