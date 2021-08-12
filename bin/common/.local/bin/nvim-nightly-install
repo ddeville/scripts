@@ -86,11 +86,11 @@ function _nvim_nightly_compile {
     rm "$tmp_path"
 
     # Build
-    pushd "$tmp_dir/neovim-nightly"
+    pushd "$tmp_dir/neovim-nightly" > /dev/null
     echo "Building in $(pwd)"
     make CMAKE_BUILD_TYPE=Release CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$NVIM_INSTALL_PATH"
     make install
-    popd
+    popd > /dev/null
 
     # Cleanup
     rm -rf "$tmp_dir"

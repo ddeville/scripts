@@ -17,7 +17,7 @@ function _rust_analyzer {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     if [ "$(uname)" = "Darwin" ]; then
         if [[ "$(uname -m)" == "arm64" ]]; then
@@ -41,7 +41,7 @@ function _rust_analyzer {
     mv "$filename" rust-analyzer
     chmod +x rust-analyzer
 
-    popd
+    popd > /dev/null
 
     ln -s "../$foldername/rust-analyzer" "$linkname"
 }
@@ -60,7 +60,7 @@ function _clangd {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     if [ "$(uname)" = "Darwin" ]; then
         platform_name="mac"
@@ -82,7 +82,7 @@ function _clangd {
     unzip -q "$archive_path"
     rm "$archive_path"
 
-    popd
+    popd > /dev/null
 
     bin_path="$foldername/clangd_$version_name/bin/clangd"
     chmod +x "$bin_path"
@@ -110,7 +110,7 @@ function _gopls {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     export GOPATH="$(pwd)"
     export GOBIN="$(pwd)"
@@ -118,7 +118,7 @@ function _gopls {
     go get -v golang.org/x/tools/gopls
     go clean -modcache
 
-    popd
+    popd > /dev/null
 
     ln -s "../$foldername/gopls" "$linkname"
 }
@@ -142,12 +142,12 @@ function _tsserver {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     npm init -y --scope=lsp
     npm install typescript-language-server@latest typescript@latest
 
-    popd
+    popd > /dev/null
 
     ln -s "../$foldername/node_modules/.bin/typescript-language-server" "$linkname"
 }
@@ -171,12 +171,12 @@ function _pyright {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     npm init -y --scope=lsp
     npm install pyright@latest
 
-    popd
+    popd > /dev/null
 
     ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
 }
@@ -200,7 +200,7 @@ function _sumneko_lua {
     fi
 
     mkdir "$foldername"
-    pushd "$foldername"
+    pushd "$foldername" > /dev/null
 
     if [ "$(uname)" = "Darwin" ]; then
         ninja_file="macos.ninja"
@@ -220,17 +220,17 @@ function _sumneko_lua {
 
     git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
 
-    pushd "lua-language-server"
+    pushd "lua-language-server" > /dev/null
 
     git submodule update --init --recursive
 
-    pushd "3rd/luamake"
+    pushd "3rd/luamake" > /dev/null
     ninja -f compile/ninja/$ninja_file
-    popd
+    popd > /dev/null
 
     ./3rd/luamake/luamake rebuild
 
-    popd
+    popd > /dev/null
 
     curpath="$(pwd)"
 
@@ -238,7 +238,7 @@ function _sumneko_lua {
     $curpath/lua-language-server/bin/$bin_dir/lua-language-server -E $curpath/lua-language-server/main.lua"
     chmod +x lua
 
-    popd
+    popd > /dev/null
 
     command ln -s "../$foldername/lua" "$linkname"
 }
@@ -277,7 +277,7 @@ fi
 
 mkdir -p "$LSP_INSTALL_PATH/bin"
 
-pushd "$LSP_INSTALL_PATH"
+pushd "$LSP_INSTALL_PATH" > /dev/null
 for arg; do
     if [[ $arg == "rust-analyzer" ]] || $install_all; then
         _rust_analyzer
@@ -298,4 +298,4 @@ for arg; do
         _sumneko_lua
     fi
 done
-popd
+popd > /dev/null

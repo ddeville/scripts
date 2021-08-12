@@ -8,10 +8,10 @@ else
     DIRS="common"
 fi
 
-pushd $HOME/scripts/config
+pushd $HOME/scripts/config > /dev/null
 stow $DIRS -t $HOME -v
-popd
+popd > /dev/null
 
-pushd $HOME/scripts/bin
+pushd $HOME/scripts/bin > /dev/null
 stow $DIRS -t $HOME -v
-popd
+popd > /dev/null
