@@ -1,8 +1,15 @@
-dpi=140
+#!/bin/sh
 
-xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
-xrandr --output DisplayPort-1 --mode 3840x2160 --pos 3840x0 --rotate right
+dpi=96
 
+# This is my dual monitor home machine
+if [[ $(hostname) == "arch" ]]; then
+    dpi=140
+    xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
+    xrandr --output DisplayPort-1 --mode 3840x2160 --pos 3840x0 --rotate right
+fi
+
+# Update the DPI in the X resources
 xrandr --dpi "$dpi"
 xrdb -merge <(echo "Xft.dpi: $dpi")
 xrdb -merge <(echo "*dpi: $dpi")
