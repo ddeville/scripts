@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$(uname)" = "Linux" ]; then
+    DIRS="common linux"
+elif [ "$(uname)" = "Darwin" ]; then
+    DIRS="common macos"
+else
+    DIRS="common"
+fi
+
+pushd $HOME/scripts/config
+stow $DIRS -t $HOME -v
+popd
+
+pushd $HOME/scripts/bin
+stow $DIRS -t $HOME -v
+popd
