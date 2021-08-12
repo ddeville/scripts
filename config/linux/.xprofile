@@ -2,7 +2,7 @@
 
 dpi=96
 
-# This is my dual monitor home machine
+# This is my home machine with two monitors
 if [[ $(hostname) == "arch" ]]; then
     dpi=140
     xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
