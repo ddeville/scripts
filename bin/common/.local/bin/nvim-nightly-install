@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -eu
 
 NVIM_INSTALL_PATH="/opt/nvim/nightly"
@@ -30,7 +29,7 @@ function _nvim_nightly_prebuilt {
         filename="nvim-linux64.tar.gz"
         foldername="nvim-linux64"
     else
-        echo "Unsupported platform:" "$(uname)"
+        echo "Unsupported platform: $(uname)"
         exit 1
     fi
     url="https://github.com/neovim/neovim/releases/download/nightly/$filename"

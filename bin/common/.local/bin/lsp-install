@@ -1,0 +1,301 @@
+#!/usr/bin/env bash
+set -eu
+
+# NOTE: Remember to add to completions when adding a new server type
+
+function _rust_analyzer {
+    echo "Installing rust-analyzer"
+
+    foldername="_rust-analyzer"
+    linkname="bin/rust-analyzer"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    if [ "$(uname)" = "Darwin" ]; then
+        if [[ "$(uname -m)" == "arm64" ]]; then
+            filename="rust-analyzer-aarch64-apple-darwin"
+        else
+            filename="rust-analyzer-x86_64-apple-darwin"
+        fi
+    elif [ "$(uname)" = "Linux" ]; then
+        filename="rust-analyzer-x86_64-unknown-linux-gnu"
+    else
+        echo "Unsupported platform: $(uname)"
+        exit 1
+    fi
+    url="https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/$filename.gz"
+
+    archive_path="$filename.gz"
+    echo "Downloading $url to $archive_path"
+    curl -L --url "$url" --output "$archive_path"
+
+    gzip -d "$archive_path"
+    mv "$filename" rust-analyzer
+    chmod +x rust-analyzer
+
+    popd
+
+    ln -s "../$foldername/rust-analyzer" "$linkname"
+}
+
+function _clangd {
+    echo "Installing clangd"
+
+    foldername="_clangd"
+    linkname="bin/clangd"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    if [ "$(uname)" = "Darwin" ]; then
+        platform_name="mac"
+    elif [ "$(uname)" = "Linux" ]; then
+        platform_name="linux"
+    else
+        echo "Unsupported platform: $(uname)"
+        exit 1
+    fi
+
+    version_url="https://api.github.com/repos/clangd/clangd/releases/latest"
+    version_name="$(curl $version_url | jq --raw-output '.name')"
+    url="https://github.com/clangd/clangd/releases/download/$version_name/clangd-$platform_name-$version_name.zip"
+
+    archive_path="clangd.zip"
+    echo "Downloading $url to $archive_path"
+    curl -L --url "$url" --output "$archive_path"
+
+    unzip -q "$archive_path"
+    rm "$archive_path"
+
+    popd
+
+    bin_path="$foldername/clangd_$version_name/bin/clangd"
+    chmod +x "$bin_path"
+
+    ln -s "../$bin_path" "$linkname"
+}
+
+function _gopls {
+    echo "Installing gopls"
+
+    if ! command -v go &> /dev/null; then
+        echo "The gopls language server requires Go to be installed"
+        exit 1
+    fi
+
+    foldername="_gopls"
+    linkname="bin/gopls"
+
+    if [ -d "$foldername" ]; then
+        chmod -R 700 "$foldername"  # some go files in `pkg/` are not writable...
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    export GOPATH="$(pwd)"
+    export GOBIN="$(pwd)"
+    export GO111MODULE=on
+    go get -v golang.org/x/tools/gopls
+    go clean -modcache
+
+    popd
+
+    ln -s "../$foldername/gopls" "$linkname"
+}
+
+function _tsserver {
+    echo "Installing tsserver"
+
+    if ! command -v npm &> /dev/null; then
+        echo "The tsserver language server requires Node to be installed"
+        exit 1
+    fi
+
+    foldername="_tsserver"
+    linkname="bin/typescript-language-server"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    npm init -y --scope=lsp
+    npm install typescript-language-server@latest typescript@latest
+
+    popd
+
+    ln -s "../$foldername/node_modules/.bin/typescript-language-server" "$linkname"
+}
+
+function _pyright {
+    echo "Installing pyright"
+
+    if ! command -v npm &> /dev/null; then
+        echo "The pyright language server requires Node to be installed"
+        exit 1
+    fi
+
+    foldername="_pyright"
+    linkname="bin/pyright-langserver"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    npm init -y --scope=lsp
+    npm install pyright@latest
+
+    popd
+
+    ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
+}
+
+function _sumneko_lua {
+    echo "Installing sumneko_lua"
+
+    if ! command -v ninja &> /dev/null; then
+        echo "The sumneko_lua language server requires Ninja to be installed"
+        exit 1
+    fi
+
+    foldername="_lua"
+    linkname="bin/lua-language-server"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername"
+
+    if [ "$(uname)" = "Darwin" ]; then
+        ninja_file="macos.ninja"
+        bin_dir="macOS"
+    elif [ "$(uname)" = "Linux" ]; then
+        ninja_file="linux.ninja"
+        bin_dir="Linux"
+    else
+        echo "Unsupported platform: $(uname)"
+        exit 1
+    fi
+
+    # We assume that the first tag is the latest, an assumption that the GH API
+    # also makes...
+    tags_url="https://api.github.com/repos/sumneko/lua-language-server/tags"
+    tag_name="$(curl $tags_url | jq --raw-output '.[0].name')"
+
+    git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
+
+    pushd "lua-language-server"
+
+    git submodule update --init --recursive
+
+    pushd "3rd/luamake"
+    ninja -f compile/ninja/$ninja_file
+    popd
+
+    ./3rd/luamake/luamake rebuild
+
+    popd
+
+    curpath="$(pwd)"
+
+    command echo >lua "#!/bin/sh
+    $curpath/lua-language-server/bin/$bin_dir/lua-language-server -E $curpath/lua-language-server/main.lua"
+    chmod +x lua
+
+    popd
+
+    command ln -s "../$foldername/lua" "$linkname"
+}
+
+if [[ $# == 0 ]]; then
+    echo "Available servers:"
+    echo "  * rust-analyzer"
+    echo "  * clangd"
+    echo "  * gopls"
+    echo "  * tsserver"
+    echo "  * pyright"
+    echo "  * sumneko_lua"
+    exit 1
+fi
+
+install_all=false
+for arg; do
+    if [[ $arg == "all" ]]; then
+        install_all=true
+    fi
+done
+
+LSP_INSTALL_PATH="/opt/lsp"
+
+if [ ! -d $LSP_INSTALL_PATH ]; then
+    echo "Creating install folder"
+    sudo mkdir -p $LSP_INSTALL_PATH
+    sudo chown $USER $LSP_INSTALL_PATH
+fi
+
+# Make sure it's a folder with the right permissions
+if [ ! -d $LSP_INSTALL_PATH ] || [ -f $LSP_INSTALL_PATH ] || [ ! -O $LSP_INSTALL_PATH ]; then
+    echo "Make sure that" $LSP_INSTALL_PATH "is a directory and is owned by" $USER
+    exit 1
+fi
+
+mkdir -p "$LSP_INSTALL_PATH/bin"
+
+pushd "$LSP_INSTALL_PATH"
+for arg; do
+    if [[ $arg == "rust-analyzer" ]] || $install_all; then
+        _rust_analyzer
+    fi
+    if [[ $arg == "clangd" ]] || $install_all; then
+        _clangd
+    fi
+    if [[ $arg == "gopls" ]] || $install_all; then
+        _gopls
+    fi
+    if [[ $arg == "tsserver" ]] || $install_all; then
+        _tsserver
+    fi
+    if [[ $arg == "pyright" ]] || $install_all; then
+        _pyright
+    fi
+    if [[ $arg == "sumneko_lua" ]] || $install_all; then
+        _sumneko_lua
+    fi
+done
+popd

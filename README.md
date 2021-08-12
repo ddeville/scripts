@@ -28,10 +28,10 @@ Also manually install iTerm2 and whatever other GUI programs necessary.
     - `python2 -m pip install --upgrade pynvim`
     - `python3 -m pip install --upgrade pynvim`
     - `npm install -g neovim`
-- Install the various LSP servers by running `lsp_install`.
+- Install the various LSP servers by running `lsp-install`.
 - Rehash the `pyenv` shims by running `pyenv rehash shell` (and install latest python version).
 
 ## Maintenance
 
 - Periodically update the shell plugins by running `update-shell-plugins`.
-- Periodically update the LSP binaries by running `lsp_install`.
+- Periodically update the LSP binaries by running `lsp-install`.
