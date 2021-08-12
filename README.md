@@ -21,7 +21,7 @@ Also manually install iTerm2 and whatever other GUI programs necessary.
 
 ## Post-installation
 
-- Stow the various config files by running `bin/common/stow-config`.
+- Stow the various config files by running `bin/stow-config`.
 - Add the rust source and linters to the rustup install: `rustup component add rust-src rustfmt clippy`.
 - Install the nightly Neovim by running `nvim-nightly-install`.
 - Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
