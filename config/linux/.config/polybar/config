@@ -206,7 +206,7 @@ format-underline = #55aa55
 
 [module/aur-updates]
 type = custom/script
-exec = yay -Qua | wc -l
+exec = paru -Qua | wc -l
 interval = 1200
 label = AUR: %output%
 format-foreground = ${colors.foreground}
