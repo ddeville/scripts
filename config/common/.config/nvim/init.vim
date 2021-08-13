@@ -220,6 +220,9 @@ vnoremap K :m '<-2<CR>gv=gv
 " map screen redraw to also turn off search highlighting
 nnoremap <C-l> :nohl<CR><C-l>
 
+" make Y behave like D and C
+nnoremap Y y$
+
 " ==> DIAGNOSTICS
 
 " diagnostic error messages in red
