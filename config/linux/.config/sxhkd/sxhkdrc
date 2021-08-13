@@ -52,7 +52,7 @@ alt + bracket{left,right}
 
 # focus or send the window to the given desktop on the current monitor
 super + {_,shift + }{1-9,0}
-	bspc {desktop -f,node -d} '^{1-9,10}.local'
+	bspc {desktop -f,node -d} '^{1-9,10}'
 
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
