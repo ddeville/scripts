@@ -53,8 +53,8 @@ echo "damien ALL=(ALL) ALL" >> /etc/sudoers.d/damien
 
 sudo -u damien -H sh -c "chsh -s /usr/bin/fish"
 
-sudo -u damien -H sh -c "cd \$(mktemp -d -t yay-XXXXXXXXXX); \
-    git clone https://aur.archlinux.org/yay-git.git; \
+sudo -u damien -H sh -c "cd \$(mktemp -d -t paru-XXXXXXXXXX); \
+    git clone https://aur.archlinux.org/paru.git; \
     makepkg -si;"
 
 sudo -u damien -H sh -c "git clone https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"

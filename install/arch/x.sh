@@ -10,7 +10,7 @@ sudo pacman -S --needed \
     faenza-icon-theme papirus-icon-theme \
     ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji tex-gyre-fonts gnu-free-fonts xorg-fonts-misc ttf-linux-libertine
 
-yay -S --needed \
+paru -S --needed \
     polybar \
     ttf-nunito montserrat-font-ttf otf-public-sans ttf-mac-fonts ttf-font-awesome
 
