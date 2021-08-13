@@ -12,6 +12,7 @@ redshift -P -O 4500
 # set up polybar
 killall -q polybar
 while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+mkdir -p $HOME/.cache/logs
 polybar main 2> $HOME/.cache/logs/polybar-main.err &
 polybar term 2> $HOME/.cache/logs/polybar-term.err &
 
