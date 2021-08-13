@@ -27,7 +27,7 @@ function fish_greeting
     else
         echo $l_color" OS:         "$r_color(uname -rs)
         echo $l_color" Uptime:     "$r_color(uptime -p)
-        echo $l_color" Disk usage: "$r_color(df -h -l | grep -E 'dev/(nvm|sd)' | awk '{if ($6 == "/") { print $4" available ("$5" used)"}}')
+        echo $l_color" Disk usage: "$r_color(df -h -l | grep -E 'dev/(nvm|sd)' | awk '{if ($6 == "/") { printf "%s available (%s used)\n", $4, $5}}')
         echo $l_color" User:       "$r_color(id -un)
         echo $l_color" Hostname:   "$r_color(uname -n)
     end
