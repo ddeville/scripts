@@ -3,7 +3,7 @@
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 timedatectl set-ntp true
 hwclock --systohc
-sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+sed -i "/#en_US.UTF-8 UTF-8/s/#//" /etc/locale.gen
 locale-gen
 
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
