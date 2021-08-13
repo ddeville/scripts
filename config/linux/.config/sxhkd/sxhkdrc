@@ -18,22 +18,6 @@ ctrl + @space
 super + shift + s
 	slock
 
-# focus the given desktop
-super + {1-8}
-	bspc desktop -f '^{1-8}'
-super + 9
-	bspc desktop -f 'code'
-super + 0
-	bspc desktop -f 'dbx-code'
-
-# send a window to a given desktop and move to it
-super + shift + {1-8}
-	bspc node -d '^{1-8}' --follow
-super + shift + 9
-	bspc node -d 'code' --follow
-super + shift + 0
-	bspc node -d 'dbx-code' --follow
-
 # make sxhkd reload its configuration files:
 super + Escape
 	pkill -USR1 -x sxhkd
@@ -46,10 +30,6 @@ super + alt + {q,r}
 super + {_,shift + }w
 	bspc node -{c,k}
 
-# alternate between the tiled and monocle layout
-super + m
-	bspc desktop -l next
-
 # set the window state
 super + {t,shift + t,s,f}
 	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
@@ -58,21 +38,33 @@ super + {t,shift + t,s,f}
 super + ctrl + {m,x,y,z}
 	bspc node -g {marked,locked,sticky,private}
 
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# focus or send to the next/previous monitor
+super + {_,shift + }bracket{left,right}
+	bspc {monitor -f,node -m} {prev,next}
+
+# focus the next/previous desktop in the current monitor
+alt + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus or send the window to the given desktop on the current monitor
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}.local'
+
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
-
-# focus the node for the given path jump
-super + {p,b,comma,period}
-	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous window in the current desktop
 super + {_,shift + }c
 	bspc node -f {next,prev}.local.!hidden.window
 
-# focus the next/previous desktop in the current monitor
-super + bracket{left,right}
-	bspc desktop -f {prev,next}.local
+# focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
 
 # focus the last node/desktop
 super + {grave,Tab}

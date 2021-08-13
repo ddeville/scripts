@@ -8,7 +8,7 @@ secondary = #e60053
 alert = #bd2c40
 
 [bar/main]
-monitor = DisplayPort-0
+monitor = ${env:MONITOR:DisplayPort-0}
 inherit = bar/shared
 modules-left = date bspwm xwindow
 modules-center =
@@ -20,7 +20,7 @@ tray-background = ${colors.background-alt}
 enable-ipc = true
 
 [bar/term]
-monitor = DisplayPort-1
+monitor = ${env:MONITOR:DisplayPort-1}
 inherit = bar/shared
 modules-left = date bspwm
 modules-center =
