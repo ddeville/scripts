@@ -200,7 +200,7 @@ exec = pacman -Qu | wc -l
 interval = 1200
 label = Pacman: %output%
 format-foreground = ${colors.foreground}
-format-prefix = " "
+format-prefix = " "
 format-prefix-foreground = ${colors.alert}
 format-underline = #55aa55
 
@@ -210,7 +210,7 @@ exec = paru -Qua | wc -l
 interval = 1200
 label = AUR: %output%
 format-foreground = ${colors.foreground}
-format-prefix = " "
+format-prefix = " "
 format-prefix-foreground = ${colors.alert}
 format-underline = #55aa55
 
