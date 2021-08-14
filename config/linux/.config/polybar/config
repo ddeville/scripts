@@ -196,7 +196,7 @@ menu-0-2-exec = systemctl poweroff
 
 [module/pacman-updates]
 type = custom/script
-exec = pacman -Qu | wc -l
+exec = checkupdates | wc -l
 interval = 1200
 label = Pacman: %output%
 format-foreground = ${colors.foreground}
