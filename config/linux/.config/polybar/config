@@ -196,7 +196,7 @@ menu-0-2-exec = systemctl poweroff
 
 [module/pacman-updates]
 type = custom/script
-exec = checkupdates | wc -l
+exec = checkupdates 2> /dev/null | wc -l
 interval = 1200
 label = Pacman: %output%
 format-foreground = ${colors.foreground}
@@ -206,7 +206,7 @@ format-underline = #55aa55
 
 [module/aur-updates]
 type = custom/script
-exec = paru -Qua | wc -l
+exec = paru -Qua 2> /dev/null | wc -l
 interval = 1200
 label = AUR: %output%
 format-foreground = ${colors.foreground}
