@@ -81,7 +81,7 @@ label-empty-foreground = #555555
 
 [module/xwindow]
 type = internal/xwindow
-format-prefix = "    "
+format-prefix = "     "
 format-prefix-foreground = ${colors.foreground-alt}
 label = "%title:0:60:...%"
 
