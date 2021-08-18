@@ -8,7 +8,9 @@ sudo pacman -S --needed \
     dunst redshift neofetch playerctl rofi seahorse \
     alacritty firefox-developer-edition nautilus sxiv mupdf remmina \
     faenza-icon-theme papirus-icon-theme \
-    ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji tex-gyre-fonts gnu-free-fonts xorg-fonts-misc ttf-linux-libertine
+    ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji \
+    tex-gyre-fonts gnu-free-fonts xorg-fonts-misc ttf-linux-libertine ttf-opensans \
+    adobe-source-serif-fonts adobe-source-sans-fonts adobe-source-code-pro-fonts
 
 paru -S --needed \
     polybar \
