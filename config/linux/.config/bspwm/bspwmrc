@@ -9,6 +9,13 @@ nitrogen --restore &
 # tweak screen color to be easier on eyes
 redshift -P -O 4500
 
+# get the right hwmon path to monitor CPU temp in polybar
+for i in /sys/class/hwmon/hwmon*/temp*_input; do
+    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "k10temp: Tdie" ]; then
+        export HWMON_PATH="$i"
+    fi
+done
+
 # set up polybar
 killall -q polybar
 while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done

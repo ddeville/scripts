@@ -98,14 +98,14 @@ format-disconnected =
 [module/temperature]
 type = internal/temperature
 interval = 1
-thermal-zone = 0
+hwmon-path = ${env:HWMON_PATH}
 base-temperature = 20
 warn-temperature = 60
 format = <ramp> <label>
 format-underline = #f50a4d
 format-warn = <ramp> <label-warn>
 format-warn-underline = ${self.format-underline}
-label = %temperature-f%
+label = %temperature-f:6%
 label-warn = %temperature-f%
 label-warn-foreground = ${colors.secondary}
 ramp-0 = 
