@@ -10,8 +10,9 @@ nitrogen --restore &
 redshift -P -O 4500
 
 # get the right hwmon path to monitor CPU temp in polybar
+cpu_label="k10temp: Tdie"
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
-    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "k10temp: Tdie" ]; then
+    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$cpu_label" ]; then
         export HWMON_PATH="$i"
     fi
 done
