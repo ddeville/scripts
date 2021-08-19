@@ -196,7 +196,7 @@ menu-0-2-exec = systemctl poweroff
 
 [module/email]
 type = custom/script
-exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread
+exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread || echo "offline"
 interval = 60
 label =   %output%
 format = <label>
@@ -211,6 +211,7 @@ interval = 60
 label =   %notifications%
 format = <label>
 format-underline = #0099ff
+label-offline = offline
 
 [module/pacman-updates]
 type = custom/script
