@@ -24,7 +24,7 @@ monitor = ${env:MONITOR:DisplayPort-1}
 inherit = bar/shared
 modules-left = date bspwm
 modules-center =
-modules-right = github pacman-updates aur-updates
+modules-right = email github pacman-updates aur-updates
 
 [bar/shared]
 wm-restack = bspwm
@@ -194,12 +194,21 @@ menu-0-1-exec = systemctl reboot
 menu-0-2 = power off
 menu-0-2-exec = systemctl poweroff
 
+[module/email]
+type = custom/script
+exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread
+interval = 60
+label = %output%
+format-prefix = " "
+format-prefix-foreground = ${colors.foreground}
+format-underline = #0099ff
+
 [module/github]
 type = internal/github
 token = ${file:/home/damien/.config/github/notifications.token}
 user = ddeville
 empty-notifications = true
-interval = 10
+interval = 60
 format = <label>
 label =   %notifications%
 format-underline = #0099ff

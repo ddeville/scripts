@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -eu
+
+username="$1"
+token="$2"
+
+account_id=$(curl -sL https://jmap.fastmail.com/.well-known/jmap -u $username:$token |
+    jq --raw-output '.primaryAccounts."urn:ietf:params:jmap:mail"' 2> /dev/null)
+
+query='{
+    "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
+    "methodCalls": [
+        ["Mailbox/query", {"accountId": "'$account_id'", "filter": {"role": "inbox"}}, "inbox_query"],
+        ["Mailbox/get", {"accountId": "'$account_id'", "#ids": {"resultOf": "inbox_query", "name": "Mailbox/query", "path": "/ids/*"}}, "0"]
+    ]
+}'
+
+unread_count=$(curl -sL https://jmap.fastmail.com/api/ -u $username:$token -X POST -H "Content-Type: application/json" --data "$query" |
+    jq --raw-output '.methodResponses[1][1].list[0].unreadEmails' 2> /dev/null)
+
+echo $unread_count
