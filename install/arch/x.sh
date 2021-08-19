@@ -14,6 +14,6 @@ sudo pacman -S --needed \
 
 paru -S --needed \
     polybar \
-    ttf-nunito montserrat-font-ttf otf-public-sans ttf-mac-fonts ttf-font-awesome
+    ttf-nunito montserrat-ttf otf-public-sans ttf-mac-fonts ttf-font-awesome
 
 sudo systemctl enable lightdm
