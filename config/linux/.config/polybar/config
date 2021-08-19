@@ -61,9 +61,10 @@ interval = 5
 date = "%a %b %d"
 time = %I:%M%p
 label = %date% %time%
-format-prefix = " "
+format-prefix = "  "
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = #0a6cf5
+format-suffix = " "
 
 [module/bspwm]
 type = internal/bspwm
@@ -90,8 +91,9 @@ type = internal/network
 interface = enp4s0
 interval = 1.0
 format-connected-underline = #55aa55
-format-connected-prefix = "  "
+format-connected-prefix = "   "
 format-connected-prefix-foreground = ${colors.foreground-alt}
+format-connected-suffix = " "
 label-connected = " %upspeed%  %downspeed%"
 format-disconnected =
 
@@ -102,6 +104,8 @@ hwmon-path = ${env:HWMON_PATH}
 base-temperature = 20
 warn-temperature = 60
 format = <ramp> <label>
+format-prefix = " "
+format-suffix = " "
 format-underline = #f50a4d
 format-warn = <ramp> <label-warn>
 format-warn-underline = ${self.format-underline}
@@ -116,16 +120,18 @@ ramp-foreground = ${colors.foreground-alt}
 [module/cpu]
 type = internal/cpu
 interval = 1
-format-prefix = " "
+format-prefix = "  "
 format-prefix-foreground = ${colors.foreground-alt}
+format-suffix = " "
 format-underline = #f90000
 label = %percentage:2%%
 
 [module/memory]
 type = internal/memory
 interval = 1
-format-prefix = " "
+format-prefix = "  "
 format-prefix-foreground = ${colors.foreground-alt}
+format-suffix = " "
 format-underline = #f50a4d
 label = %percentage_used:2%%
 
@@ -134,14 +140,17 @@ type = internal/fs
 mount-0 = /
 interval = 25
 format-mounted = <label-mounted>
-format-mounted-prefix = " "
+format-mounted-prefix = "  "
 format-mounted-prefix-foreground = ${colors.foreground-alt}
+format-mounted-suffix = " "
 format-mounted-underline = #55aa55
 label-mounted = %free%
 
 [module/pulseaudio]
 type = internal/pulseaudio
 format-volume = <ramp-volume> <label-volume> <bar-volume>
+format-volume-prefix = " "
+format-volume-suffix = " "
 use-ui-max = false
 interval = 1
 label-volume = %percentage%%
@@ -173,6 +182,8 @@ bar-volume-empty-foreground = ${colors.foreground-alt}
 [module/dunst]
 type = custom/ipc
 initial = 1
+format-prefix = " "
+format-suffix = " "
 format-foreground = #fba922
 hook-0 = echo "%{A1:dunstctl set-paused true && polybar-msg hook dunst 2:}%{A}" &
 hook-1 = echo "%{A1:dunstctl set-paused false && polybar-msg hook dunst 1:}%{A}" &
@@ -181,6 +192,8 @@ hook-1 = echo "%{A1:dunstctl set-paused false && polybar-msg hook dunst 1:}%{
 type = custom/menu
 expand-right = true
 format-spacing = 1
+format-prefix = " "
+format-suffix = " "
 label-open = 
 label-open-foreground = ${colors.alert}
 label-close = cancel
@@ -198,7 +211,7 @@ menu-0-2-exec = systemctl poweroff
 type = custom/script
 exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread || echo "offline"
 interval = 60
-label =   %output%
+label = "   %output% "
 format = <label>
 format-underline = #0099ff
 
@@ -208,7 +221,7 @@ token = ${file:/home/damien/.config/github/notifications.token}
 user = ddeville
 empty-notifications = true
 interval = 60
-label =   %notifications%
+label = "   %notifications% "
 format = <label>
 format-underline = #0099ff
 label-offline = offline
@@ -219,8 +232,9 @@ exec = checkupdates 2> /dev/null | wc -l
 interval = 300
 label = Pacman: %output%
 format-foreground = ${colors.foreground}
-format-prefix = " "
+format-prefix = "  "
 format-prefix-foreground = ${colors.alert}
+format-suffix = " "
 format-underline = #55aa55
 
 [module/aur-updates]
@@ -229,8 +243,9 @@ exec = paru -Qua 2> /dev/null | wc -l
 interval = 300
 label = AUR: %output%
 format-foreground = ${colors.foreground}
-format-prefix = " "
+format-prefix = "  "
 format-prefix-foreground = ${colors.alert}
+format-suffix = " "
 format-underline = #55aa55
 
 ; vim:ft=dosini
