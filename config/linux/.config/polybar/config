@@ -198,9 +198,7 @@ menu-0-2-exec = systemctl poweroff
 type = custom/script
 exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread
 interval = 60
-label = %output%
-format-prefix = " "
-format-prefix-foreground = ${colors.foreground}
+label =   %output%
 format-underline = #0099ff
 
 [module/github]
