@@ -199,6 +199,7 @@ type = custom/script
 exec = cat /home/damien/.config/fastmail/email.token | xargs /home/damien/.local/bin/fastmail-check-unread
 interval = 60
 label =   %output%
+format = <label>
 format-underline = #0099ff
 
 [module/github]
@@ -207,8 +208,8 @@ token = ${file:/home/damien/.config/github/notifications.token}
 user = ddeville
 empty-notifications = true
 interval = 60
-format = <label>
 label =   %notifications%
+format = <label>
 format-underline = #0099ff
 
 [module/pacman-updates]
