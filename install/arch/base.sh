@@ -24,7 +24,7 @@ pacman -Syy
 pacman -S --needed \
     grub efibootmgr os-prober \
     xf86-video-amdgpu \
-    base-devel linux-headers man-db man-pages git pacman-contrib unzip perf gdb flamegraph \
+    base-devel linux-headers man-db man-pages git pacman-contrib unzip \
     xdg-user-dirs xdg-utils dialog terminus-font \
     networkmanager network-manager-applet libvncserver \
     openssh rsync openbsd-netcat iptables ipset firewalld gnupg gnome-keyring libsecret \
@@ -33,7 +33,7 @@ pacman -S --needed \
     acpi acpi_call acpid \
     mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g \
     fish vim neovim stow bat exa htop jq ripgrep tmux curl fd \
-    cmake ninja python rustup go nodejs npm pyenv docker tree-sitter
+    cmake ninja python rustup go nodejs npm pyenv docker tree-sitter perf gdb flamegraph
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
