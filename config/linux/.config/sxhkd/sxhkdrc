@@ -106,10 +106,17 @@ XF86AudioPrev
 XF86AudioNext
 	playerctl --player=spotify next
 
-# Dunst
+# dunst
 ctrl + period
 	dunstctl close
 ctrl + shift + period
 	dunstctl close-all
 ctrl + alt + period
 	dunstctl history-pop
+
+# maim
+ctrl + shift + 3
+	maim -s ~/Pictures/screenshot-(date +%Y_%m_%d-%H_%M_%S).png
+
+ctrl + shift + 4
+	maim -s | xclip -selection clipboard -t image/png
