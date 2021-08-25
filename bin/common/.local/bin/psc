@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cmd="ps axo pid,ppid,user,command"
 if [ "$1" == "" ]; then
