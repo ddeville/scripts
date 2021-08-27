@@ -68,6 +68,7 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
   Plug 'tpope/vim-unimpaired'
   Plug 'tpope/vim-vinegar'
   Plug 'vimwiki/vimwiki'
+  Plug 'machakann/vim-highlightedyank'
 
   " neovim only
   if has("nvim-0.5")
@@ -186,11 +187,6 @@ let g:netrw_localrmdir = "rm -r"
 let g:netrw_liststyle = 1
 let g:netrw_winsize = 85
 let g:netrw_browse_split = 0
-
-" highlight on yank
-if has("nvim-0.5")
-  autocmd TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=250, on_visual=true}
-end
 
 " ==> MAPPINGS
 
