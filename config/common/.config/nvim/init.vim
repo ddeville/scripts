@@ -244,10 +244,12 @@ highlight LspDiagnosticsSignHint guifg=Gray ctermfg=Gray
 highlight LspDiagnosticsUnderlineHint guifg=Gray ctermfg=Gray
 
 " configure sign column for diagnostic messages
-sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
-sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
-sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
-sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
+if has("nvim")
+  sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
+  sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
+  sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
+  sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
+end
 
 " load main lua plugin
 if has("nvim-0.5")
