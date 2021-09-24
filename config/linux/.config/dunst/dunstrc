@@ -27,7 +27,7 @@
     # the top and down respectively.
     # The width can be negative.  In this case the actual width is the
     # screen width minus the width defined in within the geometry option.
-    geometry = "600x15-30+30"
+    geometry = "600x10-30+30"
 
     # Turn on the progess bar
     progress_bar = true
@@ -199,7 +199,7 @@
     sticky_history = yes
 
     # Maximum amount of notifications kept in history
-    history_length = 50
+    history_length = 100
 
     ### Misc/Advanced ###
 
