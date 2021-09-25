@@ -35,6 +35,5 @@ bspc config borderless_monocle false
 bspc config gapless_monocle false
 
 bspc rule -a Slack desktop='dbx' follow=on
-bspc rule -a zoom desktop='dbx' follow=on
 bspc rule -a Spotify desktop='media' follow=on
 bspc rule -a discord desktop='media' follow=on
