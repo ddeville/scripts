@@ -24,7 +24,7 @@ pacman -Syy
 pacman -S --needed \
     grub efibootmgr os-prober \
     xf86-video-amdgpu \
-    base-devel linux-headers man-db man-pages git pacman-contrib zip unzip \
+    base-devel linux-headers man-db man-pages git pacman-contrib zip unzip lsb-release \
     xdg-user-dirs xdg-utils dialog terminus-font \
     networkmanager network-manager-applet libvncserver \
     openssh rsync openbsd-netcat iptables ipset firewalld gnupg gnome-keyring libsecret \
