@@ -37,5 +37,5 @@ bspc config gapless_monocle false
 bspc rule -a Slack desktop='dbx' follow=on
 bspc rule -a Spotify desktop='media' follow=on
 bspc rule -a discord desktop='media' follow=on
-bspc rule -a zoom desktop='zoom' state=floating
+bspc rule -a zoom desktop='zoom' state=floating follow=on
 bspc rule -a 1Password state=floating
