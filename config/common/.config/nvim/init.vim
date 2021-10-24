@@ -222,7 +222,7 @@ nnoremap <C-l> :nohl<CR><C-l>
 " make Y behave like D and C
 nnoremap Y y$
 
-" ==> DIAGNOSTICS
+" ==> HIGHLIGHTS
 
 " diagnostic error messages in red
 highlight LspDiagnosticsDefaultError guifg=Red ctermfg=Red
@@ -252,6 +252,16 @@ if has("nvim")
   sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
   sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 end
+
+" nvim-cmp
+highlight CmpItemAbbr guifg=Gray ctermfg=Gray
+highlight CmpItemAbbrDeprecated guifg=Red ctermfg=Red
+highlight CmpItemAbbrMatch guifg=Yellow ctermfg=Yellow
+highlight CmpItemAbbrMatch gui=underline cterm=underline
+highlight CmpItemAbbrMatchFuzzy guifg=Yellow ctermfg=Yellow
+highlight CmpItemAbbrMatchFuzzy gui=underline cterm=underline
+highlight CmpItemKind guifg=Green ctermfg=Green
+highlight CmpItemMenu guifg=Magenta ctermfg=Magenta
 
 " load main lua plugin
 if has("nvim-0.5")
