@@ -16,6 +16,7 @@ window:
     lines: 40
   title: Alacritty
   dynamic_title: false
+  dynamic_padding: true
   padding:
     x: 4
     y: 2
