@@ -1,9 +1,12 @@
 local nvim_lsp = require("lspconfig")
 local lsp_status = require("lsp-status")
+local cmp_nvim_lsp = require("cmp_nvim_lsp")
 local util = require("ddeville/util")
 
 local function setup_client(name, config)
-  config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities or {})
+  config.capabilities = vim.tbl_deep_extend("force", config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
+  config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities)
+  config.capabilities = cmp_nvim_lsp.update_capabilities(config.capabilities)
 
   local custom_on_attach = config.on_attach
   config.on_attach = function(client, bufnr)
@@ -181,4 +184,4 @@ lsp_status.register_progress()
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
-util.create_augroup("code_action_lightbuld", { {"CursorHold,CursorHoldI" , "*", "lua require'nvim-lightbulb'.update_lightbulb()"} })
+util.create_augroup("code_action_lightbulb", { {"CursorHold,CursorHoldI" , "*", "lua require'nvim-lightbulb'.update_lightbulb()"} })

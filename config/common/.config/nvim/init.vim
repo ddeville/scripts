@@ -72,7 +72,9 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
 
   " neovim only
   if has("nvim-0.5")
-    Plug 'hrsh7th/nvim-compe' | Plug 'hrsh7th/vim-vsnip'
+    Plug 'hrsh7th/nvim-cmp'
+    Plug 'hrsh7th/cmp-nvim-lsp' | Plug 'hrsh7th/cmp-buffer'| Plug 'hrsh7th/cmp-path' | Plug 'hrsh7th/cmp-nvim-lua'
+    Plug 'hrsh7th/vim-vsnip' | Plug 'hrsh7th/cmp-vsnip'
     Plug 'kosayoda/nvim-lightbulb'
     Plug 'neovim/nvim-lspconfig'
     Plug 'nvim-lua/lsp_extensions.nvim'
