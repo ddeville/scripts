@@ -10,7 +10,7 @@ scrolling:
 
 window:
   startup_mode: Windowed
-  decorations: full
+  decorations: none
   dimensions:
     columns: 100
     lines: 40
@@ -29,7 +29,7 @@ font:
   bold:
     family: Anonymous Pro
     style: Regular
-  size: 12
+  size: 12.0
   offset:
     y: 3
   use_thin_strokes: true
