@@ -14,3 +14,8 @@ if test -e "$HOME/src/server/go"
         set -x GOPATH $GOPATH "$HOME/src/server/go"
     end
 end
+
+# Try to fix the wrong `SSH_AUTH_SOCK` before running any command in tmux
+function _set_ssh_env_var_tmux --on-event fish_preexec --description "Update the env var to the latest ssh sock"
+    ssh_tmux_fix
+end
