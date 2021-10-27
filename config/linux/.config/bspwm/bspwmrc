@@ -25,7 +25,7 @@ polybar main 2> $HOME/.cache/logs/polybar-main.err &
 polybar term 2> $HOME/.cache/logs/polybar-term.err &
 
 bspc monitor DisplayPort-0 -d web media dbx zoom a b
-bspc monitor DisplayPort-1 -d code dbx-code c d
+bspc monitor DisplayPort-1 -d code dbx-code devbox c
 
 bspc config border_width 2
 bspc config window_gap 0
