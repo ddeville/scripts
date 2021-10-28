@@ -9,7 +9,7 @@ function dbx_devbox --description "SSH to my devbox"
         if not tmux list-sessions 2> /dev/null | grep devbox > /dev/null 2>&1
             tmux new-session -D -s devbox -d -c ~
             tmux new-window -t devbox -n repo -d -c ~/src/server-mirror
-            tmux new-window -t devbox -n editor -d -c ~/src/server-mirrot
+            tmux new-window -t devbox -n editor -d -c ~/src/server-mirror
             tmux send-keys -t devbox:3 \"nvim .\" Enter
             tmux new-window -t devbox -n scripts -d -c ~/scripts
             tmux kill-window -t devbox:1
