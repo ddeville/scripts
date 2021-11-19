@@ -5,13 +5,13 @@
     editor = nvim
     excludesfile = ~/.config/git/gitignore_global
 [diff]
-    tool = nvim -d
+    tool = vimdiff
     algorithm = patience
     compactionHeuristic = true
 [difftool]
     prompt = false
 [merge]
-    tool = nvim -d
+    tool = vimdiff
     conflictstyle = diff3
 [mergetool]
     prompt = false
