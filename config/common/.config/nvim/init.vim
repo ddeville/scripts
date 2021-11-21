@@ -18,18 +18,27 @@ if empty($XDG_STATE_HOME)
   let $XDG_STATE_HOME = $HOME . "/.local/state"
 endif
 
-" store swap and backup files under XDG state dir
-if !isdirectory($XDG_STATE_HOME . "/vim/backup")
-  call mkdir($XDG_STATE_HOME . "/vim/backup", "p", 0700)
+" (use different folders for vim and nvim since formats can be incompatible...)
+if has("nvim")
+  let backup_path = $XDG_STATE_HOME . "/nvim/backup"
+  let undo_path = $XDG_STATE_HOME . "/nvim/undo"
+else
+  let backup_path = $XDG_STATE_HOME . "/vim/backup"
+  let undo_path = $XDG_STATE_HOME . "/vim/undo"
 endif
-let &directory = $XDG_STATE_HOME . "/vim/backup//"
-let &backupdir = $XDG_STATE_HOME . "/vim/backup//"
+
+" store swap and backup files under XDG state dir
+if !isdirectory(backup_path)
+  call mkdir(backup_path, "p", 0700)
+endif
+let &directory = backup_path . "//"
+let &backupdir = backup_path . "//"
 
 " permanent undo
-if !isdirectory($XDG_STATE_HOME . "/vim/undo")
-  call mkdir($XDG_STATE_HOME . "/vim/undo", "p", 0700)
+if !isdirectory(undo_path)
+  call mkdir(undo_path, "p", 0700)
 endif
-let &undodir = $XDG_STATE_HOME . "/vim/undo//"
+let &undodir = undo_path . "//"
 set undofile
 
 " get netrw and viminfo to store their history in the XDG state dir
