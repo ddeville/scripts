@@ -8,6 +8,7 @@ if status --is-interactive && test -e $base16_path
     source $base16_path
 end
 
+set -x GOPATH $HOME/src/go
 # GOPATH for Dropbox server code
 if test -e "$HOME/src/server/go"
     if not set -q GOPATH || not contains "$HOME/src/server/go" "$GOPATH"
