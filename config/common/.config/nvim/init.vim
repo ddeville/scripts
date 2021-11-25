@@ -78,6 +78,8 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
   Plug 'tpope/vim-vinegar'
   Plug 'vimwiki/vimwiki'
   Plug 'machakann/vim-highlightedyank'
+  Plug 'google/vim-maktaba'
+  Plug 'google/vim-codefmt'
 
   " neovim only
   if has("nvim-0.5")
