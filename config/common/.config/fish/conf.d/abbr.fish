@@ -5,7 +5,7 @@ alias vim "nvim"
 alias ll "exa --long --all"
 alias tree "exa --tree --level=3"
 alias gaa "git add .; and git ci"
-alias gaaa "git add .; and git ci --amend"
+alias gaaa "git add .; and git ci --amend --no-edit"
 alias oo "open ."
 
 # abbreviations
