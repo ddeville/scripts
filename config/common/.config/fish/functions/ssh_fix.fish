@@ -9,7 +9,7 @@ function ssh_fix --description "Load and add the current SSH key to the session"
     end
     switch (uname)
         case Darwin
-            ssh-add -K $path
+            ssh-add --apple-use-keychain $path
         case '*'
             ssh-add $path
     end
