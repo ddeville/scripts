@@ -1,7 +1,7 @@
 let g:fzf_layout = { "down": "35%" }
 
 " we use different commands in the shell
-let $FZF_DEFAULT_COMMAND = "fd --type file --color=never --hidden --exclude .git"
+let $FZF_DEFAULT_COMMAND = "fd --type file --color=never --hidden --strip-cwd-prefix --exclude .git"
 
 nnoremap <Leader>; :Buffers<CR>
 nnoremap ; :Buffers<CR>
