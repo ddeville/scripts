@@ -94,11 +94,11 @@ super + {Left,Down,Up,Right}
 
 # media keys
 XF86AudioRaiseVolume
-	pactl set-sink-volume @DEFAULT_SINK@ +1%
+	pamixer --increase 1
 XF86AudioLowerVolume
-	pactl set-sink-volume @DEFAULT_SINK@ -1%
+	pamixer --decrease 1
 XF86AudioMute
-	pactl set-sink-mute @DEFAULT_SINK@ toggle
+	pamixer --toggle-mute
 XF86AudioPlay
 	playerctl --player=spotify play-pause
 XF86AudioPrev
