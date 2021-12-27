@@ -37,6 +37,6 @@ end
 
 function fish_right_prompt
     set_color brblack
-    date "+%l:%m:%S %p"
+    date "+%l:%M:%S %p"
     set_color normal
 end
