@@ -48,3 +48,6 @@ bspc rule -a Spotify desktop='media' follow=on
 bspc rule -a discord desktop='media' follow=on
 bspc rule -a zoom desktop='zoom' state=floating follow=on
 bspc rule -a 1Password state=floating
+
+# make all windows on desktop 'flt' floating
+command -v bspwm-floating > /dev/null && bspwm-floating flt &

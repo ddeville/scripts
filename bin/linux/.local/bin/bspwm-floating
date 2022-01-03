@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Make all window in desktop identified by $1 floating, either when added or moved into this desktop.
+
+FLOATING_DESKTOP_ID=$(bspc query -D -d "$1")
+
+bspc subscribe node_add node_swap node_transfer | while read -a msg ; do
+   case ${msg[0]} in
+      node_add)
+         # node_add <monitor_id> <desktop_id> <ip_id> <node_id>
+         dst_desktop_id=${msg[2]}
+         window_id=${msg[4]}
+         ;;
+      node_swap | node_transfer)
+         # node_swap <src_monitor_id> <src_desktop_id> <src_node_id> <dst_monitor_id> <dst_desktop_id> <dst_node_id>
+         # node_transfer <src_monitor_id> <src_desktop_id> <src_node_id> <dst_monitor_id> <dst_desktop_id> <dst_node_id>
+         dst_desktop_id=${msg[5]}
+         window_id=${msg[3]}
+         ;;
+   esac
+   [ "$FLOATING_DESKTOP_ID" = "$dst_desktop_id" ] && bspc node "$window_id" -t floating
+done
