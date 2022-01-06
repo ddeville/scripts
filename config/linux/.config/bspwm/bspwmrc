@@ -28,7 +28,7 @@ polybar term 2> $HOME/.cache/logs/polybar-term.err &
 
 # make all windows on desktop 'flt' floating
 killall --quiet --wait --user $USER --exact bspwm-floating > /dev/null
-command -v bspwm-floating > /dev/null && bspwm-floating flt &
+[ -x ~/.local/bin/bspwm-floating ] && ~/.local/bin/bspwm-floating flt &
 
 # set up nitrogen for background pictures
 # no need to kill existing instances since when using `--restore` the process exits as soon as the background is set.
