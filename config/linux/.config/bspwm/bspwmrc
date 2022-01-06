@@ -1,13 +1,20 @@
 #!/bin/sh
 
-# kill the current running instances
-pgrep -x sxhkd > /dev/null || sxhkd &
+bspc config border_width 2
+bspc config window_gap 0
+bspc config focused_border_color \#ff8c00
+bspc config split_ratio 0.5
+bspc config borderless_monocle false
+bspc config gapless_monocle false
 
-# set up nitrogen
-nitrogen --restore &
+bspc monitor DisplayPort-0 -d web media dbx zoom vnc flt
+bspc monitor DisplayPort-1 -d code dbx-code devbox a
 
-# tweak screen color to be easier on eyes
-redshift -P -O 4500
+bspc rule -a Slack desktop='dbx' follow=on
+bspc rule -a Spotify desktop='media' follow=on
+bspc rule -a discord desktop='media' follow=on
+bspc rule -a zoom desktop='zoom' state=floating follow=on
+bspc rule -a 1Password state=floating
 
 # Get the right hwmon path to monitor CPU temp in polybar.
 # Specifically we are looking for the hardware monitor with name `k10temp` which is the driver that
@@ -26,28 +33,23 @@ for i in /sys/class/hwmon/hwmon*/temp*_input; do
     fi
 done
 
+# setup sxhkd, killing any running instances beforehand
+killall --quiet --wait --user $USER --exact sxhkd > /dev/null
+sxhkd &
+
 # set up polybar
-killall -q polybar
-while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+killall --quiet --wait --user $USER --exact polybar > /dev/null
 mkdir -p $HOME/.cache/logs
 polybar main 2> $HOME/.cache/logs/polybar-main.err &
 polybar term 2> $HOME/.cache/logs/polybar-term.err &
 
-bspc monitor DisplayPort-0 -d web media dbx zoom vnc flt
-bspc monitor DisplayPort-1 -d code dbx-code devbox a
-
-bspc config border_width 2
-bspc config window_gap 0
-bspc config focused_border_color \#ff8c00
-bspc config split_ratio 0.5
-bspc config borderless_monocle false
-bspc config gapless_monocle false
-
-bspc rule -a Slack desktop='dbx' follow=on
-bspc rule -a Spotify desktop='media' follow=on
-bspc rule -a discord desktop='media' follow=on
-bspc rule -a zoom desktop='zoom' state=floating follow=on
-bspc rule -a 1Password state=floating
-
 # make all windows on desktop 'flt' floating
+killall --quiet --wait --user $USER --exact bspwm-floating > /dev/null
 command -v bspwm-floating > /dev/null && bspwm-floating flt &
+
+# tweak screen color to be easier on the eyes
+redshift -P -O 4500
+
+# set up nitrogen for background pictures
+# no need to kill existing instances since when using `--restore` the process exits as soon as the background is set.
+nitrogen --restore &
