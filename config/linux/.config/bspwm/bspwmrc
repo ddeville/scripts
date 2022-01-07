@@ -16,6 +16,23 @@ bspc rule -a discord desktop='media' follow=on
 bspc rule -a zoom desktop='zoom' state=floating follow=on
 bspc rule -a 1Password state=floating
 
+# Get the right hwmon path to monitor CPU temp in polybar.
+# Specifically we are looking for the hardware monitor with name `k10temp` which is the driver that
+# can read AMD CPU temps.
+# Once we have matched on this `k10temp` name, we are looking for the right temperature among:
+#  - Tdie -> the die temperature, that is the real measured temp
+#  - Tctl -> the temperature control value, which is the reported temp
+#  - Tccd{1..8} ->  the temperature of of the core complex dies.
+# Tdie is most likely what we want since it's the most accurate and Tctl can be somewhat different
+# since it is not necessarily the real measured temp and is instead used for fan control.
+# See https://www.kernel.org/doc/html/v5.12/hwmon/k10temp.html
+cpu_label="k10temp: Tctl"
+for i in /sys/class/hwmon/hwmon*/temp*_input; do
+    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$cpu_label" ]; then
+        export HWMON_PATH="$i"
+    fi
+done
+
 # setup sxhkd
 killall --quiet --wait --user $USER --exact sxhkd > /dev/null
 sxhkd &
@@ -36,20 +53,3 @@ nitrogen --restore &
 
 # tweak screen color to be easier on the eyes
 redshift -P -O 4500
-
-# Get the right hwmon path to monitor CPU temp in polybar.
-# Specifically we are looking for the hardware monitor with name `k10temp` which is the driver that
-# can read AMD CPU temps.
-# Once we have matched on this `k10temp` name, we are looking for the right temperature among:
-#  - Tdie -> the die temperature, that is the real measured temp
-#  - Tctl -> the temperature control value, which is the reported temp
-#  - Tccd{1..8} ->  the temperature of of the core complex dies.
-# Tdie is most likely what we want since it's the most accurate and Tctl can be somewhat different
-# since it is not necessarily the real measured temp and is instead used for fan control.
-# See https://www.kernel.org/doc/html/v5.12/hwmon/k10temp.html
-cpu_label="k10temp: Tctl"
-for i in /sys/class/hwmon/hwmon*/temp*_input; do
-    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$cpu_label" ]; then
-        export HWMON_PATH="$i"
-    fi
-done
