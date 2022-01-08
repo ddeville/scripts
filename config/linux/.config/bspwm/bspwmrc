@@ -22,10 +22,11 @@ bspc rule -a 1Password state=floating
 # Once we have matched on this `k10temp` name, we are looking for the right temperature among:
 #  - Tdie -> the die temperature, that is the real measured temp
 #  - Tctl -> the temperature control value, which is the reported temp
-#  - Tccd{1..8} ->  the temperature of of the core complex dies.
+#  - Tccd{1..8} ->  the temperature of the core complex dies.
 # Tdie is most likely what we want since it's the most accurate and Tctl can be somewhat different
 # since it is not necessarily the real measured temp and is instead used for fan control.
 # See https://www.kernel.org/doc/html/v5.12/hwmon/k10temp.html
+# However, Tdie also seems to be missing as of kernel version ~5.14 so use Tctl for now.
 cpu_label="k10temp: Tctl"
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
     if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$cpu_label" ]; then
