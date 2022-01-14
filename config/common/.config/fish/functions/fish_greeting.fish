@@ -21,15 +21,23 @@ function fish_greeting
     if [ (uname -s) = "Darwin" ]
         echo $l_color" OS:         "$r_color(sw_vers -productName) $r_color(sw_vers -productVersion) $r_color(sw_vers -buildVersion)
         echo $l_color" Uptime:     "$r_color(uptime | sed -E 's/.*(up.*), [[:digit:]]+ user.*/\1/')
-        echo $l_color" Disk usage: "$r_color(df -H -l | grep -E '/System/Volumes/Data$' | awk '{printf "%s available (%s used)\n", $4, $5}')
         echo $l_color" User:       "$r_color(id -un)
         echo $l_color" Hostname:   "$r_color(uname -n)
+        echo $l_color" Disk usage: "$r_color(df -H -l | grep -E '/System/Volumes/Data$' | awk '{printf "%s available (%s used)\n", $4, $5}')
     else
         echo $l_color" OS:         "$r_color(uname -rs)
         echo $l_color" Uptime:     "$r_color(uptime -p)
-        echo $l_color" Disk usage: "$r_color(df -h -l | grep -E 'dev/(nvme|sd|root)' | awk '{if ($6 == "/") { printf "%s available (%s used)\n", $4, $5}}')
         echo $l_color" User:       "$r_color(id -un)
         echo $l_color" Hostname:   "$r_color(uname -n)
+        echo -n $l_color" Disk usage: "
+        echo -ne $r_color(\
+            df -l -h | \
+            grep -E 'dev/(nvme|sd|xvda|root)' | \
+            awk '{
+                if (NR!=1) printf "             "
+                printf "%-9s -> %4s available (%3s used)\\\\n", $6, $4, $5
+            }'
+        )
     end
 
     echo
