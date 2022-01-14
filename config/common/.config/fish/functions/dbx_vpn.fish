@@ -20,7 +20,7 @@ function dbx_vpn --description "Forward port to Dropbox Mac Pro and set up proxy
 
     echo "SSH connecting to" $server
     echo "SSH binding to port" $port
-    command ssh -D $port -N $server
+    command ssh -D $port -N $server > /dev/null 2>&1
 
     if [ (uname -s) = "Darwin" ]
         echo "Disabling SOCKS proxy"
