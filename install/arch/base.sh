@@ -31,7 +31,7 @@ pacman -S --needed \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack paxmixer pavucontrol sof-firmware \
     acpi acpi_call acpid \
-    mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g \
+    mtools dosfstools smbclient gvfs gvfs-smb nfs-utils ntfs-3g btrfs-progs \
     fish vim neovim stow bat exa htop jq ripgrep tmux curl fd \
     cmake ninja python rustup go nodejs npm pyenv docker tree-sitter perf gdb flamegraph
 
