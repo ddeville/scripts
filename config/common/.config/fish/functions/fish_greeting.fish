@@ -35,7 +35,7 @@ function fish_greeting
             grep -E 'dev/(nvme|sd|xvda|root)' | \
             awk '{
                 if (NR!=1) printf "             "
-                printf "%-9s -> %4s available (%3s used)\\\\n", $6, $4, $5
+                printf "%s -> %4s available (%3s used)\\\\n", $6, $4, $5
             }'
         )
     end
