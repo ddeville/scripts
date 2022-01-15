@@ -121,6 +121,7 @@ label = "  %percentage_used:2%% "
 [module/filesystem]
 type = internal/fs
 mount-0 = /
+mount-1 = /home/damien/data
 interval = 25
 format-mounted = <label-mounted>
 format-mounted-underline = #55aa55
