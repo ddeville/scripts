@@ -20,7 +20,6 @@ do
    then
       continue
    fi
-
    export $line
 done <"$CREDS"
 
