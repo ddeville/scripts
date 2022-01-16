@@ -1,0 +1,31 @@
+#!/bin/bash
+
+CREDS="/etc/duplicity/credentials/passphrase_damien"
+DEST="file:///home/damien/data/Backup"
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+if [ ! -f "$CREDS" ]
+then
+   echo "Credentials cannot be read at $CREDS"
+   exit 1
+fi
+
+while read -r line
+do
+   if [[ "$line" == \#* ]] || [[ "$line" != *=* ]] || [ -z "$line" ]
+   then
+      continue
+   fi
+
+   export $line
+done <"$CREDS"
+
+duplicity --exclude /home/damien/.cache --exclude /home/damien/data /home "$DEST"
+
+# duplicity remove-all-but-n-full 32 --force "$DEST"
+# duplicity cleanup --force "$DEST"
+# duplicity collection-status "$DEST"
