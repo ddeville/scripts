@@ -34,7 +34,7 @@ pacman -S --needed \
     mtools dosfstools smbclient gvfs gvfs-smb cifs-utils nfs-utils ntfs-3g btrfs-progs \
     fish vim neovim stow bat exa htop jq ripgrep tmux curl fd \
     cmake ninja python rustup go nodejs npm pyenv tree-sitter perf gdb flamegraph \
-    docker qemu qemu-arch-extra ovmf
+    docker qemu qemu-arch-extra ovmf vde2 bridge-utils
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
