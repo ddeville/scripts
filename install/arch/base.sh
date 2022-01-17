@@ -27,7 +27,7 @@ pacman -S --needed \
     base-devel linux-headers man-db man-pages git pacman-contrib zip unzip lsb-release \
     xdg-user-dirs xdg-utils dialog terminus-font \
     networkmanager network-manager-applet libvncserver \
-    openssh rsync openbsd-netcat iptables ipset firewalld gnupg gnome-keyring libsecret \
+    openssh rsync openbsd-netcat iptables-nft ipset firewalld gnupg gnome-keyring libsecret \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack paxmixer pavucontrol sof-firmware \
     acpi acpi_call acpid \
