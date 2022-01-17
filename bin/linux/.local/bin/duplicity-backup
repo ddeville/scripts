@@ -25,6 +25,6 @@ done <"$CREDS"
 
 duplicity --exclude /home/damien/.cache --exclude /home/damien/data /home "$DEST"
 
-# duplicity remove-all-but-n-full 32 --force "$DEST"
-# duplicity cleanup --force "$DEST"
-# duplicity collection-status "$DEST"
+duplicity remove-all-but-n-full 64 --force "$DEST"
+duplicity cleanup --force "$DEST"
+duplicity collection-status "$DEST"
