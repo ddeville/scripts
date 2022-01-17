@@ -7,7 +7,7 @@ sudo pacman -S --needed \
     bspwm sxhkd slock lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings \
     dunst redshift neofetch playerctl rofi seahorse \
     maim xclip \
-    alacritty firefox-developer-edition nautilus sxiv mupdf remmina \
+    alacritty firefox-developer-edition nautilus sxiv mupdf remmina virt-manager \
     faenza-icon-theme papirus-icon-theme \
     ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji \
     tex-gyre-fonts gnu-free-fonts xorg-fonts-misc ttf-linux-libertine ttf-opensans \
