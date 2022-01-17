@@ -47,7 +47,7 @@ systemctl enable avahi-daemon
 systemctl enable fstrim.timer
 systemctl enable firewalld
 systemctl enable acpid
-systemctl enable libvirtd.service
+systemctl enable libvirtd
 
 useradd -m damien
 passwd damien
