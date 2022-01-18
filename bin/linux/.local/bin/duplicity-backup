@@ -28,10 +28,15 @@ then
    done <"$CREDS"
 fi
 
+# Back things up!
+#
+# Note that earlier `include/exclude` "override" previous ones so we put the
+# catch all ones last.
 duplicity --exclude /home/damien/.cache \
           --exclude /home/damien/data \
-          /home \
-          "$DEST"
+          --include /home \
+          --exclude '**' \
+          / "$DEST"
 
 duplicity remove-all-but-n-full 64 --force "$DEST"
 duplicity cleanup --force "$DEST"
