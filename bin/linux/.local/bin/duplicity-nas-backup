@@ -28,7 +28,12 @@ duplicity --no-encryption \
           "$DEST"
 
 # Clean things up a little
-duplicity remove-all-but-n-full 12 --force "$DEST"
+duplicity remove-all-but-n-full 12 \
+          --ssh-options="-oIdentityFile='$KEY_FILE'" \
+          --force \
+          "$DEST"
 
 # And show a helpful status
-duplicity collection-status "$DEST"
+duplicity collection-status \
+          --ssh-options="-oIdentityFile='$KEY_FILE'" \
+          "$DEST"
