@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+DEST="rsync://damien@nas.home.kattungar.net//volume1/Duplicity/$(hostname)"
+DELETE_AFTER=1Y
+
+if [[ $EUID == 0 ]]; then
+   echo "This script must *not* be run as root"
+   exit 1
+fi
+
+# Back things up!
+#
+# Note that earlier `include/exclude` "override" the ones that come after in the
+# command line arguments so we put the catch-all ones last.
+duplicity --no-encryption \
+          --exclude ignorecase:/**/cache/** \
+          --exclude ignorecase:/**/.cache/** \
+          --exclude /home/damien/data \
+          /home \
+          "$DEST"
+
+# Clean things up a little
+duplicity remove-older-than $DELETE_AFTER --force "$DEST"
+
+# And show a helpful status
+duplicity collection-status "$DEST"

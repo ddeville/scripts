@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+DEST="file:///home/damien/data/Backup"
+DELETE_AFTER=1Y
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+# Back things up!
+#
+# Note that earlier `include/exclude` "override" the ones that come after in the
+# command line arguments so we put the catch-all ones last.
+duplicity --no-encryption \
+          --exclude ignorecase:/**/cache/** \
+          --exclude ignorecase:/**/.cache/** \
+          --exclude /home/damien/data \
+          --exclude /dev \
+          --exclude /mnt \
+          --exclude /proc \
+          --exclude /run \
+          --exclude /sys \
+          --exclude /tmp \
+          --exclude /var/lock \
+          --exclude /var/run \
+          --exclude /var/tmp \
+          / \
+          "$DEST"
+
+# Clean things up a little
+duplicity remove-older-than $DELETE_AFTER --force "$DEST"
+
+# And show a helpful status
+duplicity collection-status "$DEST"
