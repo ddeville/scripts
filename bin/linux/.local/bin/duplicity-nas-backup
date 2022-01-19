@@ -1,19 +1,24 @@
 #!/bin/bash
 set -e
 
-DEST="rsync://damien@nas.home.kattungar.net//volume1/Duplicity/$(hostname)"
-DELETE_AFTER=1Y
-
 if [[ $EUID == 0 ]]; then
    echo "This script must *not* be run as root"
    exit 1
 fi
 
+DEST="rsync://damien@nas.home.kattungar.net//volume1/Duplicity/$(hostname)"
+
 # Back things up!
+#
+# - Only backup the home directory
+# - No need to encrypt since the Synology shared folder is encrypted anyway
+# - Full backup every 14 days, otherwise incremental
+# - Keep 12 full backups, around 6M worth of backup
 #
 # Note that earlier `include/exclude` "override" the ones that come after in the
 # command line arguments so we put the catch-all ones last.
 duplicity --no-encryption \
+          --full-if-older-than 14D \
           --exclude ignorecase:/**/cache/** \
           --exclude ignorecase:/**/.cache/** \
           --exclude /home/damien/data \
@@ -21,7 +26,7 @@ duplicity --no-encryption \
           "$DEST"
 
 # Clean things up a little
-duplicity remove-older-than $DELETE_AFTER --force "$DEST"
+duplicity remove-all-but-n-full 12 --force "$DEST"
 
 # And show a helpful status
 duplicity collection-status "$DEST"

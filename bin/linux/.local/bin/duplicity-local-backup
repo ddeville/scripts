@@ -1,19 +1,24 @@
 #!/bin/bash
 set -e
 
-DEST="file:///home/damien/data/Backup"
-DELETE_AFTER=1Y
-
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
    exit 1
 fi
 
+DEST="file:///home/damien/data/Backup"
+
 # Back things up!
+#
+# - Backup the entire system
+# - No need to encrypt since it's all local anyway
+# - Full backup every 14 days, otherwise incremental
+# - Keep 12 full backups, around 6M worth of backup
 #
 # Note that earlier `include/exclude` "override" the ones that come after in the
 # command line arguments so we put the catch-all ones last.
 duplicity --no-encryption \
+          --full-if-older-than 14D \
           --exclude ignorecase:/**/cache/** \
           --exclude ignorecase:/**/.cache/** \
           --exclude /home/damien/data \
@@ -30,7 +35,7 @@ duplicity --no-encryption \
           "$DEST"
 
 # Clean things up a little
-duplicity remove-older-than $DELETE_AFTER --force "$DEST"
+duplicity remove-all-but-n-full 12 --force "$DEST"
 
 # And show a helpful status
 duplicity collection-status "$DEST"
