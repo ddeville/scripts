@@ -18,10 +18,18 @@ case $1 in
          "-oIdentityFile='/etc/duplicity/credentials/nas_key'"
       )
       ;;
+   dbx)
+      DEST="dpbx:///Backup/Duplicity/$(hostname)"
+      CREDS=()
+      export DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
+      ;;
    *)
-      echo "Unknown command (needs to be 'local' or 'nas')"
+      echo "Unknown command (needs to be 'local', 'nas' or 'dbx')"
       exit 1
 esac
+
+# All backups are encrypted with the same passphrase.
+export PASSPHRASE=$(</etc/duplicity/credentials/gpg_pass)
 
 # The list of directories to exclude when backing up the root directory.
 #
@@ -42,12 +50,15 @@ EXCLUDES=(
    "--exclude /var/tmp"
 )
 
+FULL_DUR=14D
+FULL_CNT=12
+
 # Back up the entire system!
-# Full backup every 14 days, otherwise incremental, and no encryption necessary.
-duplicity --no-encryption --full-if-older-than=14D ${CREDS[@]} ${EXCLUDES[@]} / "$DEST"
+# Full backup every 14 days, otherwise incremental.
+duplicity --full-if-older-than $FULL_DUR ${CREDS[@]} ${EXCLUDES[@]} / "$DEST"
 
 # Keep 12 full backups, around 6M worth of data.
-duplicity remove-all-but-n-full 12 --force ${CREDS[@]} "$DEST"
+duplicity remove-all-but-n-full $FULL_CNT --force ${CREDS[@]} "$DEST"
 
 # And show a helpful status.
 duplicity collection-status ${CREDS[@]} "$DEST"
