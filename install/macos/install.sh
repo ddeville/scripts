@@ -15,7 +15,7 @@ $brew_path/brew install \
     pyenv golang node robotsandpencils/made/xcodes \
     font-anonymous-pro
 
-echo $brew_path/fish >> /etc/shells
+sudo echo $brew_path/fish >> /etc/shells
 chsh -s $brew_path/fish
 
 mkdir -p $HOME/.local/share
