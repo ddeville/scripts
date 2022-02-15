@@ -45,9 +45,9 @@ font-0 = "Noto Sans Mono:size=10;1"
 font-1 = "Noto Sans Mono:size=10;1"
 font-2 = "Noto Sans Symbols:size=10;1"
 font-3 = "Noto Sans Symbols2:size=10;1"
-font-4 = "Font Awesome 5 Free:size=12;1"
-font-5 = "Font Awesome 5 Free Solid:size=12;1"
-font-6 = "Font Awesome 5 Brands:size=12;1"
+font-4 = "Font Awesome 6 Free:size=12;1"
+font-5 = "Font Awesome 6 Free Solid:size=12;1"
+font-6 = "Font Awesome 6 Brands:size=12;1"
 
 [global/wm]
 margin-top = 0
