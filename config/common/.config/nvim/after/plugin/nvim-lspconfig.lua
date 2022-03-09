@@ -23,10 +23,10 @@ local function setup_client(name, config)
     set_keymap("n", "<C-k>",      "<cmd>lua vim.lsp.buf.signature_help()<CR>")
     set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
     set_keymap("n", "<leader>a",  "<cmd>lua vim.lsp.buf.code_action()<CR>")
-    set_keymap("n", "<leader>e",  "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ focusable = false })<CR>")
-    set_keymap("n", "<leader>q",  "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>")
-    set_keymap("n", "[g",         "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>")
-    set_keymap("n", "]g",         "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>")
+    set_keymap("n", "<leader>e",  "<cmd>lua vim.diagnostic.open_float()<CR>")
+    set_keymap("n", "<leader>q",  "<cmd>lua vim.diagnostic.set_loclist()<CR>")
+    set_keymap("n", "[g",         "<cmd>lua vim.diagnostic.goto_prev()<CR>")
+    set_keymap("n", "]g",         "<cmd>lua vim.diagnostic.goto_next()<CR>")
 
     -- Invoke the custom `on_attach` function for the client, if needed
     if custom_on_attach then
