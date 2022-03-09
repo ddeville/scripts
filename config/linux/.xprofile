@@ -22,6 +22,5 @@ xset s 1800 1800
 xset dpms 1800 1800 1800
 
 # Start keyring and polkit auth agent
-eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
-export SSH_AUTH_SOCK
+eval $(gnome-keyring-daemon --start --components=pkcs11,secrets)
 [ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
