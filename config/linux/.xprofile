@@ -21,5 +21,7 @@ xsetroot -cursor_name left_ptr
 xset s 1800 1800
 xset dpms 1800 1800 1800
 
+# Start keyring and polkit auth agent
 eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
 export SSH_AUTH_SOCK
+[ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
