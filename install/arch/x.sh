@@ -6,7 +6,7 @@ sudo pacman -S --needed \
     xorg xorg-xinit lxappearance \
     bspwm sxhkd slock lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings \
     dunst redshift neofetch playerctl rofi seahorse \
-    maim xclip polkit-gnome \
+    maim xclip mate-polkit \
     alacritty firefox nautilus sxiv mupdf remmina virt-manager \
     faenza-icon-theme papirus-icon-theme \
     ttf-anonymous-pro ttf-liberation inter-font ttf-dejavu noto-fonts noto-fonts-emoji \
