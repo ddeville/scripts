@@ -51,6 +51,3 @@ killall --quiet --wait --user $USER --exact bspwm-floating > /dev/null
 # set up nitrogen for background pictures
 # no need to kill existing instances since when using `--restore` the process exits as soon as the background is set.
 nitrogen --restore &
-
-# tweak screen color to be easier on the eyes
-redshift -P -O 4500

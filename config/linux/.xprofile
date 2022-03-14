@@ -21,6 +21,13 @@ xsetroot -cursor_name left_ptr
 xset s 1800 1800
 xset dpms 1800 1800 1800
 
+# Tweak screen color to be easier on the eyes
+redshift -P -O 4500
+
 # Start keyring and polkit auth agent
-eval $(gnome-keyring-daemon --start --components=pkcs11,secrets)
+gnome-keyring-daemon --start --components=pkcs11,secrets
 [ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 &
+
+# Start regular applications that we want at startup
+[ -x /usr/bin/dropbox ] && pgrep dropbox > /dev/null || /usr/bin/dropbox &
+[ -x /usr/bin/1password ] && pgrep 1password > /dev/null || /usr/bin/1password &
