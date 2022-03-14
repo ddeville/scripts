@@ -23,4 +23,4 @@ xset dpms 1800 1800 1800
 
 # Start keyring and polkit auth agent
 eval $(gnome-keyring-daemon --start --components=pkcs11,secrets)
-[ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ] && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+[ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 &
