@@ -32,7 +32,7 @@ function fish_greeting
         echo -n $l_color" Disk usage: "
         echo -ne $r_color(\
             df -l -h | \
-            grep -E 'dev/(nvme|sd|xvda|root)' | \
+            grep -E 'dev/(nvme|sd|vda|xvda|root)' | \
             awk '{
                 if (NR!=1) printf "             "
                 printf "%s -> %4s available (%s used)\\\\n", $6, $4, $5

@@ -1,3 +1,3 @@
 function dbx_rdp_win_devbox --description "Setup RDP connection to my Windows devbox"
-    ssh -i ~/.ssh/dbx_id_rsa -N -L 23389:damien-win:3389 damien@damien-mp.home.kattungar.net
+    ssh -N -L 23389:damien-win:3389 damien@damien-mp.home.kattungar.net
 end
