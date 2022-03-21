@@ -1,18 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 
-dpi=96
+DPI=140
 
-# This is my home machine with two monitors
 if [[ $(hostname) == "arch" ]]; then
-    dpi=140
+    # This is my home machine with two monitors
     xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
     xrandr --output DisplayPort-1 --mode 3840x2160 --pos 3840x0 --rotate right
+elif [[ $(hostname) == "archvm"* ]]; then
+    # Random Arch VMs in libvirt
+    xrandr --output Virtual-1 --mode 1920x1440 --primary
 fi
 
 # Update the DPI in the X resources
-xrandr --dpi "$dpi"
-xrdb -merge <(echo "Xft.dpi: $dpi")
-xrdb -merge <(echo "*dpi: $dpi")
+xrandr --dpi "$DPI"
+xrdb -merge <(echo "Xft.dpi: $DPI")
+xrdb -merge <(echo "*dpi: $DPI")
 
 xset r rate 180 50
 xsetroot -cursor_name left_ptr
@@ -26,8 +28,8 @@ redshift -P -O 4500
 
 # Start keyring and polkit auth agent
 gnome-keyring-daemon --start --components=pkcs11,secrets
-[ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 &
+[ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 & disown
 
 # Start regular applications that we want at startup
-[ -x /usr/bin/dropbox ] && pgrep dropbox > /dev/null || /usr/bin/dropbox &
-[ -x /usr/bin/1password ] && pgrep 1password > /dev/null || /usr/bin/1password &
+[ -x /usr/bin/dropbox ] && pgrep dropbox > /dev/null || /usr/bin/dropbox & disown
+[ -x /usr/bin/1password ] && pgrep 1password > /dev/null || /usr/bin/1password & disown

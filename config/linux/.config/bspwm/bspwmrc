@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 bspc config border_width 2
 bspc config window_gap 0
@@ -7,13 +7,14 @@ bspc config split_ratio 0.5
 bspc config borderless_monocle false
 bspc config gapless_monocle false
 
-bspc monitor DisplayPort-0 -d web media dbx zoom vnc flt
-bspc monitor DisplayPort-1 -d code dbx-code devbox a
+if [[ $(hostname) == "arch" ]]; then
+    bspc monitor DisplayPort-0 -d web media dbx zoom vnc flt
+    bspc monitor DisplayPort-1 -d code dbx-code devbox a
+else
+    bspc monitor -d web code media flt a b c
+fi
 
-bspc rule -a Slack desktop='dbx' follow=on
-bspc rule -a Spotify desktop='media' follow=on
-bspc rule -a discord desktop='media' follow=on
-bspc rule -a zoom desktop='zoom' state=floating
+bspc rule -a zoom state=floating
 bspc rule -a 1Password state=floating
 
 # Get the right hwmon path to monitor CPU temp in polybar.
@@ -27,9 +28,9 @@ bspc rule -a 1Password state=floating
 # since it is not necessarily the real measured temp and is instead used for fan control.
 # See https://www.kernel.org/doc/html/v5.12/hwmon/k10temp.html
 # However, Tdie also seems to be missing as of kernel version ~5.14 so use Tctl for now.
-cpu_label="k10temp: Tctl"
+CPU_LABEL="k10temp: Tctl"
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
-    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$cpu_label" ]; then
+    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$CPU_LABEL" ]; then
         export HWMON_PATH="$i"
     fi
 done
@@ -39,10 +40,15 @@ killall --quiet --wait --user $USER --exact sxhkd > /dev/null
 sxhkd &
 
 # set up polybar
-killall --quiet --wait --user $USER --exact polybar > /dev/null
+polybar-msg cmd quit > /dev/null
 mkdir -p $HOME/.cache/logs
-polybar main 2> $HOME/.cache/logs/polybar-main.err &
-polybar term 2> $HOME/.cache/logs/polybar-term.err &
+
+if [[ $(hostname) == "arch" ]]; then
+    MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2> $HOME/.cache/logs/polybar-main.err &
+    MONITOR=DisplayPort-1 polybar term 2> $HOME/.cache/logs/polybar-term.err &
+else
+    polybar minimal 2> $HOME/.cache/logs/polybar-minimal.err &
+fi
 
 # make all windows on desktop 'flt' floating
 killall --quiet --wait --user $USER --exact bspwm-floating > /dev/null
