@@ -1,7 +1,14 @@
 config/common/.config/fish/fish_variables
 config/common/.config/nvim/plugged
 config/common/.config/tmux/plugins
-config/common/.ssh/known_hosts
-config/common/.ssh/ssh_auth_sock
 config/linux/.config/gtk-3.0/bookmarks
 config/linux/.config/gtk-3.0/servers
+
+# by default ignore everything in `.ssh` aside from this very whitelist
+config/common/.ssh
+!config/common/.ssh/authorized_keys
+!config/common/.ssh/config
+!config/common/.ssh/id_dbx.pub
+!config/common/.ssh/id_personal.pub
+!config/common/.ssh/rc
+!config/common/.ssh/use_1password.sh
