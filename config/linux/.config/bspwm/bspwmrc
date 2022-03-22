@@ -15,6 +15,7 @@ else
 fi
 
 bspc rule -a zoom state=floating
+bspc rule -a "zoom " state=floating
 bspc rule -a 1Password state=floating
 
 # Get the right hwmon path to monitor CPU temp in polybar.
