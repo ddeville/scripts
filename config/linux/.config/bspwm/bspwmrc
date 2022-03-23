@@ -14,8 +14,8 @@ else
     bspc monitor -d web code media flt a b c
 fi
 
-bspc rule -a zoom state=floating
-bspc rule -a "zoom " state=floating
+bspc rule -a zoom desktop="zoom" state=floating
+bspc rule -a "zoom " desktop="zoom" state=floating
 bspc rule -a 1Password state=floating
 
 # Get the right hwmon path to monitor CPU temp in polybar.
