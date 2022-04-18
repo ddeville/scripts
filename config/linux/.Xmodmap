@@ -1,4 +1,4 @@
-! Turn CapsLock into Control, Control into Super_L and Control_L as Super_L
+! Turn CapsLock into Control, Control_L into Super_L and Super_L into Control_L
 ! This is because:
 !   1. I have always used CapsLock as Control on the command line
 !   2. I have used macs forever and have that Command key wired in my fingers
