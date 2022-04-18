@@ -166,22 +166,27 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Setup inlay hints for Rust, this needs to be aggressively refetched.
-util.create_augroup("rust_inlay_hints", { {
-  "BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter",
-  "*.rs",
-  "lua",
-  [[require'lsp_extensions'.inlay_hints{
-    highlight = "Comment";
-    prefix = " ▶ ";
-    aligned = false;
-    only_current_line = false;
-    enabled = { "TypeHint", "ChainingHint" };
-  }]],
-} })
+vim.api.nvim_create_autocmd("BufEnter,BufWinEnter,BufWritePost,InsertLeave,TabEnter", {
+  pattern = "*.rs",
+  callback = function(args)
+    require'lsp_extensions'.inlay_hints{
+      highlight = "Comment";
+      prefix = " ▶ ";
+      aligned = false;
+      only_current_line = false;
+      enabled = { "TypeHint", "ChainingHint" };
+    }
+  end,
+})
 
 -- Add support for reporting LSP progress
 lsp_status.register_progress()
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
-util.create_augroup("code_action_lightbulb", { {"CursorHold,CursorHoldI" , "*", "lua require'nvim-lightbulb'.update_lightbulb()"} })
+vim.api.nvim_create_autocmd("CursorHold,CursorHoldI", {
+  pattern = "*",
+  callback = function(args)
+    require'nvim-lightbulb'.update_lightbulb()
+  end,
+})
