@@ -11,15 +11,15 @@ cmp.setup({
     { name = "path" },
     { name = "buffer", keyword_length = 3 },
   },
-  mapping = {
-    ["<C-e>"] = cmp.mapping.close(),
+  mapping = cmp.mapping.preset.insert({
+    ["<C-e>"] = cmp.mapping.abort(),
     ["<C-y>"] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Insert,
       select = true,
     },
     ["<C-d>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
-  },
+  }),
   formatting = {
     format = function(entry, vim_item)
       local menu = {
