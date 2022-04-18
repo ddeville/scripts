@@ -21,7 +21,7 @@ xsetroot -cursor_name left_ptr
 
 # If not running on my main desktop that has a programmed keychron keyboard, let's tweak
 # a few keys.
-if [[ ! $(hostname) == "arch" ]] && [[ ! $(hostname) == "archvm"* ]]; then
+if [[ $(hostname) != "arch" ]] && [[ $(hostname) != "archvm"* ]]; then
     # Turn CapsLock into Control, Control_L into Super_L and Super_L into Control_L
     # This is because:
     #   1. I have always used CapsLock as Control on the command line
