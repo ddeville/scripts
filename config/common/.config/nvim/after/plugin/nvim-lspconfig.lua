@@ -22,6 +22,11 @@ vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextHint", { fg = "Gray", ctermfg =
 vim.api.nvim_set_hl(0, "LspDiagnosticsSignHint", { fg = "Gray", ctermfg = "Gray" })
 vim.api.nvim_set_hl(0, "LspDiagnosticsUnderlineHint", { fg = "Gray", ctermfg = "Gray" })
 
+vim.fn.sign_define("LspDiagnosticsSignError", { text = "E", texthl = "LspDiagnosticsDefaultError" })
+vim.fn.sign_define("LspDiagnosticsSignWarning", { text = "W", texthl = "LspDiagnosticsDefaultWarning" })
+vim.fn.sign_define("LspDiagnosticsSignInformation", { text = "I", texthl = "LspDiagnosticsDefaultInformation" })
+vim.fn.sign_define("LspDiagnosticsSignHint", { text = "H", texthl = "LspDiagnosticsDefaultHint" })
+
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
   config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities)

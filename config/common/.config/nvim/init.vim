@@ -233,16 +233,6 @@ nnoremap <C-l> :nohl<CR><C-l>
 " make Y behave like D and C
 nnoremap Y y$
 
-" ==> HIGHLIGHTS
-
-" configure sign column for diagnostic messages
-if has("nvim")
-  sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
-  sign define LspDiagnosticsSignWarning text=W texthl=LspDiagnosticsDefaultWarning
-  sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
-  sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
-end
-
 " load main lua plugin
 if has("nvim-0.5")
   lua require("ddeville")
