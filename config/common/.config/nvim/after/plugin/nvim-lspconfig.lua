@@ -1,7 +1,6 @@
 local nvim_lsp = require("lspconfig")
 local lsp_status = require("lsp-status")
 local cmp_nvim_lsp = require("cmp_nvim_lsp")
-local util = require("ddeville/util")
 
 vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultError", { fg = "Red", ctermfg = "Red" })
 vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextError", { fg = "Red", ctermfg = "Red" })
