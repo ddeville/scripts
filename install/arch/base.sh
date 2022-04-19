@@ -40,7 +40,7 @@ pacman -S --needed \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pamixer pavucontrol sof-firmware \
     acpi acpi_call acpid \
     mtools dosfstools smbclient gvfs gvfs-smb cifs-utils nfs-utils ntfs-3g btrfs-progs \
-    fish vim neovim stow bat exa htop jq ripgrep tmux curl fd \
+    fish vim neovim stow bat exa htop jq ripgrep tmux curl fd glances duf dust \
     cmake ninja python rustup go nodejs npm pyenv tree-sitter perf gdb \
     docker qemu qemu-arch-extra libvirt ovmf vde2 bridge-utils dnsmasq dmidecode
 
