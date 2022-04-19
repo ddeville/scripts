@@ -235,27 +235,6 @@ nnoremap Y y$
 
 " ==> HIGHLIGHTS
 
-" diagnostic error messages in red
-highlight LspDiagnosticsDefaultError guifg=Red ctermfg=Red
-highlight LspDiagnosticsVirtualTextError guifg=Red ctermfg=Red
-highlight LspDiagnosticsSignError guifg=Red ctermfg=Red
-highlight LspDiagnosticsUnderlineError guifg=Red ctermfg=Red
-" diagnostic warning messages in yellow
-highlight LspDiagnosticsDefaultWarning guifg=Yellow ctermfg=Yellow
-highlight LspDiagnosticsVirtualTextWarning guifg=Yellow ctermfg=Yellow
-highlight LspDiagnosticsSignWarning guifg=Yellow ctermfg=Yellow
-highlight LspDiagnosticsUnderlineWarning guifg=Red ctermfg=Red
-" diagnostic info messages in white
-highlight LspDiagnosticsDefaultInformation guifg=White ctermfg=White
-highlight LspDiagnosticsVirtualTextInformation guifg=White ctermfg=White
-highlight LspDiagnosticsSignInformation guifg=White ctermfg=White
-highlight LspDiagnosticsUnderlineInformation guifg=White ctermfg=White
-" diagnostic hint messages in gray
-highlight LspDiagnosticsDefaultHint guifg=Gray ctermfg=Gray
-highlight LspDiagnosticsVirtualTextHint guifg=Gray ctermfg=Gray
-highlight LspDiagnosticsSignHint guifg=Gray ctermfg=Gray
-highlight LspDiagnosticsUnderlineHint guifg=Gray ctermfg=Gray
-
 " configure sign column for diagnostic messages
 if has("nvim")
   sign define LspDiagnosticsSignError text=E texthl=LspDiagnosticsDefaultError
@@ -263,16 +242,6 @@ if has("nvim")
   sign define LspDiagnosticsSignInformation text=I texthl=LspDiagnosticsDefaultInformation
   sign define LspDiagnosticsSignHint text=H texthl=LspDiagnosticsDefaultHint
 end
-
-" nvim-cmp
-highlight CmpItemAbbr guifg=Gray ctermfg=Gray
-highlight CmpItemAbbrDeprecated guifg=Red ctermfg=Red
-highlight CmpItemAbbrMatch guifg=Yellow ctermfg=Yellow
-highlight CmpItemAbbrMatch gui=underline cterm=underline
-highlight CmpItemAbbrMatchFuzzy guifg=Yellow ctermfg=Yellow
-highlight CmpItemAbbrMatchFuzzy gui=underline cterm=underline
-highlight CmpItemKind guifg=Green ctermfg=Green
-highlight CmpItemMenu guifg=Magenta ctermfg=Magenta
 
 " load main lua plugin
 if has("nvim-0.5")

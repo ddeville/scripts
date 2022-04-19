@@ -3,6 +3,26 @@ local lsp_status = require("lsp-status")
 local cmp_nvim_lsp = require("cmp_nvim_lsp")
 local util = require("ddeville/util")
 
+vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultError", { fg = "Red", ctermfg = "Red" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextError", { fg = "Red", ctermfg = "Red" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsSignError", { fg = "Red", ctermfg = "Red" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsUnderlineError", { fg = "Red", ctermfg = "Red" })
+
+vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultWarning", { fg = "Yellow", ctermfg = "Yellow" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextWarning", { fg = "Yellow", ctermfg = "Yellow" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsSignWarning", { fg = "Yellow", ctermfg = "Yellow" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsUnderlineWarning", { fg = "Yellow", ctermfg = "Yellow" })
+
+vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultInformation", { fg = "White", ctermfg = "White" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextInformation", { fg = "White", ctermfg = "White" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsSignInformation", { fg = "White", ctermfg = "White" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsUnderlineInformation", { fg = "White", ctermfg = "White" })
+
+vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultHint", { fg = "Gray", ctermfg = "Gray" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextHint", { fg = "Gray", ctermfg = "Gray" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsSignHint", { fg = "Gray", ctermfg = "Gray" })
+vim.api.nvim_set_hl(0, "LspDiagnosticsUnderlineHint", { fg = "Gray", ctermfg = "Gray" })
+
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
   config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities)
