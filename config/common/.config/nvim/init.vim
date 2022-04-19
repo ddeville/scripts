@@ -89,7 +89,6 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
     Plug 'hrsh7th/vim-vsnip' | Plug 'hrsh7th/cmp-vsnip'
     Plug 'kosayoda/nvim-lightbulb'
     Plug 'neovim/nvim-lspconfig'
-    Plug 'nvim-lua/lsp_extensions.nvim'
     Plug 'nvim-lua/lsp-status.nvim'
     Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
