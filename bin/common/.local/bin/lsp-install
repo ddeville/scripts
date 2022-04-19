@@ -115,7 +115,7 @@ function _gopls {
     export GOPATH="$(pwd)"
     export GOBIN="$(pwd)"
     export GO111MODULE=on
-    go get -v golang.org/x/tools/gopls
+    go install golang.org/x/tools/gopls@latest
     go clean -modcache
 
     popd > /dev/null
