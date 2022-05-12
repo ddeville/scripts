@@ -96,7 +96,7 @@ setup_client("rust_analyzer", {
         autoreload = true;
       };
       procMacro = {
-        enable = false;
+        enable = true;
       };
     };
   };
