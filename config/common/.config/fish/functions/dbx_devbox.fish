@@ -1,6 +1,6 @@
 function dbx_devbox --description "SSH to my devbox"
     ssh -o ServerAliveInterval=180 -o ServerAliveCountMax=2 -A -J \
-        damien@damien-mp.home.kattungar.net \
+        damien@damien-studio.home.kattungar.net \
         damien-dbx -t "
         if not tmux list-sessions 2> /dev/null | grep devbox > /dev/null 2>&1
             tmux new-session -D -s devbox -d -c ~
