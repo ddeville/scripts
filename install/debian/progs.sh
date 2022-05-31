@@ -4,7 +4,7 @@
 : ${USERNAME:=damien}
 
 sudo apt-get install \
-    fish vim neovim stow bat htop jq ripgrep tmux curl fd-find cmake golang gdb exa
+    fish vim neovim stow bat htop jq ripgrep tmux curl fd-find cmake golang gdb exa zoxide
 
 sudo echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
 
