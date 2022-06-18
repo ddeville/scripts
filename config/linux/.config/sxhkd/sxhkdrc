@@ -16,6 +16,7 @@ ctrl + @space
 
 # lock
 super + shift + s
+	systemctl suspend
 	slock
 
 # make sxhkd reload its configuration files:
