@@ -34,7 +34,7 @@ pacman -S --needed \
     xf86-video-amdgpu \
     base-devel linux-headers pkg-config man-db man-pages git pacman-contrib zip unzip lsb-release \
     xdg-user-dirs xdg-utils dialog terminus-font \
-    networkmanager network-manager-applet wireguard-tools libvncserver freerdp \
+    networkmanager network-manager-applet wireguard-tools ethtool libvncserver freerdp \
     openssh rsync openbsd-netcat iptables-nft ipset firewalld gnupg gnome-keyring libsecret polkit \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
     alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pamixer pavucontrol sof-firmware \
