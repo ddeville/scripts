@@ -44,6 +44,9 @@ set undofile
 " get netrw and viminfo to store their history in the XDG state dir
 let g:netrw_home = $XDG_STATE_HOME . '/vim'
 if !has("nvim")
+  if !isdirectory($XDG_STATE_HOME/vim/viminfo)
+    call mkdir($XDG_STATE_HOME/vim/viminfo, "p", 0700)
+  endif
   set viminfo+=n$XDG_STATE_HOME/vim/viminfo
 endif
 
