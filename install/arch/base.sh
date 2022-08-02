@@ -37,7 +37,7 @@ pacman -S --needed \
     networkmanager network-manager-applet wireguard-tools ethtool libvncserver freerdp \
     openssh rsync openbsd-netcat iptables-nft ipset firewalld gnupg gnome-keyring libsecret polkit \
     avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
-    alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack pamixer pavucontrol sof-firmware \
+    alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber pavucontrol sof-firmware \
     acpi acpi_call acpid \
     mtools dosfstools smbclient gvfs gvfs-smb cifs-utils nfs-utils ntfs-3g btrfs-progs \
     fish vim neovim stow bat exa htop jq ripgrep tmux curl fd glances duf dust zoxide \
