@@ -95,11 +95,11 @@ super + {Left,Down,Up,Right}
 
 # media keys
 XF86AudioRaiseVolume
-	pactl set-sink-volume @DEFAULT_SINK@ +1%
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
 XF86AudioLowerVolume
-	pactl set-sink-volume @DEFAULT_SINK@ -1%
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
 XF86AudioMute
-	pactl set-sink-mute @DEFAULT_SINK@ toggle
+	wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 XF86AudioPlay
 	playerctl --player=spotify play-pause
 XF86AudioPrev
