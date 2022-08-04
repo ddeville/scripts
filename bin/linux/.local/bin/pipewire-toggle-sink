@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-#speaker="alsa_output.usb-Audioengine_Ltd._Audioengine_2__ABCDEFB1180003-00.analog-stereo"
-speaker="alsa_output.usb-Audioengine_Ltd._Audioengine_2__ABCDEFB1180003-00.iec958-stereo"
+speaker="alsa_output.usb-Audioengine_Ltd._Audioengine_2__ABCDEFB1180003-00.analog-stereo"
 headphones="alsa_output.pci-0000_0c_00.4.analog-stereo"
 
 current="$(pactl get-default-sink)"
