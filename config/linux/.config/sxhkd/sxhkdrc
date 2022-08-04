@@ -15,6 +15,10 @@ ctrl + @space
 	rofi -show drun -m -1
 
 # lock
+super + shift + l
+	slock & sleep 0.5 && xset dpms force off
+
+# sleep
 super + shift + s
 	systemctl suspend
 	slock
