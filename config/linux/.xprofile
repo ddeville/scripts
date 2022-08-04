@@ -44,8 +44,8 @@ if [[ $(hostname) != "arch" ]] && [[ $(hostname) != "archvm"* ]]; then
 fi
 
 # Sleep and screen saver
-xset s 1800 1800
-xset dpms 1800 1800 1800
+xset s 600 600
+xset dpms 600 600 600
 
 # Tweak screen color to be easier on the eyes
 redshift -P -O 4500
