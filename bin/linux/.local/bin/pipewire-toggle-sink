@@ -4,32 +4,41 @@ set -e
 speaker="alsa_output.usb-Audioengine_Ltd._Audioengine_2__ABCDEFB1180003-00.analog-stereo"
 headphones="alsa_output.pci-0000_0c_00.4.analog-stereo"
 
-current="$(pactl get-default-sink)"
+output () {
+    case "$1" in
+        $speaker)
+            echo "";;
+        $headphones)
+            echo "";;
+        *)
+            echo "";;
+    esac
+}
+
+update() {
+    # Make sure that this sink actually exists...
+    for sink in $(pactl list short sinks | cut -f2); do
+        if [ "$sink" = "$1" ] ; then
+            pactl set-default-sink $1
+            output $1
+            return
+        fi
+    done
+    output
+}
+
+current_sink="$(pactl get-default-sink)"
 
 case "$1" in
     --output)
-        case $current in
-            $speaker)
-                echo ""
-                ;;
-            $headphones)
-                echo ""
-                ;;
-            *)
-                echo ""
-                ;;
-        esac
-        ;;
+        output $current_sink;;
     *)
-        case $current in
+        case $current_sink in
             $speaker)
-                pactl set-default-sink $headphones &
-                echo ""
-                ;;
-            $headphones|*)
-                pactl set-default-sink $speaker
-                echo ""
-                ;;&
+                update $headphones;;
+            $headphones)
+                update $speaker;;
+            *)
+                update $speaker;;
         esac
-        ;;
 esac
