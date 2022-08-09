@@ -17,6 +17,7 @@ fi
 bspc rule -a zoom desktop="zoom" state=floating
 bspc rule -a "zoom " desktop="zoom" state=floating
 bspc rule -a 1Password state=floating
+bspc rule -a QjackCtl state=floating
 
 # Get the right hwmon path to monitor CPU temp in polybar.
 # Specifically we are looking for the hardware monitor with name `k10temp` which is the driver that
