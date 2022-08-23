@@ -2,10 +2,9 @@
 
 set -eu
 
-username="$1"
-token="$2"
+token="$1"
 
-account_id=$(curl -sL https://jmap.fastmail.com/.well-known/jmap -u $username:$token |
+account_id=$(curl -sL https://api.fastmail.com/.well-known/jmap -H "Authorization: Bearer $token" -H "Content-Type: application/json" |
     jq --raw-output '.primaryAccounts."urn:ietf:params:jmap:mail"' 2> /dev/null)
 
 query='{
@@ -16,7 +15,7 @@ query='{
     ]
 }'
 
-unread_count=$(curl -sL https://jmap.fastmail.com/api/ -u $username:$token -X POST -H "Content-Type: application/json" --data "$query" |
+unread_count=$(curl -sL https://api.fastmail.com/jmap/api/ -X POST -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data "$query" |
     jq --raw-output '.methodResponses[1][1].list[0].unreadEmails' 2> /dev/null)
 
 echo $unread_count
