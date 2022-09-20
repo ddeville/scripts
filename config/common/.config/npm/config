@@ -1,2 +1,2 @@
-editor = "nvim"
-cache = ${XDG_CACHE_HOME}/npm
+editor=nvim
+cache=${XDG_CACHE_HOME}/npm
