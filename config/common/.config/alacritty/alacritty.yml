@@ -20,7 +20,7 @@ window:
   padding:
     x: 4
     y: 2
-  gtk_theme_variant: dark
+  decorations_theme_variant: dark
 
 font:
   normal:
@@ -32,7 +32,7 @@ font:
   size: 11.5
   offset:
     y: 2
-  use_thin_strokes: true
+  AppleFontSmoothing: true
 
 cursor:
   style: Block
