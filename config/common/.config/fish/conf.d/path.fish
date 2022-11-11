@@ -39,6 +39,7 @@ end
 
 # brew install its stuff there on M1 macs
 add_to_path "/opt/homebrew/bin"
+add_to_path "/opt/homebrew/sbin"
 
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
