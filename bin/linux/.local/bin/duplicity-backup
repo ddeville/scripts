@@ -9,18 +9,12 @@ fi
 case $1 in
    local)
       DEST="file:///home/damien/data/Backup"
-      CREDS=()
       ;;
    nas)
-      DEST="rsync://duplicity@nas.home.kattungar.net//volume1/Duplicity/$(hostname)"
-      CREDS=(
-         "--ssh-options"
-         "-oIdentityFile='/etc/duplicity/credentials/nas_key'"
-      )
+      DEST="file:///home/damien/data/NAS/Duplicity/$(hostname)"
       ;;
    dbx)
       DEST="dpbx:///Backup/Duplicity/$(hostname)"
-      CREDS=()
       export DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
       ;;
    *)
@@ -51,10 +45,10 @@ EXCLUDES=(
 )
 
 # Back up the entire system! Full backup every month, otherwise incremental.
-duplicity --full-if-older-than 1M ${CREDS[@]} ${EXCLUDES[@]} / "$DEST"
+duplicity --full-if-older-than 1M ${EXCLUDES[@]} / "$DEST"
 
 # Keep 6 full backups, that is 6 months worth of data.
-duplicity remove-all-but-n-full 6 --force ${CREDS[@]} "$DEST"
+duplicity remove-all-but-n-full 6 --force "$DEST"
 
 # And show a helpful status.
-duplicity collection-status ${CREDS[@]} "$DEST"
+duplicity collection-status "$DEST"
