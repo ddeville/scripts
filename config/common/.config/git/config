@@ -1,3 +1,6 @@
+[core]
+    editor = nvim
+    excludesfile = ~/.config/git/gitignore_global
 [user]
     name = Damien Deville
     email = damien@ddeville.me
@@ -10,9 +13,6 @@
     program = /opt/1Password/op-ssh-sign
 [commit]
     gpgsign = true
-[core]
-    editor = nvim
-    excludesfile = ~/.config/git/gitignore_global
 [diff]
     tool = vimdiff
     algorithm = patience
