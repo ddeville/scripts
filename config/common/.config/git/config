@@ -3,6 +3,7 @@
     excludesfile = ~/.config/git/gitignore_global
 [user]
     name = Damien Deville
+    # TODO: Create different configs with work-related values here and use https://dzone.com/articles/how-to-use-gitconfigs-includeif
     email = damien@ddeville.me
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdfnAiFh+I4A/UMO73DjVDc84Dbpg/IthY9NHqqMJ4N
 [gpg]
