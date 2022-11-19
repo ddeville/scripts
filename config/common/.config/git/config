@@ -1,6 +1,15 @@
 [user]
-    name = Damien DeVille
+    name = Damien Deville
     email = damien@ddeville.me
+    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdfnAiFh+I4A/UMO73DjVDc84Dbpg/IthY9NHqqMJ4N
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    # NOTE: If on macos, remember to symlink "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+    #       to `/opt/1Password/op-ssh-sign`.
+    program = /opt/1Password/op-ssh-sign
+[commit]
+    gpgsign = true
 [core]
     editor = nvim
     excludesfile = ~/.config/git/gitignore_global
