@@ -138,8 +138,7 @@ setup_client("gopls", {
   capabilities = lsp_status.capabilities;
 })
 
--- TODO(damien): Fix this but right now it's spinning at 100% for hours on rSERVER...
--- setup_client("pyright", {})
+setup_client("pyright", {})
 
 setup_client("tsserver", {})
 
