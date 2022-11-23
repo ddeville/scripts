@@ -1,4 +1,9 @@
 function pyenv
+    if not type -fq pyenv
+        echo "pyenv is not installed, this is just a fish function wrapper!"
+        return 1
+    end
+
     set command $argv[1]
     set -e argv[1]
 
