@@ -1,5 +1,4 @@
 set -gx CLICOLOR 1
-set -gx TERM xterm-256color
 set -gx EDITOR nvim
 set -gx PYENV_SHELL fish
 
