@@ -121,6 +121,15 @@ setup_client("rust_analyzer", {
 
 setup_client("gopls", {
   cmd = { "gopls", "serve" };
+  filetypes = {"go", "gomod"};
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true;
+      };
+      staticcheck = true;
+    };
+  };
   root_dir = function(fname)
     local mod = nvim_lsp.util.root_pattern("go.mod")(fname)
     if mod ~= nil then
