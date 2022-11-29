@@ -54,6 +54,7 @@
     co = checkout
     aa = add -A
     ci = commit
+    cu = commit --no-gpg-sign
     di = diff
     df = difftool
     mg = merge
