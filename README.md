@@ -25,7 +25,6 @@ Then run the `install/macos/install.sh` script.
 - Add the rust source and linters to the rustup install: `rustup component add rust-src rustfmt clippy`.
 - Install the nightly Neovim by running `nvim-nightly-install`.
 - Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
-    - `python2 -m pip install --upgrade pynvim`
     - `python3 -m pip install --upgrade pynvim`
     - `npm install -g neovim`
 - Install the various LSP servers by running `lsp-install`.
