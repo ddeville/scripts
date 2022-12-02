@@ -3,6 +3,8 @@ function dbx_vpn --description "Forward port to Dropbox Mac Pro and set up proxy
     set network_service $argv[1]
     set server $argv[2]
 
+    # NOTE: You can then set `socks4://localhost:45623` as the proxy in Firefox
+
     if test -d $network_service
         echo "No network service given, defaulting to Ethernet"
         set network_service "Ethernet"
