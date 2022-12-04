@@ -5,6 +5,7 @@
     name = Damien Deville
     # TODO: Create different configs with work-related values here and use https://dzone.com/articles/how-to-use-gitconfigs-includeif
     email = damien@ddeville.me
+    # NOTE: Reference https://developer.1password.com/docs/ssh/git-commit-signing
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL9YoKFxv4ixFrJvRn3wUz5BSxtPjGk30tHGRc18BInN
 [gpg]
     format = ssh
