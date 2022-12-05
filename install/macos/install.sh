@@ -33,7 +33,7 @@ chflags hidden ~/Applications
 mkdir -p ~/.1password
 ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ~/.1password/agent.sock
 sudo mkdir -p /opt/1Password
-ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
+sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
