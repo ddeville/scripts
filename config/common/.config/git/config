@@ -31,6 +31,7 @@
     keepBackup = false
 [push]
     default = simple
+    autoSetupRemote = true
 [color]
     ui = auto
 [color "branch"]
