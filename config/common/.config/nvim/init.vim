@@ -84,6 +84,7 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
   Plug 'google/vim-maktaba'
   Plug 'google/vim-codefmt'
   Plug 'baskerville/vim-sxhkdrc'
+  Plug 'hashivim/vim-terraform'
 
   " neovim only
   if has("nvim-0.5")
