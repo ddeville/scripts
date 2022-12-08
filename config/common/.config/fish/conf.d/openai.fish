@@ -15,6 +15,12 @@ case "*"
     set -x KUBECONFIG "$API_KUBECONFIG:$CURRENT_KUBECONFIG"
 end
 
+function buildbox_activate
+    set -gx DOCKER_HOST build-box.internal.api.openai.org:2376
+    set -gx DOCKER_TLS_VERIFY 1
+    set -gx DOCKER_CERT_PATH "$HOME/.docker/build-box"
+end
+
 function nicer_kubectl
     set cluster $argv[1]
     if test (count $argv) -eq 1
