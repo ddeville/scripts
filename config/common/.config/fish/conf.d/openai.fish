@@ -21,6 +21,15 @@ function buildbox_activate
     set -gx DOCKER_CERT_PATH "$HOME/.docker/build-box"
 end
 
+function buildbox_deactivate
+    set --unexport DOCKER_HOST
+    set --erase DOCKER_HOST
+    set --unexport DOCKER_TLS_VERIFY
+    set --erase DOCKER_TLS_VERIFY
+    set --unexport DOCKER_CERT_PATH
+    set --erase DOCKER_CERT_PATH
+end
+
 function nicer_kubectl
     set cluster $argv[1]
     if test (count $argv) -eq 1
