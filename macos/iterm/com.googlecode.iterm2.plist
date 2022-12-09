@@ -314,12 +314,36 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
+		<key>0x43-0x120000-0x8</key>
+		<dict>
+			<key>Action</key>
+			<integer>25</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string>Copy
+Copy</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
 		<key>0x47-0x120000</key>
 		<dict>
 			<key>Action</key>
 			<integer>25</integer>
 			<key>Text</key>
 			<string>Find Next</string>
+		</dict>
+		<key>0x56-0x120000-0x9</key>
+		<dict>
+			<key>Action</key>
+			<integer>25</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string>Paste
+Paste</string>
+			<key>Version</key>
+			<integer>1</integer>
 		</dict>
 		<key>0x67-0x100000</key>
 		<dict>
