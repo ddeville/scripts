@@ -8,6 +8,7 @@ alias gaa "git add .; and git ci"
 alias gaaa "git add .; and git ci --amend --no-edit"
 alias gaau "git add .; and git cu"
 alias oo "open ."
+alias tf "terraform"
 
 # abbreviations
 abbr -a -g cdd "cd .."
