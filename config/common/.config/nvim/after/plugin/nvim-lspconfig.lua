@@ -151,6 +151,9 @@ setup_client("pyright", {})
 
 setup_client("tsserver", {})
 
+-- TODO: Add schemas for k8s (and others) https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
+setup_client("yamlls", {})
+
 setup_client("clangd", {})
 
 setup_client("sourcekit", {
