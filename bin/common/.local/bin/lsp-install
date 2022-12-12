@@ -181,7 +181,7 @@ function _pyright {
     ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
 }
 
-function _yaml {
+function _yamlls {
     echo "Installing yaml-language-server"
 
     if ! command -v npm &> /dev/null; then
@@ -189,7 +189,7 @@ function _yaml {
         exit 1
     fi
 
-    foldername="_yaml"
+    foldername="_yamlls"
     linkname="bin/yaml-language-server"
 
     if [ -d "$foldername" ]; then
@@ -208,6 +208,54 @@ function _yaml {
     popd > /dev/null
 
     ln -s "../$foldername/node_modules/.bin/yaml-language-server" "$linkname"
+}
+
+function _terraformls {
+    echo "Installing terraform-ls"
+
+    foldername="_terraform-ls"
+    linkname="bin/terraform-ls"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername" > /dev/null
+
+    if [ "$(uname)" = "Darwin" ]; then
+        if [[ "$(uname -m)" == "arm64" ]]; then
+            platform_name="darwin_arm64"
+        else
+            platform_name="darwin_amd64"
+        fi
+    elif [ "$(uname)" = "Linux" ]; then
+        platform_name="linux_amd64"
+    else
+        echo "Unsupported platform: $(uname)"
+        exit 1
+    fi
+
+    version_url="https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
+    version_name="$(curl $version_url | jq --raw-output '.name')"
+    url="https://github.com/hashicorp/terraform-ls/releases/download/$version_name/terraform-ls_${version_name:1}_$platform_name.zip"
+
+    archive_path="terraform-ls.zip"
+    echo "Downloading $url to $archive_path"
+    curl -L --url "$url" --output "$archive_path"
+
+    unzip -q "$archive_path"
+    rm "$archive_path"
+
+    popd > /dev/null
+
+    bin_path="$foldername/terraform-ls"
+    chmod +x "$bin_path"
+
+    ln -s "../$bin_path" "$linkname"
 }
 
 function _sumneko_lua {
@@ -279,6 +327,8 @@ if [[ $# == 0 ]]; then
     echo "  * gopls"
     echo "  * tsserver"
     echo "  * pyright"
+    echo "  * yamlls"
+    echo "  * terraform-ls"
     echo "  * sumneko_lua"
     exit 1
 fi
@@ -323,11 +373,14 @@ for arg; do
     if [[ $arg == "pyright" ]] || $install_all; then
         _pyright
     fi
-    if [[ $arg == "yaml" ]] || $install_all; then
-        _yaml
+    if [[ $arg == "yamlls" ]] || $install_all; then
+        _yamlls
     fi
     if [[ $arg == "sumneko_lua" ]] || $install_all; then
         _sumneko_lua
+    fi
+    if [[ $arg == "terraform-ls" ]] || $install_all; then
+        _terraformls
     fi
 done
 popd > /dev/null
