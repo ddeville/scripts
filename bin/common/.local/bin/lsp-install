@@ -181,6 +181,35 @@ function _pyright {
     ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
 }
 
+function _yaml {
+    echo "Installing yaml-language-server"
+
+    if ! command -v npm &> /dev/null; then
+        echo "The yaml language server requires Node to be installed"
+        exit 1
+    fi
+
+    foldername="_yaml"
+    linkname="bin/yaml-language-server"
+
+    if [ -d "$foldername" ]; then
+        rm -rf "$foldername"
+    fi
+    if [ -L "$linkname" ]; then
+        rm "$linkname"
+    fi
+
+    mkdir "$foldername"
+    pushd "$foldername" > /dev/null
+
+    npm init -y --scope=lsp
+    npm install yaml-language-server@latest
+
+    popd > /dev/null
+
+    ln -s "../$foldername/node_modules/.bin/yaml-language-server" "$linkname"
+}
+
 function _sumneko_lua {
     echo "Installing sumneko_lua"
 
@@ -293,6 +322,9 @@ for arg; do
     fi
     if [[ $arg == "pyright" ]] || $install_all; then
         _pyright
+    fi
+    if [[ $arg == "yaml" ]] || $install_all; then
+        _yaml
     fi
     if [[ $arg == "sumneko_lua" ]] || $install_all; then
         _sumneko_lua
