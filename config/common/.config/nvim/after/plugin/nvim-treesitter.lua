@@ -10,6 +10,7 @@ treesitter.setup {
     "dockerfile",
     "fish",
     "go",
+    "hcl",
     "html",
     "java",
     "javascript",
