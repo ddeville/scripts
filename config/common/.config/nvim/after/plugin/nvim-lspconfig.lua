@@ -147,7 +147,23 @@ setup_client("gopls", {
   capabilities = lsp_status.capabilities;
 })
 
-setup_client("pyright", {})
+setup_client("pyright", {
+  root_dir = function(fname)
+      local root_files = {
+          'pyproject.toml',
+          'pyrightconfig.json',
+      }
+      return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
+  end,
+  settings = {
+      python = {
+          analysis = {
+              autoSearchPaths = false,
+              diagnosticMode = "workspace",
+          },
+      },
+  },
+})
 
 setup_client("tsserver", {})
 
