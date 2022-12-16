@@ -158,11 +158,13 @@ setup_client("pyright", {
   settings = {
       python = {
           analysis = {
-              autoSearchPaths = false,
-              diagnosticMode = "workspace",
-          },
-      },
-  },
+              autoSearchPaths = false;
+              diagnosticMode = "workspace";
+              typeCheckingMode = "basic";
+              useLibraryCodeForTypes = true;
+          };
+      };
+  };
 })
 
 setup_client("tsserver", {})
