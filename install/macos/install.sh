@@ -12,7 +12,7 @@ fi
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
     bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide \
-    pyenv golang node robotsandpencils/made/xcodes \
+    pyenv pyenv-virtualenv golang node robotsandpencils/made/xcodes \
     font-anonymous-pro
 
 sudo sh -c "echo $brew_path/fish >> /etc/shells"
