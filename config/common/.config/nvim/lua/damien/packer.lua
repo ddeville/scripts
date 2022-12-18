@@ -1,4 +1,7 @@
-local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+local packer = require("packer")
+local packer_util = require("packer.util")
+
+local install_path = vim.fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
 local bootstrapping = false
 
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
@@ -7,7 +10,7 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
     vim.cmd [[packadd packer.nvim]]
 end
 
-require('packer').startup({
+packer.startup({
     function(use)
         -- Package manager
         use "wbthomason/packer.nvim"
@@ -80,7 +83,7 @@ require('packer').startup({
         use {
             "nvim-treesitter/nvim-treesitter",
             run = function()
-                pcall(require('nvim-treesitter.install').update { with_sync = true })
+                pcall(require("nvim-treesitter.install").update { with_sync = true })
             end,
         }
 
@@ -95,16 +98,17 @@ require('packer').startup({
 
 
       -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-      -- use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make', cond = vim.fn.executable 'make' == 1 }
+      -- use { "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable "make" == 1 }
 
         if bootstrapping then
-            require('packer').sync()
+            packer.sync()
         end
     end,
     config = {
         display = {
-            open_fn = require('packer.util').float,
+            open_fn = packer_util.float,
         },
+        compile_path = vim.fn.stdpath("data") .. "/site/pack/loader/start/packer.nvim/plugin/packer_compiled.lua",
     },
 })
 
