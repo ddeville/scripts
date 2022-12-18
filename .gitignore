@@ -1,5 +1,4 @@
 config/common/.config/fish/fish_variables
-config/common/.config/nvim/plugged
 config/common/.config/tmux/plugins
 config/linux/.config/gtk-3.0/bookmarks
 config/linux/.config/gtk-3.0/servers
