@@ -97,7 +97,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 local highlight_ag = vim.api.nvim_create_augroup("HighlightOnYank", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
     group = highlight_ag;
-    callback = function(ev)
+    callback = function()
         vim.highlight.on_yank { timeout = 350 }
     end
 })
