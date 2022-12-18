@@ -18,14 +18,8 @@ if empty($XDG_STATE_HOME)
   let $XDG_STATE_HOME = $HOME . "/.local/state"
 endif
 
-" (use different folders for vim and nvim since formats can be incompatible...)
-if has("nvim")
-  let backup_path = $XDG_STATE_HOME . "/nvim/backup"
-  let undo_path = $XDG_STATE_HOME . "/nvim/undo"
-else
-  let backup_path = $XDG_STATE_HOME . "/vim/backup"
-  let undo_path = $XDG_STATE_HOME . "/vim/undo"
-endif
+let backup_path = $XDG_STATE_HOME . "/nvim/backup"
+let undo_path = $XDG_STATE_HOME . "/nvim/undo"
 
 " store swap and backup files under XDG state dir
 if !isdirectory(backup_path)
@@ -43,12 +37,6 @@ set undofile
 
 " get netrw and viminfo to store their history in the XDG state dir
 let g:netrw_home = $XDG_STATE_HOME . '/vim'
-if !has("nvim")
-  if !isdirectory($XDG_STATE_HOME . "/vim")
-    call mkdir($XDG_STATE_HOME . "/vim", "p", 0700)
-  endif
-  set viminfo+=n$XDG_STATE_HOME/vim/viminfo
-endif
 
 " set leader to space instead of the default backslash
 noremap <Space> <Nop>
@@ -87,16 +75,14 @@ call plug#begin($XDG_CONFIG_HOME . "/nvim/plugged")
   Plug 'hashivim/vim-terraform'
 
   " neovim only
-  if has("nvim-0.5")
-    Plug 'hrsh7th/nvim-cmp'
-    Plug 'hrsh7th/cmp-nvim-lsp' | Plug 'hrsh7th/cmp-buffer'| Plug 'hrsh7th/cmp-path' | Plug 'hrsh7th/cmp-nvim-lua'
-    Plug 'hrsh7th/vim-vsnip' | Plug 'hrsh7th/cmp-vsnip'
-    Plug 'kosayoda/nvim-lightbulb'
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'nvim-lua/lsp-status.nvim'
-    Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
-  endif
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/cmp-nvim-lsp' | Plug 'hrsh7th/cmp-buffer'| Plug 'hrsh7th/cmp-path' | Plug 'hrsh7th/cmp-nvim-lua'
+  Plug 'hrsh7th/vim-vsnip' | Plug 'hrsh7th/cmp-vsnip'
+  Plug 'kosayoda/nvim-lightbulb'
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-lua/lsp-status.nvim'
+  Plug 'nvim-telescope/telescope.nvim' | Plug 'nvim-lua/popup.nvim' | Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 
 call plug#end()
 
@@ -160,11 +146,7 @@ set ruler
 set number
 
 " show the diagnostic ui where the number goes
-if has("nvim-0.5") || has("patch-8.1.1564")
-  set signcolumn=number
-else
-  set signcolumn=yes
-end
+set signcolumn=number
 
 " display a column at 80 char
 set colorcolumn=80
@@ -238,6 +220,4 @@ nnoremap <C-l> :nohl<CR><C-l>
 nnoremap Y y$
 
 " load main lua plugin
-if has("nvim-0.5")
-  lua require("ddeville")
-end
+lua require("ddeville")

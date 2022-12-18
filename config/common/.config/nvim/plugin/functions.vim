@@ -27,5 +27,5 @@ function FolderCleanup(path, days)
   endif
 endfunction
 
-" remove undo files which have not been modified for 30 days
-call FolderCleanup(&undodir, 30)
+" remove undo files which have not been modified for 60 days
+call FolderCleanup(&undodir, 60)
