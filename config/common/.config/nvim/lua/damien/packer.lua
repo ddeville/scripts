@@ -48,10 +48,8 @@ packer.startup({
         use {
             "neovim/nvim-lspconfig";
             requires = {
-                "nvim-lua/lsp-status.nvim";
                 "kosayoda/nvim-lightbulb";
-                -- TODO(damien): Enable
-                -- "j-hui/fidget.nvim";
+                "j-hui/fidget.nvim";
             };
         }
 
