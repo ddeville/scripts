@@ -22,6 +22,7 @@ treesitter.setup {
     "rust",
     "toml",
     "typescript",
+    "vim",
     "yaml",
   };
   highlight = {
