@@ -1,7 +1,6 @@
 #!/bin/sh
 
-nvim +PlugUpgrade +qall
-nvim +PlugUpdate +qall
+nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 export TMUX_PLUGIN_MANAGER_PATH=$HOME/.config/tmux/plugins
 $HOME/.config/tmux/plugins/tpm/bin/install_plugins
