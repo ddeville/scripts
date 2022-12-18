@@ -83,12 +83,21 @@ vim.opt.shortmess:append({ c = true })
 
 -- trailing whitespace is bad
 vim.api.nvim_set_hl(0, "WhiteSpaceEOL", { ctermbg = 1 })
-local augroup = vim.api.nvim_create_augroup("TrailingWhitespace", { clear = true })
+local trailing_ag = vim.api.nvim_create_augroup("TrailingWhitespace", { clear = true })
 vim.api.nvim_create_autocmd("InsertEnter", {
-    group = augroup;
+    group = trailing_ag;
     command = [[match WhiteSpaceEOL /\s\+\%#\@<!$/]];
 })
 vim.api.nvim_create_autocmd("InsertLeave", {
-    group = augroup;
+    group = trailing_ag;
     command = [[match WhiteSpaceEOL /\s\+$/]];
+})
+
+-- highlight on yan
+local highlight_ag = vim.api.nvim_create_augroup("HighlightOnYank", { clear = true })
+vim.api.nvim_create_autocmd("TextYankPost", {
+    group = highlight_ag;
+    callback = function(ev)
+        vim.highlight.on_yank { timeout = 350 }
+    end
 })

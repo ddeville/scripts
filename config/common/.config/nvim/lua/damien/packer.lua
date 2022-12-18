@@ -51,9 +51,6 @@ require('packer').startup(function(use)
     use "tpope/vim-unimpaired"
     use "tpope/vim-vinegar"
 
-    -- TODO(damien): Remove
-    use "machakann/vim-highlightedyank"
-
     -- Autocompletion
     use {
         "hrsh7th/nvim-cmp",
