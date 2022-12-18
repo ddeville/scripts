@@ -1,5 +1,3 @@
-local xdg = require("damien.xdg")
-
 -- vim needs a posix shell and fish is not
 if vim.opt.shell == "fish$" then
     vim.opt.shell = [[/bin/bash]]
@@ -41,7 +39,6 @@ vim.opt.incsearch = true
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
-vim.opt.undodir = xdg.state_dir .. "/nvim/undodir"
 
 -- always show at least one line above/below the cursor (and 5 on each side if not wrapping)
 vim.opt.scrolloff = 1
