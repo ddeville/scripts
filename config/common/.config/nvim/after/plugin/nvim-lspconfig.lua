@@ -1,6 +1,6 @@
 local nvim_lsp = require("lspconfig")
-local lsp_status = require("lsp-status")
 local cmp_nvim_lsp = require("cmp_nvim_lsp")
+local fidget = require("fidget")
 
 vim.api.nvim_set_hl(0, "LspDiagnosticsDefaultError", { fg = "Red", ctermfg = "Red" })
 vim.api.nvim_set_hl(0, "LspDiagnosticsVirtualTextError", { fg = "Red", ctermfg = "Red" })
@@ -29,12 +29,10 @@ vim.fn.sign_define("LspDiagnosticsSignHint", { text = "H", texthl = "LspDiagnost
 
 local function setup_client(name, config)
   config.capabilities = vim.tbl_deep_extend("force", config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
-  config.capabilities = vim.tbl_deep_extend("force", lsp_status.capabilities, config.capabilities)
   config.capabilities = cmp_nvim_lsp.default_capabilities(config.capabilities)
 
   local custom_on_attach = config.on_attach
   config.on_attach = function(client, bufnr)
-    lsp_status.on_attach(client)
 
     local function set_keymap(key, fn)
       vim.api.nvim_buf_set_keymap(bufnr, "n", key, "", { noremap = true, silent = true, callback = fn})
@@ -144,7 +142,6 @@ setup_client("gopls", {
     end
     return nvim_lsp.util.root_pattern(".git")(fname)
   end;
-  capabilities = lsp_status.capabilities;
 })
 
 setup_client("pyright", {
@@ -220,8 +217,8 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   }
 )
 
--- Add support for reporting LSP progress
-lsp_status.register_progress()
+-- LSP Status
+fidget.setup()
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
