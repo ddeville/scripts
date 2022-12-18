@@ -30,7 +30,6 @@ add_to_path "/opt/lsp/bin"
 add_to_path "$HOME/.local/bin"
 add_to_path "$CARGO_HOME/bin"
 add_to_path "$HOME/src/go/bin"
-add_to_path "$FZF_HOME/bin"
 
 # check whether xcode is installed and add its bin dir to the path if so
 if which xcode-select > /dev/null 2>&1; and set -l XC (xcode-select --print-path)

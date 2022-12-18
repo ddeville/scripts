@@ -27,8 +27,6 @@ set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
 # rust
 set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
-# fzf
-set -x FZF_HOME "$XDG_DATA_HOME/fzf"
 # node
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
 set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
