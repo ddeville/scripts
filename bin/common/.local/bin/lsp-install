@@ -281,10 +281,8 @@ function _sumneko_lua {
 
     if [ "$(uname)" = "Darwin" ]; then
         ninja_file="macos.ninja"
-        bin_dir="macOS"
     elif [ "$(uname)" = "Linux" ]; then
         ninja_file="linux.ninja"
-        bin_dir="Linux"
     else
         echo "Unsupported platform: $(uname)"
         exit 1
@@ -311,8 +309,8 @@ function _sumneko_lua {
 
     curpath="$(pwd)"
 
-    command echo >lua "#!/bin/sh
-    $curpath/lua-language-server/bin/$bin_dir/lua-language-server -E $curpath/lua-language-server/main.lua"
+    command echo >>lua "#!/bin/sh"
+    command echo >>lua "$curpath/lua-language-server/bin/lua-language-server -E $curpath/lua-language-server/main.lua"
     chmod +x lua
 
     popd > /dev/null
