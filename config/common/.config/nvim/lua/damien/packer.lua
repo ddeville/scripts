@@ -15,90 +15,91 @@ packer.startup({
         -- Package manager
         use "wbthomason/packer.nvim"
 
-        -- Color scheme
-        use "chriskempson/base16-vim"
+        -- Appearance
+        use {
+            "chriskempson/base16-vim";
+            "itchyny/lightline.vim";
+            "mhinz/vim-startify";
+        }
 
         -- Languages
-        use "dag/vim-fish"
-        use "fatih/vim-go"
-        use "rust-lang/rust.vim"
-        use "hashivim/vim-terraform"
-        use "baskerville/vim-sxhkdrc"
-
-        -- Google formatter (used for Starlark)
         use {
-            "google/vim-codefmt",
-            requires = {
-                "google/vim-maktaba",
-            },
+            "dag/vim-fish";
+            "fatih/vim-go";
+            "rust-lang/rust.vim";
+            "hashivim/vim-terraform";
+            "baskerville/vim-sxhkdrc";
         }
 
-        -- fzf
+        -- Code formatter (used for Starlark)
         use {
-            "junegunn/fzf.vim",
-            requires = {
-                { "junegunn/fzf" }
-            }
+            "google/vim-codefmt";
+            requires = { "google/vim-maktaba" };
         }
 
-        use "itchyny/lightline.vim"
+        -- Navigation
         use "mhinz/vim-grepper"
-        use "mhinz/vim-startify"
-        use "tpope/vim-commentary"
-        use "tpope/vim-eunuch"
-        use "tpope/vim-fugitive"
-        use "tpope/vim-git"
-        use "tpope/vim-repeat"
-        use "tpope/vim-rhubarb"
-        use "tpope/vim-sleuth"
-        use "tpope/vim-surround"
-        use "tpope/vim-unimpaired"
-        use "tpope/vim-vinegar"
-
-        -- Autocompletion
         use {
-            "hrsh7th/nvim-cmp",
-            requires = {
-                "hrsh7th/cmp-nvim-lsp",
-                "hrsh7th/cmp-buffer",
-                "hrsh7th/cmp-path",
-                "hrsh7th/cmp-nvim-lua",
-                "hrsh7th/vim-vsnip",
-                "hrsh7th/cmp-vsnip",
-            },
+            "junegunn/fzf.vim";
+            requires = { "junegunn/fzf" };
         }
 
         -- LSP
         use {
-            "neovim/nvim-lspconfig",
+            "neovim/nvim-lspconfig";
             requires = {
-                "nvim-lua/lsp-status.nvim",
-                "kosayoda/nvim-lightbulb",
+                "nvim-lua/lsp-status.nvim";
+                "kosayoda/nvim-lightbulb";
                 -- TODO(damien): Enable
-                -- "j-hui/fidget.nvim",
-            },
+                -- "j-hui/fidget.nvim";
+            };
+        }
+
+        -- Autocompletion
+        use {
+            "hrsh7th/nvim-cmp";
+            requires = {
+                "hrsh7th/cmp-nvim-lsp";
+                "hrsh7th/cmp-buffer";
+                "hrsh7th/cmp-path";
+                "hrsh7th/cmp-nvim-lua";
+                "hrsh7th/vim-vsnip";
+                "hrsh7th/cmp-vsnip";
+            };
         }
 
         -- Treesitter
         use {
-            "nvim-treesitter/nvim-treesitter",
+            "nvim-treesitter/nvim-treesitter";
             run = function()
                 pcall(require("nvim-treesitter.install").update { with_sync = true })
-            end,
+            end;
         }
 
         -- Telescope
         use {
-            "nvim-telescope/telescope.nvim",
+            "nvim-telescope/telescope.nvim";
             requires = {
-                "nvim-lua/popup.nvim",
-                "nvim-lua/plenary.nvim",
+                "nvim-lua/popup.nvim";
+                "nvim-lua/plenary.nvim";
             },
         }
+        -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
+        -- use { "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable "make" == 1 }
 
-
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-      -- use { "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable "make" == 1 }
+        -- tpope
+        use {
+            "tpope/vim-commentary";
+            "tpope/vim-eunuch";
+            "tpope/vim-fugitive";
+            "tpope/vim-git";
+            "tpope/vim-repeat";
+            "tpope/vim-rhubarb";
+            "tpope/vim-sleuth";
+            "tpope/vim-surround";
+            "tpope/vim-unimpaired";
+            "tpope/vim-vinegar";
+        }
 
         if bootstrapping then
             packer.sync()
