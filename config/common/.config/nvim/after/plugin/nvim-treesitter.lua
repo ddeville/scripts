@@ -11,6 +11,7 @@ treesitter.setup {
     "fish",
     "go",
     "hcl",
+    "help",
     "html",
     "java",
     "javascript",
