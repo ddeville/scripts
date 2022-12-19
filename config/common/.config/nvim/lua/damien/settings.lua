@@ -1,6 +1,6 @@
 -- vim needs a posix shell and fish is not
 if vim.opt.shell == "fish$" then
-    vim.opt.shell = [[/bin/bash]]
+  vim.opt.shell = [[/bin/bash]]
 end
 
 -- dark background is better
@@ -85,19 +85,19 @@ vim.opt.shortmess:append({ c = true })
 vim.api.nvim_set_hl(0, "WhiteSpaceEOL", { ctermbg = 1 })
 local trailing_ag = vim.api.nvim_create_augroup("TrailingWhitespace", { clear = true })
 vim.api.nvim_create_autocmd("InsertEnter", {
-    group = trailing_ag;
-    command = [[match WhiteSpaceEOL /\s\+\%#\@<!$/]];
+  group = trailing_ag;
+  command = [[match WhiteSpaceEOL /\s\+\%#\@<!$/]];
 })
 vim.api.nvim_create_autocmd("InsertLeave", {
-    group = trailing_ag;
-    command = [[match WhiteSpaceEOL /\s\+$/]];
+  group = trailing_ag;
+  command = [[match WhiteSpaceEOL /\s\+$/]];
 })
 
 -- highlight on yan
 local highlight_ag = vim.api.nvim_create_augroup("HighlightOnYank", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-    group = highlight_ag;
-    callback = function()
-        vim.highlight.on_yank { timeout = 350 }
-    end
+  group = highlight_ag;
+  callback = function()
+    vim.highlight.on_yank { timeout = 350 }
+  end
 })
