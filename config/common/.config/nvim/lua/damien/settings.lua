@@ -1,6 +1,6 @@
 -- vim needs a posix shell and fish is not
-if vim.opt.shell == "fish$" then
-  vim.opt.shell = [[/bin/bash]]
+if vim.o.shell:sub(-5) == "/fish" then
+  vim.o.shell = [[/bin/bash]]
 end
 
 -- dark background is better
