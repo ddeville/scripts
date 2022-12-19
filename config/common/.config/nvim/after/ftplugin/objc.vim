@@ -1,5 +1,5 @@
 " Use C++ style comment strings with commentary.vim
-setl commentstring=//%s
+setlocal commentstring=//%s
 
 " Search for include files inside frameworks (used for gf etc.)
-setl includeexpr=substitute(v:fname,'\\([^/]\\+\\)/\\(.\\+\\)','/System/Library/Frameworks/\\1.framework/Headers/\\2','')
+setlocal includeexpr=substitute(v:fname,'\\([^/]\\+\\)/\\(.\\+\\)','/System/Library/Frameworks/\\1.framework/Headers/\\2','')
