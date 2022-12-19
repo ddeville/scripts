@@ -218,7 +218,11 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- LSP Status
-fidget.setup()
+fidget.setup({
+  text = {
+    spinner = "bouncing_bar";
+  };
+})
 
 -- Display an indicator in the sign column when a code action is available
 vim.fn.sign_define("LightBulbSign", { text = "▶", texthl = "LspDiagnosticsDefaultInformation" })
