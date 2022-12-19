@@ -17,10 +17,10 @@ vim.keymap.set("i", "<right>", "<nop>")
 -- search current selection in visual mode with */#
 vim.cmd([[
 function! DamienVSetSearch()
-    let temp = @@
-    norm! gvy
-    let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
-    let @@ = temp
+  let temp = @@
+  norm! gvy
+  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @@ = temp
 endfunction
 ]])
 vim.keymap.set("v", "*", ":<C-u>call DamienVSetSearch()<CR>//<CR><c-o>")
