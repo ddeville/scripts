@@ -23,16 +23,12 @@
     compactionHeuristic = true
 [difftool]
     prompt = false
-[difftool "vimdiff"]
-    path = nvim
 [merge]
     tool = vimdiff
     conflictstyle = diff3
 [mergetool]
     prompt = false
     keepBackup = false
-[mergetool "vimdiff"]
-    path = nvim
 [push]
     default = simple
     autoSetupRemote = true
