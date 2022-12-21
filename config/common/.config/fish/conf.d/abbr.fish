@@ -2,7 +2,6 @@
 alias e "nvim"
 alias realvim (which vim)
 alias vim "nvim"
-alias vimdiff "nvim -d"
 alias ll "exa --long --all"
 alias tree "exa --tree --level=3"
 alias gaa "git add .; and git ci"
