@@ -11,10 +11,6 @@ if status --is-interactive && test -e $base16_path
 end
 
 set -x GOPATH "$HOME/src/go"
-if test -e "$HOME/src/server/go"
-    # For Dropbox server code
-    set -x GOPATH $GOPATH "$HOME/src/server/go"
-end
 
 # Sometimes this is not set correctly if only the Xcode CLI tools are installed
 if test (uname) = "Darwin" && ! test -n "$SDKROOT"
