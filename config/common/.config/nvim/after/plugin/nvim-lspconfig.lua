@@ -149,6 +149,10 @@ setup_client("pyright", {
       local root_files = {
           'pyproject.toml',
           'pyrightconfig.json',
+          'setup.py',
+          'setup.cfg',
+          'requirements.txt',
+          'Pipfile',
       }
       return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
   end,
