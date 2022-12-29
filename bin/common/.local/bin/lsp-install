@@ -374,11 +374,11 @@ for arg; do
     if [[ $arg == "yamlls" ]] || $install_all; then
         _yamlls
     fi
-    if [[ $arg == "sumneko_lua" ]] || $install_all; then
-        _sumneko_lua
-    fi
     if [[ $arg == "terraform-ls" ]] || $install_all; then
         _terraformls
+    fi
+    if [[ $arg == "sumneko_lua" ]] || $install_all; then
+        _sumneko_lua
     fi
 done
 popd > /dev/null
