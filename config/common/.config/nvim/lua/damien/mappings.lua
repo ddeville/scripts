@@ -35,3 +35,6 @@ vim.keymap.set("n", "<C-l>", ":nohl<CR><C-l>")
 
 -- make Y behave like D and C
 vim.keymap.set("n", "Y", "y$")
+
+-- don't clobber the yank register when deleting with x
+vim.keymap.set({'n', 'x'}, 'x', '"_x')
