@@ -153,17 +153,26 @@ setup_client("pyright", {
           'setup.cfg',
           'requirements.txt',
           'Pipfile',
+          '.git',
       }
       return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
   end,
   settings = {
       python = {
           analysis = {
-              autoSearchPaths = false;
+              autoSearchPaths = true;
               diagnosticMode = "workspace";
               typeCheckingMode = "basic";
               useLibraryCodeForTypes = true;
           };
+          venvPath = (function()
+            local pyenv_root = os.getenv("PYENV_ROOT");
+            if pyenv_root ~= nil then
+              return pyenv_root .. "/versions"
+            else
+              return nil
+            end
+          end)()
       };
   };
 })
