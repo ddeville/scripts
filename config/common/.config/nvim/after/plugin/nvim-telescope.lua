@@ -16,12 +16,10 @@ telescope.setup {
       -- Close when hitting escape in insert mode, rather than going to normal mode
       i = {
         ["<esc>"] = actions.close,
-        ["<c-q>"] = actions.send_to_qflist + actions.open_qflist;
-        ["<c-s>"] = actions.send_selected_to_qflist + actions.open_qflist;
+        ["<c-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
       };
       n = {
-        ["<c-q>"] = actions.send_to_qflist + actions.open_qflist;
-        ["<c-s>"] = actions.send_selected_to_qflist + actions.open_qflist;
+        ["<c-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
       }
     };
   };
