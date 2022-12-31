@@ -2,7 +2,7 @@ vim.g.grepper = {
   tools = { "rg", "git", "grep" };
   highlight = 1;
   rg = {
-    grepprg = "rg -H --no-heading --hidden --vimgrep";
+    grepprg = "rg -H --no-heading --vimgrep";
   };
 }
 
