@@ -13,7 +13,7 @@ local packer_util = require("packer.util")
 packer.startup({
   function(use)
     -- Package manager
-    use "wbthomason/packer.nvim"
+    use { "wbthomason/packer.nvim" }
 
     -- Appearance
     use {
@@ -38,7 +38,7 @@ packer.startup({
     }
 
     -- Navigation
-    use "mhinz/vim-grepper"
+    use { "mhinz/vim-grepper" }
     use {
       "junegunn/fzf.vim";
       requires = { "junegunn/fzf" };
@@ -82,8 +82,10 @@ packer.startup({
         "nvim-lua/plenary.nvim";
       },
     }
-    -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-    -- use { "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable "make" == 1 }
+    use {
+      "nvim-telescope/telescope-fzf-native.nvim";
+      run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build';
+    }
 
     -- tpope
     use {
