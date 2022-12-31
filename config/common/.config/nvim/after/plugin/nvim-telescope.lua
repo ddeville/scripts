@@ -41,13 +41,13 @@ telescope.setup {
       };
     };
     find_files = {
+      find_command = { "fd", "--type", "file", "--color=never", "--hidden", "--strip-cwd-prefix", "--exclude", ".git" };
       theme = "ivy";
       results_title = false;
       preview_title = false;
-      find_command = { "fd", "--type", "file", "--color=never", "--hidden", "--strip-cwd-prefix", "--exclude", ".git" };
       sorting_strategy = "descending";
       layout_config = {
-        height = 0.45;
+        height = 0.35;
         prompt_position = "bottom";
         preview_width = 0.45;
       };
