@@ -28,6 +28,7 @@ telescope.setup {
       preview_title = false;
       sorting_strategy = "descending";
       sort_lastused = true;
+      sort_mru = true;
       layout_config = {
         height = 0.35;
         prompt_position = "bottom";
