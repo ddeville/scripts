@@ -45,10 +45,6 @@ packer.startup({
       "mattesgroeger/vim-bookmarks";
       "tom-anders/telescope-vim-bookmarks.nvim";
     }
-    use {
-      "junegunn/fzf.vim";
-      requires = { "junegunn/fzf" };
-    }
 
     -- LSP
     use {
