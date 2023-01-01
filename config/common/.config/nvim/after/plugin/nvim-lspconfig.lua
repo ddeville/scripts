@@ -150,6 +150,13 @@ setup_client("pyright", {
           'pyproject.toml',
           'pyrightconfig.json',
           '.git',
+          -- In theory we should also have the following but openai/api uses several packages but needs
+          -- to be a single python project...
+          --
+          -- 'setup.py',
+          -- 'setup.cfg',
+          -- 'requirements.txt',
+          -- 'Pipfile',
       }
       return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
   end,
