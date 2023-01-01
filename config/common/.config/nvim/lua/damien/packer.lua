@@ -13,7 +13,9 @@ local packer_util = require("packer.util")
 packer.startup({
   function(use)
     -- Package manager
-    use { "wbthomason/packer.nvim" }
+    use {
+      "wbthomason/packer.nvim"
+    }
 
     -- Appearance
     use {
@@ -38,7 +40,10 @@ packer.startup({
     }
 
     -- Navigation
-    use { "mhinz/vim-grepper" }
+    use {
+      "mhinz/vim-grepper";
+      "mattesgroeger/vim-bookmarks";
+    }
     use {
       "junegunn/fzf.vim";
       requires = { "junegunn/fzf" };
