@@ -5,7 +5,6 @@ local actions = require("telescope.actions")
 vim.keymap.set("n", "<leader>;", builtin.buffers)
 vim.keymap.set("n", ";", builtin.buffers)
 vim.keymap.set("n", "<leader>o", builtin.find_files)
-vim.keymap.set("n", "<C-p>", builtin.find_files)
 vim.keymap.set("n", "<leader>s", builtin.git_status)
 vim.keymap.set("n", "<leader>t", builtin.tags)
 vim.keymap.set("n", "//", builtin.current_buffer_fuzzy_find)
@@ -13,13 +12,12 @@ vim.keymap.set("n", "//", builtin.current_buffer_fuzzy_find)
 telescope.setup {
   defaults = {
     mappings = {
-      -- Close when hitting escape in insert mode, rather than going to normal mode
       i = {
-        ["<esc>"] = actions.close,
-        ["<c-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
+        ["<esc>"] = actions.close,  -- Close when hitting escape in insert mode, rather than going to normal mode
+        ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
       };
       n = {
-        ["<c-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
+        ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist;
       }
     };
   };
@@ -37,10 +35,10 @@ telescope.setup {
       };
       mappings = {
         i = {
-          ["<c-d>"] = actions.delete_buffer;
+          ["<C-d>"] = actions.delete_buffer;
         };
         n = {
-          ["<c-d>"] = actions.delete_buffer;
+          ["<C-d>"] = actions.delete_buffer;
         };
       };
     };
