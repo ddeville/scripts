@@ -1,107 +1,110 @@
-local install_path = vim.fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 local bootstrapping = false
 
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   bootstrapping = true
-  vim.fn.execute("!git clone https://github.com/wbthomason/packer.nvim " .. install_path)
-  vim.cmd [[packadd packer.nvim]]
+  vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
+  vim.cmd([[packadd packer.nvim]])
 end
 
-local packer = require("packer")
-local packer_util = require("packer.util")
+local packer = require('packer')
+local packer_util = require('packer.util')
 
 packer.startup({
   function(use)
     -- Package manager
-    use {
-      "wbthomason/packer.nvim"
-    }
+    use({
+      'wbthomason/packer.nvim',
+    })
 
     -- Appearance
-    use {
-      "chriskempson/base16-vim";
-      "itchyny/lightline.vim";
-      "mhinz/vim-startify";
-    }
+    use({
+      'chriskempson/base16-vim',
+      'itchyny/lightline.vim',
+      'mhinz/vim-startify',
+    })
 
     -- Languages
-    use {
-      "dag/vim-fish";
-      "fatih/vim-go";
-      "rust-lang/rust.vim";
-      "hashivim/vim-terraform";
-      "baskerville/vim-sxhkdrc";
-    }
+    use({
+      'dag/vim-fish',
+      'fatih/vim-go',
+      'rust-lang/rust.vim',
+      'hashivim/vim-terraform',
+      'baskerville/vim-sxhkdrc',
+    })
 
-    -- Code formatter (used for Starlark)
-    use {
-      "google/vim-codefmt";
-      requires = { "google/vim-maktaba" };
-    }
+    -- Code formatters
+    use({
+      'google/vim-codefmt', -- used for Starlark
+      requires = { 'google/vim-maktaba' },
+    })
+    use({
+      'ckipp01/stylua-nvim',
+    })
 
     -- Navigation
-    use {
-      "mhinz/vim-grepper";
-      "mattesgroeger/vim-bookmarks";
-      "tom-anders/telescope-vim-bookmarks.nvim";
-    }
+    use({
+      'mhinz/vim-grepper',
+      'mattesgroeger/vim-bookmarks',
+      'tom-anders/telescope-vim-bookmarks.nvim',
+    })
 
     -- LSP
-    use {
-      "neovim/nvim-lspconfig";
+    use({
+      'neovim/nvim-lspconfig',
       requires = {
-        "kosayoda/nvim-lightbulb";
-        "j-hui/fidget.nvim";
-      };
-    }
+        'kosayoda/nvim-lightbulb',
+        'j-hui/fidget.nvim',
+      },
+    })
 
     -- Autocompletion
-    use {
-      "hrsh7th/nvim-cmp";
+    use({
+      'hrsh7th/nvim-cmp',
       requires = {
-        "hrsh7th/cmp-nvim-lsp";
-        "hrsh7th/cmp-buffer";
-        "hrsh7th/cmp-path";
-        "hrsh7th/cmp-nvim-lua";
-        "hrsh7th/vim-vsnip";
-        "hrsh7th/cmp-vsnip";
-      };
-    }
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-buffer',
+        'hrsh7th/cmp-path',
+        'hrsh7th/cmp-nvim-lua',
+        'hrsh7th/vim-vsnip',
+        'hrsh7th/cmp-vsnip',
+      },
+    })
 
     -- Treesitter
-    use {
-      "nvim-treesitter/nvim-treesitter";
+    use({
+      'nvim-treesitter/nvim-treesitter',
       run = function()
-        pcall(require("nvim-treesitter.install").update { with_sync = true })
-      end;
-    }
+        pcall(require('nvim-treesitter.install').update({ with_sync = true }))
+      end,
+    })
 
     -- Telescope
-    use {
-      "nvim-telescope/telescope.nvim";
+    use({
+      'nvim-telescope/telescope.nvim',
       requires = {
-        "nvim-lua/popup.nvim";
-        "nvim-lua/plenary.nvim";
+        'nvim-lua/popup.nvim',
+        'nvim-lua/plenary.nvim',
       },
-    }
-    use {
-      "nvim-telescope/telescope-fzf-native.nvim";
-      run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build';
-    }
+    })
+    use({
+      'nvim-telescope/telescope-fzf-native.nvim',
+      run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
+    })
 
     -- tpope
-    use {
-      "tpope/vim-commentary";
-      "tpope/vim-eunuch";
-      "tpope/vim-fugitive";
-      "tpope/vim-git";
-      "tpope/vim-repeat";
-      "tpope/vim-rhubarb";
-      "tpope/vim-sleuth";
-      "tpope/vim-surround";
-      "tpope/vim-unimpaired";
-      "tpope/vim-vinegar";
-    }
+    use({
+      'tpope/vim-commentary',
+      'tpope/vim-eunuch',
+      'tpope/vim-fugitive',
+      'tpope/vim-git',
+      'tpope/vim-repeat',
+      'tpope/vim-rhubarb',
+      'tpope/vim-sleuth',
+      'tpope/vim-surround',
+      'tpope/vim-unimpaired',
+      'tpope/vim-vinegar',
+    })
 
     if bootstrapping then
       packer.sync()
@@ -111,15 +114,15 @@ packer.startup({
     display = {
       open_fn = packer_util.float,
     },
-    compile_path = vim.fn.stdpath("data") .. "/site/pack/loader/start/packer.nvim/plugin/packer_compiled.lua",
+    compile_path = vim.fn.stdpath('data') .. '/site/pack/loader/start/packer.nvim/plugin/packer_compiled.lua',
   },
 })
 
 -- When we are bootstrapping Packer, it doesn't make sense to execute the rest of the init.lua.
 if bootstrapping then
-  print "=================================="
-  print "    Plugins are being installed"
-  print "    Wait until Packer completes,"
-  print "       then restart nvim"
-  print "=================================="
+  print('==================================')
+  print('    Plugins are being installed')
+  print('    Wait until Packer completes,')
+  print('       then restart nvim')
+  print('==================================')
 end
