@@ -1,10 +1,10 @@
 -- vim needs a posix shell and fish is not
-if vim.o.shell:sub(-5) == "/fish" then
+if vim.o.shell:sub(-5) == '/fish' then
   vim.o.shell = [[/bin/bash]]
 end
 
 -- dark background is better
-vim.opt.background = "dark"
+vim.opt.background = 'dark'
 
 -- allow switching between buffers without saving first
 vim.opt.hidden = true
@@ -23,7 +23,7 @@ vim.opt.timeoutlen = 1000
 vim.opt.ttimeoutlen = 0
 
 -- set mouse support so that we can select text and tabs
-vim.opt.mouse = "a"
+vim.opt.mouse = 'a'
 
 -- lower how long it takes for cursor hold to kick off (for code actions for example)
 vim.opt.updatetime = 300
@@ -51,10 +51,10 @@ vim.opt.ruler = true
 vim.opt.number = true
 
 -- show the diagnostic ui where the number goes
-vim.opt.signcolumn = "number"
+vim.opt.signcolumn = 'number'
 
 -- display a column at 80 char
-vim.opt.colorcolumn = "80"
+vim.opt.colorcolumn = '80'
 
 -- highlight the current line
 vim.opt.cursorline = true
@@ -73,7 +73,7 @@ vim.opt.splitright = true
 vim.g.nojoinspaces = true
 
 -- netrw
-vim.gnetrw_localrmdir = "rm -r"
+vim.gnetrw_localrmdir = 'rm -r'
 vim.gnetrw_liststyle = 4
 vim.gnetrw_winsize = 85
 vim.gnetrw_browse_split = 0
@@ -82,22 +82,22 @@ vim.gnetrw_browse_split = 0
 vim.opt.shortmess:append({ c = true })
 
 -- trailing whitespace is bad
-vim.api.nvim_set_hl(0, "WhiteSpaceEOL", { ctermbg = 1 })
-local trailing_ag = vim.api.nvim_create_augroup("TrailingWhitespace", { clear = true })
-vim.api.nvim_create_autocmd("InsertEnter", {
-  group = trailing_ag;
-  command = [[match WhiteSpaceEOL /\s\+\%#\@<!$/]];
+vim.api.nvim_set_hl(0, 'WhiteSpaceEOL', { ctermbg = 1 })
+local trailing_ag = vim.api.nvim_create_augroup('TrailingWhitespace', { clear = true })
+vim.api.nvim_create_autocmd('InsertEnter', {
+  group = trailing_ag,
+  command = [[match WhiteSpaceEOL /\s\+\%#\@<!$/]],
 })
-vim.api.nvim_create_autocmd("InsertLeave", {
-  group = trailing_ag;
-  command = [[match WhiteSpaceEOL /\s\+$/]];
+vim.api.nvim_create_autocmd('InsertLeave', {
+  group = trailing_ag,
+  command = [[match WhiteSpaceEOL /\s\+$/]],
 })
 
 -- highlight on yan
-local highlight_ag = vim.api.nvim_create_augroup("HighlightOnYank", { clear = true })
-vim.api.nvim_create_autocmd("TextYankPost", {
-  group = highlight_ag;
+local highlight_ag = vim.api.nvim_create_augroup('HighlightOnYank', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+  group = highlight_ag,
   callback = function()
-    vim.highlight.on_yank { timeout = 350 }
-  end
+    vim.highlight.on_yank({ timeout = 350 })
+  end,
 })

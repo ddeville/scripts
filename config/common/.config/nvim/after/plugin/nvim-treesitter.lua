@@ -1,32 +1,32 @@
-local treesitter = require("nvim-treesitter.configs")
+local treesitter = require('nvim-treesitter.configs')
 
-treesitter.setup {
+treesitter.setup({
   ensure_installed = {
-    "bash",
-    "c",
-    "comment",
-    "cpp",
-    "css",
-    "dockerfile",
-    "fish",
-    "go",
-    "hcl",
-    "help",
-    "html",
-    "java",
-    "javascript",
-    "json",
-    "kotlin",
-    "lua",
-    "python",
-    "rust",
-    "toml",
-    "typescript",
-    "vim",
-    "yaml",
-  };
+    'bash',
+    'c',
+    'comment',
+    'cpp',
+    'css',
+    'dockerfile',
+    'fish',
+    'go',
+    'hcl',
+    'help',
+    'html',
+    'java',
+    'javascript',
+    'json',
+    'kotlin',
+    'lua',
+    'python',
+    'rust',
+    'toml',
+    'typescript',
+    'vim',
+    'yaml',
+  },
   highlight = {
-    enable = true;
-    additional_vim_regex_highlighting = false;
-  };
-}
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+})
