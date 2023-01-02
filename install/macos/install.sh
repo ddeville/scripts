@@ -60,6 +60,7 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 
 defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
 
-defaults write org.alacritty AppleFontSmoothing -int 0
+# If you want very thin glyphs in Alacritty, although it might look a bit bad...
+# defaults write org.alacritty AppleFontSmoothing -int 0
 
 killall Dock
