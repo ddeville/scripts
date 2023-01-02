@@ -55,6 +55,9 @@ telescope.setup({
         preview_width = 0.45,
       },
     },
+    current_buffer_fuzzy_find = {
+      sorting_strategy = 'ascending',
+    },
   },
   extensions = {
     fzf = {
