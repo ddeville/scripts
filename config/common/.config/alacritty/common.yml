@@ -1,0 +1,37 @@
+live_config_reload: true
+working_directory: ~
+
+env:
+  TERM: alacritty
+
+scrolling:
+  history: 100000
+
+cursor:
+  style: Block
+  blinking: Off
+  unfocused_hollow: true
+
+colors:
+  cursor:
+    text: CellBackground
+    cursor: "#d5ba9b"
+draw_bold_text_with_bright_colors: false
+
+bell:
+  duration: 0
+  command: None
+
+window:
+  startup_mode: Windowed
+  decorations: full
+  title: Alacritty
+  dynamic_title: false
+
+font:
+  normal:
+    family: Anonymous Pro
+    style: Regular
+  bold:
+    family: Anonymous Pro
+    style: Regular

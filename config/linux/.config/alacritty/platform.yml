@@ -1,0 +1,17 @@
+window:
+  # Let the window manager set the appropriate dimensions
+  dimensions:
+    columns: 0
+    lines: 0
+  # Windows don't need decoration in bspwm
+  decorations: none
+  decorations_theme_variant: dark
+  dynamic_padding: true
+  padding:
+    x: 4
+    y: 2
+
+font:
+  size: 11.5
+  offset:
+    y: 2

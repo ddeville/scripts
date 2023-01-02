@@ -1,0 +1,24 @@
+window:
+  dimensions:
+    columns: 100
+    lines: 40
+  dynamic_padding: true
+  padding:
+    x: 2
+    y: 2
+
+font:
+  size: 14
+  offset:
+    y: 5
+  AppleFontSmoothing: true
+
+# Doesn't seem to have any effect on macOS (where I need it)
+# alt_send_esc: true
+
+key_bindings:
+  # On macOS Option doesn't act as a meta alt key (send the esc sequence) and unfortunately Alacritty doesn't support
+  # remapping the modifier entirely (and `alt_send_esc` doesn't seem to work, at least in the shell)
+  # So instead we remap the bindings that we care about.
+  - { key: S,        mods: Alt, chars: "\x1bs",                      }
+  - { key: C,        mods: Alt, chars: "\x1bc",                      }
