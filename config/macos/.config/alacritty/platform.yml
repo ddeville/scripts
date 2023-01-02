@@ -11,6 +11,8 @@ font:
   size: 14
   offset:
     y: 5
+  glyph_offset:
+    y: 2
   AppleFontSmoothing: true
 
 # Doesn't seem to have any effect on macOS (where I need it)
