@@ -15,13 +15,13 @@ case "*"
     set -x KUBECONFIG "$API_KUBECONFIG:$CURRENT_KUBECONFIG"
 end
 
-function buildbox_activate
+function openai_buildbox_activate
     set -gx DOCKER_HOST build-box.internal.api.openai.org:2376
     set -gx DOCKER_TLS_VERIFY 1
     set -gx DOCKER_CERT_PATH "$HOME/.docker/build-box"
 end
 
-function buildbox_deactivate
+function openai_buildbox_deactivate
     set --unexport DOCKER_HOST
     set --erase DOCKER_HOST
     set --unexport DOCKER_TLS_VERIFY
@@ -84,12 +84,14 @@ alias c10 "prod-engine-aks-centralus-panda"
 
 # INTERNAL CLUSTERS
 alias internal-ci-api "nicer_kubectl internal-ci-api"
+alias internal-ci-prod-api "nicer_kubectl ci-prod-aks"
 alias internal-admin-prod-api "nicer_kubectl internal-admin-prod-api"
 alias internal-admin-staging-api "nicer_kubectl internal-admin-staging-api"
 alias prod-admin-westus2-output "nicer_kubectl prod-admin-westus2-output"
 alias staging-admin-westus2-output "nicer_kubectl staging-admin-westus2-output"
 
 alias ci "internal-ci-api"
+alias ci-prod "internal-ci-prod-api"
 alias admin-old "internal-admin-prod-api"
 alias sadmin-old "internal-admin-staging-api"
 alias admin "prod-admin-westus2-output"
