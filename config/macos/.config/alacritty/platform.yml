@@ -22,5 +22,9 @@ key_bindings:
   # On macOS Option doesn't act as a meta alt key (send the esc sequence) and unfortunately Alacritty doesn't support
   # remapping the modifier entirely (and `alt_send_esc` doesn't seem to work, at least in the shell)
   # So instead we remap the bindings that we care about.
-  - { key: S,        mods: Alt, chars: "\x1bs",                      }
-  - { key: C,        mods: Alt, chars: "\x1bc",                      }
+  - { key: S, mods: Alt, chars: "\x1bs" }
+  - { key: C, mods: Alt, chars: "\x1bc" }
+  # On Linux, ctlr-c (obviously) doesn't copy and one has to use ctrl-shift-c. Since I bind ctrl to cmd when using Linux
+  # I'm too used to it so also map cmd-shift-{c,v} to copy and paste on macos too...
+  - { key: C, mods: Command|Shift, action: Copy }
+  - { key: V, mods: Command|Shift, action: Paste }
