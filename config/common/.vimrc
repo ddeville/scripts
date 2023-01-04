@@ -1,10 +1,11 @@
-colorscheme quiet
-
-syntax off
+syntax on
+colorscheme torte
 
 hi Normal         ctermfg=7 ctermbg=0
-hi DiffAdd        ctermfg=2
-hi DiffDelete     ctermfg=1
-hi DiffChange     ctermfg=7
-hi DiffText       ctermfg=4
-hi Folded         ctermbg=18
+hi DiffAdd        ctermfg=black ctermbg=cyan
+hi DiffDelete     ctermfg=black ctermbg=darkmagenta
+hi DiffChange     ctermfg=black ctermbg=darkblue
+hi DiffText       ctermfg=18
+hi Folded         ctermbg=19
+hi StatusLine     ctermfg=0 ctermbg=254
+hi StatusLineNC   ctermfg=0 ctermbg=20
