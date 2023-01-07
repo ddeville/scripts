@@ -15,22 +15,7 @@ case "*"
     set -x KUBECONFIG "$API_KUBECONFIG:$CURRENT_KUBECONFIG"
 end
 
-function openai_buildbox_activate
-    set -gx DOCKER_HOST build-box.internal.api.openai.org:2376
-    set -gx DOCKER_TLS_VERIFY 1
-    set -gx DOCKER_CERT_PATH "$HOME/.docker/build-box"
-end
-
-function openai_buildbox_deactivate
-    set --unexport DOCKER_HOST
-    set --erase DOCKER_HOST
-    set --unexport DOCKER_TLS_VERIFY
-    set --erase DOCKER_TLS_VERIFY
-    set --unexport DOCKER_CERT_PATH
-    set --erase DOCKER_CERT_PATH
-end
-
-function nicer_kubectl
+function __nicer_kubectl
     set cluster $argv[1]
     if test (count $argv) -eq 1
         if test $COLUMNS -gt 200
@@ -55,23 +40,23 @@ alias engine-doctor-prod "admin-openai engines.doctor -e prod -i"
 alias engine-doctor-staging "admin-openai engines.doctor -e staging -i"
 
 ## STAGING CLUSTERS
-alias staging-primary-aks-scus-api-b "nicer_kubectl staging-primary-aks-scus-api-b"
-alias staging-engine-aks-scentralus-output "nicer_kubectl staging-engine-aks-scentralus-output"
-alias staging-first-party-aks-scus-api-b "nicer_kubectl staging-first-party-aks-scus-api-b"
+alias staging-primary-aks-scus-api-b "__nicer_kubectl staging-primary-aks-scus-api-b"
+alias staging-engine-aks-scentralus-output "__nicer_kubectl staging-engine-aks-scentralus-output"
+alias staging-first-party-aks-scus-api-b "__nicer_kubectl staging-first-party-aks-scus-api-b"
 
 alias sp "staging-primary-aks-scus-api-b"
 alias x "staging-engine-aks-scentralus-output"
 alias s1p "staging-first-party-aks-scus-api-b"
 
 ## PROD CLUSTERS
-alias prod-primary-aks-scentralus-api-b "nicer_kubectl prod-primary-aks-scentralus-api-b"
-alias prod-first-party-aks-scentralus-api-b "nicer_kubectl prod-first-party-aks-scentralus-api-b"
-alias prod-engine-aks-scentralus-output "nicer_kubectl prod-engine-aks-scentralus-output"
-alias prod-engine-aks-eastus-output "nicer_kubectl prod-engine-aks-eastus-output"
-alias prod-engine-aks-westus2-output "nicer_kubectl prod-engine-aks-westus2-output"
-alias prod-engine-aks-eastus2-output "nicer_kubectl prod-engine-aks-eastus2-output"
-alias prod-engine-aks-centralus-api-loan "nicer_kubectl prod-engine-aks-centralus-api-loan"  # Loan cluster from research
-alias prod-engine-aks-centralus-panda "nicer_kubectl prod-engine-aks-centralus-panda"  # Loan cluster from research
+alias prod-primary-aks-scentralus-api-b "__nicer_kubectl prod-primary-aks-scentralus-api-b"
+alias prod-first-party-aks-scentralus-api-b "__nicer_kubectl prod-first-party-aks-scentralus-api-b"
+alias prod-engine-aks-scentralus-output "__nicer_kubectl prod-engine-aks-scentralus-output"
+alias prod-engine-aks-eastus-output "__nicer_kubectl prod-engine-aks-eastus-output"
+alias prod-engine-aks-westus2-output "__nicer_kubectl prod-engine-aks-westus2-output"
+alias prod-engine-aks-eastus2-output "__nicer_kubectl prod-engine-aks-eastus2-output"
+alias prod-engine-aks-centralus-api-loan "__nicer_kubectl prod-engine-aks-centralus-api-loan"  # Loan cluster from research
+alias prod-engine-aks-centralus-panda "__nicer_kubectl prod-engine-aks-centralus-panda"  # Loan cluster from research
 
 alias p "prod-primary-aks-scentralus-api-b"
 alias 1p "prod-first-party-aks-scentralus-api-b"
@@ -83,10 +68,10 @@ alias c9 "prod-engine-aks-centralus-api-loan"
 alias c10 "prod-engine-aks-centralus-panda"
 
 # INTERNAL CLUSTERS
-alias internal-ci-api "nicer_kubectl internal-ci-api"
-alias internal-ci-prod-api "nicer_kubectl ci-prod-aks"
-alias prod-admin-westus2-output "nicer_kubectl prod-admin-westus2-output"
-alias staging-admin-westus2-output "nicer_kubectl staging-admin-westus2-output"
+alias internal-ci-api "__nicer_kubectl internal-ci-api"
+alias internal-ci-prod-api "__nicer_kubectl ci-prod-aks"
+alias prod-admin-westus2-output "__nicer_kubectl prod-admin-westus2-output"
+alias staging-admin-westus2-output "__nicer_kubectl staging-admin-westus2-output"
 
 alias ci "internal-ci-api"
 alias ci-prod "internal-ci-prod-api"
