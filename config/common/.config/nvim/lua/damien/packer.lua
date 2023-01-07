@@ -46,7 +46,7 @@ packer.startup({
     use({
       'mhinz/vim-grepper',
       'mattesgroeger/vim-bookmarks',
-      'tom-anders/telescope-vim-bookmarks.nvim',
+      'ddeville/telescope-vim-bookmarks.nvim',
     })
 
     -- LSP
