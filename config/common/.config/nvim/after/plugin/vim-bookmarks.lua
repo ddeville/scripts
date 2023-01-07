@@ -6,8 +6,7 @@ vim.g.bookmark_show_toggle_warning = false
 local bookmarks = require('telescope').extensions.vim_bookmarks
 
 local common_settings = {
-  width_line = 4,
-  width_text = 40,
+  layout_strategy = 'vertical',
 }
 
 local function all()
