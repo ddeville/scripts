@@ -1,15 +1,20 @@
-function ffmpeg_split_episodes
-    argparse --name=ffmpeg_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' 'dry_run' -- $argv
+function plex_split_episodes
+    argparse --name=plex_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' 'dry_run' -- $argv
     or return
 
     if test -d $_flag_name_format; or test -d $_flag_timestamp; or test -d $_flag_count
         echo "Usage: "
-        echo "  ffmpeg_split_episodes -name_format=\"Curious.George.S01E%s.1080p.WEB.h264-NOMA.mkv\" --timestamp=\"00:11:58\" --count=30 [--dry_run]"
+        echo "  plex_split_episodes -name_format=\"Curious.George.S01E%s.1080p.WEB.h264-NOMA.mkv\" --timestamp=\"00:11:58\" --count=30 [--dry_run]"
         return 1
     end
 
     for idx in (seq -f "%02g" $_flag_count)
         set filename (printf $_flag_name_format $idx)
+        if not test -f $filename
+            echo "Cannot find file at path \"$filename\", stopping"
+            return 1
+        end
+
         set ext (string split -r -m1 . $filename)[2]
         set ts $_flag_timestamp
 
