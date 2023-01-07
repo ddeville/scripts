@@ -1,10 +1,10 @@
 function ffmpeg_split_episodes
-    argparse --name=ffmpeg_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' -- $argv
+    argparse --name=ffmpeg_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' 'dry_run' -- $argv
     or return
 
     if test -d $_flag_name_format; or test -d $_flag_timestamp; or test -d $_flag_count
         echo "Usage: "
-        echo "  ffmpeg_split_episodes Curious.George.S01E%s.1080p.WEB.h264-NOMA.mkv \"00:11:58\" 30"
+        echo "  ffmpeg_split_episodes -name_format=\"Curious.George.S01E%s.1080p.WEB.h264-NOMA.mkv\" --timestamp=\"00:11:58\" --count=30 [--dry_run]"
         return 1
     end
 
@@ -19,11 +19,13 @@ function ffmpeg_split_episodes
         echo "Running:"
         echo "  ffmpeg -t \"$ts\" -c copy \"$out1\" -ss \"$ts\" -c copy \"$out2\" -i \"$filename\""
 
-        ffmpeg -t "$ts" -c copy "$out1" -ss "$ts" -c copy "$out2" -i "$filename"
+        if test -d $_flag_dry_run
+            ffmpeg -t "$ts" -c copy "$out1" -ss "$ts" -c copy "$out2" -i "$filename"
 
-        if test $status -ne 0
-            echo "Failed to run ffmpeg, stopping"
-            return $status
+            if test $status -ne 0
+                echo "Failed to run ffmpeg, stopping"
+                return $status
+            end
         end
     end
 end
