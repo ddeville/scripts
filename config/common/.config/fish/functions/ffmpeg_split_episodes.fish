@@ -16,6 +16,9 @@ function ffmpeg_split_episodes
         set out1 (printf "%02d.$ext" (math "$idx * 2 - 1"))
         set out2 (printf "%02d.$ext" (math "$idx * 2"))
 
+        echo "Running:"
+        echo "  ffmpeg -t \"$ts\" -c copy \"$out1\" -ss \"$ts\" -c copy \"$out2\" -i \"$filename\""
+
         ffmpeg -t "$ts" -c copy "$out1" -ss "$ts" -c copy "$out2" -i "$filename"
 
         if test $status -ne 0
