@@ -5,5 +5,18 @@ vim.g.bookmark_show_toggle_warning = false
 
 local bookmarks = require('telescope').extensions.vim_bookmarks
 
-vim.keymap.set('n', 'ma', bookmarks.all)
-vim.keymap.set('n', 'mb', bookmarks.current_file)
+local common_settings = {
+  width_line = 4,
+  width_text = 40,
+}
+
+local function all()
+  bookmarks.all(common_settings)
+end
+
+local function current_file()
+  bookmarks.current_file(common_settings)
+end
+
+vim.keymap.set('n', 'ma', all)
+vim.keymap.set('n', 'mb', current_file)
