@@ -28,3 +28,5 @@ key_bindings:
   # I'm too used to it so also map cmd-shift-{c,v} to copy and paste on macos too...
   - { key: C, mods: Command|Shift, action: Copy }
   - { key: V, mods: Command|Shift, action: Paste }
+  # By default, on macos cmd-N calls CreateNewInstance
+  - { key: N, mods: Command, action: CreateNewWindow }
