@@ -1,5 +1,7 @@
 #!/bin/sh
 
+SCRIPT_DIR=$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 arch_name="$(uname -m)"
@@ -35,21 +37,7 @@ ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ~/.
 sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
-# Terminfo
-tmp_dir="$(mktemp -d)"
-pushd $tmp_dir
-
-# Install alacritty terminfo (https://github.com/alacritty/alacritty/blob/master/INSTALL.md#terminfo)
-git clone --depth=1 https://github.com/alacritty/alacritty.git
-/usr/bin/tic -xe alacritty,alacritty-direct alacritty/extra/alacritty.info
-
-# Install tmux terminfo (see https://gist.github.com/bbqtd/a4ac060d6f6b9ea6fe3aabe735aa9d95)
-curl -LO https://invisible-island.net/datafiles/current/terminfo.src.gz
-gunzip terminfo.src.gz
-/usr/bin/tic -xe tmux-256color terminfo.src
-
-popd
-rm -rf $tmp_dir
+$SCRIPT_DIR/../../bin/macos/.local/bin/update-terminfo
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
