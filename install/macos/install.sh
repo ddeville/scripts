@@ -13,7 +13,7 @@ fi
 
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
-    bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide \
+    bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
     pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes stylua \
     font-anonymous-pro
 
