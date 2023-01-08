@@ -39,6 +39,10 @@ vim.keymap.set('n', 'Y', 'y$')
 -- don't clobber the yank register when deleting with x
 vim.keymap.set({ 'n', 'x' }, 'x', '"_x')
 
+-- support deleting without clobbering the default register
+vim.keymap.set('n', '<leader>d', '"_d')
+vim.keymap.set('v', '<leader>d', '"_d')
+
 -- integration with system clipboard
 vim.keymap.set('n', '<leader>y', '"+y')
 vim.keymap.set('v', '<leader>y', '"+y')
