@@ -68,16 +68,16 @@ sudo -u $USERNAME -H sh -c "chsh -s /usr/bin/fish"
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
 sudo -u $USERNAME -H sh -c "rustup default stable"
 
-sudo -u $USERNAME -H sh -c "cd /home/$USERNAME; \
-    git clone https://aur.archlinux.org/paru.git; \
-    cd paru; \
-    makepkg -si;
-    rm -rf /home/$USERNAME/paru;"
+git clone --depth=1 https://aur.archlinux.org/paru.git; \
+    sudo -u $USERNAME -H sh -c "cd /home/$USERNAME; \
+cd paru; \
+makepkg -si;
+rm -rf /home/$USERNAME/paru;"
 
 mv /scripts /home/$USERNAME/scripts
 chown $USERNAME:$USERNAME -R /home/$USERNAME/scripts
 
-sudo -u $USERNAME -H sh -c "git clone https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
-sudo -u $USERNAME -H sh -c "git clone https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
+sudo -u $USERNAME -H sh -c "git clone --depth=1 https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
+sudo -u $USERNAME -H sh -c "git clone --depth=1 https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
