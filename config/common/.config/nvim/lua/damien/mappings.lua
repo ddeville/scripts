@@ -42,6 +42,10 @@ vim.keymap.set({ 'n', 'x' }, 'x', '"_x')
 -- support deleting without clobbering the default register
 vim.keymap.set('n', '<leader>d', '"_d')
 vim.keymap.set('v', '<leader>d', '"_d')
+vim.keymap.set('n', '<leader>D', '"_D')
+vim.keymap.set('n', '<leader>c', '"_c')
+vim.keymap.set('v', '<leader>c', '"_c')
+vim.keymap.set('n', '<leader>C', '"_C')
 
 -- integration with system clipboard
 vim.keymap.set('n', '<leader>y', '"+y')
