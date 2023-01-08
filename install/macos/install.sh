@@ -49,7 +49,7 @@ gunzip terminfo.src.gz
 /usr/bin/tic -xe tmux-256color terminfo.src
 
 pod
-rm -r $tmp_dir
+rm -rf $tmp_dir
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
