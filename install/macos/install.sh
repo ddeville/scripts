@@ -35,6 +35,22 @@ ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ~/.
 sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
+# Terminfo
+tmp_dir="$(mktemp -d)"
+pushd $tmp_dir
+
+# Install alacritty terminfo (https://github.com/alacritty/alacritty/blob/master/INSTALL.md#terminfo)
+git clone --depth=1 https://github.com/alacritty/alacritty.git
+/usr/bin/tic -xe alacritty,alacritty-direct alacritty/extra/alacritty.info
+
+# Install tmux terminfo (see https://gist.github.com/bbqtd/a4ac060d6f6b9ea6fe3aabe735aa9d95)
+curl -LO https://invisible-island.net/datafiles/current/terminfo.src.gz
+gunzip terminfo.src.gz
+/usr/bin/tic -xe tmux-256color terminfo.src
+
+pod
+rm -r $tmp_dir
+
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
