@@ -70,5 +70,6 @@
     last = log -1 HEAD
     authors = shortlog -s -n -e
     ls = log --graph --pretty='%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]' --abbrev-commit --date=short
+    logs = log --show-signature
 [init]
     defaultBranch = master
