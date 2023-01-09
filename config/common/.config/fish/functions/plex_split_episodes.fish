@@ -1,5 +1,5 @@
 function plex_split_episodes
-    argparse --name=plex_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' 'dry_run' -- $argv
+    argparse --name=plex_split_episodes 'n/name_format=' 't/timestamp=' 'c/count=' dry_run -- $argv
     or return
 
     if test -d $_flag_name_format; or test -d $_flag_timestamp; or test -d $_flag_count

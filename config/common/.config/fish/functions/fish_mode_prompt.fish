@@ -12,7 +12,7 @@ function fish_mode_prompt
         case visual
             set_color brred
             echo "[V]"
-        end
-        set_color normal
-        echo -n " "
+    end
+    set_color normal
+    echo -n " "
 end

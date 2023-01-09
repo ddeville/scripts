@@ -1,14 +1,14 @@
 # aliases
-alias e "nvim"
+alias e nvim
 alias realvim (which vim)
-alias vim "nvim"
+alias vim nvim
 alias ll "exa --long --all"
 alias tree "exa --tree --level=3"
 alias gaa "git add .; and git ci"
 alias gaaa "git add .; and git ci --amend --no-edit"
 alias gaau "git add .; and git cu"
 alias oo "open ."
-alias tf "terraform"
+alias tf terraform
 
 # abbreviations
 abbr -a -g cdd "cd .."

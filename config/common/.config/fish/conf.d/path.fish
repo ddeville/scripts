@@ -1,7 +1,7 @@
 # clean up existing path before resourcing it so that starting tmux doesn't end
 # up with duplicated entries in the path (and the default paths prepended to the
 # front) - this is because this config file is loaded twice when starting tmux.
-if test -e "/usr/libexec/path_helper"
+if test -e /usr/libexec/path_helper
     set PATH ""
     eval (/usr/libexec/path_helper -c)
 end
@@ -20,11 +20,11 @@ end
 add_to_path "$PYENV_ROOT/shims"
 
 # add the dropbox overrides before the rest (if this is a dropbox machine)
-add_to_path "/opt/dropbox-override/bin"
+add_to_path /opt/dropbox-override/bin
 
 # customly built packages
-add_to_path "/opt/nvim/nightly/bin"
-add_to_path "/opt/lsp/bin"
+add_to_path /opt/nvim/nightly/bin
+add_to_path /opt/lsp/bin
 
 # various user binaries
 add_to_path "$HOME/.local/bin"
@@ -32,13 +32,13 @@ add_to_path "$CARGO_HOME/bin"
 add_to_path "$HOME/src/go/bin"
 
 # check whether xcode is installed and add its bin dir to the path if so
-if which xcode-select > /dev/null 2>&1; and set -l XC (xcode-select --print-path)
+if which xcode-select >/dev/null 2>&1; and set -l XC (xcode-select --print-path)
     add_to_path "$XC/usr/bin"
 end
 
 # brew install its stuff there on M1 macs
-add_to_path "/opt/homebrew/bin"
-add_to_path "/opt/homebrew/sbin"
+add_to_path /opt/homebrew/bin
+add_to_path /opt/homebrew/sbin
 
 # we can now set the new entries in front of the path
 set -x PATH $PATH_ENTRIES $PATH
