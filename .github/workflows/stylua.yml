@@ -1,0 +1,25 @@
+---
+
+name: Run stylua on lua code
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  push:
+    branches:
+      - '**'
+    tags:
+      - '!**'
+
+jobs:
+  stylua:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run stylua
+        uses: JohnnyMorganz/stylua-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check config/common/.config/nvim
