@@ -1,6 +1,8 @@
 ---
 
-name: Run stylua on lua code
+# This runs `stylua`: https://github.com/JohnnyMorganz/StyLua
+#
+name: Run stylua on nvim config code
 
 on:
   pull_request:
