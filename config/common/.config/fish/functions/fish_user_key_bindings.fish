@@ -1,6 +1,6 @@
 function fish_user_key_bindings
     # When on macos, the keybindings have to be sourced manually.
-    if test (uname) = "Darwin"
+    if test (uname) = Darwin
         if test -e "/opt/homebrew/opt/fzf/shell/key-bindings.fish"
             source /opt/homebrew/opt/fzf/shell/key-bindings.fish
         else if test -e "/usr/local/opt/fzf/shell/key-bindings.fish"

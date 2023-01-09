@@ -1,3 +1,3 @@
-if command -v zoxide &> /dev/null
+if command -v zoxide &>/dev/null
     zoxide init fish | source
 end

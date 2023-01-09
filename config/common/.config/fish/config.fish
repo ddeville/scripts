@@ -17,6 +17,6 @@ set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
 set -x FZF_ALT_C_COMMAND "fd --type d --exclude .git --hidden --color=never"
 
 # Sometimes this is not set correctly if only the Xcode CLI tools are installed
-if test (uname) = "Darwin" && ! test -n "$SDKROOT"
+if test (uname) = Darwin && ! test -n "$SDKROOT"
     set -gx SDKROOT (xcrun --sdk macosx --show-sdk-path)
 end

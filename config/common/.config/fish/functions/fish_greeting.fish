@@ -18,7 +18,7 @@ function fish_greeting
     set -l l_color (set_color normal; set_color --bold white)
     set -l r_color (set_color normal; set_color green)
 
-    if [ (uname -s) = "Darwin" ]
+    if [ (uname -s) = Darwin ]
         echo $l_color" OS:         "$r_color(sw_vers -productName) $r_color(sw_vers -productVersion) $r_color(sw_vers -buildVersion)
         echo $l_color" Uptime:     "$r_color(uptime | sed -E 's/.*(up.*), [[:digit:]]+ user.*/\1/')
         echo $l_color" User:       "$r_color(id -un)

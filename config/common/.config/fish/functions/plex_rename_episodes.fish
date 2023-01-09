@@ -1,5 +1,5 @@
 function plex_rename_episodes
-    argparse --name=plex_rename_episodes 'n/names=' 'c/count=' 'e/extension=' 'dry_run' -- $argv
+    argparse --name=plex_rename_episodes 'n/names=' 'c/count=' 'e/extension=' dry_run -- $argv
     or return
 
     if test -d $_flag_names; or test -d $_flag_count; or test -d $_flag_extension
@@ -8,7 +8,7 @@ function plex_rename_episodes
         return 1
     end
 
-    set file_path (eval echo $_flag_names)  # for ~ expansion
+    set file_path (eval echo $_flag_names) # for ~ expansion
     set filenames (string split '\n' (cat $file_path))
 
     if test (count $filenames) -ne $_flag_count

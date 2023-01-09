@@ -21,7 +21,7 @@ function fish_prompt
     set -l venv_color (set_color cyan)
     set -l normal_color (set_color $fish_color_normal)
 
-    if test "$USER" = "root"
+    if test "$USER" = root
         set prompt_sign "#"
     else
         set prompt_sign ">"

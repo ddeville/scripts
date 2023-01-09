@@ -5,4 +5,4 @@ set -gx fish_key_bindings fish_vi_key_bindings
 bind -M insert \cy accept-autosuggestion
 
 # alt-c doesn't work on macos so rather than tweaking the iterm settings bind it
-bind -M insert "ç" fzf-cd-widget
+bind -M insert ç fzf-cd-widget
