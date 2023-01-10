@@ -6,17 +6,17 @@ SCRIPT_DIR=$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
-    brew_path=/opt/homebrew/bin
+  brew_path=/opt/homebrew/bin
 else
-    brew_path=/usr/local/bin
+  brew_path=/usr/local/bin
 fi
 
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
-    bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
-    pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes \
-    stylua shellcheck shfmt buildifier \
-    font-anonymous-pro
+  bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
+  pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes \
+  stylua shellcheck shfmt buildifier \
+  font-anonymous-pro
 
 sudo sh -c "echo $brew_path/fish >> /etc/shells"
 chsh -s $brew_path/fish
