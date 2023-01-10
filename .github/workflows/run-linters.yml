@@ -50,3 +50,5 @@ jobs:
           SHFMT_OPTS: --simplify --indent 2
         with:
           sh_checker_shellcheck_disable: true
+          sh_checker_shfmt_disable: false
+          sh_checker_checkbashisms_enable: true
