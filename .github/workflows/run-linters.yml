@@ -47,6 +47,6 @@ jobs:
         uses: luizm/action-sh-checker@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHFMT_OPTS: -s
+          SHFMT_OPTS: --simplify --indent 2
         with:
           sh_checker_shellcheck_disable: true
