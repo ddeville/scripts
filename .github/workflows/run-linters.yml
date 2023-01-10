@@ -36,3 +36,16 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           severity: style
+  shfmt:
+    name: shfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run shfmt
+        uses: luizm/action-sh-checker@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHFMT_OPTS: -s
+        with:
+          sh_checker_shellcheck_disable: true
