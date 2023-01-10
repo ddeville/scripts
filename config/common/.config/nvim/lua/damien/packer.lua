@@ -36,7 +36,10 @@ packer.startup({
     -- Code formatters
     use({
       'google/vim-codefmt', -- used for Starlark
-      requires = { 'google/vim-maktaba' },
+      requires = {
+        'google/vim-maktaba',
+        'google/vim-glaive',
+      },
     })
     use({
       'ckipp01/stylua-nvim',
