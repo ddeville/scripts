@@ -66,6 +66,7 @@ echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
 sudo -u $USERNAME -H sh -c "chsh -s /usr/bin/fish"
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
+sudo -u $USERNAME -H sh -c "rustup component add rust-src rustfmt clippy"
 sudo -u $USERNAME -H sh -c "rustup default stable"
 
 git clone --depth=1 https://aur.archlinux.org/paru.git; \
