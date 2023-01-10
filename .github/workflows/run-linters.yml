@@ -37,7 +37,8 @@ jobs:
         with:
           severity: style
   shfmt:
-    name: shfmt
+    # This runs `shfmt`: https://github.com/mvdan/sh and `checkbashisms`: https://linux.die.net/man/1/checkbashisms
+    name: Shell Formatter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
