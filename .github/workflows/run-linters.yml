@@ -1,8 +1,6 @@
 ---
 
-# This runs `stylua`: https://github.com/JohnnyMorganz/StyLua
-#
-name: Run stylua on nvim config code
+name: Run linters
 
 on:
   pull_request:
@@ -15,6 +13,7 @@ on:
 
 jobs:
   stylua:
+    # This runs `stylua`: https://github.com/JohnnyMorganz/StyLua
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout
@@ -25,3 +24,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: --check config/common/.config/nvim
+  shellcheck:
+    # This runs `shellcheck`: https://www.shellcheck.net
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
