@@ -2,6 +2,7 @@
 
 nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
-export TMUX_PLUGIN_MANAGER_PATH=$HOME/.config/tmux/plugins
-$HOME/.config/tmux/plugins/tpm/bin/install_plugins
-$HOME/.config/tmux/plugins/tpm/bin/update_plugins all
+TMUX_PLUGIN_MANAGER_PATH="$HOME/.config/tmux/plugins"
+export TMUX_PLUGIN_MANAGER_PATH
+"$HOME"/.config/tmux/plugins/tpm/bin/install_plugins
+"$HOME"/.config/tmux/plugins/tpm/bin/update_plugins all

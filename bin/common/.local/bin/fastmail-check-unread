@@ -18,4 +18,4 @@ query='{
 unread_count=$(curl -sL https://api.fastmail.com/jmap/api/ -X POST -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data "$query" |
     jq --raw-output '.methodResponses[1][1].list[0].unreadEmails' 2> /dev/null)
 
-echo $unread_count
+echo "$unread_count"

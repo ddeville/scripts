@@ -1,12 +1,12 @@
 #!/bin/sh
 
 # Can be overriden from the command line
-: ${USERNAME:=damien}
+: "${USERNAME:=damien}"
 
 sudo apt-get install \
     fish vim neovim stow bat htop jq ripgrep tmux curl fd-find cmake golang gdb exa zoxide
 
-sudo echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
+echo "$USERNAME ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/"$USERNAME" > /dev/null
 
 chsh -s /usr/bin/fish
 

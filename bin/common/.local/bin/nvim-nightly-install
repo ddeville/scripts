@@ -8,12 +8,12 @@ function _setup {
     if [ ! -d $NVIM_INSTALL_PATH ]; then
         echo "Creating install folder"
         sudo mkdir -p $NVIM_INSTALL_PATH
-        sudo chown $USER $NVIM_INSTALL_PATH
+        sudo chown "$USER" $NVIM_INSTALL_PATH
     fi
 
     # Make sure it's a folder with the right permissions
     if [ ! -d $NVIM_INSTALL_PATH ] || [ -f $NVIM_INSTALL_PATH ] || [ ! -O $NVIM_INSTALL_PATH ]; then
-        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" $USER
+        echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" "$USER"
         exit 1
     fi
 }
@@ -45,14 +45,14 @@ function _nvim_nightly_prebuilt {
     rm "$tmp_path"
 
     # Check whether it is a new version
-    new_version="$($tmp_dir/$foldername/bin/nvim --version | head -n 1)"
+    new_version="$("$tmp_dir"/$foldername/bin/nvim --version | head -n 1)"
     if [ -f "$NVIM_INSTALL_PATH/bin/nvim" ]; then
         cur_version="$($NVIM_INSTALL_PATH/bin/nvim --version | head -n 1)"
 
         if [[ "$cur_version" == "$new_version" ]]; then
             echo "Version $cur_version is already installed"
             # Cleanup
-            rm -rf "$tmp_dir/$foldername"
+            rm -rf "${tmp_dir:?}/$foldername"
             exit 0
         fi
     fi
@@ -60,11 +60,11 @@ function _nvim_nightly_prebuilt {
     # Delete the existing install and move the new one over
     echo "Installing $new_version"
     touch "$NVIM_INSTALL_PATH/sentinel"
-    rm -rf "$NVIM_INSTALL_PATH/"*
+    rm -rf "${NVIM_INSTALL_PATH:?}/"*
     mv "$tmp_dir/$foldername/"* $NVIM_INSTALL_PATH
 
     # Cleanup
-    rm -r "$tmp_dir/$foldername"
+    rm -r "${tmp_dir:?}/$foldername"
 }
 
 # Prerequisites:
