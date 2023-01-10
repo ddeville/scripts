@@ -4,9 +4,9 @@
 : "${USERNAME:=damien}"
 
 sudo apt-get install \
-    fish vim neovim stow bat htop jq ripgrep tmux curl fd-find cmake golang gdb exa zoxide
+  fish vim neovim stow bat htop jq ripgrep tmux curl fd-find cmake golang gdb exa zoxide
 
-echo "$USERNAME ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/"$USERNAME" > /dev/null
+echo "$USERNAME ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/"$USERNAME" >/dev/null
 
 chsh -s /usr/bin/fish
 

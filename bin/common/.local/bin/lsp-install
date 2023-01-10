@@ -4,384 +4,384 @@ set -eu
 # NOTE: Remember to add to completions when adding a new server type
 
 function _rust_analyzer {
-    echo "Installing rust-analyzer"
+  echo "Installing rust-analyzer"
 
-    foldername="_rust-analyzer"
-    linkname="bin/rust-analyzer"
+  foldername="_rust-analyzer"
+  linkname="bin/rust-analyzer"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    if [ "$(uname)" = "Darwin" ]; then
-        if [[ "$(uname -m)" == "arm64" ]]; then
-            filename="rust-analyzer-aarch64-apple-darwin"
-        else
-            filename="rust-analyzer-x86_64-apple-darwin"
-        fi
-    elif [ "$(uname)" = "Linux" ]; then
-        filename="rust-analyzer-x86_64-unknown-linux-gnu"
+  if [ "$(uname)" = "Darwin" ]; then
+    if [[ "$(uname -m)" == "arm64" ]]; then
+      filename="rust-analyzer-aarch64-apple-darwin"
     else
-        echo "Unsupported platform: $(uname)"
-        exit 1
+      filename="rust-analyzer-x86_64-apple-darwin"
     fi
-    url="https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/$filename.gz"
+  elif [ "$(uname)" = "Linux" ]; then
+    filename="rust-analyzer-x86_64-unknown-linux-gnu"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
+  url="https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/$filename.gz"
 
-    archive_path="$filename.gz"
-    echo "Downloading $url to $archive_path"
-    curl -L --url "$url" --output "$archive_path"
+  archive_path="$filename.gz"
+  echo "Downloading $url to $archive_path"
+  curl -L --url "$url" --output "$archive_path"
 
-    gzip -d "$archive_path"
-    mv "$filename" rust-analyzer
-    chmod +x rust-analyzer
+  gzip -d "$archive_path"
+  mv "$filename" rust-analyzer
+  chmod +x rust-analyzer
 
-    popd > /dev/null
+  popd >/dev/null
 
-    ln -s "../$foldername/rust-analyzer" "$linkname"
+  ln -s "../$foldername/rust-analyzer" "$linkname"
 }
 
 function _clangd {
-    echo "Installing clangd"
+  echo "Installing clangd"
 
-    foldername="_clangd"
-    linkname="bin/clangd"
+  foldername="_clangd"
+  linkname="bin/clangd"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    if [ "$(uname)" = "Darwin" ]; then
-        platform_name="mac"
-    elif [ "$(uname)" = "Linux" ]; then
-        platform_name="linux"
-    else
-        echo "Unsupported platform: $(uname)"
-        exit 1
-    fi
+  if [ "$(uname)" = "Darwin" ]; then
+    platform_name="mac"
+  elif [ "$(uname)" = "Linux" ]; then
+    platform_name="linux"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
 
-    version_url="https://api.github.com/repos/clangd/clangd/releases/latest"
-    version_name="$(curl $version_url | jq --raw-output '.name')"
-    url="https://github.com/clangd/clangd/releases/download/$version_name/clangd-$platform_name-$version_name.zip"
+  version_url="https://api.github.com/repos/clangd/clangd/releases/latest"
+  version_name="$(curl $version_url | jq --raw-output '.name')"
+  url="https://github.com/clangd/clangd/releases/download/$version_name/clangd-$platform_name-$version_name.zip"
 
-    archive_path="clangd.zip"
-    echo "Downloading $url to $archive_path"
-    curl -L --url "$url" --output "$archive_path"
+  archive_path="clangd.zip"
+  echo "Downloading $url to $archive_path"
+  curl -L --url "$url" --output "$archive_path"
 
-    unzip -q "$archive_path"
-    rm "$archive_path"
+  unzip -q "$archive_path"
+  rm "$archive_path"
 
-    popd > /dev/null
+  popd >/dev/null
 
-    bin_path="$foldername/clangd_$version_name/bin/clangd"
-    chmod +x "$bin_path"
+  bin_path="$foldername/clangd_$version_name/bin/clangd"
+  chmod +x "$bin_path"
 
-    ln -s "../$bin_path" "$linkname"
+  ln -s "../$bin_path" "$linkname"
 }
 
 function _gopls {
-    echo "Installing gopls"
+  echo "Installing gopls"
 
-    if ! command -v go &> /dev/null; then
-        echo "The gopls language server requires Go to be installed"
-        exit 1
-    fi
+  if ! command -v go &>/dev/null; then
+    echo "The gopls language server requires Go to be installed"
+    exit 1
+  fi
 
-    foldername="_gopls"
-    linkname="bin/gopls"
+  foldername="_gopls"
+  linkname="bin/gopls"
 
-    if [ -d "$foldername" ]; then
-        chmod -R 700 "$foldername"  # some go files in `pkg/` are not writable...
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    chmod -R 700 "$foldername" # some go files in `pkg/` are not writable...
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    GOPATH="$(pwd)"
-    export GOPATH
-    GOBIN="$(pwd)"
-    export GOBIN
-    GO111MODULE=on
-    export GO111MODULE
-    go install golang.org/x/tools/gopls@latest
-    go clean -modcache
+  GOPATH="$(pwd)"
+  export GOPATH
+  GOBIN="$(pwd)"
+  export GOBIN
+  GO111MODULE=on
+  export GO111MODULE
+  go install golang.org/x/tools/gopls@latest
+  go clean -modcache
 
-    popd > /dev/null
+  popd >/dev/null
 
-    ln -s "../$foldername/gopls" "$linkname"
+  ln -s "../$foldername/gopls" "$linkname"
 }
 
 function _tsserver {
-    echo "Installing tsserver"
+  echo "Installing tsserver"
 
-    if ! command -v npm &> /dev/null; then
-        echo "The tsserver language server requires Node to be installed"
-        exit 1
-    fi
+  if ! command -v npm &>/dev/null; then
+    echo "The tsserver language server requires Node to be installed"
+    exit 1
+  fi
 
-    foldername="_tsserver"
-    linkname="bin/typescript-language-server"
+  foldername="_tsserver"
+  linkname="bin/typescript-language-server"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    npm init -y --scope=lsp
-    npm install typescript-language-server@latest typescript@latest
+  npm init -y --scope=lsp
+  npm install typescript-language-server@latest typescript@latest
 
-    popd > /dev/null
+  popd >/dev/null
 
-    ln -s "../$foldername/node_modules/.bin/typescript-language-server" "$linkname"
+  ln -s "../$foldername/node_modules/.bin/typescript-language-server" "$linkname"
 }
 
 function _pyright {
-    echo "Installing pyright"
+  echo "Installing pyright"
 
-    if ! command -v npm &> /dev/null; then
-        echo "The pyright language server requires Node to be installed"
-        exit 1
-    fi
+  if ! command -v npm &>/dev/null; then
+    echo "The pyright language server requires Node to be installed"
+    exit 1
+  fi
 
-    foldername="_pyright"
-    linkname="bin/pyright-langserver"
+  foldername="_pyright"
+  linkname="bin/pyright-langserver"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    npm init -y --scope=lsp
-    npm install pyright@latest
+  npm init -y --scope=lsp
+  npm install pyright@latest
 
-    popd > /dev/null
+  popd >/dev/null
 
-    ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
+  ln -s "../$foldername/node_modules/.bin/pyright-langserver" "$linkname"
 }
 
 function _yamlls {
-    echo "Installing yaml-language-server"
+  echo "Installing yaml-language-server"
 
-    if ! command -v npm &> /dev/null; then
-        echo "The yaml language server requires Node to be installed"
-        exit 1
-    fi
+  if ! command -v npm &>/dev/null; then
+    echo "The yaml language server requires Node to be installed"
+    exit 1
+  fi
 
-    foldername="_yamlls"
-    linkname="bin/yaml-language-server"
+  foldername="_yamlls"
+  linkname="bin/yaml-language-server"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    npm init -y --scope=lsp
-    npm install yaml-language-server@latest
+  npm init -y --scope=lsp
+  npm install yaml-language-server@latest
 
-    popd > /dev/null
+  popd >/dev/null
 
-    ln -s "../$foldername/node_modules/.bin/yaml-language-server" "$linkname"
+  ln -s "../$foldername/node_modules/.bin/yaml-language-server" "$linkname"
 }
 
 function _terraformls {
-    echo "Installing terraform-ls"
+  echo "Installing terraform-ls"
 
-    foldername="_terraform-ls"
-    linkname="bin/terraform-ls"
+  foldername="_terraform-ls"
+  linkname="bin/terraform-ls"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    if [ "$(uname)" = "Darwin" ]; then
-        if [[ "$(uname -m)" == "arm64" ]]; then
-            platform_name="darwin_arm64"
-        else
-            platform_name="darwin_amd64"
-        fi
-    elif [ "$(uname)" = "Linux" ]; then
-        platform_name="linux_amd64"
+  if [ "$(uname)" = "Darwin" ]; then
+    if [[ "$(uname -m)" == "arm64" ]]; then
+      platform_name="darwin_arm64"
     else
-        echo "Unsupported platform: $(uname)"
-        exit 1
+      platform_name="darwin_amd64"
     fi
+  elif [ "$(uname)" = "Linux" ]; then
+    platform_name="linux_amd64"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
 
-    version_url="https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
-    version_name="$(curl $version_url | jq --raw-output '.name')"
-    url="https://github.com/hashicorp/terraform-ls/releases/download/$version_name/terraform-ls_${version_name:1}_$platform_name.zip"
+  version_url="https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
+  version_name="$(curl $version_url | jq --raw-output '.name')"
+  url="https://github.com/hashicorp/terraform-ls/releases/download/$version_name/terraform-ls_${version_name:1}_$platform_name.zip"
 
-    archive_path="terraform-ls.zip"
-    echo "Downloading $url to $archive_path"
-    curl -L --url "$url" --output "$archive_path"
+  archive_path="terraform-ls.zip"
+  echo "Downloading $url to $archive_path"
+  curl -L --url "$url" --output "$archive_path"
 
-    unzip -q "$archive_path"
-    rm "$archive_path"
+  unzip -q "$archive_path"
+  rm "$archive_path"
 
-    popd > /dev/null
+  popd >/dev/null
 
-    bin_path="$foldername/terraform-ls"
-    chmod +x "$bin_path"
+  bin_path="$foldername/terraform-ls"
+  chmod +x "$bin_path"
 
-    ln -s "../$bin_path" "$linkname"
+  ln -s "../$bin_path" "$linkname"
 }
 
 function _sumneko_lua {
-    echo "Installing sumneko_lua"
+  echo "Installing sumneko_lua"
 
-    if ! command -v ninja &> /dev/null; then
-        echo "The sumneko_lua language server requires Ninja to be installed"
-        exit 1
-    fi
+  if ! command -v ninja &>/dev/null; then
+    echo "The sumneko_lua language server requires Ninja to be installed"
+    exit 1
+  fi
 
-    foldername="_lua"
-    linkname="bin/lua-language-server"
+  foldername="_lua"
+  linkname="bin/lua-language-server"
 
-    if [ -d "$foldername" ]; then
-        rm -rf "$foldername"
-    fi
-    if [ -L "$linkname" ]; then
-        rm "$linkname"
-    fi
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
 
-    mkdir "$foldername"
-    pushd "$foldername" > /dev/null
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
 
-    if [ "$(uname)" = "Darwin" ]; then
-        ninja_file="macos.ninja"
-    elif [ "$(uname)" = "Linux" ]; then
-        ninja_file="linux.ninja"
-    else
-        echo "Unsupported platform: $(uname)"
-        exit 1
-    fi
+  if [ "$(uname)" = "Darwin" ]; then
+    ninja_file="macos.ninja"
+  elif [ "$(uname)" = "Linux" ]; then
+    ninja_file="linux.ninja"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
 
-    # We assume that the first tag is the latest, an assumption that the GH API
-    # also makes...
-    tags_url="https://api.github.com/repos/sumneko/lua-language-server/tags"
-    tag_name="$(curl $tags_url | jq --raw-output '.[0].name')"
+  # We assume that the first tag is the latest, an assumption that the GH API
+  # also makes...
+  tags_url="https://api.github.com/repos/sumneko/lua-language-server/tags"
+  tag_name="$(curl $tags_url | jq --raw-output '.[0].name')"
 
-    git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
+  git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
 
-    pushd "lua-language-server" > /dev/null
+  pushd "lua-language-server" >/dev/null
 
-    git submodule update --init --recursive
+  git submodule update --init --recursive
 
-    pushd "3rd/luamake" > /dev/null
-    ninja -f compile/ninja/$ninja_file
-    popd > /dev/null
+  pushd "3rd/luamake" >/dev/null
+  ninja -f compile/ninja/$ninja_file
+  popd >/dev/null
 
-    ./3rd/luamake/luamake rebuild
+  ./3rd/luamake/luamake rebuild
 
-    popd > /dev/null
+  popd >/dev/null
 
-    curpath="$(pwd)"
+  curpath="$(pwd)"
 
-    command echo >>lua "#!/bin/sh"
-    command echo >>lua "$curpath/lua-language-server/bin/lua-language-server -E $curpath/lua-language-server/main.lua"
-    chmod +x lua
+  command echo "#!/bin/sh" >>lua
+  command echo "$curpath/lua-language-server/bin/lua-language-server -E $curpath/lua-language-server/main.lua" >>lua
+  chmod +x lua
 
-    popd > /dev/null
+  popd >/dev/null
 
-    command ln -s "../$foldername/lua" "$linkname"
+  command ln -s "../$foldername/lua" "$linkname"
 }
 
 if [[ $# == 0 ]]; then
-    echo "Available servers:"
-    echo "  * rust-analyzer"
-    echo "  * clangd"
-    echo "  * gopls"
-    echo "  * tsserver"
-    echo "  * pyright"
-    echo "  * yamlls"
-    echo "  * terraform-ls"
-    echo "  * sumneko_lua"
-    exit 1
+  echo "Available servers:"
+  echo "  * rust-analyzer"
+  echo "  * clangd"
+  echo "  * gopls"
+  echo "  * tsserver"
+  echo "  * pyright"
+  echo "  * yamlls"
+  echo "  * terraform-ls"
+  echo "  * sumneko_lua"
+  exit 1
 fi
 
 install_all=false
 for arg; do
-    if [[ $arg == "all" ]]; then
-        install_all=true
-    fi
+  if [[ $arg == "all" ]]; then
+    install_all=true
+  fi
 done
 
 LSP_INSTALL_PATH="/opt/lsp"
 
 if [ ! -d $LSP_INSTALL_PATH ]; then
-    echo "Creating install folder"
-    sudo mkdir -p $LSP_INSTALL_PATH
-    sudo chown "$USER" $LSP_INSTALL_PATH
+  echo "Creating install folder"
+  sudo mkdir -p $LSP_INSTALL_PATH
+  sudo chown "$USER" $LSP_INSTALL_PATH
 fi
 
 # Make sure it's a folder with the right permissions
 if [ ! -d $LSP_INSTALL_PATH ] || [ -f $LSP_INSTALL_PATH ] || [ ! -O $LSP_INSTALL_PATH ]; then
-    echo "Make sure that" $LSP_INSTALL_PATH "is a directory and is owned by" "$USER"
-    exit 1
+  echo "Make sure that" $LSP_INSTALL_PATH "is a directory and is owned by" "$USER"
+  exit 1
 fi
 
 mkdir -p "$LSP_INSTALL_PATH/bin"
 
-pushd "$LSP_INSTALL_PATH" > /dev/null
+pushd "$LSP_INSTALL_PATH" >/dev/null
 for arg; do
-    if [[ $arg == "rust-analyzer" ]] || $install_all; then
-        _rust_analyzer
-    fi
-    if [[ $arg == "clangd" ]] || $install_all; then
-        _clangd
-    fi
-    if [[ $arg == "gopls" ]] || $install_all; then
-        _gopls
-    fi
-    if [[ $arg == "tsserver" ]] || $install_all; then
-        _tsserver
-    fi
-    if [[ $arg == "pyright" ]] || $install_all; then
-        _pyright
-    fi
-    if [[ $arg == "yamlls" ]] || $install_all; then
-        _yamlls
-    fi
-    if [[ $arg == "terraform-ls" ]] || $install_all; then
-        _terraformls
-    fi
-    if [[ $arg == "sumneko_lua" ]] || $install_all; then
-        _sumneko_lua
-    fi
+  if [[ $arg == "rust-analyzer" ]] || $install_all; then
+    _rust_analyzer
+  fi
+  if [[ $arg == "clangd" ]] || $install_all; then
+    _clangd
+  fi
+  if [[ $arg == "gopls" ]] || $install_all; then
+    _gopls
+  fi
+  if [[ $arg == "tsserver" ]] || $install_all; then
+    _tsserver
+  fi
+  if [[ $arg == "pyright" ]] || $install_all; then
+    _pyright
+  fi
+  if [[ $arg == "yamlls" ]] || $install_all; then
+    _yamlls
+  fi
+  if [[ $arg == "terraform-ls" ]] || $install_all; then
+    _terraformls
+  fi
+  if [[ $arg == "sumneko_lua" ]] || $install_all; then
+    _sumneko_lua
+  fi
 done
-popd > /dev/null
+popd >/dev/null
