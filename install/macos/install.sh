@@ -15,7 +15,7 @@ $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
     bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
     pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes \
-    stylua shellcheck buildifier \
+    stylua shellcheck shfmt buildifier \
     font-anonymous-pro
 
 sudo sh -c "echo $brew_path/fish >> /etc/shells"
