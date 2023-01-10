@@ -27,7 +27,7 @@ jobs:
           args: --check config/common/.config/nvim
   shellcheck:
     # This runs `shellcheck`: https://www.shellcheck.net
-    name: ShellCheck
+    name: Shell Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

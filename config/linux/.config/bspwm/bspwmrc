@@ -8,10 +8,10 @@ bspc config borderless_monocle false
 bspc config gapless_monocle false
 
 if [[ $(hostname) == "arch" ]]; then
-    bspc monitor DisplayPort-0 -d web media work zoom vnc flt
-    bspc monitor DisplayPort-1 -d code work-code devbox a
+  bspc monitor DisplayPort-0 -d web media work zoom vnc flt
+  bspc monitor DisplayPort-1 -d code work-code devbox a
 else
-    bspc monitor -d web code media flt a b c
+  bspc monitor -d web code media flt a b c
 fi
 
 bspc rule -a zoom desktop="zoom" state=floating
@@ -32,28 +32,28 @@ bspc rule -a QjackCtl state=floating
 # However, Tdie also seems to be missing as of kernel version ~5.14 so use Tctl for now.
 CPU_LABEL="k10temp: Tctl"
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
-    if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$CPU_LABEL" ]; then
-        export HWMON_PATH="$i"
-    fi
+  if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$CPU_LABEL" ]; then
+    export HWMON_PATH="$i"
+  fi
 done
 
 # setup sxhkd
-killall --quiet --wait --user $USER --exact sxhkd > /dev/null
+killall --quiet --wait --user $USER --exact sxhkd >/dev/null
 sxhkd &
 
 # set up polybar
-polybar-msg cmd quit > /dev/null
+polybar-msg cmd quit >/dev/null
 mkdir -p $HOME/.cache/logs
 
 if [[ $(hostname) == "arch" ]]; then
-    MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2> $HOME/.cache/logs/polybar-main.err &
-    MONITOR=DisplayPort-1 polybar term 2> $HOME/.cache/logs/polybar-term.err &
+  MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2>$HOME/.cache/logs/polybar-main.err &
+  MONITOR=DisplayPort-1 polybar term 2>$HOME/.cache/logs/polybar-term.err &
 else
-    polybar minimal 2> $HOME/.cache/logs/polybar-minimal.err &
+  polybar minimal 2>$HOME/.cache/logs/polybar-minimal.err &
 fi
 
 # make all windows on desktop 'flt' floating
-killall --quiet --wait --user $USER --exact bspwm-floating > /dev/null
+killall --quiet --wait --user $USER --exact bspwm-floating >/dev/null
 [ -x ~/.local/bin/bspwm-floating ] && ~/.local/bin/bspwm-floating flt &
 
 # set up nitrogen for background pictures
