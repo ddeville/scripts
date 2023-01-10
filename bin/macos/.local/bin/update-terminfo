@@ -2,7 +2,7 @@
 
 tmp_dir="$(mktemp -d)"
 
-pushd $tmp_dir
+pushd "$tmp_dir" || exit 1
 
 # Install alacritty terminfo
 # -> https://github.com/alacritty/alacritty/blob/master/INSTALL.md#terminfo
@@ -15,6 +15,6 @@ curl -LO https://invisible-island.net/datafiles/current/terminfo.src.gz
 gunzip terminfo.src.gz
 /usr/bin/tic -xe tmux-256color terminfo.src
 
-popd
+popd || exit 1
 
-rm -rf $tmp_dir
+rm -rf "$tmp_dir"

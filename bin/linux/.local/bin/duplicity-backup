@@ -15,7 +15,8 @@ case $1 in
       ;;
    dbx)
       DEST="dpbx:///Backup/Duplicity/$(hostname)"
-      export DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
+      DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
+      export DPBX_ACCESS_TOKEN
       ;;
    *)
       echo "Unknown command (needs to be 'local', 'nas' or 'dbx')"
@@ -23,7 +24,8 @@ case $1 in
 esac
 
 # All backups are encrypted with the same passphrase.
-export PASSPHRASE=$(</etc/duplicity/credentials/gpg_pass)
+PASSPHRASE=$(</etc/duplicity/credentials/gpg_pass)
+export PASSPHRASE
 
 # The list of directories to exclude when backing up the root directory.
 #
@@ -45,7 +47,7 @@ EXCLUDES=(
 )
 
 # Back up the entire system! Full backup every month, otherwise incremental.
-duplicity --full-if-older-than 1M ${EXCLUDES[@]} / "$DEST"
+duplicity --full-if-older-than 1M "${EXCLUDES[@]}" / "$DEST"
 
 # Keep 6 full backups, that is 6 months worth of data.
 duplicity remove-all-but-n-full 6 --force "$DEST"

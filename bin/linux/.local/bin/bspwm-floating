@@ -4,7 +4,7 @@
 
 FLOATING_DESKTOP_ID=$(bspc query -D -d "$1")
 
-bspc subscribe node_add node_swap node_transfer | while read -a msg ; do
+bspc subscribe node_add node_swap node_transfer | while read -r -a msg ; do
    case ${msg[0]} in
       node_add)
          # node_add <monitor_id> <desktop_id> <ip_id> <node_id>

@@ -112,9 +112,12 @@ function _gopls {
     mkdir "$foldername"
     pushd "$foldername" > /dev/null
 
-    export GOPATH="$(pwd)"
-    export GOBIN="$(pwd)"
-    export GO111MODULE=on
+    GOPATH="$(pwd)"
+    export GOPATH
+    GOBIN="$(pwd)"
+    export GOBIN
+    GO111MODULE=on
+    export GO111MODULE
     go install golang.org/x/tools/gopls@latest
     go clean -modcache
 
@@ -343,12 +346,12 @@ LSP_INSTALL_PATH="/opt/lsp"
 if [ ! -d $LSP_INSTALL_PATH ]; then
     echo "Creating install folder"
     sudo mkdir -p $LSP_INSTALL_PATH
-    sudo chown $USER $LSP_INSTALL_PATH
+    sudo chown "$USER" $LSP_INSTALL_PATH
 fi
 
 # Make sure it's a folder with the right permissions
 if [ ! -d $LSP_INSTALL_PATH ] || [ -f $LSP_INSTALL_PATH ] || [ ! -O $LSP_INSTALL_PATH ]; then
-    echo "Make sure that" $LSP_INSTALL_PATH "is a directory and is owned by" $USER
+    echo "Make sure that" $LSP_INSTALL_PATH "is a directory and is owned by" "$USER"
     exit 1
 fi
 

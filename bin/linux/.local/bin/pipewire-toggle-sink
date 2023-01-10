@@ -6,9 +6,9 @@ headphones="alsa_output.pci-0000_0c_00.4.analog-stereo"
 
 output () {
     case "$1" in
-        $speaker)
+        "$speaker")
             echo "";;
-        $headphones)
+        "$headphones")
             echo "";;
         *)
             echo "";;
@@ -19,8 +19,8 @@ update() {
     # Make sure that this sink actually exists...
     for sink in $(pactl list short sinks | cut -f2); do
         if [ "$sink" = "$1" ] ; then
-            pactl set-default-sink $1
-            output $1
+            pactl set-default-sink "$1"
+            output "$1"
             return
         fi
     done
@@ -31,12 +31,12 @@ current_sink="$(pactl get-default-sink)"
 
 case "$1" in
     --output)
-        output $current_sink;;
+        output "$current_sink";;
     *)
         case $current_sink in
-            $speaker)
+            "$speaker")
                 update $headphones;;
-            $headphones)
+            "$headphones")
                 update $speaker;;
             *)
                 update $speaker;;
