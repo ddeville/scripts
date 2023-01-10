@@ -2,25 +2,26 @@
 set -e
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root"
-   exit 1
+  echo "This script must be run as root"
+  exit 1
 fi
 
 case $1 in
-   local)
-      DEST="file:///home/damien/data/Backup"
-      ;;
-   nas)
-      DEST="file:///home/damien/data/NAS/Duplicity/$(hostname)"
-      ;;
-   dbx)
-      DEST="dpbx:///Backup/Duplicity/$(hostname)"
-      DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
-      export DPBX_ACCESS_TOKEN
-      ;;
-   *)
-      echo "Unknown command (needs to be 'local', 'nas' or 'dbx')"
-      exit 1
+local)
+  DEST="file:///home/damien/data/Backup"
+  ;;
+nas)
+  DEST="file:///home/damien/data/NAS/Duplicity/$(hostname)"
+  ;;
+dbx)
+  DEST="dpbx:///Backup/Duplicity/$(hostname)"
+  DPBX_ACCESS_TOKEN=$(</etc/duplicity/credentials/dbx_access_token)
+  export DPBX_ACCESS_TOKEN
+  ;;
+*)
+  echo "Unknown command (needs to be 'local', 'nas' or 'dbx')"
+  exit 1
+  ;;
 esac
 
 # All backups are encrypted with the same passphrase.
@@ -32,18 +33,18 @@ export PASSPHRASE
 # Note that earlier `include/exclude` "override" the ones that come after in the
 # command line arguments so we put the catch-all ones last.
 EXCLUDES=(
-   "--exclude ignorecase:/**/cache/**"
-   "--exclude ignorecase:/**/.cache/**"
-   "--exclude /home/damien/data"
-   "--exclude /dev"
-   "--exclude /mnt"
-   "--exclude /proc"
-   "--exclude /run"
-   "--exclude /sys"
-   "--exclude /tmp"
-   "--exclude /var/lock"
-   "--exclude /var/run"
-   "--exclude /var/tmp"
+  "--exclude ignorecase:/**/cache/**"
+  "--exclude ignorecase:/**/.cache/**"
+  "--exclude /home/damien/data"
+  "--exclude /dev"
+  "--exclude /mnt"
+  "--exclude /proc"
+  "--exclude /run"
+  "--exclude /sys"
+  "--exclude /tmp"
+  "--exclude /var/lock"
+  "--exclude /var/run"
+  "--exclude /var/tmp"
 )
 
 # Back up the entire system! Full backup every month, otherwise incremental.

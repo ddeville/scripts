@@ -2,7 +2,7 @@
 
 cmd="ps axo pid,ppid,user,command"
 if [ "$1" == "" ]; then
-    ${cmd}
+  ${cmd}
 else
-    ${cmd} | grep "$1" | grep -v "grep $1" | grep -v "bin/psc"
+  ${cmd} | grep "$1" | grep -v "grep $1" | grep -v "bin/psc"
 fi

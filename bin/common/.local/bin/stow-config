@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ "$(uname)" = "Linux" ]; then
-    DIRS="common linux"
+  DIRS="common linux"
 elif [ "$(uname)" = "Darwin" ]; then
-    DIRS="common macos"
+  DIRS="common macos"
 else
-    DIRS="common"
+  DIRS="common"
 fi
 
 stow $DIRS -d $HOME/scripts/config -t $HOME -v
