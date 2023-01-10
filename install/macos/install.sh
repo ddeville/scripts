@@ -14,7 +14,8 @@ fi
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew install \
     bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
-    pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes stylua \
+    pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes \
+    stylua shellcheck \
     font-anonymous-pro
 
 sudo sh -c "echo $brew_path/fish >> /etc/shells"
@@ -22,18 +23,20 @@ chsh -s $brew_path/fish
 
 mkdir -p $HOME/.local/share
 
-export CARGO_HOME=~/.local/share/cargo
-export RUSTUP_HOME=~/.local/share/rustup
+export CARGO_HOME=$HOME/.local/share/cargo
+export RUSTUP_HOME=$HOME/.local/share/rustup
 curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+$HOME/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
+$HOME/.local/share/cargo/bin/rustup default stable
 
-git clone https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell
-git clone https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm
+git clone https://github.com/ddeville/base16-shell.git $HOME/.local/share/base16-shell
+git clone https://github.com/tmux-plugins/tpm $HOME/scripts/config/common/.config/tmux/plugins/tpm
 
-chflags nohidden ~/Library
-chflags hidden ~/Applications
+chflags nohidden $HOME/Library
+chflags hidden $HOME/Applications
 
-mkdir -p ~/.1password
-ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ~/.1password/agent.sock
+mkdir -p $HOME/.1password
+ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" $HOME/.1password/agent.sock
 sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
