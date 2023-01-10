@@ -20,8 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run Stylua
-        uses: JohnnyMorganz/stylua-action@master
+        uses: JohnnyMorganz/stylua-action@v2
         with:
+          version: latest
           args: --check config/common/.config/nvim
   shellcheck:
     # This runs `shellcheck`: https://www.shellcheck.net
