@@ -38,23 +38,23 @@ for i in /sys/class/hwmon/hwmon*/temp*_input; do
 done
 
 # setup sxhkd
-killall --quiet --wait --user $USER --exact sxhkd >/dev/null
+killall --quiet --wait --user "$USER" --exact sxhkd >/dev/null
 sxhkd &
 
 # set up polybar
 polybar-msg cmd quit >/dev/null
-mkdir -p $HOME/.cache/logs
+mkdir -p "$HOME/.cache/logs"
 
 if [[ $(hostname) == "arch" ]]; then
-  MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2>$HOME/.cache/logs/polybar-main.err &
-  MONITOR=DisplayPort-1 polybar term 2>$HOME/.cache/logs/polybar-term.err &
+  MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2>"$HOME/.cache/logs/polybar-main.err" &
+  MONITOR=DisplayPort-1 polybar term 2>"$HOME/.cache/logs/polybar-term.err" &
 else
-  polybar minimal 2>$HOME/.cache/logs/polybar-minimal.err &
+  polybar minimal 2>"$HOME/.cache/logs/polybar-minimal.err" &
 fi
 
 # make all windows on desktop 'flt' floating
-killall --quiet --wait --user $USER --exact bspwm-floating >/dev/null
-[ -x ~/.local/bin/bspwm-floating ] && ~/.local/bin/bspwm-floating flt &
+killall --quiet --wait --user "$USER" --exact bspwm-floating >/dev/null
+[ -x "$HOME/.local/bin/bspwm-floating" ] && "$HOME/.local/bin/bspwm-floating" flt &
 
 # set up nitrogen for background pictures
 # no need to kill existing instances since when using `--restore` the process exits as soon as the background is set.
