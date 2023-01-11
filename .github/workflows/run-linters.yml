@@ -61,3 +61,16 @@ jobs:
         uses: actions/checkout@v3
       - name: Run fish_indent
         uses: ddeville/fish-indent-action@master
+  vint:
+    # This runs `vint`: https://github.com/Vimjas/vint
+    name: Vint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: vint
+        uses: ludvighz/vint-action@v1
+        with:
+          path: config/common/.config/nvim
+          # TODO(damien): Fix
+          # args: --style-problem --enable-neovim
