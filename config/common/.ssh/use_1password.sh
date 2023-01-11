@@ -23,8 +23,8 @@
 
 # First get the OpenSSH version since `IdentityAgent` was first introduced in 7.3
 ssh_ver=$(ssh -V 2>&1 | sed 's/,.*//; s/^OpenSSH_//; s/[^0123456789.].*//')
-ssh_major=$(echo $ssh_ver | awk -F'.' '{printf $1}')
-ssh_minor=$(echo $ssh_ver | awk -F'.' '{printf $2}')
+ssh_major=$(echo "$ssh_ver" | awk -F'.' '{printf $1}')
+ssh_minor=$(echo "$ssh_ver" | awk -F'.' '{printf $2}')
 if [ "$ssh_major" -lt "7" ]; then
   exit 1
 elif [ "$ssh_major" -eq "7" ] && [ "$ssh_minor" -lt "3" ]; then

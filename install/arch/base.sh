@@ -2,8 +2,8 @@
 set -eu
 
 # Can be overriden from the command line
-: ${USERNAME:=damien}
-: ${HOSTNAME:=arch}
+: "${USERNAME:=damien}"
+: "${HOSTNAME:=arch}"
 
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 timedatectl set-ntp true
@@ -13,9 +13,11 @@ locale-gen
 
 echo "LANG=en_US.UTF-8" >>/etc/locale.conf
 echo "$HOSTNAME" >>/etc/hostname
-echo "127.0.0.1 localhost" >>/etc/hosts
-echo "::1       localhost" >>/etc/hosts
-echo "127.0.1.1 $HOSTNAME.localdomain $HOSTNAME" >>/etc/hosts
+{
+  echo "127.0.0.1 localhost"
+  echo "::1       localhost"
+  echo "127.0.1.1 $HOSTNAME.localdomain $HOSTNAME"
+} >>/etc/hosts
 
 printf "\e[1;32m==> Setting root password\n\e[0m"
 passwd
@@ -58,27 +60,27 @@ systemctl enable acpid
 systemctl enable libvirtd
 
 printf "\e[1;32m==> Creating new user\n\e[0m"
-useradd -m $USERNAME
-passwd $USERNAME
+useradd -m "$USERNAME"
+passwd "$USERNAME"
 mkdir -p /etc/sudoers.d
-echo "$USERNAME ALL=(ALL) ALL" >>/etc/sudoers.d/$USERNAME
+echo "$USERNAME ALL=(ALL) ALL" >>"/etc/sudoers.d/$USERNAME"
 
-sudo -u $USERNAME -H sh -c "chsh -s /usr/bin/fish"
+sudo -u "$USERNAME" -H sh -c "chsh -s /usr/bin/fish"
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
-sudo -u $USERNAME -H sh -c "rustup component add rust-src rustfmt clippy"
-sudo -u $USERNAME -H sh -c "rustup default stable"
+sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
+sudo -u "$USERNAME" -H sh -c "rustup default stable"
 
 git clone --depth=1 https://aur.archlinux.org/paru.git
-sudo -u $USERNAME -H sh -c "cd /home/$USERNAME; \
+sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME; \
 cd paru; \
 makepkg -si;
 rm -rf /home/$USERNAME/paru;"
 
-mv /scripts /home/$USERNAME/scripts
-chown $USERNAME:$USERNAME -R /home/$USERNAME/scripts
+mv /scripts "/home/$USERNAME/scripts"
+chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
-sudo -u $USERNAME -H sh -c "git clone --depth=1 https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
-sudo -u $USERNAME -H sh -c "git clone --depth=1 https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
+sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
+sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
