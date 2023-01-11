@@ -52,3 +52,12 @@ jobs:
           sh_checker_shellcheck_disable: true
           sh_checker_shfmt_disable: false
           sh_checker_checkbashisms_enable: true
+  fish_indent:
+    # This runs `fish_indent`: https://fishshell.com/docs/current/cmds/fish_indent.html
+    name: Fish Indent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run fish_indent
+        uses: ddeville/fish-indent-action@master
