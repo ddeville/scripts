@@ -7,7 +7,6 @@ end
 
 set -gx OPENAI_USER "$USER"
 set -gx API_REPO_PATH "$HOME/code/api"
-set -l MANAGE_SCRIPT_PATH "$API_REPO_PATH/manage/dev_setup/bash_or_zsh_rc"
 
 oai_set_api_key silent
 oai_buildbox_activate silent
@@ -49,7 +48,7 @@ function nicer_kubectl
 end
 
 # Read all the aliases from Bash and turn them into Fish aliases, ugh...
-for line in (cat "$MANAGE_SCRIPT_PATH")
+for line in (cat "$API_REPO_PATH/manage/dev_setup/bash_or_zsh_rc")
     if string match --regex "^alias *" $line >/dev/null
         set line (string replace --regex "^alias *" "" $line)
         set entry (string split "=" $line)
