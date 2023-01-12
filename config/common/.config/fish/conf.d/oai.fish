@@ -1,6 +1,6 @@
-# We only ever need to run this on an oai machine
-set OPENAI_MACHINES oai-damien
+set -l OPENAI_MACHINES oai-damien
 
+# We only ever need to run this on an oai machine
 if not contains (hostname) "$OPENAI_MACHINES"
     return
 end
