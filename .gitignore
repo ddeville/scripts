@@ -8,6 +8,6 @@ config/common/.ssh
 !config/common/.ssh/authorized_keys
 !config/common/.ssh/config
 !config/common/.ssh/id_personal.pub
-!config/common/.ssh/id_openai.pub
+!config/common/.ssh/id_oai.pub
 !config/common/.ssh/rc
 !config/common/.ssh/use_1password.sh

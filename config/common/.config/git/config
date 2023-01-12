@@ -7,7 +7,7 @@
     # NOTE: Reference https://developer.1password.com/docs/ssh/git-commit-signing
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL9YoKFxv4ixFrJvRn3wUz5BSxtPjGk30tHGRc18BInN
 [includeIf "gitdir:~/code/"]
-    path = ~/.config/git/config_openai
+    path = ~/.config/git/config_oai
 [gpg]
     format = ssh
 [gpg "ssh"]
