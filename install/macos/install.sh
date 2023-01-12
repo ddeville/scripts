@@ -1,8 +1,32 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-SCRIPT_DIR=$(CDPATH="" cd -- "$(dirname -- "$0")" && pwd -P)
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# First install Xcode Command Line Tools if needed
+if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
+  echo "Installing Xcode Commadn Line Tools"
+  # This temporary file prompts the 'softwareupdate' utility to list the Command Line Tools
+  clt_placeholder="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
+  sudo touch "$clt_placeholder"
+  clt_label_command="/usr/sbin/softwareupdate -l |
+		     grep -B 1 -E 'Command Line Tools' |
+		     awk -F'*' '/^ *\\*/ {print \$2}' |
+		     sed -e 's/^ *Label: //' -e 's/^ *//' |
+		     sort -V |
+		     tail -n1"
+  clt_label="$(chomp "$(/bin/bash -c "$clt_label_command")")"
+  if [[ -n $clt_label ]]; then
+    echo "Installing $clt_label"
+    sudo "/usr/sbin/softwareupdate" "-i" "$clt_label"
+    sudo "/usr/bin/xcode-select" "--switch" "/Library/Developer/CommandLineTools"
+  fi
+  sudo rm -f "$clt_placeholder"
+fi
+
+export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+
+# We can now install all the packages
+"$SCRIPT_DIR"/install_packages
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
@@ -10,13 +34,6 @@ if [ "${arch_name}" = "arm64" ]; then
 else
   brew_path=/usr/local/bin
 fi
-
-$brew_path/brew tap homebrew/cask-fonts
-$brew_path/brew install \
-  bat exa fish htop jq neovim ripgrep stow tmux fd cmake ninja bash zoxide lazygit \
-  pyenv pyenv-virtualenv golang node fzf robotsandpencils/made/xcodes \
-  stylua shellcheck shfmt checkbashisms buildifier \
-  font-anonymous-pro
 
 sudo sh -c "echo $brew_path/fish >> /etc/shells"
 chsh -s $brew_path/fish
@@ -34,6 +51,7 @@ git clone https://github.com/tmux-plugins/tpm "$HOME/scripts/config/common/.conf
 
 chflags nohidden "$HOME/Library"
 chflags hidden "$HOME/Applications"
+chflags hidden "$HOME/Public"
 
 mkdir -p "$HOME/.1password"
 ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
