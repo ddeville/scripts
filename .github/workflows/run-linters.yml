@@ -69,8 +69,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: vint
-        uses: ludvighz/vint-action@v1
-        with:
-          path: config/common/.config/nvim
-          # TODO(damien): Fix
-          # args: --style-problem --enable-neovim
+        uses: ddeville/vint-action@master
