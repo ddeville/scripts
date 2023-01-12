@@ -19,9 +19,6 @@ end
 # make sure that this is before anything in the path (it overwrites others)
 add_to_path "$PYENV_ROOT/shims"
 
-# add the dropbox overrides before the rest (if this is a dropbox machine)
-add_to_path /opt/dropbox-override/bin
-
 # customly built packages
 add_to_path /opt/nvim/nightly/bin
 add_to_path /opt/lsp/bin
