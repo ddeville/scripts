@@ -1,7 +1,8 @@
 set -x OPENAI_USER "$USER"
 set -x API_REPO_PATH "$HOME/code/api"
 
-oai_set_api_key autoload
+oai_set_api_key silent
+oai_buildbox_activate silent
 
 # 1. Set `KUBECONFIG` to its default value if it wasn't set
 # 2. Prepend `API_KUBECONFIG` to it in all cases
