@@ -77,9 +77,3 @@ alias ci internal-ci-api
 alias ci-prod internal-ci-prod-api
 alias admin prod-admin-westus2-output
 alias sadmin staging-admin-westus2-output
-
-# kubectl_preflight is a hacky script that takes a kube context name and attempts
-# to use it to verify that you are able to access it. It's meant to handle weird
-# edge cases where you need to re-auth due to 2FA expiration in your az login
-# or other token expiration. Hopefully we will soon rarely need to use it in prod!
-alias kubectl_preflight "python $API_REPO_PATH/manage/dev_setup/kubectl_preflight.py"

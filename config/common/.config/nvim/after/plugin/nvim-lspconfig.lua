@@ -150,7 +150,7 @@ setup_client('pyright', {
       'pyproject.toml',
       'pyrightconfig.json',
       '.git',
-      -- In theory we should also have the following but openai/api uses several packages but needs
+      -- In theory we should also have the following but oai/api uses several packages but needs
       -- to be a single python project...
       --
       -- 'setup.py',

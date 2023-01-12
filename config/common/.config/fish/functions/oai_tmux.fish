@@ -1,5 +1,5 @@
-function openai_tmux --description "Create OpenAI tmux session"
-    set session openai
+function oai_tmux --description "Create OAI tmux session"
+    set session oai
     if not command tmux list-sessions 2>/dev/null | grep $session >/dev/null 2>&1
         # create the session at ~
         command tmux new-session -D -s $session -d -c ~

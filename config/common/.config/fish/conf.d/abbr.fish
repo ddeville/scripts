@@ -16,6 +16,3 @@ abbr -a -g con "tail -40 -f /var/log/system.log"
 abbr -a -g topc "top -o cpu"
 abbr -a -g topm "top -o mem"
 abbr -a -g vpn "echo -e \"push\r\" | /opt/cisco/anyconnect/bin/vpn -s connect \"amer-west\""
-
-# openai
-alias acrlogin "az login && az acr login -n openaiapiglobal --subscription api"

@@ -1,4 +1,4 @@
-function openai_checkout_api_pins --description "Checkout whatever is the current version for pinned repos in API"
+function oai_checkout_api_pins --description "Checkout whatever is the current version for pinned repos in API"
     set -l code_dir "$HOME/code"
     set -l manage_dir "$code_dir/api/manage"
 
