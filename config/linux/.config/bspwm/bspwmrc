@@ -32,7 +32,7 @@ bspc rule -a QjackCtl state=floating
 # However, Tdie also seems to be missing as of kernel version ~5.14 so use Tctl for now.
 CPU_LABEL="k10temp: Tctl"
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
-  if [ "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))" = "$CPU_LABEL" ]; then
+  if [ "$(<"$(dirname "$i")"/name): $(cat "${i%_*}"_label 2>/dev/null || basename "${i%_*}")" = "$CPU_LABEL" ]; then
     export HWMON_PATH="$i"
   fi
 done
