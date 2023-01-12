@@ -15,9 +15,7 @@ Then, run `base.sh`, `x.sh` and `progs.sh` in that order.
 
 ### MacOS
 
-First install iTerm2, 1Password and Xcode (or Xcode CLI tools).
-
-Then run the `install/macos/install.sh` script.
+Run the `install/macos/install.sh` script.
 
 ## Post-installation
 
