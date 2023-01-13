@@ -18,4 +18,5 @@ readarray -t packages <"$script_dir"/brew_packages.txt
 
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew tap homebrew/cask-versions
+$brew_path/brew update
 $brew_path/brew install "${packages[@]}"
