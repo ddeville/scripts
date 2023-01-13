@@ -9,7 +9,7 @@ pushd "$tmp_dir" || exit 1
 # Note that we prefer symlinking the version from the app if it's installed since it's what brew also does.
 if [ -e /Applications/Alacritty.app/Contents/Resources/61/alacritty ]; then
   echo "Alacritty is installed, symlinking terminfo"
-  rm "$HOME/.terminfo/61/alacritty" "$HOME/.terminfo/61/alacritty-direct" 2> /dev/null
+  rm "$HOME/.terminfo/61/alacritty" "$HOME/.terminfo/61/alacritty-direct" 2>/dev/null
   mkdir -p "$HOME"/.terminfo/61
   ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty "$HOME/.terminfo/61/alacritty"
   ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty-direct "$HOME/.terminfo/61/alacritty-direct"
