@@ -47,16 +47,20 @@ function nicer_kubectl
     end
 end
 
+set -l oia_script_path "$API_REPO_PATH/manage/dev_setup/bash_or_zsh_rc"
+
 # Read all the aliases from Bash and turn them into Fish aliases, ugh...
-for line in (cat "$API_REPO_PATH/manage/dev_setup/bash_or_zsh_rc")
-    if string match --regex "^alias *" $line >/dev/null
-        set line (string replace --regex "^alias *" "" $line)
-        set entry (string split "=" $line)
+if test -e $oia_script_path
+    for line in (cat $oia_script_path)
+        if string match --regex "^alias *" $line >/dev/null
+            set line (string replace --regex "^alias *" "" $line)
+            set entry (string split "=" $line)
 
-        set value $entry[2]
-        set value (string replace -a "'" "" $value)
-        set value (string replace -a '"' "" $value)
+            set value $entry[2]
+            set value (string replace -a "'" "" $value)
+            set value (string replace -a '"' "" $value)
 
-        alias $entry[1] "$value"
+            alias $entry[1] "$value"
+        end
     end
 end
