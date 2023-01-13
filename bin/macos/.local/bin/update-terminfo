@@ -6,11 +6,23 @@ pushd "$tmp_dir" || exit 1
 
 # Install alacritty terminfo
 # -> https://github.com/alacritty/alacritty/blob/master/INSTALL.md#terminfo
-git clone --depth=1 https://github.com/alacritty/alacritty.git
-/usr/bin/tic -xe alacritty,alacritty-direct alacritty/extra/alacritty.info
+# Note that we prefer symlinking the version from the app if it's installed since it's what brew also does.
+if [ -e /Applications/Alacritty.app/Contents/Resources/61/alacritty ]; then
+  echo "Alacritty is installed, symlinking terminfo"
+  rm "$HOME/.terminfo/61/alacritty" "$HOME/.terminfo/61/alacritty-direct" 2> /dev/null
+  mkdir -p "$HOME"/.terminfo/61
+  ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty "$HOME/.terminfo/61/alacritty"
+  ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty-direct "$HOME/.terminfo/61/alacritty-direct"
+
+else
+  echo "Alacritty is not installed, building terminfo"
+  git clone --depth=1 https://github.com/alacritty/alacritty.git
+  /usr/bin/tic -xe alacritty,alacritty-direct alacritty/extra/alacritty.info
+fi
 
 # Install tmux terminfo
 # -> https://gist.github.com/bbqtd/a4ac060d6f6b9ea6fe3aabe735aa9d95
+echo "Building tmux terminfo"
 curl -LO https://invisible-island.net/datafiles/current/terminfo.src.gz
 gunzip terminfo.src.gz
 /usr/bin/tic -xe tmux-256color terminfo.src
