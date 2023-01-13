@@ -3,6 +3,10 @@ exa
 fish
 htop
 jq
+vim
+git
+curl
+openssh
 neovim
 ripgrep
 stow
@@ -18,13 +22,15 @@ pyenv-virtualenv
 golang
 node
 fzf
-robotsandpencils/made/xcodes
 stylua
 shellcheck
 shfmt
 checkbashisms
 buildifier
 font-anonymous-pro
+teamookla/speedtest/speedtest
+robotsandpencils/made/xcodes
+1password/tap/1password-cli
 1password
 alacritty
 alfred4
