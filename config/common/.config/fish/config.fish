@@ -20,3 +20,8 @@ set -x FZF_ALT_C_COMMAND "fd --type d --exclude .git --hidden --color=never"
 if test (uname) = Darwin && ! test -n "$SDKROOT"
     set -gx SDKROOT (xcrun --sdk macosx --show-sdk-path)
 end
+
+# 1Password command-line plugins
+if test -e "$XDG_CONFIG_HOME/op/plugins.sh"
+    source "$XDG_CONFIG_HOME/op/plugins.sh"
+end

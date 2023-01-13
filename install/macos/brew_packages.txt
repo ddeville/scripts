@@ -28,6 +28,7 @@ shfmt
 checkbashisms
 buildifier
 font-anonymous-pro
+github/homebrew-gh/gh
 teamookla/speedtest/speedtest
 robotsandpencils/made/xcodes
 1password/tap/1password-cli
