@@ -24,6 +24,7 @@ telescope.setup({
   pickers = {
     buffers = {
       theme = 'ivy',
+      previewer = false,
       results_title = false,
       preview_title = false,
       sorting_strategy = 'descending',
