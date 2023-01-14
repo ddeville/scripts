@@ -66,3 +66,9 @@ font:
   bold:
     family: Anonymous Pro
     style: Regular
+  italic:
+    family: Anonymous Pro
+    style: Italic
+  bold_italic:
+    family: Anonymous Pro
+    style: Italic
