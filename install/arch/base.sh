@@ -80,7 +80,7 @@ rm -rf /home/$USERNAME/paru;"
 mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
-sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://github.com/ddeville/base16-shell.git ~/.local/share/base16-shell"
+sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://github.com/tinted-theming/base16-shell.git ~/.local/share/base16-shell"
 sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://github.com/tmux-plugins/tpm ~/scripts/config/common/.config/tmux/plugins/tpm"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
