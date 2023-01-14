@@ -125,7 +125,7 @@ def task_run_stow():
 def task_install_base16():
     # type: () -> TaskManifest
     repos = [
-        ("base16-shell", "https://github.com/ddeville/base16-shell.git"),
+        ("base16-shell", "https://github.com/tinted-theming/base16-shell.git"),
     ]
     def cmd():
         # type: () -> None
