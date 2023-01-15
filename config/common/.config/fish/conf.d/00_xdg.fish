@@ -40,7 +40,6 @@ command mkdir -p "$XDG_STATE_HOME/less"
 set -x HISTFILE "$XDG_STATE_HOME/bash/history"
 command mkdir -p "$XDG_STATE_HOME/bash"
 # base16
-set -x BASE16_STATE_DIR "$XDG_STATE_HOME/base16"
 set -x BASE16_CONFIG_PATH "$XDG_STATE_HOME/base16"
 # ripgrep
 set -x RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
