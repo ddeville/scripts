@@ -42,11 +42,13 @@ mkdir -p "$HOME/.local/share"
 
 export CARGO_HOME="$HOME/.local/share/cargo"
 export RUSTUP_HOME="$HOME/.local/share/rustup"
-curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+/usr/bin/curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 "$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 "$HOME"/.local/share/cargo/bin/rustup default stable
 
+export PATH="$brew_path":$PATH
 "$SCRIPT_DIR"/../../bin/common/.local/bin/update-shell-plugins
+"$SCRIPT_DIR"/../../bin/macos/.local/bin/update-terminfo
 
 chflags nohidden "$HOME/Library"
 chflags hidden "$HOME/Applications"
@@ -56,8 +58,6 @@ mkdir -p "$HOME/.1password"
 ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
 sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
-
-"$SCRIPT_DIR"/../../bin/macos/.local/bin/update-terminfo
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
