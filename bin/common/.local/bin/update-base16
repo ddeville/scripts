@@ -13,15 +13,15 @@ repos=(
   "https://github.com/tinted-theming/base16-dunst.git"
 )
 
-for repo in ${repos[@]}; do
-  folder_name=$(echo $repo | cut -d/ -f5 | cut -d. -f1)
+for repo in "${repos[@]}"; do
+  folder_name=$(echo "$repo" | cut -d/ -f5 | cut -d. -f1)
   path="$base16_path/$folder_name"
   # If the repo was never cloned, do so, otherwise just update it
-  if [ -d $path ]; then
-    pushd $path || exit 1
+  if [ -d "$path" ]; then
+    pushd "$path" || exit 1
     git pull --rebase
     popd || exit 1
   else
-    git clone $repo $path
+    git clone "$repo" "$path"
   fi
 done
