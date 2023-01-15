@@ -3,4 +3,4 @@ if status --is-interactive && test -e $base16_path
     source $base16_path
 end
 
-set -x BASE16_THEME_DEFAULT base16-gruvbox-dark-pale
+set -x BASE16_THEME_DEFAULT gruvbox-dark-pale
