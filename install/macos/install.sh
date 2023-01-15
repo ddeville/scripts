@@ -46,8 +46,7 @@ curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 "$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 "$HOME"/.local/share/cargo/bin/rustup default stable
 
-git clone https://github.com/tinted-theming/base16-shell.git "$HOME/.local/share/base16-shell"
-git clone https://github.com/tmux-plugins/tpm "$HOME/scripts/config/common/.config/tmux/plugins/tpm"
+"$SCRIPT_DIR"/../../bin/common/.local/bin/update-shell-plugins
 
 chflags nohidden "$HOME/Library"
 chflags hidden "$HOME/Applications"
