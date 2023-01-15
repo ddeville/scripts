@@ -52,5 +52,8 @@ set -x BASE16_SHELL_HOOKS_PATH "$XDG_CONFIG_HOME/base16/hooks"
 # ripgrep
 set -x RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 
+# tmux
+set -x TMUX_PLUGIN_MANAGER_PATH "$XDG_DATA_HOME/tmux/plugins"
+
 # golang
 set -x GOPATH "$HOME/src/go"
