@@ -9,9 +9,6 @@ repos=(
   "https://github.com/tinted-theming/base16-shell.git"
   "https://github.com/tinted-theming/base16-tmux.git"
   "https://github.com/tinted-theming/base16-fzf.git"
-  "https://github.com/tinted-theming/base16-rofi.git"
-  "https://github.com/tinted-theming/base16-polybar.git"
-  "https://github.com/tinted-theming/base16-dunst.git"
   "https://github.com/aarowill/base16-alacritty.git"
 )
 
