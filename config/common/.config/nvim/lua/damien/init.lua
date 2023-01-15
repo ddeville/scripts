@@ -1,4 +1,4 @@
 require('damien.packer')
-require('damien.color')
+require('damien.base16')
 require('damien.settings')
 require('damien.mappings')
