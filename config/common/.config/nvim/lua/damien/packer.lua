@@ -19,7 +19,7 @@ packer.startup({
 
     -- Appearance
     use({
-      'chriskempson/base16-vim',
+      'tinted-theming/base16-vim',
       'itchyny/lightline.vim',
       'mhinz/vim-startify',
     })
