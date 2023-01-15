@@ -12,6 +12,7 @@ repos=(
   "https://github.com/tinted-theming/base16-rofi.git"
   "https://github.com/tinted-theming/base16-polybar.git"
   "https://github.com/tinted-theming/base16-dunst.git"
+  "https://github.com/aarowill/base16-alacritty.git"
 )
 
 for repo in "${repos[@]}"; do
