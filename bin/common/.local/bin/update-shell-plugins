@@ -29,7 +29,7 @@ done
 packer_path="$XDG_DATA_HOME/site/pack/packer/start/packer.nvim"
 
 if [ ! -d "$packer_path" ]; then
-  mkdir -p (dirname "$packer_path")
+  mkdir -p "$(dirname "$packer_path")"
   git clone https://github.com/wbthomason/packer.nvim "$packer_path"
 fi
 
@@ -39,7 +39,7 @@ nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 tpm_path="$TMUX_PLUGIN_MANAGER_PATH/tpm"
 
 if [ ! -d "$tpm_path" ]; then
-  mkdir -p (dirname "$tpm_path")
+  mkdir -p "$(dirname "$tpm_path")"
   git clone https://github.com/tmux-plugins/tpm "$tpm_path"
 fi
 
