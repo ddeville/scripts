@@ -1,6 +1,11 @@
 # This script is called whenever the base16 theme is loaded or changed.
 
 read current_theme_name <"$BASE16_SHELL_THEME_NAME_PATH"
+read previous_theme_name <"$BASE16_SHELL_PREVIOUS_THEME_NAME_PATH"
+
+if test "$current_theme_name" = "$previous_theme_name"
+    return
+end
 
 # NOTE: base16-fzf edits and exports `FZF_DEFAULT_OPTS` to a universal
 # variable, which is not a behavior we want here.
