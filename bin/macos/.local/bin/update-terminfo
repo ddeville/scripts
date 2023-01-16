@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eux
+
 tmp_dir="$(mktemp -d)"
 
 pushd "$tmp_dir" || exit 1
