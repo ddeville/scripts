@@ -21,6 +21,7 @@ packer.startup({
     use({
       'tinted-theming/base16-vim',
       'itchyny/lightline.vim',
+      'daviesjamie/vim-base16-lightline',
       'mhinz/vim-startify',
     })
 
