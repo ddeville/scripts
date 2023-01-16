@@ -3,8 +3,6 @@
 read current_theme_name <"$BASE16_SHELL_THEME_NAME_PATH"
 read previous_theme_name <"$BASE16_SHELL_PREVIOUS_THEME_NAME_PATH"
 
-if test "$current_theme_name" = "$previous_theme_name"
-    return
+if test "$current_theme_name" != "$previous_theme_name"
+    ln -sf "$XDG_DATA_HOME/base16/base16-alacritty/colors/base16-$current_theme_name-256.yml" "$BASE16_CONFIG_PATH/base16-alacritty.yml"
 end
-
-ln -sf "$XDG_DATA_HOME/base16/base16-alacritty/colors/base16-$current_theme_name-256.yml" "$BASE16_CONFIG_PATH/base16-alacritty.yml"
