@@ -10,5 +10,5 @@ ln -sf $orig_path $dest_path
 
 # And if tmux is actually running, reload it live
 if test -n "$TMUX"
-    tmux source-file $dest_path
+    tmux source-file "$XDG_CONFIG_HOME/tmux/tmux.conf"
 end
