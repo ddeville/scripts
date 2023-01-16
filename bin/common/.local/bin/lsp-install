@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -eu
+
+set -eux
 
 # NOTE: Remember to add to completions when adding a new server type
 

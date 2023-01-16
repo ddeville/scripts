@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -eux
 
 # First update base16
 base16_path="$XDG_DATA_HOME/base16"
