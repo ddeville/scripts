@@ -32,6 +32,7 @@ packer.startup({
       'rust-lang/rust.vim',
       'hashivim/vim-terraform',
       'baskerville/vim-sxhkdrc',
+      'tmux-plugins/vim-tmux',
     })
 
     -- Code formatters
