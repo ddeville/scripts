@@ -26,13 +26,20 @@ for repo in "${repos[@]}"; do
 done
 
 # Then neovim plugins
+packer_path="$XDG_DATA_HOME/site/pack/packer/start/packer.nvim"
+
+if [ ! -d "$packer_path" ]; then
+  mkdir -p (dirname "$packer_path")
+  git clone https://github.com/wbthomason/packer.nvim "$packer_path"
+fi
+
 nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # And finally tmux plugins
 tpm_path="$TMUX_PLUGIN_MANAGER_PATH/tpm"
 
 if [ ! -d "$tpm_path" ]; then
-  mkdir -p "$TMUX_PLUGIN_MANAGER_PATH"
+  mkdir -p (dirname "$tpm_path")
   git clone https://github.com/tmux-plugins/tpm "$tpm_path"
 fi
 
