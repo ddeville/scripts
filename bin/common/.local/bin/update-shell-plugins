@@ -33,6 +33,7 @@ if [ ! -d "$packer_path" ]; then
   git clone https://github.com/wbthomason/packer.nvim "$packer_path"
 fi
 
+nvim --headless +PackerUpdate +PackerCompile +qa
 nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # And finally tmux plugins
