@@ -20,4 +20,5 @@ packages=("${packages[@]//#*/}")
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew tap homebrew/cask-versions
 $brew_path/brew update
+# shellcheck disable=SC2068
 $brew_path/brew install ${packages[@]}
