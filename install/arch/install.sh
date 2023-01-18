@@ -72,9 +72,9 @@ sudo -u "$USERNAME" -H sh -c "rustup default stable"
 
 # Install Paru
 git clone --depth=1 https://aur.archlinux.org/paru.git
-sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME; \
-cd paru; \
-makepkg -si;
+sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME;\
+cd paru;\
+makepkg -si;\
 rm -rf /home/$USERNAME/paru;"
 
 # Install AUR packages with Paru
@@ -87,6 +87,9 @@ mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
 # Setup the shell plugins
-sudo -u "$USERNAME" -H "/home/$USERNAME/scripts/bin/common/.local/bin/update-shell-plugins"
+sudo -u "$USERNAME" -H sh -c "\
+export XDG_DATA_HOME=/home/$USERNAME/.local/share\
+export TMUX_PLUGIN_MANAGER_PATH=$XDG_DATA_HOME/tmux/plugins\
+/home/$USERNAME/scripts/bin/common/.local/bin/update-shell-plugins"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
