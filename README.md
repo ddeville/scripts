@@ -10,8 +10,7 @@ The legacy installer can still be found under `install/legacy`.
 
 ### Arch Linux
 
-Follow the instructions in `install/arch/setup.txt` to kick off the installation from the ISO.
-Then, run `base.sh`, `x.sh` and `progs.sh` in that order.
+Follow the instructions in `install/arch/setup.txt` to kick off the installation from the ISO and run the `install/arch/install.sh` script.
 
 ### MacOS
 
