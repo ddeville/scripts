@@ -6,6 +6,7 @@ set -eu
 : "${USERNAME:=damien}"
 : "${HOSTNAME:=arch}"
 
+# Setup time and locale
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 timedatectl set-ntp true
 hwclock --systohc
@@ -23,6 +24,7 @@ echo "$HOSTNAME" >>/etc/hostname
 printf "\e[1;32m==> Setting root password\n\e[0m"
 passwd
 
+# Setup pacman mirrors (can be changed to something closer if not in the bay area)
 cat <<EOT >/etc/pacman.d/mirrorlist
 Server = https://mirrors.sonic.net/archlinux/\$repo/os/\$arch
 Server = https://mirrors.ocf.berkeley.edu/archlinux/\$repo/os/\$arch
@@ -54,31 +56,37 @@ systemctl enable acpid
 systemctl enable libvirtd
 systemctl enable lightdm
 
+# Create user and make sure it can sudo
 printf "\e[1;32m==> Creating new user\n\e[0m"
 useradd -m "$USERNAME"
 passwd "$USERNAME"
 mkdir -p /etc/sudoers.d
 echo "$USERNAME ALL=(ALL) ALL" >>"/etc/sudoers.d/$USERNAME"
 
+# Make fish the default shell
 sudo -u "$USERNAME" -H sh -c "chsh -s /usr/bin/fish"
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
 sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
 sudo -u "$USERNAME" -H sh -c "rustup default stable"
 
+# Install Paru
 git clone --depth=1 https://aur.archlinux.org/paru.git
 sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME; \
 cd paru; \
 makepkg -si;
 rm -rf /home/$USERNAME/paru;"
 
+# Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
 /usr/bin/paru -Syy
 /usr/bin/paru -S --needed "${aur_packages[@]}"
 
+# Move the scripts repo to the home directory
 mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
+# Setup the shell plugins
 sudo -u "$USERNAME" -H "/home/$USERNAME/scripts/bin/common/.local/bin/update-shell-plugins"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
