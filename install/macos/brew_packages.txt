@@ -1,41 +1,51 @@
+# Regular
+bash
 bat
+curl
 exa
+fd
 fish
+fzf
+gh
+git
 htop
 jq
-vim
-git
-curl
-openssh
+lazygit
 neovim
+openssh
 ripgrep
 stow
+teamookla/speedtest/speedtest
 tmux
-fd
+vim
+zoxide
+
+# Build tools
 cmake
 ninja
-bash
-zoxide
-lazygit
-pyenv
-pyenv-virtualenv
+
+# Languages
 golang
 node
-fzf
-stylua
+pyenv
+pyenv-virtualenv
+
+# Linters/formatters
+buildifier
+checkbashisms
 shellcheck
 shfmt
-checkbashisms
-buildifier
+stylua
+
+# Fonts
 font-anonymous-pro
-github/homebrew-gh/gh
-teamookla/speedtest/speedtest
-robotsandpencils/made/xcodes
+
+# Casks
 1password/tap/1password-cli
 1password
 alacritty
 alfred4
-mos
-stay
 google-chrome
+mos
 spotify
+stay

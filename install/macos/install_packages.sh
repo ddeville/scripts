@@ -15,8 +15,9 @@ if [ ! -x $brew_path/brew ]; then
 fi
 
 readarray -t packages <"$script_dir"/brew_packages.txt
+packages=("${packages[@]//#*/}")
 
 $brew_path/brew tap homebrew/cask-fonts
 $brew_path/brew tap homebrew/cask-versions
 $brew_path/brew update
-$brew_path/brew install "${packages[@]}"
+$brew_path/brew install ${packages[@]}
