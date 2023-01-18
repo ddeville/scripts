@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -eu
 
 # Can be overriden from the command line
@@ -30,24 +31,14 @@ Server = https://mirrors.mit.edu/archlinux/\$repo/os/\$arch
 EOT
 
 pacman -Syy
-
-pacman -S --needed \
-  grub efibootmgr os-prober \
-  xf86-video-amdgpu \
-  base-devel linux-headers pkg-config man-db man-pages git pacman-contrib zip unzip lsb-release \
-  xdg-user-dirs xdg-utils dialog terminus-font \
-  networkmanager network-manager-applet wireguard-tools ethtool libvncserver freerdp \
-  openssh rsync openbsd-netcat iptables-nft ipset firewalld gnupg gnome-keyring libsecret polkit \
-  avahi bluez bluez-utils cups hplip inetutils dnsutils nss-mdns \
-  alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber pavucontrol sof-firmware \
-  acpi acpi_call acpid \
-  mtools dosfstools smbclient gvfs gvfs-smb cifs-utils nfs-utils ntfs-3g btrfs-progs \
-  fish vim neovim stow bat exa htop jq ripgrep tmux curl fd glances duf dust fzf zoxide lazygit \
-  cmake ninja python rustup go nodejs npm pyenv tree-sitter perf gdb \
-  duplicity docker qemu-desktop qemu-emulators-full libvirt ovmf vde2 bridge-utils dnsmasq dmidecode
+pacman -S --needed grub efibootmgr os-prober xf86-video-amdgpu
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
+
+readarray -t base_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/base_packages.txt")
+pacman -Syy
+pacman -S --needed "${base_packages[@]}"
 
 systemctl enable NetworkManager
 systemctl enable bluetooth
@@ -58,6 +49,7 @@ systemctl enable fstrim.timer
 systemctl enable firewalld
 systemctl enable acpid
 systemctl enable libvirtd
+systemctl enable lightdm
 
 printf "\e[1;32m==> Creating new user\n\e[0m"
 useradd -m "$USERNAME"
@@ -76,6 +68,10 @@ sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME; \
 cd paru; \
 makepkg -si;
 rm -rf /home/$USERNAME/paru;"
+
+readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
+/usr/bin/paru -Syy
+/usr/bin/paru -S --needed "${aur_packages[@]}"
 
 mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"

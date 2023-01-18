@@ -20,7 +20,7 @@ mount /dev/XXX3 /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/XXX1 /mnt/boot/efi
 
-# to install arch
+# to install arch (NOTE: switch `amd-ucode` with `intel-ucode` if installing on intel)
 pacstrap /mnt base linux linux-firmware amd-ucode git vim
 
 # to create file system table
@@ -29,20 +29,18 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # move into new install
 arch-chroot /mnt
 
-# add `amdgpu` to `MODULES`
+# add `amdgpu` to `MODULES` (NOTE: assuming an AMD graphics card)
 vim /etc/mkinitcpio.conf
 mkinitcpio -p linux
 
 # next steps:
 #
-#   1. clone repo under `/scripts` and run `/scripts/install/arch/base.sh`
+#   1. clone repo under `/scripts` and run `/scripts/install/arch/install.sh`
 #      (you can set `USERNAME` and `HOSTNAME` to override them before calling the script)
 #
-#   2. login as user and run `~/scripts/install/arch/x.sh` and `~/scripts/install/arch/progs.sh`
+#   2. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
 #
-#   3. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
-#
-#   4. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
+#   3. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
 #      update `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc`.
 
 # vi: ft=sh
