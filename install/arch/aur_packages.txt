@@ -1,0 +1,25 @@
+# ============= Regular =============
+1password
+1password-cli
+dropbox
+dropbox-cli
+flamegraph
+google-chrome
+nautilus-dropbox
+pyenv-virtualenv
+spotify
+sysz
+
+# ====== Linters / Formatters =======
+buildifier-bin
+checkbashisms
+shellcheck
+shfmt
+stylua
+
+# ============== Fonts ==============
+apple-fonts
+montserrat-ttf
+otf-public-sans
+ttf-mac-fonts
+ttf-nunito
