@@ -4,7 +4,9 @@ pkg-config
 man-db
 man-pages
 git
+grep
 pacman-contrib
+sudo
 zip
 unzip
 lsb-release
