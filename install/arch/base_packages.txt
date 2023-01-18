@@ -106,6 +106,7 @@ bridge-utils
 dnsmasq
 dmidecode
 
+xf86-video-amdgpu
 xorg
 xorg-xinit
 lxappearance

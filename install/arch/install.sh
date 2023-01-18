@@ -30,16 +30,19 @@ Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
 Server = https://mirrors.mit.edu/archlinux/\$repo/os/\$arch
 EOT
 
+# Install grub
 pacman -Syy
-pacman -S --needed grub efibootmgr os-prober xf86-video-amdgpu
+pacman -S --needed grub efibootmgr os-prober
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
+# Install all the base packages
 readarray -t base_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/base_packages.txt")
 pacman -Syy
 pacman -S --needed "${base_packages[@]}"
 
+# Setup the systemd services
 systemctl enable NetworkManager
 systemctl enable bluetooth
 systemctl enable cups.service
