@@ -1,4 +1,4 @@
-# Regular
+# ============= Regular =============
 bash
 bat
 curl
@@ -20,27 +20,27 @@ tmux
 vim
 zoxide
 
-# Build tools
+# =========== Build Tools ===========
 cmake
 ninja
 
-# Languages
+# ============ Languages ============
 golang
 node
 pyenv
 pyenv-virtualenv
 
-# Linters/formatters
+# ======= Linters / Formatters ======
 buildifier
 checkbashisms
 shellcheck
 shfmt
 stylua
 
-# Fonts
+# ============== Fonts ==============
 font-anonymous-pro
 
-# Casks
+# ============== Casks ==============
 1password/tap/1password-cli
 1password
 alacritty
