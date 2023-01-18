@@ -14,7 +14,6 @@ lsb-release
 xdg-user-dirs
 xdg-utils
 dialog
-terminus-font
 
 networkmanager
 network-manager-applet
@@ -43,14 +42,16 @@ inetutils
 dnsutils
 nss-mdns
 
+
+# ============== Sound ==============
 alsa-utils
+pavucontrol
 pipewire
 pipewire-alsa
 pipewire-pulse
 pipewire-jack
-wireplumber
-pavucontrol
 sof-firmware
+wireplumber
 
 acpi
 acpi_call
@@ -150,6 +151,7 @@ inter-font
 noto-fonts
 noto-fonts-emoji
 papirus-icon-theme
+terminus-font
 tex-gyre-fonts
 ttf-anonymous-pro
 ttf-dejavu
