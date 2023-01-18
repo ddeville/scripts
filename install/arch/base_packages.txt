@@ -1,3 +1,4 @@
+# =============== Base ==============
 base-devel
 linux-headers
 pkg-config
@@ -13,14 +14,14 @@ lsb-release
 
 xdg-user-dirs
 xdg-utils
-dialog
 
+# ============ Networking ===========
+ethtool
+freerdp
+libvncserver
 networkmanager
 network-manager-applet
 wireguard-tools
-ethtool
-libvncserver
-freerdp
 
 openssh
 rsync
@@ -41,7 +42,6 @@ hplip
 inetutils
 dnsutils
 nss-mdns
-
 
 # ============== Sound ==============
 alsa-utils
@@ -85,6 +85,8 @@ dust
 fzf
 zoxide
 lazygit
+dialog
+duplicity
 
 cmake
 ninja
@@ -98,21 +100,23 @@ tree-sitter
 perf
 gdb
 
-duplicity
+# ========== Virtualization =========
+bridge-utils
+dmidecode
+dnsmasq
 docker
-qemu-desktop
-qemu-emulators-full
 libvirt
 ovmf
+qemu-desktop
+qemu-emulators-full
 vde2
-bridge-utils
-dnsmasq
-dmidecode
 
+
+# =============== X11 ===============
+lxappearance
 xf86-video-amdgpu
 xorg
 xorg-xinit
-lxappearance
 
 bspwm
 sxhkd
