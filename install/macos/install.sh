@@ -47,6 +47,8 @@ export RUSTUP_HOME="$HOME/.local/share/rustup"
 "$HOME"/.local/share/cargo/bin/rustup default stable
 
 export PATH="$brew_path":$PATH
+export XDG_DATA_HOME="$HOME/.local/share"
+export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$SCRIPT_DIR"/../../bin/common/.local/bin/update-shell-plugins
 "$SCRIPT_DIR"/../../bin/macos/.local/bin/update-terminfo
 
