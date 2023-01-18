@@ -4,21 +4,19 @@ script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
-  brew_path=/opt/homebrew/bin
+  brew=/opt/homebrew/bin/brew
 else
-  brew_path=/usr/local/bin
+  brew=/usr/local/bin/brew
 fi
 
-if [ ! -x $brew_path/brew ]; then
+if [ ! -x $brew ]; then
   echo "Install Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-readarray -t packages <"$script_dir"/brew_packages.txt
-packages=("${packages[@]//#*/}")
+$brew tap homebrew/cask-fonts
+$brew tap homebrew/cask-versions
+$brew update
 
-$brew_path/brew tap homebrew/cask-fonts
-$brew_path/brew tap homebrew/cask-versions
-$brew_path/brew update
-# shellcheck disable=SC2068
-$brew_path/brew install ${packages[@]}
+readarray -t packages < <(grep -Ev "^\#|^\$" "$script_dir/brew_packages.txt")
+$brew install "${packages[@]}"
