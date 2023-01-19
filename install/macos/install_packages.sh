@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eu
+
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 arch_name="$(uname -m)"
