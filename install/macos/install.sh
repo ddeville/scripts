@@ -52,14 +52,14 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$SCRIPT_DIR"/../../bin/common/.local/bin/update-shell-plugins
 "$SCRIPT_DIR"/../../bin/macos/.local/bin/update-terminfo
 
-chflags nohidden "$HOME/Library"
-chflags hidden "$HOME/Applications"
-chflags hidden "$HOME/Public"
-
 mkdir -p "$HOME/.1password"
 ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
 sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
+
+chflags nohidden "$HOME/Library"
+chflags hidden "$HOME/Applications"
+chflags hidden "$HOME/Public"
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
