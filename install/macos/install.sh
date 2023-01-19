@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eu
+
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # First install Xcode Command Line Tools if needed
