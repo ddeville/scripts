@@ -71,11 +71,8 @@ sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
 sudo -u "$USERNAME" -H sh -c "rustup default stable"
 
 # Install Paru
-git clone --depth=1 https://aur.archlinux.org/paru.git
-sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME;\
-cd paru;\
-makepkg -si;\
-rm -rf /home/$USERNAME/paru;"
+git clone --depth=1 https://aur.archlinux.org/paru.git "/home/$USERNAME/paru"
+sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru; makepkg -si; rm -rf /home/$USERNAME/paru;"
 
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
@@ -87,9 +84,9 @@ mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
 # Setup the shell plugins
-sudo -u "$USERNAME"\
-  XDG_DATA_HOME="/home/$USERNAME/.local/share"\
-  TMUX_PLUGIN_MANAGER_PATH="/home/$USERNAME/.local/share/tmux/plugins"\
+sudo -u "$USERNAME" \
+  XDG_DATA_HOME="/home/$USERNAME/.local/share" \
+  TMUX_PLUGIN_MANAGER_PATH="/home/$USERNAME/.local/share/tmux/plugins" \
   -H sh -c "/home/$USERNAME/scripts/bin/common/.local/bin/update-shell-plugins"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
