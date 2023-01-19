@@ -77,6 +77,11 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
+defaults write com.apple.dock show-recents -int 0
+defaults write com.apple.dock autohide -int 1
+defaults write com.apple.dock magnification -int 0
+defaults write com.apple.dock mineffect "scale"
+defaults write com.apple.dock minimize-to-application -int 1
 defaults write com.apple.dock wvous-bl-corner -int 4
 defaults write com.apple.dock wvous-bl-modifier -int 0
 defaults write com.apple.dock wvous-br-corner -int 3
