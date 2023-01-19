@@ -22,20 +22,20 @@ vim.api.nvim_set_hl(0, 'LspDiagnosticsVirtualTextWarning', { fg = 'Yellow', cter
 vim.api.nvim_set_hl(0, 'LspDiagnosticsSignWarning', { fg = 'Yellow', ctermfg = 'Yellow' })
 vim.api.nvim_set_hl(0, 'LspDiagnosticsUnderlineWarning', { fg = 'Yellow', ctermfg = 'Yellow', cterm = underline })
 
-vim.api.nvim_set_hl(0, 'DiagnosticDefaultWarning', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarning', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignWarning', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineWarning', { fg = 'Yellow', ctermfg = 'Yellow', cterm = underline })
+vim.api.nvim_set_hl(0, 'DiagnosticDefaultWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
+vim.api.nvim_set_hl(0, 'DiagnosticSignWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { fg = 'Yellow', ctermfg = 'Yellow', cterm = underline })
 
 vim.api.nvim_set_hl(0, 'LspDiagnosticsDefaultInformation', { fg = 'White', ctermfg = 'White' })
 vim.api.nvim_set_hl(0, 'LspDiagnosticsVirtualTextInformation', { fg = 'White', ctermfg = 'White' })
 vim.api.nvim_set_hl(0, 'LspDiagnosticsSignInformation', { fg = 'White', ctermfg = 'White' })
 vim.api.nvim_set_hl(0, 'LspDiagnosticsUnderlineInformation', { fg = 'White', ctermfg = 'White', cterm = underline })
 
-vim.api.nvim_set_hl(0, 'DiagnosticDefaultInformation', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInformation', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignInformation', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineInformation', { fg = 'White', ctermfg = 'White', cterm = underline })
+vim.api.nvim_set_hl(0, 'DiagnosticDefaultInfo', { fg = 'White', ctermfg = 'White' })
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfo', { fg = 'White', ctermfg = 'White' })
+vim.api.nvim_set_hl(0, 'DiagnosticSignInfo', { fg = 'White', ctermfg = 'White' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { fg = 'White', ctermfg = 'White', cterm = underline })
 
 vim.api.nvim_set_hl(0, 'LspDiagnosticsDefaultHint', { fg = 'Gray', ctermfg = 'Gray' })
 vim.api.nvim_set_hl(0, 'LspDiagnosticsVirtualTextHint', { fg = 'Gray', ctermfg = 'Gray' })
@@ -53,8 +53,8 @@ vim.fn.sign_define('LspDiagnosticsSignInformation', { text = 'I', texthl = 'LspD
 vim.fn.sign_define('LspDiagnosticsSignHint', { text = 'H', texthl = 'LspDiagnosticsDefaultHint' })
 
 vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'LspDiagnosticsDefaultError' })
-vim.fn.sign_define('DiagnosticSignWarning', { text = 'W', texthl = 'LspDiagnosticsDefaultWarning' })
-vim.fn.sign_define('DiagnosticSignInformation', { text = 'I', texthl = 'LspDiagnosticsDefaultInformation' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = 'W', texthl = 'LspDiagnosticsDefaultWarning' })
+vim.fn.sign_define('DiagnosticSignInfo', { text = 'I', texthl = 'LspDiagnosticsDefaultInformation' })
 vim.fn.sign_define('DiagnosticSignHint', { text = 'H', texthl = 'LspDiagnosticsDefaultHint' })
 
 local function setup_client(name, config)
