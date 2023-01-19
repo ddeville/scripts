@@ -2,10 +2,6 @@
 
 A bunch of configs and scripts I use on every machine I set up. This repo is named `scripts` mostly for historical reasons.
 
-The install script used to be cross-platform and written in Python. I've since then decided that maintaining it was a
-pain and switched to simple shell scripts to do the original installation and more scripts to automate the updates later on.
-The legacy installer can still be found under `install/legacy`.
-
 ## Installation
 
 ### Arch Linux
