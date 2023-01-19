@@ -91,6 +91,9 @@ defaults write com.apple.dock wvous-tl-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 2
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
+defaults write com.apple.activitymonitor ShowCategory -int 100
+defaults write com.apple.activitymonitor UpdatePeriod -int 1
+
 defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
 
 # If you want very thin glyphs in Alacritty, although it might look a bit bad...
