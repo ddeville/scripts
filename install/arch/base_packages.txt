@@ -1,4 +1,5 @@
 # =============== Base ==============
+
 base-devel
 linux-headers
 pkg-config
@@ -16,6 +17,7 @@ xdg-user-dirs
 xdg-utils
 
 # ============ Networking ===========
+
 ethtool
 freerdp
 libvncserver
@@ -44,6 +46,7 @@ dnsutils
 nss-mdns
 
 # ============== Sound ==============
+
 alsa-utils
 pavucontrol
 pipewire
@@ -101,6 +104,7 @@ perf
 gdb
 
 # ========== Virtualization =========
+
 bridge-utils
 dmidecode
 dnsmasq
@@ -113,6 +117,7 @@ vde2
 
 
 # =============== X11 ===============
+
 lxappearance
 xf86-video-amdgpu
 xorg
@@ -146,6 +151,7 @@ remmina
 virt-manager
 
 # ============== Fonts ==============
+
 adobe-source-code-pro-fonts
 adobe-source-sans-fonts
 adobe-source-serif-fonts

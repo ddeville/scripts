@@ -1,4 +1,5 @@
 # ============= Regular =============
+
 1password
 1password-cli
 dropbox
@@ -11,6 +12,7 @@ spotify
 sysz
 
 # ====== Linters / Formatters =======
+
 buildifier-bin
 checkbashisms
 shellcheck
@@ -18,6 +20,7 @@ shfmt
 stylua
 
 # ============== Fonts ==============
+
 apple-fonts
 montserrat-ttf
 otf-public-sans
