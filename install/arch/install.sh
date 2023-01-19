@@ -88,8 +88,8 @@ chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
 # Setup the shell plugins
 sudo -u "$USERNAME"\
-  XDG_DATA_HOME=/home/$USERNAME/.local/share\
-  TMUX_PLUGIN_MANAGER_PATH=$XDG_DATA_HOME/tmux/plugins\
+  XDG_DATA_HOME="/home/$USERNAME/.local/share"\
+  TMUX_PLUGIN_MANAGER_PATH="/home/$USERNAME/.local/share/tmux/plugins"\
   -H sh -c "/home/$USERNAME/scripts/bin/common/.local/bin/update-shell-plugins"
 
 printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
