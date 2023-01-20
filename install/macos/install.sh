@@ -76,6 +76,21 @@ defaults write NSGlobalDomain NSAutomaticTextCompletionEnabled -bool false
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+defaults write NSGlobalDomain AppleAccentColor -int 3
+defaults write NSGlobalDomain AppleAquaColorVariant -int 1
+defaults write NSGlobalDomain AppleHighlightColor "0.752941 0.964706 0.678431 Green"
+defaults write NSGlobalDomain AppleInterfaceStyle "Dark"
+defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
+defaults write NSGlobalDomain AppleShowAllExtensions -int 1
+defaults write NSGlobalDomain ContextMenuGesture -int 0
+defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" "^\$d"
+
+defaults write com.apple.universalaccess closeViewSmoothImages -int 0
+defaults write com.apple.universalaccess closeViewScrollWheelToggle -int 1
+defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 262144
+defaults write com.apple.universalaccess closeViewHotkeysEnabled  -int 0
+defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled  -bool false
 
 defaults write com.apple.dock show-recents -int 0
 defaults write com.apple.dock autohide -int 1
