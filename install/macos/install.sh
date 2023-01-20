@@ -84,6 +84,7 @@ defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
 defaults write NSGlobalDomain AppleShowAllExtensions -int 1
 defaults write NSGlobalDomain ContextMenuGesture -int 0
 defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
+# shellcheck disable=SC2016
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
 
 defaults write com.apple.universalaccess closeViewSmoothImages -int 0
