@@ -51,6 +51,7 @@ font-anonymous-pro
 1password
 alacritty
 alfred4
+dropbox
 google-chrome
 homebrew/cask/dash
 istat-menus
