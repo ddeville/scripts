@@ -63,8 +63,8 @@ chflags nohidden "$HOME/Library"
 chflags hidden "$HOME/Applications"
 chflags hidden "$HOME/Public"
 
-defaults write com.apple.loginwindow TALLogoutSavesState -bool true
-
+# shellcheck disable=SC2016
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
@@ -84,8 +84,8 @@ defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
 defaults write NSGlobalDomain AppleShowAllExtensions -int 1
 defaults write NSGlobalDomain ContextMenuGesture -int 0
 defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
-# shellcheck disable=SC2016
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
+
+defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
 defaults write com.apple.universalaccess closeViewSmoothImages -int 0
 defaults write com.apple.universalaccess closeViewScrollWheelToggle -int 1
