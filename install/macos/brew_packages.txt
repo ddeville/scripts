@@ -52,6 +52,9 @@ font-anonymous-pro
 alacritty
 alfred4
 google-chrome
+homebrew/cask/dash
+istat-menus
 mos
+soundsource
 spotify
 stay
