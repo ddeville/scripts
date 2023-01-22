@@ -101,6 +101,7 @@ zoxide
 
 # =========== Development ===========
 
+checkbashisms
 cmake
 gdb
 go
@@ -111,6 +112,9 @@ perf
 pyenv
 python
 rustup
+shellcheck
+shfmt
+stylua
 
 # =============== X11 ===============
 
