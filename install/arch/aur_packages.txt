@@ -1,23 +1,19 @@
-# ============= Regular =============
+# =============== Shell =============
 
-1password
 1password-cli
-dropbox
+buildifier-bin
 dropbox-cli
 flamegraph
-google-chrome
-nautilus-dropbox
 pyenv-virtualenv
-spotify
 sysz
 
-# ====== Linters / Formatters =======
+# =========== X11 Programs ==========
 
-buildifier-bin
-checkbashisms
-shellcheck
-shfmt
-stylua
+1password
+dropbox
+google-chrome
+nautilus-dropbox
+spotify
 
 # ============== Fonts ==============
 

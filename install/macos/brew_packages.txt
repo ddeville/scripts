@@ -49,7 +49,6 @@ alacritty
 alfred4
 dropbox
 google-chrome
-homebrew/cask/dash
 istat-menus
 mos
 soundsource
