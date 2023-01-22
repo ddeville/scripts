@@ -1,8 +1,9 @@
-# ============= Regular =============
+# ============== Shell ==============
 
 bash
 bat
 curl
+dust
 exa
 fd
 fish
@@ -22,22 +23,16 @@ tmux
 vim
 zoxide
 
-# =========== Build Tools ===========
-
-cmake
-ninja
-
-# ============ Languages ============
-
-golang
-node
-pyenv
-pyenv-virtualenv
-
-# ======= Linters / Formatters ======
+# =========== Development ===========
 
 buildifier
 checkbashisms
+cmake
+golang
+ninja
+node
+pyenv
+pyenv-virtualenv
 shellcheck
 shfmt
 stylua
