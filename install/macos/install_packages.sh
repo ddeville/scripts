@@ -21,4 +21,4 @@ $brew tap homebrew/cask-versions
 $brew update
 
 readarray -t packages < <(grep -Ev "^\#|^\$" "$script_dir/brew_packages.txt")
-$brew install "${packages[@]}"
+$brew install --no-quarantine "${packages[@]}"
