@@ -24,6 +24,7 @@ add_to_path /opt/nvim/nightly/bin
 add_to_path /opt/lsp/bin
 
 # various user binaries
+add_to_path "$HOME/bin"
 add_to_path "$HOME/.local/bin"
 add_to_path "$CARGO_HOME/bin"
 add_to_path "$HOME/src/go/bin"
