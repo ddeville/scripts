@@ -25,6 +25,18 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: --check config/common/.config/nvim
+  sumneko:
+    # This runs `sumneko`: https://github.com/mrcjkb/lua-typecheck-action
+    name: Sumneko Lua
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Run Sumneko Lua
+      uses: mrcjkb/lua-typecheck-action@master
+      with:
+        directories: |
+          config/common/.config/nvim
   shellcheck:
     # This runs `shellcheck`: https://www.shellcheck.net
     name: Shell Check
