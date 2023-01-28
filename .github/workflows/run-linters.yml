@@ -37,6 +37,7 @@ jobs:
       with:
         directories: |
           config/common/.config/nvim
+        configpath: .luarc.json
   shellcheck:
     # This runs `shellcheck`: https://www.shellcheck.net
     name: Shell Check
