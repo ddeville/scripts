@@ -31,7 +31,7 @@ function azssh
     az ssh vm --ip $argv -- -o PubkeyAcceptedKeyTypes=+ssh-rsa-cert-v01@openssh.com
 end
 
-alias acrlogin "az login && az acr login -n openaiapiglobal --subscription api"
+alias acrlogin "rm -f $HOME/.azure/msal_token_cache.json && az login && az acr login -n openaiapiglobal --subscription api"
 
 # This function is used by the aliases created below
 function nicer_kubectl
