@@ -28,7 +28,7 @@ end
 function azssh
     # Usage: azssh <IP> for any VM IP with aadsshlogin enabled
     #  workaround https://github.com/Azure/azure-cli-extensions/issues/4026
-    az ssh vm --ip $argv -- -o PubkeyAcceptedKeyTypes=+ssh-rsa-cert-v01@openssh.com
+    az ssh vm --ip $argv[1] -- -o PubkeyAcceptedKeyTypes=+ssh-rsa-cert-v01@openssh.com $argv[2..-1]
 end
 
 alias acrlogin "rm -f $HOME/.azure/msal_token_cache.json && az login && az acr login -n openaiapiglobal --subscription api"
