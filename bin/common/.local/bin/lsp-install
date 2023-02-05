@@ -335,13 +335,6 @@ if [[ $# == 0 ]]; then
   exit 1
 fi
 
-install_all=false
-for arg; do
-  if [[ $arg == "all" ]]; then
-    install_all=true
-  fi
-done
-
 LSP_INSTALL_PATH="/opt/lsp"
 
 if [ ! -d $LSP_INSTALL_PATH ]; then
@@ -357,6 +350,13 @@ if [ ! -d $LSP_INSTALL_PATH ] || [ -f $LSP_INSTALL_PATH ] || [ ! -O $LSP_INSTALL
 fi
 
 mkdir -p "$LSP_INSTALL_PATH/bin"
+
+install_all=false
+for arg; do
+  if [[ $arg == "all" ]]; then
+    install_all=true
+  fi
+done
 
 pushd "$LSP_INSTALL_PATH" >/dev/null
 for arg; do
