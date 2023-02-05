@@ -73,7 +73,7 @@ function _clangd {
   fi
 
   version_url="https://api.github.com/repos/clangd/clangd/releases/latest"
-  version_name="$(curl $version_url | jq --raw-output '.name')"
+  version_name="$(curl -L $version_url | jq --raw-output '.name')"
   url="https://github.com/clangd/clangd/releases/download/$version_name/clangd-$platform_name-$version_name.zip"
 
   archive_path="clangd.zip"
@@ -244,7 +244,7 @@ function _terraformls {
   fi
 
   version_url="https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
-  version_name="$(curl $version_url | jq --raw-output '.name')"
+  version_name="$(curl -L $version_url | jq --raw-output '.name')"
   url="https://github.com/hashicorp/terraform-ls/releases/download/$version_name/terraform-ls_${version_name:1}_$platform_name.zip"
 
   archive_path="terraform-ls.zip"
@@ -294,8 +294,8 @@ function _sumneko_lua {
 
   # We assume that the first tag is the latest, an assumption that the GH API
   # also makes...
-  tags_url="https://api.github.com/repos/sumneko/lua-language-server/tags"
-  tag_name="$(curl $tags_url | jq --raw-output '.[0].name')"
+  tags_url="https://api.github.com/repos/LuaLS/lua-language-server/tags"
+  tag_name="$(curl -L $tags_url | jq --raw-output '.[0].name')"
 
   git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
 
