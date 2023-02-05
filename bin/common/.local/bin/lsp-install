@@ -131,7 +131,7 @@ function _tsserver {
   echo "Installing tsserver"
 
   if ! command -v npm &>/dev/null; then
-    echo "The tsserver language server requires Node to be installed"
+    echo "The tsserver language server requires Node and npm to be installed"
     exit 1
   fi
 
@@ -160,7 +160,7 @@ function _pyright {
   echo "Installing pyright"
 
   if ! command -v npm &>/dev/null; then
-    echo "The pyright language server requires Node to be installed"
+    echo "The pyright language server requires Node and npm to be installed"
     exit 1
   fi
 
@@ -189,7 +189,7 @@ function _yamlls {
   echo "Installing yaml-language-server"
 
   if ! command -v npm &>/dev/null; then
-    echo "The yaml language server requires Node to be installed"
+    echo "The yaml language server requires Node and npm to be installed"
     exit 1
   fi
 
