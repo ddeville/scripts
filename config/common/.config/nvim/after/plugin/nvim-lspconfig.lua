@@ -206,7 +206,7 @@ setup_client('sourcekit', {
   filetypes = { 'swift' },
 })
 
-setup_client('sumneko_lua', {
+setup_client('lua_ls', {
   cmd = { '/opt/lsp/bin/lua-language-server' },
   settings = {
     Lua = {

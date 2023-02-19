@@ -262,11 +262,11 @@ function _terraformls {
   ln -s "../$bin_path" "$linkname"
 }
 
-function _sumneko_lua {
-  echo "Installing sumneko_lua"
+function _luals {
+  echo "Installing lua-ls"
 
   if ! command -v ninja &>/dev/null; then
-    echo "The sumneko_lua language server requires Ninja to be installed"
+    echo "The lua-ls language server requires Ninja to be installed"
     exit 1
   fi
 
@@ -297,7 +297,7 @@ function _sumneko_lua {
   tags_url="https://api.github.com/repos/LuaLS/lua-language-server/tags"
   tag_name="$(curl -L $tags_url | jq --raw-output '.[0].name')"
 
-  git clone -b "$tag_name" "https://github.com/sumneko/lua-language-server.git"
+  git clone -b "$tag_name" "https://github.com/LuaLS/lua-language-server.git"
 
   pushd "lua-language-server" >/dev/null
 
@@ -331,7 +331,7 @@ if [[ $# == 0 ]]; then
   echo "  * pyright"
   echo "  * yamlls"
   echo "  * terraform-ls"
-  echo "  * sumneko_lua"
+  echo "  * lua-ls"
   exit 1
 fi
 
@@ -381,8 +381,8 @@ for arg; do
   if [[ $arg == "terraform-ls" ]] || $install_all; then
     _terraformls
   fi
-  if [[ $arg == "sumneko_lua" ]] || $install_all; then
-    _sumneko_lua
+  if [[ $arg == "lua-ls" ]] || $install_all; then
+    _luals
   fi
 done
 popd >/dev/null
