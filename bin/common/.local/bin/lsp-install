@@ -245,7 +245,7 @@ function _terraformls {
 
   version_url="https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
   version_name="$(curl -L $version_url | jq --raw-output '.name')"
-  url="https://github.com/hashicorp/terraform-ls/releases/download/$version_name/terraform-ls_${version_name:1}_$platform_name.zip"
+  url="https://releases.hashicorp.com/terraform-ls/${version_name:1}/terraform-ls_${version_name:1}_$platform_name.zip"
 
   archive_path="terraform-ls.zip"
   echo "Downloading $url to $archive_path"
