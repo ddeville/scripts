@@ -9,4 +9,8 @@ function oai_checkout_api_pins --description "Checkout whatever is the current v
     pushd "$code_dir/openai-python"
     git fetch && git checkout (cat "$manage_dir/openai-python.version")
     popd
+
+    pushd "$code_dir/whisper-internal"
+    git fetch && git checkout (cat "$manage_dir/whisper-internal.version")
+    popd
 end
