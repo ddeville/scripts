@@ -98,9 +98,9 @@ packer.startup({
     })
 
     -- Magic
-    use({
-      -- 'github/copilot.vim',
-    })
+    -- use({
+    -- 'github/copilot.vim',
+    -- })
 
     -- tpope
     use({
