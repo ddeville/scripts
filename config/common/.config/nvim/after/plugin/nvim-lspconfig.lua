@@ -199,7 +199,10 @@ setup_client('yamlls', {})
 
 setup_client('terraformls', {})
 
-setup_client('clangd', {})
+setup_client('clangd', {
+  -- Specifically omitting proto here
+  filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+})
 
 setup_client('sourcekit', {
   -- We use clangd for C/CPP/Objc
