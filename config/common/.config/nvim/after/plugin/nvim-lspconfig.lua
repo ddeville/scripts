@@ -62,6 +62,10 @@ local function setup_client(name, config)
     set_keymap('[g', vim.diagnostic.goto_prev)
     set_keymap(']g', vim.diagnostic.goto_next)
 
+    -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
+    -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
+    client.server_capabilities.semanticTokensProvider = nil
+
     -- Invoke the custom `on_attach` function for the client, if needed
     if custom_on_attach then
       custom_on_attach(client, bufnr)
