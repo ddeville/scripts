@@ -11,7 +11,6 @@ treesitter.setup({
     'fish',
     'go',
     'hcl',
-    'help',
     'html',
     'java',
     'javascript',
@@ -23,6 +22,7 @@ treesitter.setup({
     'toml',
     'typescript',
     'vim',
+    'vimdoc',
     'yaml',
   },
   highlight = {
