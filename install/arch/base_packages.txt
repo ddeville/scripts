@@ -162,7 +162,6 @@ vde2
 adobe-source-code-pro-fonts
 adobe-source-sans-fonts
 adobe-source-serif-fonts
-faenza-icon-theme
 gnu-free-fonts
 inter-font
 noto-fonts
