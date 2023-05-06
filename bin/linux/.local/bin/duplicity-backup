@@ -33,18 +33,18 @@ export PASSPHRASE
 # Note that earlier `include/exclude` "override" the ones that come after in the
 # command line arguments so we put the catch-all ones last.
 EXCLUDES=(
-  "--exclude ignorecase:/**/cache/**"
-  "--exclude ignorecase:/**/.cache/**"
-  "--exclude /home/damien/data"
-  "--exclude /dev"
-  "--exclude /mnt"
-  "--exclude /proc"
-  "--exclude /run"
-  "--exclude /sys"
-  "--exclude /tmp"
-  "--exclude /var/lock"
-  "--exclude /var/run"
-  "--exclude /var/tmp"
+  "--exclude=ignorecase:/**/cache/**"
+  "--exclude=ignorecase:/**/.cache/**"
+  "--exclude=/home/damien/data"
+  "--exclude=/dev"
+  "--exclude=/mnt"
+  "--exclude=/proc"
+  "--exclude=/run"
+  "--exclude=/sys"
+  "--exclude=/tmp"
+  "--exclude=/var/lock"
+  "--exclude=/var/run"
+  "--exclude=/var/tmp"
 )
 
 # Back up the entire system! Full backup every month, otherwise incremental.
