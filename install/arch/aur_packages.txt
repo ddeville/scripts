@@ -18,6 +18,7 @@ spotify
 # ============== Fonts ==============
 
 apple-fonts
+faenza-icon-theme
 montserrat-ttf
 otf-public-sans
 ttf-mac-fonts
