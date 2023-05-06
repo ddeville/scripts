@@ -5,7 +5,7 @@ window:
     lines: 0
   # Windows don't need decoration in bspwm
   decorations: none
-  decorations_theme_variant: dark
+  decorations_theme_variant: Dark
   dynamic_padding: true
   padding:
     x: 4
