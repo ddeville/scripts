@@ -25,7 +25,13 @@ switch "$KUBECONFIG"
         set -x KUBECONFIG "$API_KUBECONFIG:$CURRENT_KUBECONFIG"
 end
 
-alias acrlogin "rm -f $HOME/.azure/msal_token_cache.json && az login && az acr login -n openaiapiglobal --subscription api"
+function acrlogin
+    rm -f $HOME/.azure/msal_token_cache.json
+    rm -rf $HOME/.kube/cache/kubelogin/
+    az account clear
+    az login
+    az acr login -n openaiapiglobal --subscription api
+end
 
 # This function is used by the aliases created below
 function nicer_kubectl
