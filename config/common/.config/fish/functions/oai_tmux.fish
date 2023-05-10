@@ -20,12 +20,6 @@ function oai_tmux --description "Create OAI tmux sessions"
     command tmux new-window -t openai-py -n editor -d -c ~/code/openai-python
     command tmux send-keys -t openai-py:2 "nvim ." Enter
 
-    # The Terraform session
-    command tmux new-session -D -s terraform -d -c ~/code/terraform-config-api
-    command tmux rename-window -t terraform:1 repo
-    command tmux new-window -t terraform -n editor -d -c ~/code/terraform-config-api
-    command tmux send-keys -t terraform:2 "nvim ." Enter
-
     # The monorepo session
     command tmux new-session -D -s monorepo -d -c ~/code/openai
     command tmux rename-window -t monorepo:1 repo
