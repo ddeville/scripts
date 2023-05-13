@@ -53,8 +53,8 @@ vim.opt.number = true
 -- show the diagnostic ui where the number goes
 vim.opt.signcolumn = 'number'
 
--- display a column at 80 char
-vim.opt.colorcolumn = '80'
+-- display a column at 120 char
+vim.opt.colorcolumn = '120'
 
 -- highlight the current line
 vim.opt.cursorline = true
