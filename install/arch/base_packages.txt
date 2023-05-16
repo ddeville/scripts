@@ -152,6 +152,7 @@ dmidecode
 dnsmasq
 docker
 docker-buildx
+docker-compose
 libvirt
 ovmf
 qemu-desktop
