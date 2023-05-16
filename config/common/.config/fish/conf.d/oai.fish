@@ -64,3 +64,7 @@ if test -e $oia_script_path
         end
     end
 end
+
+function ak
+    applied kubectl $argv
+end
