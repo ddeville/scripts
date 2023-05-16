@@ -151,6 +151,7 @@ bridge-utils
 dmidecode
 dnsmasq
 docker
+docker-buildx
 libvirt
 ovmf
 qemu-desktop
