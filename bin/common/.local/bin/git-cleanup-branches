@@ -3,11 +3,11 @@
 git fetch --prune
 
 for branch in $(git branch -vv | grep -o -E '^[\* ]+\S+' | tr -d '* '); do
-    upstream=$(git rev-parse --abbrev-ref --symbolic-full-name ${branch}@{upstream} 2> /dev/null)
-    if [ -n "${upstream}" ]; then
-        if ! git show-ref --quiet refs/remotes/${upstream}; then
-            echo "Deleting branch '${branch}'"
-            git branch -D "${branch}"
-        fi
+  upstream=$(git rev-parse --abbrev-ref --symbolic-full-name "${branch}@{upstream}" 2>/dev/null)
+  if [ -n "${upstream}" ]; then
+    if ! git show-ref --quiet refs/remotes/"${upstream}"; then
+      echo "Deleting branch '${branch}'"
+      git branch -D "${branch}"
     fi
+  fi
 done
