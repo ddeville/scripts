@@ -72,7 +72,8 @@ sudo -u "$USERNAME" -H sh -c "rustup default stable"
 
 # Install Paru
 git clone --depth=1 https://aur.archlinux.org/paru.git "/home/$USERNAME/paru"
-sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru; makepkg -si; rm -rf /home/$USERNAME/paru;"
+sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru; makepkg -si"
+rm -rf "/home/$USERNAME/paru"
 
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
