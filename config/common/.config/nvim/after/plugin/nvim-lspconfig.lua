@@ -4,6 +4,8 @@ local fidget = require('fidget')
 
 local underline = { underline = true }
 
+vim.lsp.set_log_level('off')
+
 -- Diagnostics
 
 vim.diagnostic.config({
