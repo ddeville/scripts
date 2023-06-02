@@ -826,4 +826,3 @@ elif getattr(lldb, 'debugger', None):
     lldb.debugger.HandleCommand('command script add -f lldb.macosx.crashlog.Symbolicate crashlog')
     lldb.debugger.HandleCommand('command script add -f lldb.macosx.crashlog.save_crashlog save_crashlog')
     print '"crashlog" and "save_crashlog" command installed, use the "--help" option for detailed help'
-

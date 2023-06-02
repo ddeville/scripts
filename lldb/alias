@@ -9,4 +9,3 @@ command regex paw 's/(.+)/process attach --waitfor --name %1/'
 
 # pf $1 --> register read %1 --format float64
 command regex pf 's/(.+)/register read %1 --format float64 %1/'
-
