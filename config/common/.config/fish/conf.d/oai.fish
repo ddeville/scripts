@@ -65,6 +65,6 @@ if test -e $oia_script_path
     end
 end
 
-function ak
-    applied kubectl $argv
-end
+alias a applied
+alias appy applied
+alias ak "applied kubectl"
