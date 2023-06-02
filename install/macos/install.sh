@@ -28,7 +28,7 @@ fi
 export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 
 # We can now install all the packages
-"$SCRIPT_DIR"/install_packages
+"$SCRIPT_DIR"/install_packages.sh
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
