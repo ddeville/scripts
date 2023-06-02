@@ -47,7 +47,7 @@ function nicer_kubectl
     end
 end
 
-set -l oia_script_path "$API_REPO_PATH/manage/dev_setup/bash_or_zsh_rc"
+set -l oia_script_path "$API_REPO_PATH/devtools/bootstrap/bash_or_zsh_rc"
 
 # Read all the aliases from Bash and turn them into Fish aliases, ugh...
 if test -e $oia_script_path
