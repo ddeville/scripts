@@ -2,6 +2,7 @@ function oai_set_api_key --description "Load and set OpenAI API key"
     set config_path "$HOME/.config/openai/api_key.json"
 
     if test -e $config_path
+        # NOTE(perf): Using `jq` is slow and takes ~15ms for each `jq` command
         set -gx OPENAI_API_KEY (jq .OPENAI_API_KEY --raw-output $config_path)
         set -gx OPENAI_API_BASE (jq .OPENAI_API_BASE --raw-output $config_path)
     else

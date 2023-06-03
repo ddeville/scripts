@@ -2,6 +2,7 @@ function oai_buildbox_activate --description "Set the env variables necessary to
     set config_path "$HOME/.config/openai/buildbox/config.json"
 
     if test -e $config_path
+        # NOTE(perf): Using `jq` is slow and takes ~15ms for each `jq` command.
         set -gx DOCKER_HOST (jq .DOCKER_HOST --raw-output $config_path)
         set -gx DOCKER_TLS_VERIFY 1
         set -gx DOCKER_CERT_PATH (jq .DOCKER_CERT_PATH --raw-output $config_path)
