@@ -241,6 +241,8 @@ setup_client('lua_ls', {
   },
 })
 
+setup_client('bashls', {})
+
 -- Setup diagnostics
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
   signs = true,
