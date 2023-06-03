@@ -3,6 +3,6 @@ function base16_load_commands --description "Load the base16 commands to allow s
     if test -e $base16_path
         source $base16_path
     else
-        echo "Looks like base16 isn't install, run `update-shell-plugins`."
+        echo "Looks like base16 isn't installed, run `update-shell-plugins`."
     end
 end
