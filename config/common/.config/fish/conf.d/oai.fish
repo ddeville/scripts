@@ -7,23 +7,10 @@ end
 
 set -gx OPENAI_USER "$USER"
 set -gx API_REPO_PATH "$HOME/code/api"
+set -gx KUBECONFIG "$HOME/.kube/api_config"(set -q KUBECONFIG; and echo ":$KUBECONFIG"; or echo)
 
 oai_set_api_key silent
 oai_buildbox_activate silent
-
-# 1. Set `KUBECONFIG` to its default value if it wasn't set
-# 2. Prepend `API_KUBECONFIG` to it in all cases
-if set -q KUBECONFIG
-    set CURRENT_KUBECONFIG "$KUBECONFIG"
-else
-    set CURRENT_KUBECONFIG "$HOME/.kube/config"
-end
-set API_KUBECONFIG "$HOME/.kube/api_config"
-switch "$KUBECONFIG"
-    case "$API_KUBECONFIG:*"
-    case "*"
-        set -x KUBECONFIG "$API_KUBECONFIG:$CURRENT_KUBECONFIG"
-end
 
 function acrlogin
     rm -f $HOME/.azure/msal_token_cache.json
