@@ -93,7 +93,7 @@ vim.api.nvim_create_autocmd('InsertLeave', {
   command = [[match WhiteSpaceEOL /\s\+$/]],
 })
 
--- highlight on yan
+-- highlight on yank
 local highlight_ag = vim.api.nvim_create_augroup('HighlightOnYank', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_ag,
