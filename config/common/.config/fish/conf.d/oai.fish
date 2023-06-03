@@ -14,9 +14,7 @@ oai_buildbox_activate silent
 
 function acrlogin
     rm -f $HOME/.azure/msal_token_cache.json
-    rm -rf $HOME/.kube/cache/kubelogin/
-    az account clear
-    az login
+    az account clear && az login
     az acr login -n openaiapiglobal --subscription api
 end
 
