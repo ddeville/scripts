@@ -283,17 +283,7 @@ function _luals {
   mkdir "$foldername"
   pushd "$foldername" >/dev/null
 
-  if [ "$(uname)" = "Darwin" ]; then
-    ninja_file="macos.ninja"
-  elif [ "$(uname)" = "Linux" ]; then
-    ninja_file="linux.ninja"
-  else
-    echo "Unsupported platform: $(uname)"
-    exit 1
-  fi
-
-  # We assume that the first tag is the latest, an assumption that the GH API
-  # also makes...
+  # We assume that the first tag is the latest, an assumption that the GH API also makes...
   tags_url="https://api.github.com/repos/LuaLS/lua-language-server/tags"
   tag_name="$(curl -L $tags_url | jq --raw-output '.[0].name')"
 
@@ -304,7 +294,7 @@ function _luals {
   git submodule update --init --recursive
 
   pushd "3rd/luamake" >/dev/null
-  ninja -f compile/ninja/$ninja_file
+  ./compile/build.sh
   popd >/dev/null
 
   ./3rd/luamake/luamake rebuild
