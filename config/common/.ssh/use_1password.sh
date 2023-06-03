@@ -19,7 +19,6 @@
 #     managed by `launchd` on macos and whatever is used on random linux servers.
 #     Note that if we ever reach this point it is unlikely that SSH will work at all since we use `IdentityFile`
 #     all over the place in the config and agents that are not 1password (or forwarded) won't have those keys.
-#
 
 # First get the OpenSSH version since `IdentityAgent` was first introduced in 7.3
 ssh_ver=$(ssh -V 2>&1 | sed 's/,.*//; s/^OpenSSH_//; s/[^0123456789.].*//')
