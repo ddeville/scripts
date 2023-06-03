@@ -60,8 +60,12 @@ sudo mkdir -p /opt/1Password
 sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
 chflags nohidden "$HOME/Library"
-chflags hidden "$HOME/Applications"
-chflags hidden "$HOME/Public"
+if [[ -d "$HOME/Applications" ]]; then
+  chflags hidden "$HOME/Applications"
+fi
+if [[ -d "$HOME/Public" ]]; then
+  chflags hidden "$HOME/Public"
+fi
 
 # shellcheck disable=SC2016
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
@@ -110,7 +114,7 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.activitymonitor ShowCategory -int 100
 defaults write com.apple.activitymonitor UpdatePeriod -int 1
 
-defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
+# defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
 
 # If you want very thin glyphs in Alacritty, although it might look a bit bad...
 # defaults write org.alacritty AppleFontSmoothing -int 0
