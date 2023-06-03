@@ -12,7 +12,7 @@ set -gx KUBECONFIG "$HOME/.kube/api_config"(set -q KUBECONFIG; and echo ":$KUBEC
 oai_set_api_key silent
 oai_buildbox_activate silent
 
-function acrlogin
+function azlogin
     rm -f $HOME/.azure/msal_token_cache.json
     az account clear && az login
     az acr login -n openaiapiglobal --subscription api
