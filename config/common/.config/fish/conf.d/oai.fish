@@ -53,7 +53,11 @@ if test -e $oia_script_path
 end
 
 alias a applied
-alias appy applied
 alias ak "applied kubectl"
+alias ad "applied deploy"
+alias at "applied test"
+alias aa "applied autogen"
 
-source "$API_REPO_PATH/devtools/completions/applied_completions.fish"
+if test -e "$API_REPO_PATH/devtools/completions/applied_completions.fish"
+    source "$API_REPO_PATH/devtools/completions/applied_completions.fish"
+end
