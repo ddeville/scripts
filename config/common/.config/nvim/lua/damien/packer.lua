@@ -45,6 +45,7 @@ packer.startup({
     })
     use({
       'ckipp01/stylua-nvim',
+      'z0mbix/vim-shfmt',
     })
 
     -- Navigation
