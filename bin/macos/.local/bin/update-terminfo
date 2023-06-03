@@ -15,7 +15,6 @@ if [ -e /Applications/Alacritty.app/Contents/Resources/61/alacritty ]; then
   mkdir -p "$HOME"/.terminfo/61
   ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty "$HOME/.terminfo/61/alacritty"
   ln -s /Applications/Alacritty.app/Contents/Resources/61/alacritty-direct "$HOME/.terminfo/61/alacritty-direct"
-
 else
   echo "Alacritty is not installed, building terminfo"
   git clone --depth=1 https://github.com/alacritty/alacritty.git
