@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Run Stylua
-        uses: JohnnyMorganz/stylua-action@v2
+        uses: JohnnyMorganz/stylua-action@762d02aa393cd7c7f196feb932d16db1e5c5aa77  # v3.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
@@ -31,9 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
     - name: Run LuaLS
-      uses: mrcjkb/lua-typecheck-action@master
+      uses: mrcjkb/lua-typecheck-action@2221be331c202a50fdccbc9e4dd7001ca45e133a # v0.1.3
       with:
         directories: |
           config/common/.config/nvim
@@ -44,9 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # v2.0.0
         with:
           severity: style
   shfmt:
@@ -55,9 +55,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Run shfmt and checkbashisms
-        uses: luizm/action-sh-checker@master
+        uses: luizm/action-sh-checker@76ab0b22e1f194e4a582edc7969df6485c4e9246 # v0.7.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SHFMT_OPTS: --simplify --indent 2
@@ -71,15 +71,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Run fish_indent
-        uses: ddeville/fish-indent-action@master
+        uses: ddeville/fish-indent-action@f1c1ead425e5899a3f145668506c57c5e9dc627e # v0.2.0
   vint:
     # This runs `vint`: https://github.com/Vimjas/vint
     name: Vint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: vint
-        uses: ddeville/vint-action@master
+        uses: ddeville/vint-action@91d05b1f8f84702bf4cf9c25ec06811d9a8db267 # v0.1.0
