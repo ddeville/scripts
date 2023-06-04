@@ -18,7 +18,7 @@ icon_name=$(plutil -p $app_path/Contents/Info.plist | grep CFBundleIconFile | aw
 curl -L "https://www.dropbox.com/s/jrsj4vnd69995ox/Alacritty.icns" -o "$tmp_dir/$icon_name"
 mv "$tmp_dir/$icon_name" "$app_path/Contents/Resources/$icon_name"
 
-# Remove all xattr since it might interfere with codesign (specifically resource forks)
+# Remove all xattr since they might interfere with codesign (specifically resource forks).
 xattr -c "$app_path"
 
 # Retrieve the Developer ID certificate and password from 1Password and codesign the app.
@@ -27,7 +27,7 @@ cert_path="$tmp_dir/cert.p12"
 op document get "$op_cert_name" --out-file "$cert_path"
 rcodesign sign --p12-file "$cert_path" --p12-password "$cert_pass" --code-signature-flags runtime "$app_path"
 
-# Retrieve the iTunes Connect API key and notarize the app
+# Retrieve the iTunes Connect API key and notarize the app.
 api_key_path="$tmp_dir/api_key.json"
 op document get "$op_api_key_name" --out-file "$api_key_path"
 rcodesign notary-submit --api-key-path "$api_key_path" --wait --staple "$app_path"
