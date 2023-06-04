@@ -67,6 +67,8 @@ if [[ -d "$HOME/Public" ]]; then
   chflags hidden "$HOME/Public"
 fi
 
+spctl developer-mode enable-terminal
+
 # shellcheck disable=SC2016
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
