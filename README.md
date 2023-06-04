@@ -1,6 +1,6 @@
 # Scripts
 
-A bunch of configs and scripts I use on every machine I set up. This repo is named `scripts` mostly for historical reasons.
+A bunch of configs, tools and scripts I use on every machine I set up. This repo is named `scripts` mostly for historical reasons.
 
 ## Installation
 
