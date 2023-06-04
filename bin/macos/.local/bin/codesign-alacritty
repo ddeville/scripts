@@ -22,10 +22,10 @@ mv "$tmp_dir/$icon_name" "$app_path/Contents/Resources/$icon_name"
 xattr -c "$app_path"
 
 # Retrieve the Developer ID certificate and password from 1Password and codesign the app.
-passwd="$(op item get "$op_cert_name" --format json | jq -r '.fields[] | select(.label=="password") | .value')"
+cert_pass="$(op item get "$op_cert_name" --format json | jq -r '.fields[] | select(.label=="password") | .value')"
 cert_path="$tmp_dir/cert.p12"
 op document get "$op_cert_name" --out-file "$cert_path"
-rcodesign sign --p12-file "$cert_path" --p12-password "$passwd" --code-signature-flags runtime "$app_path"
+rcodesign sign --p12-file "$cert_path" --p12-password "$cert_pass" --code-signature-flags runtime "$app_path"
 
 # Retrieve the iTunes Connect API key and notarize the app
 api_key_path="$tmp_dir/api_key.json"
