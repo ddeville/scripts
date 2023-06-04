@@ -6,15 +6,18 @@ if ! command -v rcodesign &>/dev/null; then
   cargo install apple-codesign
 fi
 
-app_path="/Applications/Alacritty.app"
+orig_app_path="/Applications/Alacritty.app"
 op_cert_name="Apple Developer ID Certificate"
 op_api_key_name="iTunes Connect API Key"
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf $tmp_dir' EXIT
 
+app_path="$tmp_dir/Alacritty.app"
+cp -R "$orig_app_path" "$app_path"
+
 # Download the new icon and copy it to the app bundle.
-icon_name=$(plutil -p $app_path/Contents/Info.plist | grep CFBundleIconFile | awk -F '=>' '{print $2}' | tr -d ' "\n')
+icon_name="$(plutil -p "$app_path/Contents/Info.plist" | grep CFBundleIconFile | awk -F '=>' '{print $2}' | tr -d ' "\n')"
 curl -L "https://www.dropbox.com/s/jrsj4vnd69995ox/Alacritty.icns" -o "$tmp_dir/$icon_name"
 mv "$tmp_dir/$icon_name" "$app_path/Contents/Resources/$icon_name"
 
@@ -31,6 +34,11 @@ rcodesign sign --p12-file "$cert_path" --p12-password "$cert_pass" --code-signat
 api_key_path="$tmp_dir/api_key.json"
 op document get "$op_api_key_name" --out-file "$api_key_path"
 rcodesign notary-submit --api-key-path "$api_key_path" --wait --staple "$app_path"
+
+# Replace the original app with the new signed one
+mv "$orig_app_path" "${orig_app_path}.bak"
+mv "$app_path" "$orig_app_path"
+rm -rf "${orig_app_path}.bak"
 
 # Force refreshing the icon...
 touch "$app_path"
