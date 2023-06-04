@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -eu
+
+if ! command -v rcodesign &>/dev/null; then
+  cargo install apple-codesign
+fi
+
+app_path="/Applications/Alacritty.app"
+op_cert_name="Apple Developer ID Certificate"
+op_api_key_name="iTunes Connect API Key"
+
+tmp_dir="$(mktemp -d)"
+# trap 'rm -rf $tmp_dir' EXIT
+
+# Download the new icon and copy it to the app bundle.
+icon_name=$(plutil -p $app_path/Contents/Info.plist | grep CFBundleIconFile | awk -F '=>' '{print $2}' | tr -d ' "\n')
+curl -L "https://www.dropbox.com/s/jrsj4vnd69995ox/Alacritty.icns" -o "$tmp_dir/$icon_name"
+mv "$tmp_dir/$icon_name" "$app_path/Contents/Resources/$icon_name"
+
+# Retrieve the Developer ID certificate and password from 1Password and codesign the app.
+passwd="$(op item get "$op_cert_name" --format json | jq -r '.fields[] | select(.label=="password") | .value')"
+cert_path="$tmp_dir/cert.p12"
+op document get "$op_cert_name" --out-file "$cert_path"
+rcodesign sign --p12-file "$cert_path" --p12-password "$passwd" --code-signature-flags runtime "$app_path"
+
+# Retrieve the iTunes Connect API key and notarize the app
+api_key_path="$tmp_dir/api_key.json"
+op document get "$op_api_key_name" --out-file "$api_key_path"
+rcodesign notary-submit --api-key-path "$api_key_path" --wait --staple "$app_path"
+
+# Force refreshing the icon...
+touch "$app_path"
+/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister "$app_path"
+killall Finder
+killall Dock
