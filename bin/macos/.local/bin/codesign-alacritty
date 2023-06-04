@@ -34,6 +34,6 @@ rcodesign notary-submit --api-key-path "$api_key_path" --wait --staple "$app_pat
 
 # Force refreshing the icon...
 touch "$app_path"
-/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister "$app_path"
+/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f "$app_path"
 killall Finder
 killall Dock
