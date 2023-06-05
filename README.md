@@ -20,7 +20,7 @@ Run the `install/macos/install.sh` script.
     - `npm install -g neovim`
 - Install the various LSP servers by running `lsp-install`.
 - Rehash the `pyenv` shims by running `pyenv rehash shell` (and install latest python version).
-- On MacOS, give Alacritty Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools"
+- On MacOS, codesign Alacritty by running `codesign-alacritty` and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools"
 
 ## Maintenance
 
