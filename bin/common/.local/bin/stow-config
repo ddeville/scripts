@@ -9,9 +9,9 @@ elif [ "$(uname)" = "Darwin" ]; then
   DIRS+=(macos)
 fi
 
-# Private stuff
-if [ -d "$HOME/scripts-oai" ]; then
-  DIRS+=(oai)
+# OpenAI stuff
+if [ -d "$HOME/scripts-openai" ]; then
+  DIRS+=(openai)
 fi
 
 stow "${DIRS[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
