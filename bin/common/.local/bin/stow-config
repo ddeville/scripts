@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-DIRS=(common)
+dirs=(common)
 
 # Platform-specific stuff
-if [ "$(uname)" = "Linux" ]; then
-  DIRS+=(linux)
-elif [ "$(uname)" = "Darwin" ]; then
-  DIRS+=(macos)
+plat="$(uname)"
+if [ "$plat" = "Linux" ]; then
+  dirs+=(linux)
+elif [ "$plat" = "Darwin" ]; then
+  dirs+=(macos)
 fi
 
 # OpenAI stuff
 if [ -d "$HOME/scripts-openai" ]; then
-  DIRS+=(openai)
+  dirs+=(openai)
 fi
 
-stow "${DIRS[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
-stow "${DIRS[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
+stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
+stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
