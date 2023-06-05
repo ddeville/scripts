@@ -262,6 +262,35 @@ function _terraformls {
   ln -s "../$bin_path" "$linkname"
 }
 
+function _bashls {
+  echo "Installing bash-ls"
+
+  if ! command -v npm &>/dev/null; then
+    echo "The bash language server requires Node and npm to be installed"
+    exit 1
+  fi
+
+  foldername="_bashls"
+  linkname="bin/bash-language-server"
+
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
+
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
+
+  npm init -y --scope=lsp
+  npm install bash-language-server@latest
+
+  popd >/dev/null
+
+  ln -s "../$foldername/node_modules/.bin/bash-language-server" "$linkname"
+}
+
 function _luals {
   echo "Installing lua-ls"
 
@@ -312,35 +341,6 @@ function _luals {
   command ln -s "../$foldername/lua" "$linkname"
 }
 
-function _bashls {
-  echo "Installing bash-ls"
-
-  if ! command -v npm &>/dev/null; then
-    echo "The bash language server requires Node and npm to be installed"
-    exit 1
-  fi
-
-  foldername="_bashls"
-  linkname="bin/bash-language-server"
-
-  if [ -d "$foldername" ]; then
-    rm -rf "$foldername"
-  fi
-  if [ -L "$linkname" ]; then
-    rm "$linkname"
-  fi
-
-  mkdir "$foldername"
-  pushd "$foldername" >/dev/null
-
-  npm init -y --scope=lsp
-  npm install bash-language-server@latest
-
-  popd >/dev/null
-
-  ln -s "../$foldername/node_modules/.bin/bash-language-server" "$linkname"
-}
-
 if [[ $# == 0 ]]; then
   echo "Available servers:"
   echo "  * rust-analyzer"
@@ -350,8 +350,8 @@ if [[ $# == 0 ]]; then
   echo "  * pyright"
   echo "  * yamlls"
   echo "  * terraform-ls"
-  echo "  * lua-ls"
   echo "  * bash-ls"
+  echo "  * lua-ls"
   exit 1
 fi
 
@@ -401,11 +401,11 @@ for arg; do
   if [[ $arg == "terraform-ls" ]] || $install_all; then
     _terraformls
   fi
-  if [[ $arg == "lua-ls" ]] || $install_all; then
-    _luals
-  fi
   if [[ $arg == "bash-ls" ]] || $install_all; then
     _bashls
+  fi
+  if [[ $arg == "lua-ls" ]] || $install_all; then
+    _luals
   fi
 done
 popd >/dev/null
