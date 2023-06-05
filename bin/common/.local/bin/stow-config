@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
+DIRS=(common)
+
+# Platform-specific stuff
 if [ "$(uname)" = "Linux" ]; then
-  DIRS=(common linux)
+  DIRS+=(linux)
 elif [ "$(uname)" = "Darwin" ]; then
-  DIRS=(common macos)
-else
-  DIRS=(common)
+  DIRS+=(macos)
 fi
 
-if [ -d "$HOME/oai-damien-scripts" ]; then
-  DIRS+=('oai')
+# Private stuff
+if [ -d "$HOME/scripts-oai" ]; then
+  DIRS+=(oai)
 fi
 
 stow "${DIRS[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
