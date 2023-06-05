@@ -8,5 +8,9 @@ else
   DIRS=(common)
 fi
 
-stow "${DIRS[@]}" -d "$HOME/scripts/config" -t "$HOME" -v
-stow "${DIRS[@]}" -d "$HOME/scripts/bin" -t "$HOME" -v
+if [ -d "$HOME/oai-damien-scripts" ]; then
+  DIRS+=('oai')
+fi
+
+stow "${DIRS[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
+stow "${DIRS[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
