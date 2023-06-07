@@ -83,6 +83,7 @@ github-cli
 glances
 fish
 htop
+jless
 jq
 lazygit
 man-db

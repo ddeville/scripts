@@ -12,6 +12,7 @@ gh
 git
 htop
 koenbollen/public/jl
+jless
 jq
 lazygit
 neofetch
