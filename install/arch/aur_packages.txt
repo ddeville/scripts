@@ -4,6 +4,7 @@
 buildifier-bin
 dropbox-cli
 flamegraph
+jl
 pyenv-virtualenv
 sysz
 
