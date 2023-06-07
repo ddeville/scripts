@@ -11,6 +11,7 @@ fzf
 gh
 git
 htop
+koenbollen/public/jl
 jq
 lazygit
 neofetch
