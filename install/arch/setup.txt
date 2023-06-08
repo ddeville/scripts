@@ -31,7 +31,7 @@ genfstab -U /mnt >>/mnt/etc/fstab
 # move into new install
 arch-chroot /mnt
 
-# add `amdgpu` to `MODULES` (NOTE: assuming an AMD graphics card)
+# add `amdgpu` to `MODULES` (NOTE: assuming an AMD graphics card) and create the initial ramdisk
 vim /etc/mkinitcpio.conf
 mkinitcpio -p linux
 
@@ -40,11 +40,7 @@ mkinitcpio -p linux
 #   1. clone repo under `/scripts` and run `/scripts/install/arch/install.sh`
 #      (you can set `USERNAME` and `HOSTNAME` to override them before calling the script)
 #
-#   2. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
-#
-#   3. run `~/scripts/bin/common/.local/bin/update-shell-plugins` to install the shell plugins
-#
-#   4. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
+#   2. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
 #      update `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc`.
 
 # vi: ft=sh
