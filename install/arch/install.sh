@@ -8,8 +8,6 @@ set -eu
 
 # Setup time and locale
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-# TODO(damien): This needs systemd to be pid1 which isn't the case in an arch-chroot
-# timedatectl set-ntp true
 hwclock --systohc
 sed -i "/#en_US.UTF-8 UTF-8/s/#//" /etc/locale.gen
 locale-gen
@@ -47,6 +45,7 @@ pacman -S --needed "${base_packages[@]}"
 
 # Setup the systemd services
 systemctl enable NetworkManager
+systemctl enable systemd-timedated
 systemctl enable bluetooth
 systemctl enable sshd
 systemctl enable avahi-daemon
@@ -63,29 +62,11 @@ passwd "$USERNAME"
 mkdir -p /etc/sudoers.d
 echo "$USERNAME ALL=(ALL) ALL" >>"/etc/sudoers.d/$USERNAME"
 
-# Make fish the default shell
-sudo -u "$USERNAME" -H sh -c "chsh -s /usr/bin/fish"
-
-# Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
-sudo -u "$USERNAME" -H sh -c "rustup default stable"
-sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
-
-# Install Paru
-sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://aur.archlinux.org/paru.git /home/$USERNAME/paru"
-sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru && makepkg -si"
-rm -rf "/home/$USERNAME/paru"
-
-# Install the 1Password signing key that we will need to install the package
-sudo -u "$USERNAME" -H sh -c "curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import"
-
-# Install AUR packages with Paru
-readarray -t aur_packages < <(grep -Ev "^#|^$" "/scripts/install/arch/aur_packages.txt")
-sudo -u "$USERNAME" -H sh -c "/usr/bin/paru -Syy"
-sudo -u "$USERNAME" -H bash -c '/usr/bin/paru -S --needed "${@}"' _ "${aur_packages[@]}"
-
-# Move the scripts repo to the home directory
+# Move the scripts repo to the home directory and owned by the new user
 mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
-printf "\e[1;32m==> Done! Run su %f to start a new shell and run stow-config and update-shell-plugins.\n\n\e[0m" "$USERNAME"
+# Continue installation as the user
+sudo -u "$USERNAME" -H "/home/$USERNAME/install/arch/install_as_user.sh"
+
 printf "\e[1;32m==> Once done, type exit, umount -a and reboot.\n\e[0m"

@@ -2,8 +2,6 @@
 
 set -eu
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
   echo "Installing Xcode Commadn Line Tools"
@@ -28,7 +26,7 @@ fi
 export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 
 # We can now install all the packages
-"$SCRIPT_DIR"/install_packages.sh
+"$HOME/scripts/install/macos/install_packages.sh"
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
@@ -44,12 +42,17 @@ mkdir -p "$HOME/.local/share"
 
 export CARGO_HOME="$HOME/.local/share/cargo"
 export RUSTUP_HOME="$HOME/.local/share/rustup"
-/usr/bin/curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 "$HOME"/.local/share/cargo/bin/rustup default stable
 "$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 
 export PATH="$brew_path":$PATH
-"$SCRIPT_DIR"/../../bin/macos/.local/bin/update-terminfo
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME "$HOME/.local/state"
+export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
+"$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
+"$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
 mkdir -p "$HOME/.1password"
 ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
@@ -118,6 +121,7 @@ defaults write com.apple.activitymonitor UpdatePeriod -int 1
 # If you want very thin glyphs in Alacritty, although it might look a bit bad...
 # defaults write org.alacritty AppleFontSmoothing -int 0
 
+killall Finder
 killall Dock
 
-printf "\e[1;32m==> Done! Remember to run stow-config and update-shell-plugins.\n\e[0m"
+printf "\e[1;32m==> Done!\e[0m"
