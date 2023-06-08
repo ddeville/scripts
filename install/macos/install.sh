@@ -45,8 +45,8 @@ mkdir -p "$HOME/.local/share"
 export CARGO_HOME="$HOME/.local/share/cargo"
 export RUSTUP_HOME="$HOME/.local/share/rustup"
 /usr/bin/curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
-"$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 "$HOME"/.local/share/cargo/bin/rustup default stable
+"$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 
 export PATH="$brew_path":$PATH
 export XDG_DATA_HOME="$HOME/.local/share"
