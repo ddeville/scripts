@@ -8,7 +8,8 @@ set -eu
 
 # Setup time and locale
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-timedatectl set-ntp true
+# TODO(damien): This needs systemd to be pid1 which isn't the case in an arch-chroot
+# timedatectl set-ntp true
 hwclock --systohc
 sed -i "/#en_US.UTF-8 UTF-8/s/#//" /etc/locale.gen
 locale-gen
