@@ -64,19 +64,19 @@ mkdir -p /etc/sudoers.d
 echo "$USERNAME ALL=(ALL) ALL" >>"/etc/sudoers.d/$USERNAME"
 
 # Make fish the default shell
-sudo -u "$USERNAME" -H sh -c chsh -s /usr/bin/fish
+sudo -u "$USERNAME" -H sh -c "chsh -s /usr/bin/fish"
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
-sudo -u "$USERNAME" -H sh -c rustup default stable
-sudo -u "$USERNAME" -H sh -c rustup component add rust-src rustfmt clippy
+sudo -u "$USERNAME" -H sh -c "rustup default stable"
+sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
 
 # Install Paru
-sudo -u "$USERNAME" -H sh -c git clone --depth=1 https://aur.archlinux.org/paru.git "/home/$USERNAME/paru"
-sudo -u "$USERNAME" -H sh -c cd "/home/$USERNAME/paru" && makepkg -si
+sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://aur.archlinux.org/paru.git /home/$USERNAME/paru"
+sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru && makepkg -si"
 rm -rf "/home/$USERNAME/paru"
 
 # Install the 1Password signing key that we will need to install the package
-sudo -u "$USERNAME" -H sh -c curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
+sudo -u "$USERNAME" -H sh -c "curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import"
 
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
