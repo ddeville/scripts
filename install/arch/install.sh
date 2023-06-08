@@ -79,7 +79,7 @@ rm -rf "/home/$USERNAME/paru"
 sudo -u "$USERNAME" -H sh -c "curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import"
 
 # Install AUR packages with Paru
-readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
+readarray -t aur_packages < <(grep -Ev "^#|^$" "/scripts/install/arch/aur_packages.txt")
 sudo -u "$USERNAME" -H sh -c "/usr/bin/paru -Syy"
 sudo -u "$USERNAME" -H bash -c '/usr/bin/paru -S --needed "${@}"' _ "${aur_packages[@]}"
 
