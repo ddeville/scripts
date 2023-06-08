@@ -80,8 +80,8 @@ sudo -u "$USERNAME" -H sh -c "curl -sS https://downloads.1password.com/linux/key
 
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
-sudo -u "$USERNAME" -H sh -c /usr/bin/paru -Syy
-sudo -u "$USERNAME" -H sh -c /usr/bin/paru -S --needed "${aur_packages[@]}"
+sudo -u "$USERNAME" -H sh -c "/usr/bin/paru -Syy"
+sudo -u "$USERNAME" -H bash -c '/usr/bin/paru -S --needed "${@}"' _ "${aur_packages[@]}"
 
 # Move the scripts repo to the home directory
 mv /scripts "/home/$USERNAME/scripts"
