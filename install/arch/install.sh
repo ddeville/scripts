@@ -67,6 +67,6 @@ mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
 
 # Continue installation as the user
-sudo -u "$USERNAME" -H "/home/$USERNAME/install/arch/install_as_user.sh"
+sudo -u "$USERNAME" -H "/home/$USERNAME/scripts/install/arch/install_as_user.sh"
 
 printf "\e[1;32m==> Once done, type exit, umount -a and reboot.\n\e[0m"
