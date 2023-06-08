@@ -42,7 +42,9 @@ mkinitcpio -p linux
 #
 #   2. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
 #
-#   3. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
+#   3. run `~/scripts/bin/common/.local/bin/update-shell-plugins` to install the shell plugins
+#
+#   4. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
 #      update `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc`.
 
 # vi: ft=sh
