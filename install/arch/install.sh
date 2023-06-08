@@ -86,5 +86,6 @@ sudo -u "$USERNAME" -H sh -c /usr/bin/paru -S --needed "${aur_packages[@]}"
 # Move the scripts repo to the home directory
 mv /scripts "/home/$USERNAME/scripts"
 chown "$USERNAME":"$USERNAME" -R "/home/$USERNAME/scripts"
+#!/bin/bash
 
-printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\e[0m"
+printf "\e[1;32m==> Done! Type exit, umount -a and reboot.\n\nRemember to run stow-config and update-shell-plugins.\n\e[0m"
