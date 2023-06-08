@@ -1,3 +1,5 @@
+# NOTE: If installing in a VM in libvirt make sure to pick UEFI for "Firmware" under "Hypervisor Details".
+
 # to see available disks
 lsblk
 
