@@ -119,3 +119,5 @@ defaults write com.apple.activitymonitor UpdatePeriod -int 1
 # defaults write org.alacritty AppleFontSmoothing -int 0
 
 killall Dock
+
+printf "\e[1;32m==> Done! Remember to run stow-config and update-shell-plugins.\n\e[0m"
