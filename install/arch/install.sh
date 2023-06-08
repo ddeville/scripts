@@ -47,7 +47,6 @@ pacman -S --needed "${base_packages[@]}"
 # Setup the systemd services
 systemctl enable NetworkManager
 systemctl enable bluetooth
-systemctl enable cups.service
 systemctl enable sshd
 systemctl enable avahi-daemon
 systemctl enable fstrim.timer
@@ -67,18 +66,21 @@ echo "$USERNAME ALL=(ALL) ALL" >>"/etc/sudoers.d/$USERNAME"
 sudo -u "$USERNAME" -H sh -c "chsh -s /usr/bin/fish"
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually.
-sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
 sudo -u "$USERNAME" -H sh -c "rustup default stable"
+sudo -u "$USERNAME" -H sh -c "rustup component add rust-src rustfmt clippy"
 
 # Install Paru
-git clone --depth=1 https://aur.archlinux.org/paru.git "/home/$USERNAME/paru"
+sudo -u "$USERNAME" -H sh -c "git clone --depth=1 https://aur.archlinux.org/paru.git /home/$USERNAME/paru"
 sudo -u "$USERNAME" -H sh -c "cd /home/$USERNAME/paru; makepkg -si"
 rm -rf "/home/$USERNAME/paru"
 
+# Install the 1Password signing key that we will need to install the package
+sudo -u "$USERNAME" -H sh -c "curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import"
+
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/aur_packages.txt")
-/usr/bin/paru -Syy
-/usr/bin/paru -S --needed "${aur_packages[@]}"
+sudo -u "$USERNAME" -H sh -c "/usr/bin/paru -Syy"
+sudo -u "$USERNAME" -H sh -c "/usr/bin/paru -S --needed " "${aur_packages[@]}"
 
 # Move the scripts repo to the home directory
 mv /scripts "/home/$USERNAME/scripts"
