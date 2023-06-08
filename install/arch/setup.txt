@@ -37,14 +37,12 @@ mkinitcpio -p linux
 
 # next steps:
 #
-#   1. Exit chroot and reboot system
-#
-#   2. clone repo under `/scripts` and run `/scripts/install/arch/install.sh`
+#   1. clone repo under `/scripts` and run `/scripts/install/arch/install.sh`
 #      (you can set `USERNAME` and `HOSTNAME` to override them before calling the script)
 #
-#   3. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
+#   2. run `~/scripts/bin/common/.local/bin/stow-config` to link all config files
 #
-#   4. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
+#   3. if the machine needs extra setup (display size, polybar settings, etc...), make sure to
 #      update `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc`.
 
 # vi: ft=sh
