@@ -14,8 +14,6 @@ Run the `install/macos/install.sh` script.
 
 ## Post-installation
 
-- Stow the various config files by running `bin/stow-config`.
-- Install the shell plugins by running `update-shell-plugins`.
 - Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
     - `python3 -m pip install --upgrade pynvim`
     - `npm install -g neovim`
