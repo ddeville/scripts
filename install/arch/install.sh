@@ -25,9 +25,11 @@ passwd
 
 # Setup pacman mirrors (can be changed to something closer if not in the bay area)
 cat <<EOT >/etc/pacman.d/mirrorlist
+Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
 Server = https://mirrors.sonic.net/archlinux/\$repo/os/\$arch
 Server = https://mirrors.ocf.berkeley.edu/archlinux/\$repo/os/\$arch
-Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
+Server = https://arch.hu.fo/archlinux/\$repo/os/\$arch
+Server = https://mirror.hackingand.coffee/arch/\$repo/os/\$arch
 Server = https://mirrors.mit.edu/archlinux/\$repo/os/\$arch
 EOT
 
