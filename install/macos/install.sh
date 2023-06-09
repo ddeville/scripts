@@ -51,11 +51,18 @@ fi
 "$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 
 export PATH="$brew_path":$PATH
+
+# Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
+# configs that might have been created and that would prevent stow from completing successfully)
+rm -f "$HOME/.bashrc" "$HOME/.profile"
+scripts/bin/common/.local/bin/stow-config
+
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
+
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
 mkdir -p "$HOME/.1password"

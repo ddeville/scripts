@@ -33,10 +33,9 @@ readarray -t aur_packages < <(grep -Ev "^#|^$" "scripts/install/arch/aur_package
 paru -Syy
 paru -S --needed "${aur_packages[@]}"
 
-# These might have been created and they will prevent stow from completing successfully
+# Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
+# configs that might have been created and that would prevent stow from completing successfully)
 rm -f .bashrc .profile
-
-# Run stow to put all the configs and bins in the right place
 scripts/bin/common/.local/bin/stow-config
 
 # Setup the shell plugins
