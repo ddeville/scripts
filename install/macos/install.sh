@@ -66,9 +66,9 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
 mkdir -p "$HOME/.1password"
-ln -s "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
+ln -fs "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
 sudo mkdir -p /opt/1Password
-sudo ln -s "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
+sudo ln -fs "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
 chflags nohidden "$HOME/Library"
 if [[ -d "$HOME/Applications" ]]; then
@@ -104,12 +104,6 @@ defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
-defaults write com.apple.universalaccess closeViewSmoothImages -int 0
-defaults write com.apple.universalaccess closeViewScrollWheelToggle -int 1
-defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 262144
-defaults write com.apple.universalaccess closeViewHotkeysEnabled -int 0
-defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bool false
-
 defaults write com.apple.dock show-recents -int 0
 defaults write com.apple.dock autohide -int 1
 defaults write com.apple.dock magnification -int 0
@@ -126,6 +120,13 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 
 defaults write com.apple.activitymonitor ShowCategory -int 100
 defaults write com.apple.activitymonitor UpdatePeriod -int 1
+
+# Writing the following will not work unless Terminal/Alacritty is given Full Disk Access...
+defaults write com.apple.universalaccess closeViewSmoothImages -int 0
+defaults write com.apple.universalaccess closeViewScrollWheelToggle -int 1
+defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 262144
+defaults write com.apple.universalaccess closeViewHotkeysEnabled -int 0
+defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bool false
 
 # defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
 
