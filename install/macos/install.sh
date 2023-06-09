@@ -35,14 +35,18 @@ else
   brew_path=/usr/local/bin
 fi
 
-sudo sh -c "echo $brew_path/fish >> /etc/shells"
+if ! grep -q "$brew_path/fish" /etc/shells; then
+  sudo sh -c "echo $brew_path/fish >> /etc/shells"
+fi
 chsh -s $brew_path/fish
 
 mkdir -p "$HOME/.local/share"
 
-export CARGO_HOME="$HOME/.local/share/cargo"
-export RUSTUP_HOME="$HOME/.local/share/rustup"
-curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+if ! command -v rustup &>/dev/null; then
+  export CARGO_HOME="$HOME/.local/share/cargo"
+  export RUSTUP_HOME="$HOME/.local/share/rustup"
+  curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+fi
 "$HOME"/.local/share/cargo/bin/rustup default stable
 "$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
 
