@@ -20,5 +20,5 @@ $brew tap homebrew/cask-fonts
 $brew tap homebrew/cask-versions
 $brew update
 
-readarray -t packages < <(grep -Ev "^\#|^\$" "$script_dir/brew_packages.txt")
+readarray -t packages < <(grep -Ev "^#|^$" "$script_dir/brew_packages.txt")
 $brew install --no-quarantine "${packages[@]}"
