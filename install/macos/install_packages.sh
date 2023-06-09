@@ -20,7 +20,7 @@ $brew tap homebrew/cask-fonts
 $brew tap homebrew/cask-versions
 $brew update
 
-# NOTE: `readarray` is available on bash 4.0+ but macos uses an old 3.2 version of bash...
+# NOTE: `readarray` is available in bash 4.0+ but macos uses an old 3.2 version of bash...
 packages=()
 while IFS= read -r line; do
   [[ ! $line =~ ^#|^$ ]] && packages+=("$line")
