@@ -14,7 +14,7 @@ if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
 		     sed -e 's/^ *Label: //' -e 's/^ *//' |
 		     sort -V |
 		     tail -n1"
-  clt_label="$(chomp "$(/bin/bash -c "$clt_label_command")")"
+  clt_label="$(/bin/bash -c "$clt_label_command")"
   if [[ -n $clt_label ]]; then
     echo "Installing $clt_label"
     sudo "/usr/sbin/softwareupdate" "-i" "$clt_label"
