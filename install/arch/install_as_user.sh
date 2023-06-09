@@ -17,11 +17,13 @@ rustup default stable
 rustup component add rust-src rustfmt clippy
 
 # Install Paru
-git clone --depth=1 https://aur.archlinux.org/paru.git paru
-pushd paru || exit 1
-makepkg -si
-popd || exit 1
-rm -rf paru
+if ! command -v paru &>/dev/null; then
+  git clone --depth=1 https://aur.archlinux.org/paru.git paru
+  pushd paru || exit 1
+  makepkg -si
+  popd || exit 1
+  rm -rf paru
+fi
 
 # Install the 1Password signing key that we will need to install the package
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
