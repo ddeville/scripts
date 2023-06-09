@@ -10,7 +10,7 @@ Follow the instructions in `install/arch/setup.txt` to kick off the installation
 
 ### MacOS
 
-Run the `install/macos/install.sh` script.
+Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 
 ## Post-installation
 

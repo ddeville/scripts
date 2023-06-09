@@ -136,4 +136,4 @@ defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bo
 killall Finder
 killall Dock
 
-printf "\e[1;32m==> Done!\e[0m"
+printf "\e[1;32m==> Done! You should now reboot.\n\e[0m"
