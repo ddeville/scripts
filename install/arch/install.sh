@@ -39,7 +39,7 @@ grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Install all the base packages
-readarray -t base_packages < <(grep -Ev "^\#|^\$" "/scripts/install/arch/base_packages.txt")
+readarray -t base_packages < <(grep -Ev "^#|^$" "/scripts/install/arch/base_packages.txt")
 pacman -Syy
 pacman -S --needed "${base_packages[@]}"
 
