@@ -53,7 +53,7 @@ fi
 export PATH="$brew_path":$PATH
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME "$HOME/.local/state"
+export XDG_STATE_HOME="$HOME/.local/state"
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
