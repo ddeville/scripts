@@ -20,5 +20,10 @@ $brew tap homebrew/cask-fonts
 $brew tap homebrew/cask-versions
 $brew update
 
-readarray -t packages < <(grep -Ev "^#|^$" "$script_dir/brew_packages.txt")
+# NOTE: `readarray` is available on bash 4.0+ but macos uses an old 3.2 version of bash...
+packages=()
+while IFS= read -r line; do
+  [[ ! $line =~ ^#|^$ ]] && packages+=("$line")
+done <"$script_dir/brew_packages.txt"
+
 $brew install --no-quarantine "${packages[@]}"
