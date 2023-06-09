@@ -31,7 +31,7 @@ curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
 # Install AUR packages with Paru
 readarray -t aur_packages < <(grep -Ev "^#|^$" "scripts/install/arch/aur_packages.txt")
 paru -Syy
-paru -S --needed "${aur_packages[@]}"
+paru -S --needed "${aur_packages[@]}" || true # we don't want to fail the whole install if a package is broken
 
 # Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
 # configs that might have been created and that would prevent stow from completing successfully)
