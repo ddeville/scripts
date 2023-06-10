@@ -11,9 +11,7 @@
 [gpg]
     format = ssh
 [gpg "ssh"]
-    # NOTE: If on macos, remember to symlink "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-    #       to `/opt/1Password/op-ssh-sign`.
-    program = /opt/1Password/op-ssh-sign
+    program = op-git-ssh-sign
     allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
     gpgsign = true
