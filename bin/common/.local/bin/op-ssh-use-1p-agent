@@ -46,4 +46,4 @@ if [ -n "$TMUX" ]; then
 fi
 
 # Only use 1p if the socket exists (either as a socket or a symlink to one).
-[ -e ~/.1password/agent.sock ] && exit 0 || exit 1
+[ -e "$HOME/.1password/agent.sock" ] && exit 0 || exit 1
