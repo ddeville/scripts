@@ -2,11 +2,12 @@
 
 set -eu
 
+app_path="${1:-/Applications/Alacritty.app}"
+
 if ! command -v rcodesign &>/dev/null; then
   cargo install apple-codesign
 fi
 
-app_path="/Applications/Alacritty.app"
 op_cert_name="Apple Developer ID Certificate"
 op_api_key_name="iTunes Connect API Key"
 
