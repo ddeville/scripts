@@ -58,11 +58,10 @@ packer.startup({
     -- LSP
     use({
       'neovim/nvim-lspconfig',
-      requires = {
-        'kosayoda/nvim-lightbulb',
-        'j-hui/fidget.nvim',
-      },
+      'kosayoda/nvim-lightbulb',
     })
+    -- TODO(damien): Remove legacy tag once new version has been released https://github.com/j-hui/fidget.nvim
+    use({ 'j-hui/fidget.nvim', tag = 'legacy' })
 
     -- Autocompletion
     use({
