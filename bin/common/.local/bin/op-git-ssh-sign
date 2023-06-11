@@ -16,7 +16,7 @@ fi
 # *only* if both SSH_AUTH_SOCK and SSH_TTY are set.
 # (see https://1password.community/discussion/comment/687388/#Comment_687388).
 #
-# Note that it doesn't actually seem to matter what value is set to, it just needs to be set.
+# Note that it doesn't actually seem to matter what value it is set to, it just needs to be set.
 
 if [[ -n $TMUX && -z $SSH_TTY && -S $SSH_AUTH_SOCK ]]; then
   SSH_TTY=/dev/op-tmux-over-ssh $op_ssh_sign_path "$@"
