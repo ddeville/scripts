@@ -9,7 +9,7 @@ bspc config gapless_monocle false
 
 if [[ $(hostname) == "arch" ]]; then
   bspc monitor DisplayPort-0 -d web media work zoom vnc flt
-  bspc monitor DisplayPort-1 -d code work-code devbox a
+  bspc monitor DisplayPort-1 -d code work-code a
 else
   bspc monitor -d web code media flt a b c
 fi
