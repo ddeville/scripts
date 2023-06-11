@@ -4,7 +4,7 @@ set -eu
 
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
-  echo "Installing Xcode Commadn Line Tools"
+  echo "Installing Xcode Command Line Tools"
   # This temporary file prompts the 'softwareupdate' utility to list the Command Line Tools
   clt_placeholder="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
   sudo touch "$clt_placeholder"
