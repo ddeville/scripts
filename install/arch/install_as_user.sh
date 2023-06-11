@@ -44,3 +44,8 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 scripts/bin/common/.local/bin/update-shell-plugins
+
+# Make sure that the origin remote on the scripts repo is set to use ssh
+if [ "$(git -C "$HOME/scripts" remote get-url origin 2>/dev/null)" != "git@github.com:ddeville/scripts.git" ]; then
+  git -C "$HOME/scripts" remote set-url origin "git@github.com:ddeville/scripts.git"
+fi
