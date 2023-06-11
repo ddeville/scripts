@@ -122,8 +122,6 @@ defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 2
 defaults write com.apple.universalaccess closeViewHotkeysEnabled -int 0
 defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bool false
 
-# defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/scripts/macos/iterm"
-
 # If you want very thin glyphs in Alacritty, although it might look a bit bad...
 # defaults write org.alacritty AppleFontSmoothing -int 0
 
