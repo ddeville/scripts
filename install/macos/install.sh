@@ -122,8 +122,8 @@ defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 2
 defaults write com.apple.universalaccess closeViewHotkeysEnabled -int 0
 defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bool false
 
-# If you want very thin glyphs in Alacritty, although it might look a bit bad...
-# defaults write org.alacritty AppleFontSmoothing -int 0
+# Set thin glyphs/strokes in Alacritty
+defaults write org.alacritty AppleFontSmoothing -int 0
 
 # If `scripts` was downloaded as an archive, clone the git repo instead
 if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
