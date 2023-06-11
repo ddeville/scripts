@@ -127,6 +127,20 @@ defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bo
 # If you want very thin glyphs in Alacritty, although it might look a bit bad...
 # defaults write org.alacritty AppleFontSmoothing -int 0
 
+# If `scripts` was downloaded as an archive, clone the git repo instead
+if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
+  tmp_dir=$(mktemp -d)
+  git clone "https://github.com/ddeville/scripts.git" "$tmp_dir/scripts"
+  mv "$HOME/scripts" "$tmp_dir/scripts.bak"
+  mv "$tmp_dir/scripts" "$HOME/scripts"
+  rm -rf "$tmp_dir"
+fi
+
+# Make sure that the origin remote is set to use ssh
+if [ "$(git -C "$HOME/scripts" remote get-url origin 2>/dev/null)" != "git@github.com:ddeville/scripts.git" ]; then
+  git -C "$HOME/scripts" remote set-url origin "git@github.com:ddeville/scripts.git"
+fi
+
 killall Finder
 killall Dock
 
