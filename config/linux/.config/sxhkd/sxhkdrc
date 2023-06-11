@@ -14,7 +14,6 @@ super + d
 ctrl + @space
 	rofi -show drun -m -1
 
-
 super + shift + d
 	slock & sleep 0.5 && xset dpms force off
 
