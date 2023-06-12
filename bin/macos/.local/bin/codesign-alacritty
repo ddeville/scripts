@@ -8,7 +8,7 @@ if ! command -v rcodesign &>/dev/null; then
   cargo install apple-codesign
 fi
 
-op_cert_name="Apple Developer ID Certificate"
+op_cert_name="Apple Developer ID Application Certificate"
 op_api_key_name="iTunes Connect API Key"
 
 tmp_dir="$(mktemp -d)"
