@@ -35,6 +35,15 @@ if [ -n "$TMUX" ]; then
   # `tmux show-environment SSH_CONNECTION` outputs the following:
   #   - `-SSH_CONNECTION` when the variable is not set
   #   - `SSH_CONNECTION=192.168.101.24 49370 192.168.101.26 22` when it is set
+  #   NOTE: There are corner cases where this will not work. Consider this:
+  #     1. Client A is attached to tmux session
+  #     2. Client B connects to client A over SSH and attaches tmux (without detaching client A)
+  #     3. `tmux show-environment SSH_CONNECTION` will now show the info from client B's connection
+  #     4. Client B detaches and closes the SSH connection
+  #     5. Client A attempts to push commit to a git remote, this branch will be taken since tmux still has the value
+  #        of `SSH_CONNECTION` that was set by client B.
+  #     6. This fails because there isn't actually a remote ssh-agent connected and we're not using the 1Password agent
+  #     7. The solution here is for client A to detach and re-attach tmux to pick up the new environment variable...
   if [[ $(tmux show-environment SSH_CONNECTION) == *=* ]]; then
     exit 1
   fi
