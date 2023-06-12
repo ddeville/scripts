@@ -5,7 +5,9 @@ set -eu
 app_path="${1:-/Applications/Alacritty.app}"
 
 if ! command -v rcodesign &>/dev/null; then
-  cargo install apple-codesign
+  # Pinned to a specific version to not randomly break but it should be updated frequently to keep compatibility
+  # with whatever Apple's codesign requirements are...
+  cargo install apple-codesign --version 0.22.0
 fi
 
 op_cert_name="Apple Developer ID Application Certificate"
