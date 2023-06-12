@@ -30,17 +30,17 @@ elif [ "$ssh_major" -eq "7" ] && [ "$ssh_minor" -lt "3" ]; then
   exit 1
 fi
 
-# If we're over an active SSH connection we shouldn't use the local 1p agent.
-if [ -n "$SSH_CONNECTION" ]; then
-  exit 1
-fi
-
 # If we're in tmux and attached from a shell that has an active SSH connection we shouldn't use the local 1p agent.
 if [ -n "$TMUX" ]; then
   # `tmux show-environment SSH_CONNECTION` outputs the following:
   #   - `-SSH_CONNECTION` when the variable is not set
   #   - `SSH_CONNECTION=192.168.101.24 49370 192.168.101.26 22` when it is set
   if [[ $(tmux show-environment SSH_CONNECTION) == *=* ]]; then
+    exit 1
+  fi
+else
+  # If we're over an active SSH connection we shouldn't use the local 1p agent.
+  if [ -n "$SSH_CONNECTION" ]; then
     exit 1
   fi
 fi
