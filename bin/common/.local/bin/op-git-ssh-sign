@@ -19,7 +19,7 @@ fi
 # Note that it doesn't actually seem to matter what value it is set to, it just needs to be set.
 
 if [[ -n $TMUX && -z $SSH_TTY && -S $SSH_AUTH_SOCK ]] && [[ $(tmux show-environment SSH_CONNECTION) == *=* ]]; then
-  SSH_TTY=/dev/op-tmux-over-ssh $op_ssh_sign_path "$@"
+  exec env SSH_TTY=/dev/op-tmux-over-ssh $op_ssh_sign_path "$@"
 else
-  $op_ssh_sign_path "$@"
+  exec $op_ssh_sign_path "$@"
 fi
