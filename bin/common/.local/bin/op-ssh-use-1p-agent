@@ -36,8 +36,8 @@ if [ -n "$TMUX" ]; then
   #   - `-SSH_CONNECTION` when the variable is not set
   #   - `SSH_CONNECTION=192.168.101.24 49370 192.168.101.26 22` when it is set
   #   NOTE: There are corner cases where this will not work. Consider this:
-  #     1. Client A is attached to tmux session
-  #     2. Client B connects to client A over SSH and attaches tmux (without detaching client A)
+  #     1. Client A is attached to local tmux session
+  #     2. Client B connects to client A over SSH and attaches to tmux session (without detaching client A)
   #     3. `tmux show-environment SSH_CONNECTION` will now show the info from client B's connection
   #     4. Client B detaches and closes the SSH connection
   #     5. Client A attempts to push commit to a git remote, this branch will be taken since tmux still has the value
