@@ -29,6 +29,9 @@ end
 
 # application specific env variables to enforce XDG
 
+# readline
+set -x INPUTRC "$XDG_CONFIG_HOME/readline/inputrc"
+
 # python
 set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
