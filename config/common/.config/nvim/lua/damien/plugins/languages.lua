@@ -5,6 +5,7 @@ return {
   'tmux-plugins/vim-tmux',
   {
     'fatih/vim-go',
+    ft = 'go',
     config = function()
       -- we use nvim-lsp instead
       vim.g.go_gopls_enabled = 0
@@ -19,6 +20,7 @@ return {
   },
   {
     'rust-lang/rust.vim',
+    ft = 'rust',
     config = function()
       vim.g.rustfmt_autosave = 1
       vim.g.rustfmt_emit_files = 1

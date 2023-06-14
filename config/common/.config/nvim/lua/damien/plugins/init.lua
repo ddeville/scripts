@@ -1,37 +1,6 @@
 return {
   { 'folke/lazy.nvim', tag = 'stable' },
 
-  -- Appearance
-  'tinted-theming/base16-vim',
-  'itchyny/lightline.vim',
-  'ddeville/vim-base16-lightline',
-  'mhinz/vim-startify',
-
-  -- Languages
-  'dag/vim-fish',
-  'fatih/vim-go',
-  'rust-lang/rust.vim',
-  'hashivim/vim-terraform',
-  'baskerville/vim-sxhkdrc',
-  'tmux-plugins/vim-tmux',
-
-  -- Code formatters
-  'ckipp01/stylua-nvim',
-  'z0mbix/vim-shfmt',
-  {
-    'google/vim-codefmt', -- used for Starlark
-    enabled = false, -- quite slow to load, disable until I actually use bazel again...
-    dependencies = {
-      'google/vim-maktaba',
-      'google/vim-glaive',
-    },
-  },
-
-  -- Navigation
-  'mhinz/vim-grepper',
-  'mattesgroeger/vim-bookmarks',
-  'ddeville/telescope-vim-bookmarks.nvim',
-
   -- LSP
   {
     'neovim/nvim-lspconfig',
@@ -83,7 +52,4 @@ return {
       return vim.fn.executable('cmake') == 1
     end,
   },
-
-  -- Magic
-  { 'github/copilot.vim', enabled = false },
 }
