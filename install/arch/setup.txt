@@ -23,7 +23,7 @@ mkdir -p /mnt/boot/efi
 mount /dev/XXX1 /mnt/boot/efi
 
 # to install arch (NOTE: switch `amd-ucode` with `intel-ucode` if installing on intel)
-pacstrap /mnt base linux linux-firmware amd-ucode git vim grep
+pacstrap /mnt base base-devel linux linux-firmware amd-ucode git vim
 
 # to create file system table
 genfstab -U /mnt >>/mnt/etc/fstab
