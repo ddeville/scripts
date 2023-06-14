@@ -23,10 +23,7 @@ return {
       vim.g.go_imports_mode = 'gopls'
     end,
   },
-  {
-    'dag/vim-fish',
-    ft = 'fish',
-  },
+  { 'dag/vim-fish', ft = 'fish' },
   { 'hashivim/vim-terraform', ft = 'terraform' },
   { 'baskerville/vim-sxhkdrc', ft = 'sxhkdrc' },
   { 'tmux-plugins/vim-tmux', ft = 'tmux' },
