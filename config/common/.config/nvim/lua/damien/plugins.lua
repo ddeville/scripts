@@ -47,10 +47,14 @@ lazy.setup({
   'ddeville/telescope-vim-bookmarks.nvim',
 
   -- LSP
-  'neovim/nvim-lspconfig',
-  'kosayoda/nvim-lightbulb',
-  -- TODO(damien): Remove legacy tag once new version has been released https://github.com/j-hui/fidget.nvim
-  { 'j-hui/fidget.nvim', tag = 'legacy' },
+  {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      'kosayoda/nvim-lightbulb',
+      -- TODO(damien): Remove legacy tag once new version has been released https://github.com/j-hui/fidget.nvim
+      { 'j-hui/fidget.nvim', tag = 'legacy' },
+    },
+  },
 
   -- Autocompletion
   {
