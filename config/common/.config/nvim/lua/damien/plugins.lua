@@ -75,6 +75,7 @@ lazy.setup({
   -- Telescope
   {
     'nvim-telescope/telescope.nvim',
+    version = '*',
     dependencies = {
       'nvim-lua/popup.nvim',
       'nvim-lua/plenary.nvim',
@@ -102,6 +103,4 @@ lazy.setup({
   'tpope/vim-surround',
   'tpope/vim-unimpaired',
   'tpope/vim-vinegar',
-}, {
-  -- defaults = { version = '*' },
-})
+}, {})

@@ -19,7 +19,7 @@
   "stylua-nvim": { "branch": "main", "commit": "ce59a353f02938cba3e0285e662fcd3901cd270f" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "9bc8237565ded606e6c366a71c64c0af25cd7a50" },
   "telescope-vim-bookmarks.nvim": { "branch": "main", "commit": "9a92fdbb7e6840f355fe5ac2bc0981327c8d8ec9" },
-  "telescope.nvim": { "branch": "master", "commit": "00cf15074a2997487813672a75f946d2ead95eb0" },
+  "telescope.nvim": { "branch": "master", "commit": "776b509f80dd49d8205b9b0d94485568236d1192" },
   "vim-base16-lightline": { "branch": "master", "commit": "d35f33af85882c803af596ee40ebc6213920987c" },
   "vim-bookmarks": { "branch": "master", "commit": "9cc5fa7ecc23b052bd524d07c85356c64b92aeef" },
   "vim-codefmt": { "branch": "master", "commit": "6ee1e7e22a6ff793331da96c0884f0b906e7dc96" },
