@@ -12,7 +12,7 @@ if [ "$(command -v rcodesign &>/dev/null && rcodesign --version | awk '{print $N
 fi
 
 op_cert_name="Apple Developer ID Application Certificate"
-op_api_key_name="iTunes Connect API Key"
+op_api_key_name="iTunes Connect API Key" # pragma: allowlist secret
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf $tmp_dir' EXIT
