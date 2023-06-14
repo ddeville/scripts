@@ -5,3 +5,4 @@ require('damien.mappings')
 require('damien.lazy')
 
 require('damien.base16')
+require('damien.formatters')
