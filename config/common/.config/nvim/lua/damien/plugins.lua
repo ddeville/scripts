@@ -99,7 +99,7 @@ lazy.setup({
   },
 
   -- Magic
-  -- 'github/copilot.vim',
+  { 'github/copilot.vim', enabled = false },
 
   -- tpope
   'tpope/vim-commentary',
