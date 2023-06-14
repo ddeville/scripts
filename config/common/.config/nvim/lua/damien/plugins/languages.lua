@@ -1,5 +1,19 @@
 return {
-  'dag/vim-fish',
+  {
+    'dag/vim-fish',
+    ft = 'fish',
+    config = function()
+      local ag = vim.api.nvim_create_augroup('FishIndentAutoformat', { clear = true })
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        pattern = '*.fish',
+        group = ag,
+        callback = function()
+          vim.fn.system('fish_indent ' .. vim.fn.expand('%'))
+          vim.cmd('e!')
+        end,
+      })
+    end,
+  },
   'hashivim/vim-terraform',
   'baskerville/vim-sxhkdrc',
   'tmux-plugins/vim-tmux',
