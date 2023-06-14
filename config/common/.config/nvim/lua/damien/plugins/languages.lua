@@ -1,22 +1,13 @@
 return {
   {
-    'dag/vim-fish',
-    ft = 'fish',
+    'rust-lang/rust.vim',
+    ft = 'rust',
     config = function()
-      local ag = vim.api.nvim_create_augroup('FishIndentAutoformat', { clear = true })
-      vim.api.nvim_create_autocmd('BufWritePre', {
-        pattern = '*.fish',
-        group = ag,
-        callback = function()
-          vim.fn.system('fish_indent ' .. vim.fn.expand('%'))
-          vim.cmd('e!')
-        end,
-      })
+      vim.g.rustfmt_autosave = 1
+      vim.g.rustfmt_emit_files = 1
+      vim.g.rustfmt_fail_silently = 0
     end,
   },
-  'hashivim/vim-terraform',
-  'baskerville/vim-sxhkdrc',
-  'tmux-plugins/vim-tmux',
   {
     'fatih/vim-go',
     ft = 'go',
@@ -33,12 +24,21 @@ return {
     end,
   },
   {
-    'rust-lang/rust.vim',
-    ft = 'rust',
+    'dag/vim-fish',
+    ft = 'fish',
     config = function()
-      vim.g.rustfmt_autosave = 1
-      vim.g.rustfmt_emit_files = 1
-      vim.g.rustfmt_fail_silently = 0
+      local ag = vim.api.nvim_create_augroup('FishIndentAutoformat', { clear = true })
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        pattern = '*.fish',
+        group = ag,
+        callback = function()
+          vim.fn.system('fish_indent ' .. vim.fn.expand('%'))
+          vim.cmd('e!')
+        end,
+      })
     end,
   },
+  { 'hashivim/vim-terraform', ft = 'terraform' },
+  { 'baskerville/vim-sxhkdrc', ft = 'sxhkdrc' },
+  { 'tmux-plugins/vim-tmux', ft = 'tmux' },
 }
