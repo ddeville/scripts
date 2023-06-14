@@ -14,6 +14,8 @@ vim.opt.rtp:prepend(lazypath)
 local lazy = require('lazy')
 
 lazy.setup({
+  { 'folke/lazy.nvim', tag = 'stable' },
+
   -- Appearance
   'tinted-theming/base16-vim',
   'itchyny/lightline.vim',
