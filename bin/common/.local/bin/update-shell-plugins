@@ -26,15 +26,14 @@ for repo in "${repos[@]}"; do
 done
 
 # Then neovim plugins
-packer_path="$XDG_DATA_HOME/site/pack/packer/start/packer.nvim"
+lazy_path="$XDG_DATA_HOME/nvim/lazy/lazy.nvim"
 
-if [ ! -d "$packer_path" ]; then
-  mkdir -p "$(dirname "$packer_path")"
-  git clone https://github.com/wbthomason/packer.nvim "$packer_path"
+if [ ! -d "$lazy_path" ]; then
+  mkdir -p "$(dirname "$lazy_path")"
+  git clone --filter=blob:none https://github.com/folke/lazy.nvim.git --branch=stable "$lazy_path"
 fi
 
-nvim --headless +PackerUpdate +PackerCompile +qa
-nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+nvim --headless "+Lazy! sync" +qa
 
 # And finally tmux plugins
 tpm_path="$TMUX_PLUGIN_MANAGER_PATH/tpm"
