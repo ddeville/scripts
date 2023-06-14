@@ -26,14 +26,14 @@ window:
 
 font:
   normal:
-    family: Anonymous Pro
+    family: AnonymicePro Nerd Font
     style: Regular
   bold:
-    family: Anonymous Pro
+    family: AnonymicePro Nerd Font
     style: Regular
   italic:
-    family: Anonymous Pro
+    family: AnonymicePro Nerd Font
     style: Italic
   bold_italic:
-    family: Anonymous Pro
+    family: AnonymicePro Nerd Font
     style: Italic
