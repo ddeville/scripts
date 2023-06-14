@@ -1,7 +1,7 @@
-require('damien.base16')
 require('damien.settings')
 require('damien.mappings')
 
--- Install plugins last to make sure that things like mapping are set before they get a chance to
--- get the incorrect ones...
-require('damien.packer')
+-- Install plugins after settings and mappings to make sure that plugins don't end up using wrong ones...
+require('damien.plugins')
+
+require('damien.base16')
