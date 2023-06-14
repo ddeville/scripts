@@ -11,4 +11,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup('damien.plugins')
+require('lazy').setup({
+  { 'folke/lazy.nvim', tag = 'stable' },
+  { import = 'damien.plugins' },
+})
