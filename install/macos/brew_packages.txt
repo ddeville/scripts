@@ -18,6 +18,7 @@ lazygit
 neofetch
 neovim
 openssh
+readline
 ripgrep
 stow
 teamookla/speedtest/speedtest
