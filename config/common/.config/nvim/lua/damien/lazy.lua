@@ -31,15 +31,16 @@ lazy.setup({
   'tmux-plugins/vim-tmux',
 
   -- Code formatters
+  'ckipp01/stylua-nvim',
+  'z0mbix/vim-shfmt',
   {
     'google/vim-codefmt', -- used for Starlark
+    enabled = false, -- quite slow to load, disable until I actually use bazel again...
     dependencies = {
       'google/vim-maktaba',
       'google/vim-glaive',
     },
   },
-  'ckipp01/stylua-nvim',
-  'z0mbix/vim-shfmt',
 
   -- Navigation
   'mhinz/vim-grepper',
