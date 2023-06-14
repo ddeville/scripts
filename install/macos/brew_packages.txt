@@ -44,6 +44,7 @@ stylua
 # ============== Fonts ==============
 
 font-anonymous-pro
+font-anonymice-nerd-font
 
 # ============== Casks ==============
 
