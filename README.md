@@ -6,11 +6,11 @@ A bunch of configs, tools and install scripts I use on every machine I set up. T
 
 ### Arch Linux
 
-Follow the instructions in `install/arch/setup.txt` to kick off the installation from the ISO and run the `install/arch/install.sh` script.
+Follow the instructions in `install/arch/setup.txt` to kick off the installation from the ISO and run `make -C install`.
 
 ### MacOS
 
-Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
+Give Terminal Full Disk Access and run `make -C install`.
 
 ## Post-installation
 
