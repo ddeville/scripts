@@ -268,6 +268,7 @@ return {
         config = function()
           require('mason-lspconfig').setup({
             ensure_installed = {
+              -- LSP servers
               'rust_analyzer',
               'clangd',
               'lua_ls',
