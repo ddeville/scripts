@@ -58,6 +58,5 @@ dropbox
 google-chrome
 istat-menus
 mos
-soundsource
 spotify
 stay
