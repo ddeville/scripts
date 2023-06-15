@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 NVIM_INSTALL_PATH="/opt/nvim/nightly"
 
@@ -98,6 +98,10 @@ function _nvim_nightly_compile {
   rm -rf "$tmp_dir"
 }
 
+function _nvim_nightly_uninstall {
+  sudo rm -rf "$NVIM_INSTALL_PATH"
+}
+
 case ${1-none} in
 prebuilt)
   _nvim_nightly_prebuilt
@@ -105,10 +109,14 @@ prebuilt)
 compile)
   _nvim_nightly_compile
   ;;
+uninstall)
+  _nvim_nightly_uninstall
+  ;;
 *)
   echo "Available commands"
   echo "  * prebuilt"
   echo "  * compile"
+  echo "  * uninstall"
   exit 1
   ;;
 esac
