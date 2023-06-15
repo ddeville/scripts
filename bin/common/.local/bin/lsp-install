@@ -299,7 +299,7 @@ function _luals {
     exit 1
   fi
 
-  foldername="_lua"
+  foldername="_luals"
   linkname="bin/lua-language-server"
 
   if [ -d "$foldername" ]; then
@@ -312,33 +312,37 @@ function _luals {
   mkdir "$foldername"
   pushd "$foldername" >/dev/null
 
-  # We assume that the first tag is the latest, an assumption that the GH API also makes...
-  tags_url="https://api.github.com/repos/LuaLS/lua-language-server/tags"
-  tag_name="$(curl -L $tags_url | jq --raw-output '.[0].name')"
+  if [ "$(uname)" = "Darwin" ]; then
+    if [[ "$(uname -m)" == "arm64" ]]; then
+      platform_name="darwin-arm64"
+    else
+      platform_name="darwin-x64"
+    fi
+  elif [ "$(uname)" = "Linux" ]; then
+    platform_name="linux-x64"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
 
-  git clone -b "$tag_name" "https://github.com/LuaLS/lua-language-server.git"
+  version_url="https://api.github.com/repos/LuaLS/lua-language-server/releases/latest"
+  version_name="$(curl -L $version_url | jq --raw-output '.name')"
+  url="https://github.com/LuaLS/lua-language-server/releases/download/$version_name/lua-language-server-$version_name-$platform_name.tar.gz"
 
-  pushd "lua-language-server" >/dev/null
+  archive_path="luals.tar.gz"
+  echo "Downloading $url to $archive_path"
+  curl -L --url "$url" --output "$archive_path"
 
-  git submodule update --init --recursive
+  tar xzf "$archive_path"
+  rm "$archive_path"
 
-  pushd "3rd/luamake" >/dev/null
-  ./compile/build.sh
+  command echo "#!/bin/sh" >>lua-language-server
+  command echo "$(pwd)/bin/lua-language-server -E $(pwd)/main.lua" >>lua-language-server
+  chmod +x lua-language-server
+
   popd >/dev/null
 
-  ./3rd/luamake/luamake rebuild
-
-  popd >/dev/null
-
-  curpath="$(pwd)"
-
-  command echo "#!/bin/sh" >>lua
-  command echo "$curpath/lua-language-server/bin/lua-language-server -E $curpath/lua-language-server/main.lua" >>lua
-  chmod +x lua
-
-  popd >/dev/null
-
-  command ln -s "../$foldername/lua" "$linkname"
+  ln -s "../$foldername/lua-language-server" "$linkname"
 }
 
 if [[ $# == 0 ]]; then
