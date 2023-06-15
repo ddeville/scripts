@@ -107,6 +107,7 @@ checkbashisms
 cmake
 gdb
 go
+luarocks
 ninja
 nodejs
 npm
