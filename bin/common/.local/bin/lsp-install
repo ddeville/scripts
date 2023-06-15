@@ -91,6 +91,60 @@ function _clangd {
   ln -s "../$bin_path" "$linkname"
 }
 
+function _luals {
+  echo "Installing lua-ls"
+
+  if ! command -v ninja &>/dev/null; then
+    echo "The lua-ls language server requires Ninja to be installed"
+    exit 1
+  fi
+
+  foldername="_luals"
+  linkname="bin/lua-language-server"
+
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
+
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
+
+  if [ "$(uname)" = "Darwin" ]; then
+    if [[ "$(uname -m)" == "arm64" ]]; then
+      platform_name="darwin-arm64"
+    else
+      platform_name="darwin-x64"
+    fi
+  elif [ "$(uname)" = "Linux" ]; then
+    platform_name="linux-x64"
+  else
+    echo "Unsupported platform: $(uname)"
+    exit 1
+  fi
+
+  version_url="https://api.github.com/repos/LuaLS/lua-language-server/releases/latest"
+  version_name="$(curl -L $version_url | jq --raw-output '.name')"
+  url="https://github.com/LuaLS/lua-language-server/releases/download/$version_name/lua-language-server-$version_name-$platform_name.tar.gz"
+
+  archive_path="luals.tar.gz"
+  echo "Downloading $url to $archive_path"
+  curl -L --url "$url" --output "$archive_path"
+
+  tar xzf "$archive_path"
+  rm "$archive_path"
+
+  command echo "#!/bin/sh" >>lua-language-server
+  command echo "$(pwd)/bin/lua-language-server -E $(pwd)/main.lua" >>lua-language-server
+  chmod +x lua-language-server
+
+  popd >/dev/null
+
+  ln -s "../$foldername/lua-language-server" "$linkname"
+}
+
 function _gopls {
   echo "Installing gopls"
 
@@ -291,71 +345,17 @@ function _bashls {
   ln -s "../$foldername/node_modules/.bin/bash-language-server" "$linkname"
 }
 
-function _luals {
-  echo "Installing lua-ls"
-
-  if ! command -v ninja &>/dev/null; then
-    echo "The lua-ls language server requires Ninja to be installed"
-    exit 1
-  fi
-
-  foldername="_luals"
-  linkname="bin/lua-language-server"
-
-  if [ -d "$foldername" ]; then
-    rm -rf "$foldername"
-  fi
-  if [ -L "$linkname" ]; then
-    rm "$linkname"
-  fi
-
-  mkdir "$foldername"
-  pushd "$foldername" >/dev/null
-
-  if [ "$(uname)" = "Darwin" ]; then
-    if [[ "$(uname -m)" == "arm64" ]]; then
-      platform_name="darwin-arm64"
-    else
-      platform_name="darwin-x64"
-    fi
-  elif [ "$(uname)" = "Linux" ]; then
-    platform_name="linux-x64"
-  else
-    echo "Unsupported platform: $(uname)"
-    exit 1
-  fi
-
-  version_url="https://api.github.com/repos/LuaLS/lua-language-server/releases/latest"
-  version_name="$(curl -L $version_url | jq --raw-output '.name')"
-  url="https://github.com/LuaLS/lua-language-server/releases/download/$version_name/lua-language-server-$version_name-$platform_name.tar.gz"
-
-  archive_path="luals.tar.gz"
-  echo "Downloading $url to $archive_path"
-  curl -L --url "$url" --output "$archive_path"
-
-  tar xzf "$archive_path"
-  rm "$archive_path"
-
-  command echo "#!/bin/sh" >>lua-language-server
-  command echo "$(pwd)/bin/lua-language-server -E $(pwd)/main.lua" >>lua-language-server
-  chmod +x lua-language-server
-
-  popd >/dev/null
-
-  ln -s "../$foldername/lua-language-server" "$linkname"
-}
-
 if [[ $# == 0 ]]; then
   echo "Available servers:"
   echo "  * rust-analyzer"
   echo "  * clangd"
+  echo "  * lua-ls"
   echo "  * gopls"
   echo "  * tsserver"
   echo "  * pyright"
   echo "  * yamlls"
   echo "  * terraform-ls"
   echo "  * bash-ls"
-  echo "  * lua-ls"
   exit 1
 fi
 
@@ -390,6 +390,9 @@ for arg; do
   if [[ $arg == "clangd" ]] || $install_all; then
     _clangd
   fi
+  if [[ $arg == "lua-ls" ]] || $install_all; then
+    _luals
+  fi
   if [[ $arg == "gopls" ]] || $install_all; then
     _gopls
   fi
@@ -407,9 +410,6 @@ for arg; do
   fi
   if [[ $arg == "bash-ls" ]] || $install_all; then
     _bashls
-  fi
-  if [[ $arg == "lua-ls" ]] || $install_all; then
-    _luals
   fi
 done
 popd >/dev/null
