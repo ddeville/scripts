@@ -259,6 +259,11 @@ return {
               border = 'solid',
               width = 0.8,
               height = 0.8,
+              icons = {
+                package_installed = '✓',
+                package_pending = '➜',
+                package_uninstalled = '✗',
+              },
             },
           })
         end,
@@ -268,16 +273,16 @@ return {
         config = function()
           require('mason-lspconfig').setup({
             ensure_installed = {
-              -- LSP servers
-              'rust_analyzer',
-              'clangd',
-              'lua_ls',
-              'gopls',
-              'tsserver',
-              'pyright',
-              'yamlls',
-              'terraformls',
               'bashls',
+              'clangd',
+              'gopls',
+              'lua_ls',
+              'pyright',
+              'ruff_lsp',
+              'rust_analyzer',
+              'terraformls',
+              'tsserver',
+              'yamlls',
             },
             automatic_installation = false,
           })
