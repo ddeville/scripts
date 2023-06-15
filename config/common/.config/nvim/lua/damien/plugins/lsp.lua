@@ -255,7 +255,7 @@ return {
             PATH = 'prepend',
             max_concurrent_installers = 8,
             ui = {
-              check_outdated_packages_on_open = false,
+              check_outdated_packages_on_open = true,
               border = 'solid',
               width = 0.8,
               height = 0.8,
