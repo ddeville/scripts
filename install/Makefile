@@ -12,7 +12,7 @@ ifeq ($(UNAME_S),Darwin)
 	./macos/install.sh
 endif
 
-install_packages:
+packages:
 ifeq ($(UNAME_S),Linux)
 	./arch/install_packages.sh
 endif
