@@ -1,4 +1,4 @@
-.PHONY: install install_packages
+.PHONY: install packages
 
 all: install
 
