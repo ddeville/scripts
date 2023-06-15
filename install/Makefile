@@ -1,4 +1,4 @@
-.PHONY: install packages
+.PHONY: install packages stow
 
 all: install
 
@@ -19,3 +19,6 @@ endif
 ifeq ($(UNAME_S),Darwin)
 	./macos/install_packages.sh
 endif
+
+stow:
+	../bin/common/.local/bin/stow-config

@@ -26,3 +26,5 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 ## Maintenance
 
 - Periodically update the shell plugins by running `update-shell-plugins`.
+- Run `make -C install stow` whenever there's a new file that should be symlinked.
+- Run `make -C install packages` to install/update all packages.
