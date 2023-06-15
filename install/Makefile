@@ -1,4 +1,4 @@
-.PHONY: install packages stow
+.PHONY: install packages stow shell-plugins
 
 all: install
 
@@ -22,3 +22,6 @@ endif
 
 stow:
 	../bin/common/.local/bin/stow-config
+
+shell-plugins:
+	../bin/common/.local/bin/update-shell-plugins
