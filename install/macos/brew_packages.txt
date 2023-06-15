@@ -34,6 +34,7 @@ buildifier
 checkbashisms
 cmake
 golang
+luarocks
 ninja
 node
 pyenv
