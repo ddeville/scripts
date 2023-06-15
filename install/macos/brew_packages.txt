@@ -25,6 +25,7 @@ stow
 teamookla/speedtest/speedtest
 tmux
 vim
+wget
 zoxide
 
 # =========== Development ===========
