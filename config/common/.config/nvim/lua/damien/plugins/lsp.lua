@@ -281,6 +281,10 @@ return {
         text = {
           spinner = 'bouncing_bar',
         },
+        timer = {
+          fidget_decay = 0,
+          task_decay = 200,
+        },
       })
     end,
   },
