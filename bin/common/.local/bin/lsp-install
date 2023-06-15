@@ -345,6 +345,35 @@ function _bashls {
   ln -s "../$foldername/node_modules/.bin/bash-language-server" "$linkname"
 }
 
+function _rufflsp {
+  echo "Installing ruff-lsp"
+
+  if ! command -v python &>/dev/null; then
+    echo "The ruff language server requires Python to be installed"
+    exit 1
+  fi
+
+  foldername="_rufflsp"
+  linkname="bin/ruff-lsp"
+
+  if [ -d "$foldername" ]; then
+    rm -rf "$foldername"
+  fi
+  if [ -L "$linkname" ]; then
+    rm "$linkname"
+  fi
+
+  mkdir "$foldername"
+  pushd "$foldername" >/dev/null
+
+  python -m venv venv
+  venv/bin/pip install --disable-pip-version-check ruff-lsp
+
+  popd >/dev/null
+
+  ln -s "../$foldername/venv/bin/ruff-lsp" "$linkname"
+}
+
 if [[ $# == 0 ]]; then
   echo "Available servers:"
   echo "  * rust-analyzer"
@@ -356,6 +385,7 @@ if [[ $# == 0 ]]; then
   echo "  * yamlls"
   echo "  * terraform-ls"
   echo "  * bash-ls"
+  echo "  * ruff-lsp"
   exit 1
 fi
 
@@ -410,6 +440,9 @@ for arg; do
   fi
   if [[ $arg == "bash-ls" ]] || $install_all; then
     _bashls
+  fi
+  if [[ $arg == "ruff-lsp" ]] || $install_all; then
+    _rufflsp
   fi
 done
 popd >/dev/null
