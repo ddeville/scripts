@@ -246,6 +246,7 @@ return {
     'neovim/nvim-lspconfig',
     config = setup_lsp,
     dependencies = {
+      -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's so add them as deps
       {
         'williamboman/mason.nvim',
         build = ':MasonUpdate',
