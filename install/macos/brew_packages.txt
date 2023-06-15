@@ -37,6 +37,7 @@ ninja
 node
 pyenv
 pyenv-virtualenv
+ruff
 shellcheck
 shfmt
 stylua
