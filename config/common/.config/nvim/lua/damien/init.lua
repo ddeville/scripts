@@ -7,4 +7,3 @@ require('damien.lazy')
 require('damien.base16')
 
 require('damien.settings')
-require('damien.formatters')
