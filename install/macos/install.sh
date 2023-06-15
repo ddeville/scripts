@@ -2,6 +2,13 @@
 
 set -eu
 
+if [ "$(id -u)" -eq 0 ]; then
+  echo "The script is running as root, please run as a the user."
+  exit 1
+fi
+
+cd "$HOME"
+
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
   echo "Installing Xcode Command Line Tools"
