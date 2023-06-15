@@ -245,32 +245,12 @@ return {
   {
     'neovim/nvim-lspconfig',
     config = setup_lsp,
+    -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's
+    priority = 51,
     dependencies = {
-      -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's so add them as deps
-      {
-        'williamboman/mason.nvim',
-        build = ':MasonUpdate',
-        config = function()
-          require('mason').setup({
-            install_root_dir = vim.fn.stdpath('data') .. '/mason',
-            PATH = 'prepend',
-            max_concurrent_installers = 8,
-            ui = {
-              check_outdated_packages_on_open = true,
-              border = 'solid',
-              width = 0.8,
-              height = 0.8,
-              icons = {
-                package_installed = '✓',
-                package_pending = '➜',
-                package_uninstalled = '✗',
-              },
-            },
-          })
-        end,
-      },
       {
         'williamboman/mason-lspconfig.nvim',
+        priority = 50,
         config = function()
           require('mason-lspconfig').setup({
             ensure_installed = {
