@@ -3,9 +3,8 @@ return {
     'rust-lang/rust.vim',
     ft = 'rust',
     config = function()
-      vim.g.rustfmt_autosave = 1
-      vim.g.rustfmt_emit_files = 1
-      vim.g.rustfmt_fail_silently = 0
+      -- we use null-ls to run rustfmt
+      vim.g.rustfmt_autosave = 0
     end,
   },
   {
@@ -19,8 +18,8 @@ return {
       vim.g.go_diagnostics_enabled = 0
       vim.g.go_echo_go_info = 0
       vim.g.go_metalinter_enabled = 0
-      vim.g.go_fmt_autosave = 1
-      vim.g.go_imports_mode = 'gopls'
+      -- we use null-ls to run gofmt
+      vim.g.go_fmt_autosave = 0
     end,
   },
   { 'dag/vim-fish', ft = 'fish' },
