@@ -124,6 +124,23 @@ local function setup_lsp()
   })
 
   setup_client('pyright', {
+    root_dir = function(fname)
+      -- HACK: The API repo has a bunch of packages but a single pyrightconfig.json file...
+      local api_path = '/Users/damien/code/api'
+      if fname:sub(1, #api_path) == api_path then
+        return api_path
+      end
+
+      local root_files = {
+        'pyproject.toml',
+        'setup.py',
+        'setup.cfg',
+        'requirements.txt',
+        'Pipfile',
+        'pyrightconfig.json',
+      }
+      return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
+    end,
     settings = {
       python = {
         analysis = {
@@ -131,6 +148,32 @@ local function setup_lsp()
           diagnosticMode = 'workspace',
           typeCheckingMode = 'basic',
           useLibraryCodeForTypes = true,
+          diagnosticSeverityOverrides = {
+            reportMissingImports = false,
+            reportMissingTypeStubs = false,
+            reportPrivateImportUsage = false,
+            reportUnusedVariable = false,
+            reportUnusedImport = false,
+            reportImportCycles = false,
+            reportGeneralTypeIssues = 'information',
+            reportUnusedClass = 'warning',
+            reportUnusedFunction = 'warning',
+            reportDuplicateImport = 'warning',
+            reportUntypedFunctionDecorator = 'warning',
+            reportUntypedClassDecorator = 'warning',
+            reportUntypedBaseClass = 'warning',
+            reportUntypedNamedTuple = 'warning',
+            reportTypeCommentUsage = 'warning',
+            reportIncompatibleMethodOverride = 'warning',
+            reportIncompatibleVariableOverride = 'warning',
+            reportInconsistentConstructor = 'warning',
+            reportUninitializedInstanceVariable = 'warning',
+            reportUnnecessaryIsInstance = 'warning',
+            reportUnnecessaryCast = 'warning',
+            reportUnnecessaryComparison = 'warning',
+            reportUnnecessaryContains = 'warning',
+            reportUnnecessaryTypeIgnoreComment = 'warning',
+          },
         },
         venvPath = (function()
           local pyenv_root = os.getenv('PYENV_ROOT')
