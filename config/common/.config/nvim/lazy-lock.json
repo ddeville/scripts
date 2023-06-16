@@ -10,7 +10,7 @@
   "lightline.vim": { "branch": "master", "commit": "b1e91b41f5028d65fa3d31a425ff21591d5d957f" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "d381fcb78d7a562c3244e1c8f76406954649db36" },
   "mason.nvim": { "branch": "main", "commit": "4be1226f48bc2011024110f37b17f5ee468df58f" },
-  "null-ls.nvim": { "branch": "main", "commit": "a138b14099e9623832027ea12b4631ddd2a49256" },
+  "null-ls.nvim": { "branch": "main", "commit": "bbaf5a96913aa92281f154b08732be2f57021c45" },
   "nvim-cmp": { "branch": "main", "commit": "b8c2a62b3bd3827aa059b43be3dd4b5c45037d65" },
   "nvim-lightbulb": { "branch": "master", "commit": "ca5b44a8efffb5fec1963ccd21f25ec04cc778b7" },
   "nvim-lspconfig": { "branch": "master", "commit": "295c646488d5baa63c6c4da68fe61171b9257375" },
