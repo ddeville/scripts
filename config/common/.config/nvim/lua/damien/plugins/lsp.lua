@@ -27,7 +27,7 @@ local function setup_lsp()
       textDocument = {
         completion = {
           completionItem = {
-            -- We need snippets for compe to fully support rust-analyzer magic
+            -- We need snippets for nvim-cmp to fully support rust-analyzer magic
             snippetSupport = true,
             resolveSupport = {
               properties = {
@@ -55,7 +55,7 @@ local function setup_lsp()
 
   setup_lsp_client('pyright', {
     root_dir = function(fname)
-      -- HACK: The API repo has a bunch of packages but a single pyrightconfig.json file...
+      -- HAX: The API repo has a bunch of packages but a single pyrightconfig.json file...
       local api_path = '/Users/damien/code/api'
       if fname:sub(1, #api_path) == api_path then
         return api_path
