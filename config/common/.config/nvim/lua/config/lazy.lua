@@ -13,7 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 
 local spec = {
   { 'folke/lazy.nvim', tag = 'stable' },
-  { import = 'damien.plugins' },
+  { import = 'config.plugins' },
 }
 local opts = {
   change_detection = {
