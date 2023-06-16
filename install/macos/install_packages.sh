@@ -27,3 +27,4 @@ while IFS= read -r line; do
 done <"$script_dir/brew_packages.txt"
 
 $brew install --no-quarantine "${packages[@]}"
+$brew upgrade
