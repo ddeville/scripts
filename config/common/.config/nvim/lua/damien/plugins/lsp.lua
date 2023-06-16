@@ -9,21 +9,20 @@ local function setup_lsp()
 
     local custom_on_attach = config.on_attach
     config.on_attach = function(client, bufnr)
-      local function set_keymap(key, fn)
-        vim.api.nvim_buf_set_keymap(bufnr, 'n', key, '', { noremap = true, silent = true, callback = fn })
-      end
-      set_keymap('gd', vim.lsp.buf.definition)
-      set_keymap('gr', vim.lsp.buf.references)
-      set_keymap('gi', vim.lsp.buf.implementation)
-      set_keymap('gy', vim.lsp.buf.type_definition)
-      set_keymap('K', vim.lsp.buf.hover)
-      set_keymap('<C-k>', vim.lsp.buf.signature_help)
-      set_keymap('<leader>rn', vim.lsp.buf.rename)
-      set_keymap('<leader>a', vim.lsp.buf.code_action)
-      set_keymap('<leader>e', vim.diagnostic.open_float)
-      set_keymap('<leader>q', vim.diagnostic.setloclist)
-      set_keymap('[g', vim.diagnostic.goto_prev)
-      set_keymap(']g', vim.diagnostic.goto_next)
+      local opts = { buffer = bufnr }
+
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+      vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+      vim.keymap.set('n', 'gy', vim.lsp.buf.type_definition, opts)
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+      vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+      vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+      vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
+      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+      vim.keymap.set('n', '[g', vim.diagnostic.goto_prev, opts)
+      vim.keymap.set('n', ']g', vim.diagnostic.goto_next, opts)
 
       -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
       -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
