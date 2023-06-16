@@ -1,27 +1,22 @@
 local function setup_lsp_client(name, config)
-  local nvim_lsp = require('lspconfig')
-  local cmp_nvim_lsp = require('cmp_nvim_lsp')
-
-  config.capabilities =
-    vim.tbl_deep_extend('force', config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
-  config.capabilities = cmp_nvim_lsp.default_capabilities(config.capabilities)
-
-  local custom_on_attach = config.on_attach
-  config.on_attach = function(client, bufnr)
-    -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
-    -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
-    client.server_capabilities.semanticTokensProvider = nil
-
-    -- Invoke the custom `on_attach` function for the client, if needed
-    if custom_on_attach then
-      custom_on_attach(client, bufnr)
-    end
-  end
-
-  nvim_lsp[name].setup(config)
+  -- Extend capabilities with nvim-cmp's default capabilities
+  local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
+  config.capabilities = vim.tbl_deep_extend('force', config.capabilities or {}, lsp_capabilities)
+  config.capabilities = require('cmp_nvim_lsp').default_capabilities(config.capabilities)
+  require('lspconfig')[name].setup(config)
 end
 
 local function setup_lsp()
+  -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
+  -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('LspDisableSemanticTokensProvider', {}),
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      client.server_capabilities.semanticTokensProvider = nil
+    end,
+  })
+
   setup_lsp_client('rust_analyzer', {
     settings = {
       ['rust-analyzer'] = {
