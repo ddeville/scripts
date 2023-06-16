@@ -134,6 +134,14 @@ defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bo
 # Set thin glyphs/strokes in Alacritty
 defaults write org.alacritty AppleFontSmoothing -int 0
 
+# Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
+hidutil property --set '{
+  "UserKeyMapping": [{
+    "HIDKeyboardModifierMappingSrc": 0x700000039,
+    "HIDKeyboardModifierMappingDst": 0x7000000E0,
+  }]
+}'
+
 # If `scripts` was downloaded as an archive, clone the git repo instead
 if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
   tmp_dir=$(mktemp -d)
