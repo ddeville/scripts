@@ -6,22 +6,22 @@ UNAME_S := $(shell uname -s)
 
 install:
 ifeq ($(UNAME_S),Linux)
-	./arch/install.sh
+	@./arch/install.sh
 endif
 ifeq ($(UNAME_S),Darwin)
-	./macos/install.sh
+	@./macos/install.sh
 endif
 
 packages:
 ifeq ($(UNAME_S),Linux)
-	./arch/install_packages.sh
+	@./arch/install_packages.sh
 endif
 ifeq ($(UNAME_S),Darwin)
-	./macos/install_packages.sh
+	@./macos/install_packages.sh
 endif
 
 stow:
-	../bin/common/.local/bin/stow-config
+	@../bin/common/.local/bin/stow-config
 
 shell-plugins:
-	../bin/common/.local/bin/update-shell-plugins
+	@../bin/common/.local/bin/update-shell-plugins
