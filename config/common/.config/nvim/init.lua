@@ -1,1 +1,1 @@
-require('damien')
+require('config')
