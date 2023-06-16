@@ -75,8 +75,6 @@ local function setup_lsp()
   })
 
   setup_lsp_client('gopls', {
-    cmd = { 'gopls', 'serve' },
-    filetypes = { 'go', 'gomod' },
     settings = {
       gopls = {
         analyses = {
@@ -85,20 +83,6 @@ local function setup_lsp()
         staticcheck = true,
       },
     },
-    root_dir = function(fname)
-      local mod = nvim_lsp.util.root_pattern('go.mod')(fname)
-      if mod ~= nil then
-        return mod
-      end
-      -- Pick the nearest GOPATH by default so that we don't create a million gopls instances
-      local gopath = os.getenv('GOPATH') or ''
-      for path in (gopath .. ':'):gmatch('(.-):') do
-        if nvim_lsp.util.path.is_descendant(path, fname) then
-          return path
-        end
-      end
-      return nvim_lsp.util.root_pattern('.git')(fname)
-    end,
   })
 
   setup_lsp_client('pyright', {
