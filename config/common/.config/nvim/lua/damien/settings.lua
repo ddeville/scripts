@@ -102,11 +102,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- LSP
-
+-- disable lsp logs
 vim.lsp.set_log_level('off')
 
--- disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
+-- disable lsp semantic tokens since we use treesitter for syntax highlighting anyway...
 -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('LspDisableSemanticTokensProvider', {}),
@@ -117,7 +116,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- diagnostics
-
 vim.diagnostic.config({ severity_sort = true })
 
 vim.api.nvim_set_hl(0, 'DiagnosticError', { fg = 'Red', ctermfg = 'Red' })
