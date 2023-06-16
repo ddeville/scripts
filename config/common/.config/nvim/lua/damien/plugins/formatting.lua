@@ -3,8 +3,7 @@ return {
     'jose-elias-alvarez/null-ls.nvim',
     config = function()
       local null_ls = require('null-ls')
-
-      local ag = vim.api.nvim_create_augroup('LspFormatting', {})
+      local au = vim.api.nvim_create_augroup('LspFormatting', {})
 
       null_ls.setup({
         sources = {
@@ -18,14 +17,15 @@ return {
         },
         on_attach = function(client, bufnr)
           if client.supports_method('textDocument/formatting') then
-            vim.api.nvim_clear_autocmds({ group = ag, buffer = bufnr })
+            vim.api.nvim_clear_autocmds({ group = au, buffer = bufnr })
             vim.api.nvim_create_autocmd('BufWritePre', {
-              group = ag,
+              group = au,
               buffer = bufnr,
               callback = function()
                 vim.lsp.buf.format({
                   async = false,
                   bufnr = bufnr,
+                  -- Only allow null-ls to format buffers
                   filter = function(c)
                     return c.name == 'null-ls'
                   end,
