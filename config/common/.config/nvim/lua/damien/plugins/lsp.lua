@@ -122,7 +122,6 @@ local function setup_lsp()
 
   setup_lsp_client('tsserver', {})
 
-  -- TODO: Add schemas for k8s (and others) https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
   setup_lsp_client('yamlls', {})
 
   setup_lsp_client('terraformls', {})
