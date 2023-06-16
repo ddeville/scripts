@@ -1,43 +1,45 @@
-local function setup_lsp()
+local function setup_lsp_client(name, config)
   local nvim_lsp = require('lspconfig')
   local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
-  local function setup_client(name, config)
-    config.capabilities =
-      vim.tbl_deep_extend('force', config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
-    config.capabilities = cmp_nvim_lsp.default_capabilities(config.capabilities)
+  config.capabilities =
+    vim.tbl_deep_extend('force', config.capabilities or {}, vim.lsp.protocol.make_client_capabilities())
+  config.capabilities = cmp_nvim_lsp.default_capabilities(config.capabilities)
 
-    local custom_on_attach = config.on_attach
-    config.on_attach = function(client, bufnr)
-      local opts = { buffer = bufnr }
+  local custom_on_attach = config.on_attach
+  config.on_attach = function(client, bufnr)
+    local opts = { buffer = bufnr }
 
-      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-      vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-      vim.keymap.set('n', 'gy', vim.lsp.buf.type_definition, opts)
-      vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-      vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-      vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-      vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
-      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
-      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
-      vim.keymap.set('n', '[g', vim.diagnostic.goto_prev, opts)
-      vim.keymap.set('n', ']g', vim.diagnostic.goto_next, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', 'gy', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+    vim.keymap.set('n', '[g', vim.diagnostic.goto_prev, opts)
+    vim.keymap.set('n', ']g', vim.diagnostic.goto_next, opts)
 
-      -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
-      -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
-      client.server_capabilities.semanticTokensProvider = nil
+    -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
+    -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
+    client.server_capabilities.semanticTokensProvider = nil
 
-      -- Invoke the custom `on_attach` function for the client, if needed
-      if custom_on_attach then
-        custom_on_attach(client, bufnr)
-      end
+    -- Invoke the custom `on_attach` function for the client, if needed
+    if custom_on_attach then
+      custom_on_attach(client, bufnr)
     end
-
-    nvim_lsp[name].setup(config)
   end
 
-  setup_client('rust_analyzer', {
+  nvim_lsp[name].setup(config)
+end
+
+local function setup_lsp()
+  local nvim_lsp = require('lspconfig')
+
+  setup_lsp_client('rust_analyzer', {
     root_dir = function(fname)
       local cargo_crate_dir = nvim_lsp.util.root_pattern('Cargo.toml')(fname)
       -- Make sure that we run `cargo metadata` in the current project dir
@@ -95,7 +97,7 @@ local function setup_lsp()
     },
   })
 
-  setup_client('gopls', {
+  setup_lsp_client('gopls', {
     cmd = { 'gopls', 'serve' },
     filetypes = { 'go', 'gomod' },
     settings = {
@@ -122,7 +124,7 @@ local function setup_lsp()
     end,
   })
 
-  setup_client('pyright', {
+  setup_lsp_client('pyright', {
     root_dir = function(fname)
       -- HACK: The API repo has a bunch of packages but a single pyrightconfig.json file...
       local api_path = '/Users/damien/code/api'
@@ -183,24 +185,24 @@ local function setup_lsp()
     },
   })
 
-  setup_client('tsserver', {})
+  setup_lsp_client('tsserver', {})
 
   -- TODO: Add schemas for k8s (and others) https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
-  setup_client('yamlls', {})
+  setup_lsp_client('yamlls', {})
 
-  setup_client('terraformls', {})
+  setup_lsp_client('terraformls', {})
 
-  setup_client('clangd', {
+  setup_lsp_client('clangd', {
     -- Specifically omitting proto here
     filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
   })
 
-  setup_client('sourcekit', {
+  setup_lsp_client('sourcekit', {
     -- We use clangd for C/CPP/Objc
     filetypes = { 'swift' },
   })
 
-  setup_client('lua_ls', {
+  setup_lsp_client('lua_ls', {
     settings = {
       Lua = {
         runtime = {
@@ -225,7 +227,7 @@ local function setup_lsp()
     },
   })
 
-  setup_client('bashls', {})
+  setup_lsp_client('bashls', {})
 
   -- Setup diagnostics
 
