@@ -21,7 +21,7 @@ local function setup_lsp()
       set_keymap('<leader>rn', vim.lsp.buf.rename)
       set_keymap('<leader>a', vim.lsp.buf.code_action)
       set_keymap('<leader>e', vim.diagnostic.open_float)
-      set_keymap('<leader>q', vim.diagnostic.set_loclist)
+      set_keymap('<leader>q', vim.diagnostic.setloclist)
       set_keymap('[g', vim.diagnostic.goto_prev)
       set_keymap(']g', vim.diagnostic.goto_next)
 
