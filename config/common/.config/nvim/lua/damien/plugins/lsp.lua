@@ -37,8 +37,6 @@ local function setup_lsp_client(name, config)
 end
 
 local function setup_lsp()
-  local nvim_lsp = require('lspconfig')
-
   setup_lsp_client('rust_analyzer', {
     settings = {
       ['rust-analyzer'] = {
@@ -92,16 +90,7 @@ local function setup_lsp()
       if fname:sub(1, #api_path) == api_path then
         return api_path
       end
-
-      local root_files = {
-        'pyproject.toml',
-        'setup.py',
-        'setup.cfg',
-        'requirements.txt',
-        'Pipfile',
-        'pyrightconfig.json',
-      }
-      return nvim_lsp.util.root_pattern(unpack(root_files))(fname)
+      return require('lspconfig.server_configurations.pyright').default_config.root_dir
     end,
     settings = {
       python = {
