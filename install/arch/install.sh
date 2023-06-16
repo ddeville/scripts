@@ -2,6 +2,11 @@
 
 set -eu
 
+if [ "$(id -u)" -ne 0 ]; then
+  echo "The script needs to be run as root."
+  exit 1
+fi
+
 # Can be overriden from the command line
 : "${USERNAME:=damien}"
 : "${HOSTNAME:=arch}"
