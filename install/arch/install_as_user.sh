@@ -10,7 +10,9 @@ fi
 cd "$HOME"
 
 # Make fish the default shell
-chsh --shell /usr/bin/fish
+if [ "$SHELL" != "/usr/bin/fish" ]; then
+  chsh --shell /usr/bin/fish
+fi
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually
 rustup default stable
