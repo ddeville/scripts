@@ -170,6 +170,7 @@ return {
     dependencies = {
       {
         'williamboman/mason-lspconfig.nvim',
+        version = '*',
         priority = 50,
         config = function()
           require('mason-lspconfig').setup({
