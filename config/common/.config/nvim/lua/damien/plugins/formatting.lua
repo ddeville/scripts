@@ -15,6 +15,10 @@ return {
           null_ls.builtins.formatting.stylua,
         },
         on_attach = function(client, bufnr)
+          -- Disable LSP semantic tokens since we use treesitter for syntax highlighting anyway...
+          -- (see https://www.reddit.com/r/neovim/comments/109vgtl/how_to_disable_highlight_from_lsp)
+          client.server_capabilities.semanticTokensProvider = nil
+
           if client.supports_method('textDocument/formatting') then
             vim.api.nvim_clear_autocmds({ group = ag, buffer = bufnr })
             vim.api.nvim_create_autocmd('BufWritePre', {
