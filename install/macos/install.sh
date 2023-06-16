@@ -40,7 +40,9 @@ if ! grep -q "$brew_path/fish" /etc/shells; then
   echo "Adding $brew_path/fish to shells"
   sudo sh -c "echo $brew_path/fish >> /etc/shells"
 fi
-chsh -s $brew_path/fish
+if [ "$SHELL" != "$brew_path/fish" ]; then
+  chsh -s $brew_path/fish
+fi
 
 mkdir -p "$HOME/.local/share"
 
