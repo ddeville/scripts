@@ -13,6 +13,7 @@ return {
           null_ls.builtins.formatting.rustfmt,
           null_ls.builtins.formatting.shfmt.with({ args = { '-filename', '$FILENAME', '--simplify', '--indent', '2' } }),
           null_ls.builtins.formatting.stylua,
+          null_ls.builtins.diagnostics.fish,
         },
         on_attach = function(client, bufnr)
           if client.supports_method('textDocument/formatting') then
