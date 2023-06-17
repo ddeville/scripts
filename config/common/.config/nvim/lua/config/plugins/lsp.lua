@@ -107,7 +107,13 @@ local function setup_lsp()
 
   setup_lsp_client('tsserver', {})
 
-  setup_lsp_client('yamlls', {})
+  setup_lsp_client('yamlls', {
+    settings = {
+      yaml = {
+        keyOrdering = false,
+      },
+    },
+  })
 
   setup_lsp_client('terraformls', {})
 
