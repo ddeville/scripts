@@ -8,13 +8,16 @@ return {
       null_ls.setup({
         sources = {
           null_ls.builtins.formatting.black,
+          null_ls.builtins.formatting.buf,
           null_ls.builtins.formatting.buildifier,
+          null_ls.builtins.formatting.clang_format.with({ filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } }),
           null_ls.builtins.formatting.fish_indent,
           null_ls.builtins.formatting.gofmt,
           null_ls.builtins.formatting.ruff,
           null_ls.builtins.formatting.rustfmt,
           null_ls.builtins.formatting.shfmt.with({ args = { '-filename', '$FILENAME', '--simplify', '--indent', '2' } }),
           null_ls.builtins.formatting.stylua,
+          null_ls.builtins.formatting.terraform_fmt,
         },
         on_attach = function(client, bufnr)
           if client.supports_method('textDocument/formatting') then
