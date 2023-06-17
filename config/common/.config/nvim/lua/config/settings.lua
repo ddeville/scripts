@@ -115,9 +115,25 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- diagnostics
+-- setup diagnostics
+vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+  signs = true,
+  underline = true,
+  virtual_text = {
+    spacing = 4,
+    severity_limit = 'Hint', -- Basically show all messages
+  },
+  update_in_insert = false,
+})
 vim.diagnostic.config({ severity_sort = true })
 
+-- setup gutter signs for diagnostics
+vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'DiagnosticSignError', priority = 40 })
+vim.fn.sign_define('DiagnosticSignWarn', { text = 'W', texthl = 'DiagnosticSignWarn', priority = 30 })
+vim.fn.sign_define('DiagnosticSignInfo', { text = 'I', texthl = 'DiagnosticDefaultInfo', priority = 20 })
+vim.fn.sign_define('DiagnosticSignHint', { text = 'H', texthl = 'DiagnosticDefaultHint', priority = 10 })
+
+-- diagnostic highlights
 vim.api.nvim_set_hl(0, 'DiagnosticError', { fg = 'Red', ctermfg = 'Red' })
 vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError', { fg = 'Red', ctermfg = 'Red', cterm = { underline = true } })
 vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextError', { fg = 'Red', ctermfg = 'Red' })
@@ -141,8 +157,3 @@ vim.api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { fg = 'Gray', ctermfg = 'Gray
 vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHint', { fg = 'Gray', ctermfg = 'Gray' })
 vim.api.nvim_set_hl(0, 'DiagnosticFloatingHint', { fg = 'Gray', ctermfg = 'Gray' })
 vim.api.nvim_set_hl(0, 'DiagnosticSignHint', { fg = 'Gray', ctermfg = 'Gray' })
-
-vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'DiagnosticSignError', priority = 40 })
-vim.fn.sign_define('DiagnosticSignWarn', { text = 'W', texthl = 'DiagnosticSignWarn', priority = 30 })
-vim.fn.sign_define('DiagnosticSignInfo', { text = 'I', texthl = 'DiagnosticDefaultInfo', priority = 20 })
-vim.fn.sign_define('DiagnosticSignHint', { text = 'H', texthl = 'DiagnosticDefaultHint', priority = 10 })
