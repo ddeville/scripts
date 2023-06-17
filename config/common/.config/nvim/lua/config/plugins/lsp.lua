@@ -149,7 +149,7 @@ local servers = {
 
 -- This is a list of servers that are already installed on the machine and are not managed by Mason
 local pre_installed_servers = {
-  'sourcekit_lsp',
+  sourcekit = true,
 }
 
 return {
@@ -173,7 +173,7 @@ return {
         config = function()
           local server_names = {}
           for name, _ in pairs(servers) do
-            if pre_installed_servers[name] ~= nil then
+            if pre_installed_servers[name] == nil then
               server_names[#server_names + 1] = name
             end
           end
