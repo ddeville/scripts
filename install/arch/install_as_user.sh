@@ -49,7 +49,7 @@ scripts/bin/common/.local/bin/stow-config
 # Get pyenv ready
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 pyenv global system
-pyenv rehash shell
+pyenv rehash
 
 # Setup the shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
