@@ -1,4 +1,4 @@
-local clients = {
+local servers = {
   lua_ls = {
     settings = {
       Lua = {
@@ -147,11 +147,16 @@ local clients = {
   },
 }
 
+-- This is a list of servers that is already installed on the machine and doesn't need to be installed by Mason
+local pre_installed_servers = {
+  'sourcekit_lsp',
+}
+
 return {
   {
     'neovim/nvim-lspconfig',
     config = function()
-      for name, config in pairs(clients) do
+      for name, config in pairs(servers) do
         -- Extend capabilities with nvim-cmp's default capabilities
         local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
         config.capabilities = vim.tbl_deep_extend('force', config.capabilities or {}, lsp_capabilities)
@@ -166,19 +171,14 @@ return {
         -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's
         priority = 1000,
         config = function()
+          local server_names = {}
+          for name, _ in pairs(servers) do
+            if pre_installed_servers[name] ~= nil then
+              server_names[#server_names + 1] = name
+            end
+          end
           require('mason-lspconfig').setup({
-            ensure_installed = {
-              'bashls',
-              'clangd',
-              'gopls',
-              'lua_ls',
-              'pyright',
-              'ruff_lsp',
-              'rust_analyzer',
-              'terraformls',
-              'tsserver',
-              'yamlls',
-            },
+            ensure_installed = server_names,
             automatic_installation = true,
           })
         end,
