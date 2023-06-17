@@ -147,7 +147,7 @@ local servers = {
   },
 }
 
--- This is a list of servers that is already installed on the machine and doesn't need to be installed by Mason
+-- This is a list of servers that are already installed on the machine and are not managed by Mason
 local pre_installed_servers = {
   'sourcekit_lsp',
 }
