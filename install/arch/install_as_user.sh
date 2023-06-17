@@ -9,12 +9,18 @@ fi
 
 cd "$HOME"
 
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
 # Make fish the default shell
 if [ "$SHELL" != "/usr/bin/fish" ]; then
   chsh --shell /usr/bin/fish
 fi
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 rustup default stable
 rustup component add rust-src rustfmt clippy
 
@@ -40,10 +46,12 @@ paru -S --needed "${aur_packages[@]}" || true # we don't want to fail the whole 
 rm -f .bashrc .profile
 scripts/bin/common/.local/bin/stow-config
 
+# Get pyenv ready
+export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+pyenv global system
+pyenv rehash shell
+
 # Setup the shell plugins
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 scripts/bin/common/.local/bin/update-shell-plugins
 

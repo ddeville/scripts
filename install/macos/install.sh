@@ -9,6 +9,10 @@ fi
 
 cd "$HOME"
 
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
   echo "Installing Xcode Command Line Tools"
@@ -61,13 +65,15 @@ export PATH="$brew_path":$PATH
 rm -f "$HOME/.bashrc" "$HOME/.profile"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
 
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
+# Install shell plugins and terminfos
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
-
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
+
+# Get pyenv ready
+export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+pyenv global system
+pyenv rehash shell
 
 echo "Setting up 1Password"
 mkdir -p "$HOME/.1password"
