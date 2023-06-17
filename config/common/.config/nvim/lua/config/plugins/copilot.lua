@@ -1,9 +1,15 @@
 return {
   {
     'github/copilot.vim',
-    enabled = false,
+    -- Lazily load whenever we use `:Copilot enable`
+    cmd = 'Copilot',
     config = function()
-      vim.g.copilot_enabled = false
+      -- Only enable copilot for python and go for now
+      vim.g.copilot_filetypes = {
+        ['*'] = false,
+        python = true,
+        go = true,
+      }
     end,
   },
 }
