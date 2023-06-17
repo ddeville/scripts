@@ -48,6 +48,7 @@ scripts/bin/common/.local/bin/stow-config
 
 # Get pyenv ready
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+mkdir -p "$PYENV_ROOT"
 pyenv global system
 pyenv rehash
 
