@@ -98,6 +98,7 @@ tmux
 tree-sitter
 unzip
 vim
+wget
 zip
 zoxide
 
