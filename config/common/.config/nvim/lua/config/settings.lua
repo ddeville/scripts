@@ -125,7 +125,12 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagn
   },
   update_in_insert = false,
 })
-vim.diagnostic.config({ severity_sort = true })
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = true,
+  virtual_text = true,
+  float = { scope = 'line' },
+})
 
 -- setup gutter signs for diagnostics
 vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'DiagnosticSignError', priority = 40 })
