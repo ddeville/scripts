@@ -60,7 +60,7 @@ local function setup_lsp()
       if fname:sub(1, #api_path) == api_path then
         return api_path
       end
-      return require('lspconfig.server_configurations.pyright').default_config.root_dir
+      return require('lspconfig.server_configurations.pyright').default_config.root_dir()
     end,
     settings = {
       python = {
