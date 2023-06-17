@@ -1,13 +1,41 @@
-local function setup_lsp_client(name, config)
-  -- Extend capabilities with nvim-cmp's default capabilities
-  local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
-  config.capabilities = vim.tbl_deep_extend('force', config.capabilities or {}, lsp_capabilities)
-  config.capabilities = require('cmp_nvim_lsp').default_capabilities(config.capabilities)
-  require('lspconfig')[name].setup(config)
-end
+local clients = {
+  lua_ls = {
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT',
+          path = vim.list_extend(vim.split(package.path, ';'), { 'lua/?.lua', 'lua/?/init.lua' }),
+        },
+        diagnostics = {
+          -- Get the language server to recognize the `vim` global
+          globals = { 'vim' },
+        },
+        workspace = {
+          -- Make the server aware of Neovim runtime files
+          library = {
+            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+            [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+          },
+        },
+        telemetry = {
+          enable = false,
+        },
+      },
+    },
+  },
 
-local function setup_lsp()
-  setup_lsp_client('rust_analyzer', {
+  gopls = {
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+  },
+
+  rust_analyzer = {
     settings = {
       ['rust-analyzer'] = {
         checkOnSave = {
@@ -40,20 +68,33 @@ local function setup_lsp()
         },
       },
     },
-  })
+  },
 
-  setup_lsp_client('gopls', {
+  clangd = {
+    -- Specifically omitting proto here
+    filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+  },
+
+  sourcekit = {
+    -- We use clangd for C/CPP/Objc
+    filetypes = { 'swift' },
+  },
+
+  bashls = {},
+
+  tsserver = {},
+
+  terraformls = {},
+
+  yamlls = {
     settings = {
-      gopls = {
-        analyses = {
-          unusedparams = true,
-        },
-        staticcheck = true,
+      yaml = {
+        keyOrdering = false,
       },
     },
-  })
+  },
 
-  setup_lsp_client('pyright', {
+  pyright = {
     root_dir = function(fname)
       -- HAX: The API repo has a bunch of packages but a single pyrightconfig.json file...
       local api_path = '/Users/damien/code/api'
@@ -103,74 +144,21 @@ local function setup_lsp()
         end)(),
       },
     },
-  })
-
-  setup_lsp_client('tsserver', {})
-
-  setup_lsp_client('yamlls', {
-    settings = {
-      yaml = {
-        keyOrdering = false,
-      },
-    },
-  })
-
-  setup_lsp_client('terraformls', {})
-
-  setup_lsp_client('clangd', {
-    -- Specifically omitting proto here
-    filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
-  })
-
-  setup_lsp_client('sourcekit', {
-    -- We use clangd for C/CPP/Objc
-    filetypes = { 'swift' },
-  })
-
-  setup_lsp_client('lua_ls', {
-    settings = {
-      Lua = {
-        runtime = {
-          version = 'LuaJIT',
-          path = vim.list_extend(vim.split(package.path, ';'), { 'lua/?.lua', 'lua/?/init.lua' }),
-        },
-        diagnostics = {
-          -- Get the language server to recognize the `vim` global
-          globals = { 'vim' },
-        },
-        workspace = {
-          -- Make the server aware of Neovim runtime files
-          library = {
-            [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-            [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-          },
-        },
-        telemetry = {
-          enable = false,
-        },
-      },
-    },
-  })
-
-  setup_lsp_client('bashls', {})
-
-  -- Setup diagnostics
-
-  vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-    signs = true,
-    underline = true,
-    virtual_text = {
-      spacing = 4,
-      severity_limit = 'Hint', -- Basically show all messages
-    },
-    update_in_insert = false,
-  })
-end
+  },
+}
 
 return {
   {
     'neovim/nvim-lspconfig',
-    config = setup_lsp,
+    config = function()
+      for name, config in pairs(clients) do
+        -- Extend capabilities with nvim-cmp's default capabilities
+        local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
+        config.capabilities = vim.tbl_deep_extend('force', config.capabilities or {}, lsp_capabilities)
+        config.capabilities = require('cmp_nvim_lsp').default_capabilities(config.capabilities)
+        require('lspconfig')[name].setup(config)
+      end
+    end,
     dependencies = {
       {
         'williamboman/mason-lspconfig.nvim',
