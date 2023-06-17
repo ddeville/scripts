@@ -73,7 +73,7 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 # Get pyenv ready
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 pyenv global system
-pyenv rehash shell
+pyenv rehash
 
 echo "Setting up 1Password"
 mkdir -p "$HOME/.1password"
