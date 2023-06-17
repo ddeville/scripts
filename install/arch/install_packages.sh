@@ -13,3 +13,6 @@ sudo pacman -S --needed "${base_packages[@]}"
 readarray -t aur_packages < <(grep -Ev "^#|^$" "$script_dir/aur_packages.txt")
 /usr/bin/paru -Syy
 /usr/bin/paru -S --needed "${aur_packages[@]}"
+
+# Update everything
+/usr/bin/paru -Syu
