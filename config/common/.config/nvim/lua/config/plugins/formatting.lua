@@ -7,6 +7,7 @@ return {
 
       null_ls.setup({
         sources = {
+          null_ls.builtins.formatting.black,
           null_ls.builtins.formatting.buildifier,
           null_ls.builtins.formatting.fish_indent,
           null_ls.builtins.formatting.gofmt,

@@ -115,6 +115,7 @@ npm
 perf
 pyenv
 python
+python-black
 ruff
 rustup
 shellcheck

@@ -30,6 +30,7 @@ zoxide
 
 # =========== Development ===========
 
+black
 buildifier
 checkbashisms
 cmake
