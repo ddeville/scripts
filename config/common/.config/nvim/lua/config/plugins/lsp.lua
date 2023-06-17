@@ -171,13 +171,12 @@ return {
   {
     'neovim/nvim-lspconfig',
     config = setup_lsp,
-    -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's
-    priority = 51,
     dependencies = {
       {
         'williamboman/mason-lspconfig.nvim',
         version = '*',
-        priority = 50,
+        -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's
+        priority = 1000,
         config = function()
           require('mason-lspconfig').setup({
             ensure_installed = {

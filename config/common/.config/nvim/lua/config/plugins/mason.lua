@@ -3,7 +3,7 @@ return {
     'williamboman/mason.nvim',
     version = '*',
     -- It is important for mason and mason-lspconfig's setup to have run before lspconfig's
-    priority = 49,
+    priority = 1100,
     build = ':MasonUpdate',
     config = function()
       require('mason').setup({
