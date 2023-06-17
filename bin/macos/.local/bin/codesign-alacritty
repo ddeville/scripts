@@ -40,9 +40,8 @@ op document get "$op_api_key_name" --out-file "$api_key_path"
 rcodesign notary-submit --api-key-path "$api_key_path" --wait --staple "$tmp_app_path"
 
 # Replace the original app with the new signed one
-mv "$app_path" "${app_path}.bak"
+mv "$app_path" "$tmp_dir/Alacritty.app.bak"
 mv "$tmp_app_path" "$app_path"
-rm -rf "${app_path}.bak"
 
 # Force refreshing the icon...
 touch "$app_path"
