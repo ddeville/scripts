@@ -17,6 +17,7 @@ return {
 
       cmp.setup({
         sources = {
+          { name = 'copilot' },
           { name = 'nvim_lsp' },
           { name = 'nvim_lua' },
           { name = 'vsnip' },
@@ -35,6 +36,7 @@ return {
         formatting = {
           format = function(entry, vim_item)
             local menu = {
+              copilot = '[Copilot]',
               nvim_lsp = '[LSP]',
               nvim_lua = '[API]',
               vsnip = '[Snip]',

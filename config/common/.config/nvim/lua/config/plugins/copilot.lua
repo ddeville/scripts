@@ -1,15 +1,24 @@
 return {
   {
-    'github/copilot.vim',
+    'zbirenbaum/copilot.lua',
     -- Lazily load whenever we use `:Copilot enable`
     cmd = 'Copilot',
-    config = function()
+    opts = {
       -- Only enable copilot for python and go for now
-      vim.g.copilot_filetypes = {
-        ['*'] = false,
+      filetypes = {
         python = true,
         go = true,
-      }
-    end,
+        ['*'] = false,
+      },
+      -- Disable these since we use copilot-cmp
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+    },
+    dependencies = {
+      {
+        'zbirenbaum/copilot-cmp',
+        config = true,
+      },
+    },
   },
 }
