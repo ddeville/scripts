@@ -73,6 +73,8 @@ local servers = {
   clangd = {
     -- Specifically omitting proto here
     filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+    -- See https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428
+    capabilities = { offsetEncoding = { 'utf-16' } },
   },
 
   sourcekit = {
