@@ -46,6 +46,7 @@ ruff
 shellcheck
 shfmt
 stylua
+terraform
 
 # ============== Fonts ==============
 

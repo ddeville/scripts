@@ -123,6 +123,7 @@ rustup
 shellcheck
 shfmt
 stylua
+terraform
 
 # =============== X11 ===============
 
