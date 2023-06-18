@@ -104,7 +104,9 @@ zoxide
 
 # =========== Development ===========
 
+buf
 checkbashisms
+clang
 cmake
 gdb
 go

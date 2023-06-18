@@ -32,7 +32,9 @@ zoxide
 
 black
 buildifier
+buf
 checkbashisms
+clang-format
 cmake
 golang
 luarocks
