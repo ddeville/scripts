@@ -125,6 +125,16 @@ shfmt
 stylua
 terraform
 
+# =============== LSP ===============
+
+bash-language-server
+gopls
+lua-language-server
+pyright
+rust-analyzer
+typescript-language-server
+yaml-language-server
+
 # =============== X11 ===============
 
 bspwm
