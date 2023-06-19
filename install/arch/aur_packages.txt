@@ -8,6 +8,10 @@ jl
 pyenv-virtualenv
 sysz
 
+# =============== LSP ===============
+
+terraform-ls
+
 # =========== X11 Programs ==========
 
 1password
