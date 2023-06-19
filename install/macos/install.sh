@@ -50,9 +50,9 @@ fi
 
 mkdir -p "$HOME/.local/share"
 
+export CARGO_HOME="$HOME/.local/share/cargo"
+export RUSTUP_HOME="$HOME/.local/share/rustup"
 if ! command -v rustup &>/dev/null; then
-  export CARGO_HOME="$HOME/.local/share/cargo"
-  export RUSTUP_HOME="$HOME/.local/share/rustup"
   curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 fi
 "$HOME"/.local/share/cargo/bin/rustup default stable
