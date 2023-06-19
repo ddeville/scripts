@@ -15,13 +15,11 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 ## Post-installation
 
 - On MacOS, codesign Alacritty by running `codesign-alacritty` and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools"
-- Neovim needs some language providers to be installed manually (check with `nvim +checkhealth`):
-    - `python3 -m pip install --upgrade pynvim`
-    - `npm install -g neovim`
 - Check health of a few Neovim plugins and make sure that the appropriate packages are installed:
     - `nvim +checkhealth lazy`
     - `nvim +checkhealth mason`
     - `nvim +checkhealth null-ls`
+    - `nvim +checkhealth` to check health of everything at once
 
 ## Maintenance
 
