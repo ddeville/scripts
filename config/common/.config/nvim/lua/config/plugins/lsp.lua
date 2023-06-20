@@ -1,4 +1,24 @@
 local servers = {
+  bashls = {},
+
+  clangd = {
+    -- Specifically omitting proto here
+    filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+    -- See https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428
+    capabilities = { offsetEncoding = { 'utf-16' } },
+  },
+
+  gopls = {
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+  },
+
   lua_ls = {
     settings = {
       Lua = {
@@ -20,78 +40,6 @@ local servers = {
         telemetry = {
           enable = false,
         },
-      },
-    },
-  },
-
-  gopls = {
-    settings = {
-      gopls = {
-        analyses = {
-          unusedparams = true,
-        },
-        staticcheck = true,
-      },
-    },
-  },
-
-  rust_analyzer = {
-    settings = {
-      ['rust-analyzer'] = {
-        checkOnSave = {
-          enable = true,
-          -- Build out of tree so that we don't cause cargo lock contention
-          extraArgs = { '--target-dir', '/tmp/rust-analyzer-check' },
-        },
-        cargo = {
-          autoreload = true,
-        },
-        procMacro = {
-          enable = true,
-        },
-      },
-    },
-    capabilities = {
-      textDocument = {
-        completion = {
-          completionItem = {
-            -- We need snippets for nvim-cmp to fully support rust-analyzer magic
-            snippetSupport = true,
-            resolveSupport = {
-              properties = {
-                'documentation',
-                'detail',
-                'additionalTextEdits',
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-
-  clangd = {
-    -- Specifically omitting proto here
-    filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
-    -- See https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428
-    capabilities = { offsetEncoding = { 'utf-16' } },
-  },
-
-  sourcekit = {
-    -- We use clangd for C/CPP/Objc
-    filetypes = { 'swift' },
-  },
-
-  bashls = {},
-
-  tsserver = {},
-
-  terraformls = {},
-
-  yamlls = {
-    settings = {
-      yaml = {
-        keyOrdering = false,
       },
     },
   },
@@ -144,6 +92,58 @@ local servers = {
             return nil
           end
         end)(),
+      },
+    },
+  },
+
+  rust_analyzer = {
+    settings = {
+      ['rust-analyzer'] = {
+        checkOnSave = {
+          enable = true,
+          -- Build out of tree so that we don't cause cargo lock contention
+          extraArgs = { '--target-dir', '/tmp/rust-analyzer-check' },
+        },
+        cargo = {
+          autoreload = true,
+        },
+        procMacro = {
+          enable = true,
+        },
+      },
+    },
+    capabilities = {
+      textDocument = {
+        completion = {
+          completionItem = {
+            -- We need snippets for nvim-cmp to fully support rust-analyzer magic
+            snippetSupport = true,
+            resolveSupport = {
+              properties = {
+                'documentation',
+                'detail',
+                'additionalTextEdits',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  sourcekit = {
+    -- We use clangd for C/CPP/Objc
+    filetypes = { 'swift' },
+  },
+
+  terraformls = {},
+
+  tsserver = {},
+
+  yamlls = {
+    settings = {
+      yaml = {
+        keyOrdering = false,
       },
     },
   },
