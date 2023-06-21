@@ -95,6 +95,9 @@ spctl developer-mode enable-terminal
 # shellcheck disable=SC2016
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
@@ -113,11 +116,14 @@ defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
 defaults write NSGlobalDomain AppleShowAllExtensions -int 1
 defaults write NSGlobalDomain ContextMenuGesture -int 0
 defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 2
+defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 
 defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
 defaults write com.apple.dock show-recents -int 0
 defaults write com.apple.dock autohide -int 1
+defaults write com.apple.dock mru-spaces -bool false
 defaults write com.apple.dock magnification -int 0
 defaults write com.apple.dock mineffect "scale"
 defaults write com.apple.dock minimize-to-application -int 1
@@ -130,8 +136,24 @@ defaults write com.apple.dock wvous-tl-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 2
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
+defaults write com.apple.finder NewWindowTarget -string "PfHm"
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+defaults write com.apple.activitymonitor OpenMainWindow -bool true
 defaults write com.apple.activitymonitor ShowCategory -int 100
 defaults write com.apple.activitymonitor UpdatePeriod -int 1
+defaults write com.apple.activitymonitor SortColumn -string "CPUUsage"
+defaults write com.apple.activitymonitor SortDirection -int 0
+
+defaults write com.apple.siri StatusMenuVisible -bool false
+defaults write com.apple.menuextra.battery '{ ShowPercent = NO; }'
+defaults write com.apple.airplay showInMenuBarIfPresent -bool false
+
+defaults write com.apple.textedit RichText -int 0
 
 # Writing the following will not work unless Terminal/Alacritty is given Full Disk Access...
 defaults write com.apple.universalaccess closeViewSmoothImages -int 0
@@ -143,6 +165,29 @@ defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bo
 # Set thin glyphs/strokes in Alacritty
 defaults write org.alacritty AppleFontSmoothing -int 0
 
+# Nigthshift
+core_brightness_defaults_key="CBUser-$(dscl . -read ~ GeneratedUID | sed 's/GeneratedUID: //')"
+core_brightness_defaults_value='{
+  CBBlueLightReductionCCTTargetRaw = "3550.0";
+  CBBlueReductionStatus =     {
+    AutoBlueReductionEnabled = 1;
+    BlueLightReductionDisableScheduleAlertCounter = 3;
+    BlueLightReductionSchedule =         {
+      DayStartHour = 3;
+      DayStartMinute = 59;
+      NightStartHour = 4;
+      NightStartMinute = 0;
+    };
+    BlueReductionAvailable = 1;
+    BlueReductionEnabled = 1;
+    BlueReductionMode = 2;
+    BlueReductionSunScheduleAllowed = 1;
+    Version = 1;
+  };
+  CBColorAdaptationEnabled = 0;
+}'
+sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist "$core_brightness_defaults_key" "$core_brightness_defaults_value"
+
 # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
 hidutil property --set '{
   "UserKeyMapping": [{
@@ -150,6 +195,14 @@ hidutil property --set '{
     "HIDKeyboardModifierMappingDst": 0x7000000E0,
   }]
 }'
+
+# Make sure that Spotify doesn't start on login...
+mkdir -p "$HOME/Library/Application\ Support/Spotify"
+touch "$HOME/Library/Application\ Support/Spotify/prefs"
+if ! grep -q "app.autostart-mode" "$HOME/Library/Application\ Support/Spotify/prefs"; then
+  echo 'app.autostart-mode="off"' >>"$HOME/Library/Application\ Support/Spotify/prefs"
+  echo 'app.autostart-banner-seen=true' >>"$HOME/Library/Application\ Support/Spotify/prefs"
+fi
 
 # If `scripts` was downloaded as an archive, clone the git repo instead
 if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
