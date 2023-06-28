@@ -1,9 +1,9 @@
 [[ssh-keys]]
 account = "Kattungar"
 vault = "Personal"
-item = "p4hsuge7xjyojaj3usedonlycy"
+item = "Personal SSH Key"
 
 [[ssh-keys]]
 account = "OpenAI"
 vault = "Private"
-item = "6pokvo3xicn64dnaycilobyuii"
+item = "OpenAI SSH Key"
