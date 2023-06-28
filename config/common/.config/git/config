@@ -27,6 +27,8 @@
 [mergetool]
     prompt = false
     keepBackup = false
+[mergetool "vimdiff"]
+    layout = (LOCAL,BASE,REMOTE)/MERGED
 [push]
     default = simple
     autoSetupRemote = true
