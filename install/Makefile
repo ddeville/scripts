@@ -1,7 +1,5 @@
 .PHONY: install packages stow shell-plugins
 
-all: install
-
 UNAME_S := $(shell uname -s)
 
 install:
