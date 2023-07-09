@@ -12,7 +12,6 @@ gh
 git
 htop
 hyperfine
-koenbollen/public/jl
 jless
 jq
 lazygit
