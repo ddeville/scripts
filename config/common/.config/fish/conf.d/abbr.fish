@@ -7,6 +7,7 @@ alias tree "exa --tree --level=3"
 alias gaa "git add -A; and git ci"
 alias gaaa "git add -A; and git ci --amend --no-edit"
 alias gaau "git add -A; and git cu"
+alias gcm "git co master"
 alias oo "open ."
 alias tf terraform
 
