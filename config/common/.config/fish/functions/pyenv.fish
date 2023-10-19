@@ -11,10 +11,11 @@ function pyenv
         case activate deactivate rehash shell
             source (pyenv "sh-$command" $argv|psub)
         case install
+            set -gx PYTHON_CONFIGURE_OPTS "--enable-optimizations --with-lto --disable-shared"
+            set -gx PYTHON_CFLAGS "-march=native -mtune=native"
+            echo "Note: Building Python with optimization options (see ~/.config/fish/functions/pyenv.fish for more info)"
+
             if test (uname) = Darwin
-                # YouCompleteMe requires Python built with framework enabled
-                set -gx PYTHON_CONFIGURE_OPTS --enable-framework
-                echo "Note: Building Python with `--enable-framework` (see ~/.config/fish/functions/pyenv.fish for more info)"
                 # Homebrew doesn't add symlinks for openssl on macOS since they already
                 # install LibreSSL and they'd conflict.
                 # Since building Python requires OpenSSL let's add these paths.
@@ -29,12 +30,8 @@ function pyenv
                 else
                     echo "Note: OpenSSL is not installed with Homebrew, building Python will likely fail"
                 end
-            else
-                # YouCompleteMe requires Python built with shared libs enabled
-                set -gx PYTHON_CONFIGURE_OPTS --enable-shared
-                echo "Note: Building Python with `--enable-shared` (see ~/.config/fish/functions/pyenv.fish for more info)"
+                command pyenv "$command" $argv
             end
-            command pyenv "$command" $argv
         case '*'
             command pyenv "$command" $argv
     end
