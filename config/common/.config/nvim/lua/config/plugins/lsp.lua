@@ -209,11 +209,13 @@ return {
     config = function()
       -- Display an indicator in the sign column when a code action is available
       vim.fn.sign_define('LightBulbSign', { text = '▶', texthl = 'LspDiagnosticsDefaultInformation' })
-      vim.api.nvim_create_autocmd('CursorHold,CursorHoldI', {
-        pattern = '*',
-        callback = function(args)
-          require('nvim-lightbulb').update_lightbulb()
-        end,
+      require('nvim-lightbulb').setup({
+        autocmd = { enabled = true },
+        sign = {
+          enabled = true,
+          text = '▶',
+          hl = 'LightBulbSign',
+        },
       })
     end,
   },
