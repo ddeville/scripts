@@ -31,7 +31,7 @@ return {
         cpp = { 'clang_format' },
         cuda = { 'clang_format' },
         fish = { 'fish_indent' },
-        go = { 'goimport', 'gofmt' },
+        go = { 'gofmt' },
         lua = { 'stylua' },
         objc = { 'clang_format' },
         objcpp = { 'clang_format' },
