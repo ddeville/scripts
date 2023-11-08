@@ -1,53 +1,47 @@
 return {
-  {
-    'jose-elias-alvarez/null-ls.nvim',
-    config = function()
-      local null_ls = require('null-ls')
-      local au = vim.api.nvim_create_augroup('LspFormatting', {})
+  'stevearc/conform.nvim',
+  config = function()
+    local conform = require('conform')
 
-      null_ls.setup({
-        sources = {
-          null_ls.builtins.formatting.black.with({
-            args = {
-              '--stdin-filename',
-              '$FILENAME',
-              '--quiet',
-              '--line-length',
-              '100',
-              '-',
-            },
-          }),
-          null_ls.builtins.formatting.buf,
-          null_ls.builtins.formatting.buildifier,
-          null_ls.builtins.formatting.clang_format.with({ filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } }),
-          null_ls.builtins.formatting.fish_indent,
-          null_ls.builtins.formatting.gofmt,
-          null_ls.builtins.formatting.ruff,
-          null_ls.builtins.formatting.rustfmt,
-          null_ls.builtins.formatting.shfmt.with({ args = { '-filename', '$FILENAME', '--simplify', '--indent', '2' } }),
-          null_ls.builtins.formatting.stylua,
-          null_ls.builtins.formatting.terraform_fmt,
-        },
-        on_attach = function(client, bufnr)
-          if client.supports_method('textDocument/formatting') then
-            vim.api.nvim_clear_autocmds({ group = au, buffer = bufnr })
-            vim.api.nvim_create_autocmd('BufWritePre', {
-              group = au,
-              buffer = bufnr,
-              callback = function()
-                vim.lsp.buf.format({
-                  async = false,
-                  bufnr = bufnr,
-                  -- Only allow null-ls to format buffers
-                  filter = function(c)
-                    return c.name == 'null-ls'
-                  end,
-                })
-              end,
-            })
-          end
-        end,
-      })
-    end,
-  },
+    conform.formatters.shfmt = {
+      inherit = false,
+      command = 'shfmt',
+      args = { '-filename', '$FILENAME', '--simplify', '--indent', '2' },
+    }
+    conform.formatters.black = {
+      inherit = false,
+      command = 'black',
+      args = {
+        '--stdin-filename',
+        '$FILENAME',
+        '--quiet',
+        '--line-length',
+        '100',
+        '-',
+      },
+    }
+
+    conform.setup({
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+      formatters_by_ft = {
+        c = { 'clang_format' },
+        cpp = { 'clang_format' },
+        cuda = { 'clang_format' },
+        fish = { 'fish_indent' },
+        go = { 'goimport', 'gofmt' },
+        lua = { 'stylua' },
+        objc = { 'clang_format' },
+        objcpp = { 'clang_format' },
+        proto = { 'buf' },
+        python = { 'ruff', 'black' },
+        rust = { 'rustfmt' },
+        sh = { 'shfmt' },
+        terraform = { 'terraform_fmt' },
+        -- TODO: Add buildifier https://github.com/stevearc/conform.nvim/issues/182
+      },
+    })
+  end,
 }

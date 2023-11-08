@@ -19,7 +19,7 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 - Check health of a few Neovim plugins and make sure that the appropriate packages are installed:
     - `nvim +checkhealth lazy`
     - `nvim +checkhealth mason`
-    - `nvim +checkhealth null-ls`
+    - `nvim +checkhealth conform`
     - `nvim +checkhealth` to check health of everything at once
 
 ## Maintenance
