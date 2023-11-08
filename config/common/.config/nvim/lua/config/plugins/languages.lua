@@ -3,7 +3,7 @@ return {
     'rust-lang/rust.vim',
     ft = 'rust',
     config = function()
-      -- we use null-ls to run rustfmt
+      -- we use conform to run rustfmt
       vim.g.rustfmt_autosave = 0
     end,
   },
@@ -18,7 +18,7 @@ return {
       vim.g.go_diagnostics_enabled = 0
       vim.g.go_echo_go_info = 0
       vim.g.go_metalinter_enabled = 0
-      -- we use null-ls to run gofmt
+      -- we use conform to run gofmt
       vim.g.go_fmt_autosave = 0
     end,
   },
