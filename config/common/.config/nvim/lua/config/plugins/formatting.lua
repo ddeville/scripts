@@ -27,6 +27,7 @@ return {
         lsp_fallback = true,
       },
       formatters_by_ft = {
+        bzl = { 'buildifier' },
         c = { 'clang_format' },
         cpp = { 'clang_format' },
         cuda = { 'clang_format' },
@@ -40,7 +41,6 @@ return {
         rust = { 'rustfmt' },
         sh = { 'shfmt' },
         terraform = { 'terraform_fmt' },
-        -- TODO: Add buildifier https://github.com/stevearc/conform.nvim/issues/182
       },
     })
   end,
