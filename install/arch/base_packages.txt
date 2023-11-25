@@ -72,7 +72,7 @@ acpid
 bat
 curl
 dust
-exa
+eza
 dialog
 duf
 duplicity
