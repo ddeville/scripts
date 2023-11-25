@@ -4,7 +4,7 @@ bash
 bat
 curl
 dust
-exa
+eza
 fd
 fish
 fzf
