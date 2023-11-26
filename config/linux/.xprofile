@@ -50,6 +50,9 @@ xset dpms 600 600 600
 # Tweak screen color to be easier on the eyes
 redshift -P -O 4500
 
+# Start picom compositor
+# picom --daemon
+
 # Start keyring and polkit auth agent
 gnome-keyring-daemon --start --components=pkcs11,secrets
 if [ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && ! pgrep "polkit-mate" >/dev/null; then
