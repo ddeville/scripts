@@ -37,6 +37,9 @@ for i in /sys/class/hwmon/hwmon*/temp*_input; do
   fi
 done
 
+# start picom compositor
+picom --daemon
+
 # setup sxhkd
 killall --quiet --wait --user "$USER" --exact sxhkd >/dev/null
 sxhkd &
