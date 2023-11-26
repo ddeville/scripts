@@ -51,7 +51,7 @@ xset dpms 600 600 600
 redshift -P -O 4500
 
 # Start picom compositor
-# picom --daemon
+picom --daemon
 
 # Start keyring and polkit auth agent
 gnome-keyring-daemon --start --components=pkcs11,secrets
