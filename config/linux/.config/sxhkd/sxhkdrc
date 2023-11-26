@@ -4,7 +4,7 @@ super + Return
 
 # browser
 super + backslash
-	firefox
+	google-chrome-stable
 
 # program launcher
 super + @space
