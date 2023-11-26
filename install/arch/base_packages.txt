@@ -144,6 +144,7 @@ lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 lxappearance
 maim
+picom
 polybar
 redshift
 rofi
