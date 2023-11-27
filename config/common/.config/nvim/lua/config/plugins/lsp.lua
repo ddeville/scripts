@@ -189,17 +189,13 @@ return {
   },
   {
     'j-hui/fidget.nvim',
-    -- TODO(damien): Remove legacy tag once new version has been released https://github.com/j-hui/fidget.nvim
-    tag = 'legacy',
     config = function()
       -- LSP Status
       require('fidget').setup({
-        text = {
-          spinner = 'bouncing_bar',
-        },
-        timer = {
-          fidget_decay = 0,
-          task_decay = 200,
+        progress = {
+          display = {
+            progress_icon = { pattern = 'bouncing_bar' },
+          },
         },
       })
     end,
