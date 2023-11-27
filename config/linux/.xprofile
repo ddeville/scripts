@@ -1,16 +1,16 @@
 #!/bin/bash
 
-DPI=144
+export DPI=144
 
 if [[ $(hostname) == "arch" ]]; then
   # This is my home machine with two monitors
   xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
   xrandr --output DisplayPort-1 --mode 3840x2160 --pos 3840x0 --rotate right
-  DPI=140
+  export DPI=140
 elif [[ $(hostname) == "archvm"* ]]; then
   # Random Arch VMs in libvirt
   xrandr --output Virtual-1 --mode 1920x1440 --primary
-  DPI=140
+  export DPI=140
 fi
 
 # Update the DPI in the X resources
