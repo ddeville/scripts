@@ -1,7 +1,6 @@
 configuration {
   modi: "window,drun,ssh,combi";
   font: "Public Sans 12";
-  dpi: 140;
   combi-modi: "window,drun,ssh";
   show-icons: true;
   icon-theme: "Faenza";
