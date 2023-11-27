@@ -195,6 +195,7 @@ return {
         progress = {
           display = {
             progress_icon = { pattern = 'bouncing_bar' },
+            done_ttl = 1,
           },
         },
       })
