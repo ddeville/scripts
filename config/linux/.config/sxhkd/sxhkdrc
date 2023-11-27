@@ -8,11 +8,11 @@ super + backslash
 
 # program launcher
 super + @space
-	rofi -show drun -m -1
+	rofi -show drun -m -1 -dpi $DPI
 super + d
-	rofi -show drun -m -1
+	rofi -show drun -m -1 -dpi $DPI
 ctrl + @space
-	rofi -show drun -m -1
+	rofi -show drun -m -1 -dpi $DPI
 
 super + shift + d
 	slock & sleep 0.5 && xset dpms force off
