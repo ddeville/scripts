@@ -1,2 +1,7 @@
 --hidden
 --glob=!.git/
+--glob=!pnpm-lock.yaml
+--glob=!package-lock.json
+--glob=!yarn.lock
+--glob=!*.whl
+--glob=!tiktoken_vocab_files/
