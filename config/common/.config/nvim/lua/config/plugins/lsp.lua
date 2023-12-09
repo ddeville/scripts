@@ -42,14 +42,6 @@ local servers = {
   },
 
   pyright = {
-    root_dir = function(fname)
-      -- HAX: The OpenAI repo has a bunch of packages but a single pyrightconfig.json file...
-      local openai_path = '/Users/damien/code/openai'
-      if fname:sub(1, #openai_path) == openai_path then
-        return openai_path
-      end
-      return require('lspconfig.server_configurations.pyright').default_config.root_dir()
-    end,
     settings = {
       python = {
         analysis = {
