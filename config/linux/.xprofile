@@ -9,6 +9,10 @@ elif [[ $(hostname) == "archvm"* ]]; then
   # Random Arch VMs in libvirt
   DPI=140
   xrandr --output Virtual-1 --mode 1920x1440 --primary
+elif [[ $(hostname) == "framework" ]]; then
+  # Framework laptop
+  DPI=160
+  xrandr --output eDP --mode 2256x1504 --primary
 else
   DPI=96
 fi
@@ -26,7 +30,7 @@ xsetroot -cursor_name left_ptr
 
 # If not running on my main desktop that has a programmed keychron keyboard, let's tweak
 # a few keys.
-if [[ $(hostname) != "arch" ]] && [[ $(hostname) != "archvm"* ]]; then
+if [[ $(hostname) == "framework" ]]; then
   # Turn CapsLock into Control, Control_L into Super_L and Super_L into Control_L
   # This is because:
   #   1. I have always used CapsLock as Control on the command line
