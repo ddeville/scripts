@@ -27,7 +27,7 @@ super + Escape
 	pkill -USR1 -x sxhkd
 
 # quit/restart bspwm
-super + alt + {q,r}
+super + ctrl + {q,r}
 	bspc {quit,wm -r}
 
 # close and kill window
@@ -47,11 +47,11 @@ super + m
 	bspc desktop -l next
 
 # focus or send to the next/previous monitor
-super + {_,shift + }bracket{left,right}
+super + shift + bracket{left,right}
 	bspc {monitor -f,node -m} {prev,next}
 
 # focus the next/previous desktop in the current monitor
-alt + bracket{left,right}
+super + bracket{left,right}
 	bspc desktop -f {prev,next}.local
 
 # focus or send the window to the given desktop on the current monitor
