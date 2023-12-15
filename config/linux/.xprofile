@@ -50,6 +50,9 @@ if [[ $(hostname) == "framework" ]]; then
   xmodmap -e "add control = Control_L Control_R"
   xmodmap -e "add mod1 = Alt_L Alt_R Alt_L Meta_L"
   xmodmap -e "add mod4 = Super_L Super_R Super_L Hyper_L"
+
+  # Natural scrolling
+  xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Natural Scrolling Enabled" 1
 fi
 
 # Sleep and screen saver
