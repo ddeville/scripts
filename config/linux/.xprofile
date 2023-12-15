@@ -43,6 +43,8 @@ if [[ $(hostname) == "framework" ]]; then
   xmodmap -e "keycode 64 = Control_L"
   # Set Right Alt to Left Super
   xmodmap -e "keycode 108 = Super_L"
+  # Set Left Control to Left Super
+  xmodmap -e "keycode 37 = Super_L"
   # Set Left Super to Left Alt
   xmodmap -e "keycode 133 = Alt_L"
 
