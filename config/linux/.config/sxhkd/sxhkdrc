@@ -110,6 +110,10 @@ XF86AudioPrev
 XF86AudioNext
 	playerctl --player=spotify next
 
+# screen brightness
+XF86MonBrightness{Up,Down}
+	brightnessctl s 10{+,-}
+
 # dunst
 ctrl + period
 	dunstctl close
