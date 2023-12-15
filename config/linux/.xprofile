@@ -50,9 +50,6 @@ if [[ $(hostname) == "framework" ]]; then
   xmodmap -e "add control = Control_L Control_R"
   xmodmap -e "add mod1 = Alt_L Alt_R Alt_L Meta_L"
   xmodmap -e "add mod4 = Super_L Super_R Super_L Hyper_L"
-
-  # "Natural" scrolling
-  xmodmap -e "pointer = 1 2 3 5 4 6 7 8 9 10 11 12"
 fi
 
 # Sleep and screen saver
