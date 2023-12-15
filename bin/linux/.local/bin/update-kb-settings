@@ -1,10 +1,40 @@
-#!/bin/sh
+#!/bin/bash
 
 xset r rate 180 50
+xsetroot -cursor_name left_ptr
 
 if [ -f /etc/X11/xinit/.Xmodmap ]; then
   xmodmap /etc/X11/xinit/.Xmodmap
 fi
 if [ -e "$HOME/.Xmodmap" ]; then
   xmodmap "$HOME/.Xmodmap"
+fi
+
+# If not running on my main desktop that has a programmed keychron keyboard, let's tweak
+# a few keys.
+if [[ $(hostname) == "framework" ]]; then
+  # Clear all the modifiers that we're going to edit
+  xmodmap -e "clear lock"
+  xmodmap -e "clear control"
+  xmodmap -e "clear mod1"
+  xmodmap -e "clear mod4"
+
+  # Set Caps Lock to Left Control
+  xmodmap -e "keycode 66 = Control_L"
+  # Set Left Alt to Left Control
+  xmodmap -e "keycode 64 = Control_L"
+  # Set Right Alt to Left Super
+  xmodmap -e "keycode 108 = Super_L"
+  # Set Left Control to Left Super
+  xmodmap -e "keycode 37 = Super_L"
+  # Set Left Super to Left Alt
+  xmodmap -e "keycode 133 = Alt_L"
+
+  # Restore the modifiers
+  xmodmap -e "add control = Control_L Control_R"
+  xmodmap -e "add mod1 = Alt_L Alt_R Alt_L Meta_L"
+  xmodmap -e "add mod4 = Super_L Super_R Super_L Hyper_L"
+
+  # Natural scrolling
+  xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Natural Scrolling Enabled" 1
 fi
