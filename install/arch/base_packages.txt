@@ -96,6 +96,7 @@ ripgrep
 stow
 tmux
 tree-sitter
+tree-sitter-cli
 unzip
 vim
 wget
@@ -137,6 +138,7 @@ yaml-language-server
 
 # =============== X11 ===============
 
+brightnessctl
 bspwm
 dunst
 lightdm
