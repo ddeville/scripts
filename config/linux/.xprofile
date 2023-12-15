@@ -31,27 +31,23 @@ xsetroot -cursor_name left_ptr
 # If not running on my main desktop that has a programmed keychron keyboard, let's tweak
 # a few keys.
 if [[ $(hostname) == "framework" ]]; then
-  # Turn CapsLock into Control, Control_L into Super_L and Super_L into Control_L
-  # This is because:
-  #   1. I have always used CapsLock as Control on the command line
-  #   2. I have used macs forever and have that Command key location wired in my fingers
-  #   3. We need a key to act as Super mod for the window manager (Control_R here)
-
   xmodmap -e "clear lock"
   xmodmap -e "clear control"
+  xmodmap -e "clear mod1"
   xmodmap -e "clear mod4"
 
-  # Set Left Alt to Left Control
-  xmodmap -e "keycode 64 = Control_L"
   # Set Caps Lock to Left Control
   xmodmap -e "keycode 66 = Control_L"
+  # Set Left Alt to Left Control
+  xmodmap -e "keycode 64 = Control_L"
   # Set Right Alt to Left Super
   xmodmap -e "keycode 108 = Super_L"
   # Set Left Super to Left Alt
   xmodmap -e "keycode 133 = Alt_L"
 
   xmodmap -e "add control = Control_L Control_R"
-  xmodmap -e "add mod4 = Super_L Super_R"
+  xmodmap -e "add mod1 = Alt_L Alt_R Alt_L Meta_L"
+  xmodmap -e "add mod4 = Super_L Super_R Super_L Hyper_L"
 fi
 
 # Sleep and screen saver
