@@ -35,18 +35,20 @@ if [[ $(hostname) == "framework" ]]; then
   # This is because:
   #   1. I have always used CapsLock as Control on the command line
   #   2. I have used macs forever and have that Command key location wired in my fingers
-  #   3. We need a key to act as Super mod for the window manager (Control_L here)
+  #   3. We need a key to act as Super mod for the window manager (Control_R here)
 
   xmodmap -e "clear lock"
   xmodmap -e "clear control"
   xmodmap -e "clear mod4"
 
-  # Set Left Control to Left Super
-  xmodmap -e "keycode 37 = Super_L"
+  # Set Left Alt to Left Control
+  xmodmap -e "keycode 64 = Control_L"
   # Set Caps Lock to Left Control
   xmodmap -e "keycode 66 = Control_L"
-  # Set Left Super to Left Control
-  xmodmap -e "keycode 133 = Control_L"
+  # Set Right Alt to Left Super
+  xmodmap -e "keycode 108 = Super_L"
+  # Set Left Super to Left Alt
+  xmodmap -e "keycode 133 = Alt_L"
 
   xmodmap -e "add control = Control_L Control_R"
   xmodmap -e "add mod4 = Super_L Super_R"
