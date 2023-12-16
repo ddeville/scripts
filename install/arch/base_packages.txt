@@ -119,6 +119,7 @@ perf
 pyenv
 python
 python-black
+python-pip
 ruff
 rustup
 shellcheck
