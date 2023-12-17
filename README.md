@@ -22,6 +22,12 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
     - `nvim +checkhealth conform`
     - `nvim +checkhealth` to check health of everything at once
 
+### Biometrics on Arch Linux
+
+- Enroll finger `fprintd-enroll damien -f right-index-finger`
+- Edit `/etc/pam.d/polkit-1` and add `auth sufficient pam_fprintd.so` to the top
+- Repeat with whatever file is appropriate in `/etc/pam.d/*`
+
 ## Maintenance
 
 - Run `make -C install shell-plugins` to update the shell plugins.
