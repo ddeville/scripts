@@ -40,6 +40,7 @@ nss-mdns
 openbsd-netcat
 openssh
 rsync
+systemd-resolvconf
 wireguard-tools
 
 # ============= Security ============
