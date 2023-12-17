@@ -36,11 +36,13 @@ iptables-nft
 libvncserver
 networkmanager
 network-manager-applet
+nm-connection-editor
 nss-mdns
 openbsd-netcat
 openssh
 rsync
 systemd-resolvconf
+usbutils
 wireguard-tools
 
 # ============= Security ============
@@ -143,6 +145,7 @@ yaml-language-server
 brightnessctl
 bspwm
 dunst
+libnotify
 lightdm
 lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
