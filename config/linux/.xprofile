@@ -45,7 +45,7 @@ if [ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && ! pgrep "po
 fi
 
 # Start regular applications that we want at startup
-apps=("dropbox" "1password")
+apps=("1password")
 for app in "${apps[@]}"; do
   if [ -x "/usr/bin/$app" ] && ! pgrep "$app" >/dev/null; then
     "/usr/bin/$app" &
