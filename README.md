@@ -28,6 +28,21 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 - Edit `/etc/pam.d/polkit-1` and add `auth sufficient pam_fprintd.so` to the top
 - Repeat with whatever file is appropriate in `/etc/pam.d/*`
 
+### Lightdm on Arch Linux
+
+Edit the `/etc/lightdm/lightdm-gtk-greeter.conf` config file and add the following:
+
+```
+[greeter]
+xft-dpi=160
+background=/usr/share/backgrounds/lightdm.jpg # copy the background to this location
+clock-format=%a %b %d %I:%M%p
+indicators=~session;~spacer;~clock;~spacer;~power
+theme-name=Adwaita-dark
+icon-theme-name=Adwaita
+font-name="Public Sans"
+```
+
 ## Maintenance
 
 - Run `make -C install shell-plugins` to update the shell plugins.
