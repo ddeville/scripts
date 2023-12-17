@@ -146,6 +146,7 @@ yaml-language-server
 brightnessctl
 bspwm
 dunst
+gnome-themes-extra
 libnotify
 lightdm
 lightdm-gtk-greeter
