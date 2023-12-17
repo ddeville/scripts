@@ -44,6 +44,10 @@ if [ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ] && ! pgrep "po
   disown
 fi
 
+# Start nm-applet to display network connections in the tray
+nm-applet &
+disown
+
 # Start regular applications that we want at startup
 apps=("1password")
 for app in "${apps[@]}"; do
