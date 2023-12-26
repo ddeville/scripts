@@ -35,7 +35,7 @@ Edit the `/etc/lightdm/lightdm-gtk-greeter.conf` config file and add the followi
 ```
 [greeter]
 xft-dpi=160
-background=/usr/share/backgrounds/lightdm.jpg # copy the background to this location
+background=/usr/share/backgrounds/18.jpg # copy the background to this location
 clock-format=%a %b %d %I:%M%p
 indicators=~session;~spacer;~clock;~spacer;~power
 theme-name=Adwaita-dark
