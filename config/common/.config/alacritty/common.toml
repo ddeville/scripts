@@ -1,0 +1,40 @@
+live_config_reload = true
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[env]
+TERM = "alacritty"
+
+[scrolling]
+history = 100_000
+
+[cursor]
+style = "Block"
+unfocused_hollow = true
+
+[bell]
+duration = 0
+command = "None"
+
+[window]
+startup_mode = "Windowed"
+decorations = "full"
+title = "Alacritty"
+dynamic_title = false
+
+[font.normal]
+family = "AnonymicePro Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "AnonymicePro Nerd Font"
+style = "Regular"
+
+[font.italic]
+family = "AnonymicePro Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "AnonymicePro Nerd Font"
+style = "Italic"
