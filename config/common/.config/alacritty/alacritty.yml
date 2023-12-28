@@ -1,4 +1,0 @@
-import:
-  - "~/.config/alacritty/common.yml"
-  - "~/.config/alacritty/platform.yml"
-  - "~/.local/state/base16/base16-alacritty.yml"

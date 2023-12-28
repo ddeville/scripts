@@ -1,0 +1,53 @@
+[window]
+dynamic_padding = true
+
+[window.dimensions]
+columns = 100
+lines = 40
+
+[window.padding]
+x = 2
+y = 2
+
+[font]
+size = 14
+
+[font.offset]
+y = 5
+
+[font.glyph_offset]
+y = 2
+
+# Doesn't seem to have any effect on macOS (where I need it)
+# alt_send_esc = true
+
+# On macOS Option doesn't act as a meta alt key (send the esc sequence) and unfortunately Alacritty doesn't support
+# remapping the modifier entirely (and `alt_send_esc` doesn't seem to work, at least in the shell)
+# So instead we remap the bindings that we care about.
+[[key_bindings]]
+key = "S"
+mods = "Alt"
+chars = "\u001bs"
+
+[[key_bindings]]
+key = "C"
+mods = "Alt"
+chars = "\u001bc"
+
+# On Linux, ctlr-c (obviously) doesn't copy and one has to use ctrl-shift-c. Since I bind ctrl to cmd when using Linux
+# I'm too used to it so also map cmd-shift-{c,v} to copy and paste on macos too...
+[[key_bindings]]
+key = "C"
+mods = "Command|Shift"
+action = "Copy"
+
+[[key_bindings]]
+key = "V"
+mods = "Command|Shift"
+action = "Paste"
+
+# By default, on macos cmd-N calls CreateNewInstance
+[[key_bindings]]
+key = "N"
+mods = "Command"
+action = "CreateNewWindow"
