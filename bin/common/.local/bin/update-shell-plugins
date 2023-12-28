@@ -9,7 +9,7 @@ repos=(
   "https://github.com/tinted-theming/base16-shell.git"
   "https://github.com/tinted-theming/base16-tmux.git"
   "https://github.com/tinted-theming/base16-fzf.git"
-  "https://github.com/aarowill/base16-alacritty.git"
+  "https://github.com/ddeville/base16-alacritty.git"
 )
 
 for repo in "${repos[@]}"; do
@@ -17,9 +17,16 @@ for repo in "${repos[@]}"; do
   path="$base16_path/$folder_name"
   # If the repo was never cloned, do so, otherwise just update it
   if [ -d "$path" ]; then
+    # If the repo already exists, check if the remote has changed and update it if needed
     pushd "$path" || exit 1
+    current_remote_url=$(git remote get-url origin)
+    if [ "$current_remote_url" != "$repo" ]; then
+      git remote set-url origin "$repo"
+    fi
+    # Pull the latest changes
     git pull --rebase
     popd || exit 1
+
   else
     git clone "$repo" "$path"
   fi
