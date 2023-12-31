@@ -9,7 +9,7 @@ repos=(
   "https://github.com/tinted-theming/base16-shell.git"
   "https://github.com/tinted-theming/base16-tmux.git"
   "https://github.com/tinted-theming/base16-fzf.git"
-  "https://github.com/ddeville/base16-alacritty.git"
+  "https://github.com/aarowill/base16-alacritty.git"
 )
 
 for repo in "${repos[@]}"; do
