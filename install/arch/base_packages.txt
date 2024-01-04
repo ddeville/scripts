@@ -123,6 +123,7 @@ perf
 pyenv
 python
 python-black
+python-isort
 python-pip
 ruff
 rustup

@@ -37,7 +37,7 @@ return {
         objc = { 'clang_format' },
         objcpp = { 'clang_format' },
         proto = { 'buf' },
-        python = { 'ruff', 'black' },
+        python = { 'ruff', 'black', 'isort' },
         rust = { 'rustfmt' },
         sh = { 'shfmt' },
         terraform = { 'terraform_fmt' },
