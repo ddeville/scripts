@@ -37,6 +37,7 @@ checkbashisms
 clang-format
 cmake
 golang
+isort
 luarocks
 ninja
 node
