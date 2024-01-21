@@ -16,11 +16,13 @@
 [commit]
     gpgsign = true
 [diff]
-    tool = vimdiff
+    tool = difftastic
     algorithm = patience
     compactionHeuristic = true
 [difftool]
     prompt = false
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
 [merge]
     tool = vimdiff
     conflictstyle = zdiff3
@@ -29,6 +31,8 @@
     keepBackup = false
 [mergetool "vimdiff"]
     layout = (LOCAL,BASE,REMOTE)/MERGED
+[pager]
+    difftool = true
 [push]
     default = simple
     autoSetupRemote = true
