@@ -78,6 +78,7 @@ curl
 dust
 eza
 dialog
+difftastic
 duf
 duplicity
 fd
