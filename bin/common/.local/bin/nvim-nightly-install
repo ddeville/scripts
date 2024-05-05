@@ -24,7 +24,7 @@ function _nvim_nightly_prebuilt {
 
   # Get the download URL for the nightly package for the current platform
   if [ "$(uname)" = "Darwin" ]; then
-    filename="nvim-macos.tar.gz"
+    filename="nvim-macos-$(uname -m).tar.gz"
     foldername="nvim-macos"
   elif [ "$(uname)" = "Linux" ]; then
     filename="nvim-linux64.tar.gz"
