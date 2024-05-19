@@ -27,8 +27,8 @@ return {
       -- don't show `-- INSERT --` since we have a fancy status line
       vim.opt.showmode = false
 
-      -- By default the gruvbox theme has_overrides uses cyan for insert and green for
-      -- command but I'm so used to it being the opposite...
+      -- By default the gruvbox theme uses cyan for insert and green for command but I'm so
+      -- used to it being the opposite...
       local gruvbox = require('lualine.themes.gruvbox')
       gruvbox.command.a.bg, gruvbox.insert.a.bg = gruvbox.insert.a.bg, gruvbox.command.a.bg
       -- Also some components in the middle change color between modes which is annoying.
