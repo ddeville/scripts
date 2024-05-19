@@ -11,7 +11,7 @@ return {
         underline = false,
         bold = false,
         italic = {
-          strings = true,
+          strings = false,
           emphasis = true,
           comments = true,
           operators = false,
