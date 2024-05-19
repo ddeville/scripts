@@ -22,10 +22,12 @@ return {
     }
 
     conform.setup({
-      format_on_save = {
-        timeout_ms = 1000,
-        lsp_fallback = false,
+      format_after_save = {
+        lsp_fallback = true,
       },
+      -- Don't show formatter errors since this gets super annoying and takes
+      -- focus when saving with a syntax error.
+      notify_on_error = false,
       formatters_by_ft = {
         bzl = { 'buildifier' },
         c = { 'clang_format' },
