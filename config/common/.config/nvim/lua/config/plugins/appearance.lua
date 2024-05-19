@@ -32,8 +32,17 @@ return {
       -- By default the gruvbox theme has_overrides uses cyan for insert and green for
       -- command but I'm so used to it being the opposite...
       local gruvbox = require('lualine.themes.gruvbox')
-      gruvbox.command.a.bg = '#83a598'
-      gruvbox.insert.a.bg = '#b8bb26'
+      gruvbox.command.a.bg, gruvbox.insert.a.bg = gruvbox.insert.a.bg, gruvbox.command.a.bg
+      -- Also some components in the middle change color between modes which is annoying.
+      -- I only every want the mode component to change color when switching mode...
+      gruvbox.insert.c.bg = gruvbox.normal.c.bg
+      gruvbox.insert.c.fg = gruvbox.normal.c.fg
+      gruvbox.visual.c.bg = gruvbox.normal.c.bg
+      gruvbox.visual.c.fg = gruvbox.normal.c.fg
+      gruvbox.replace.c.bg = gruvbox.normal.c.bg
+      gruvbox.replace.c.fg = gruvbox.normal.c.fg
+      gruvbox.command.c.bg = gruvbox.normal.c.bg
+      gruvbox.command.c.fg = gruvbox.normal.c.fg
 
       require('lualine').setup({
         options = {
