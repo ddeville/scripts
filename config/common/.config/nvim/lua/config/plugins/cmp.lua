@@ -8,13 +8,6 @@ return {
 
       local cmp = require('cmp')
 
-      vim.api.nvim_set_hl(0, 'CmpItemAbbr', { fg = 'Gray', ctermfg = 'Gray' })
-      vim.api.nvim_set_hl(0, 'CmpItemAbbrDeprecated', { fg = 'Red', ctermfg = 'Red' })
-      vim.api.nvim_set_hl(0, 'CmpItemAbbrMatch', { fg = 'Yellow', ctermfg = 'Yellow', underline = true })
-      vim.api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { fg = 'Yellow', ctermfg = 'Yellow', underline = true })
-      vim.api.nvim_set_hl(0, 'CmpItemKind', { fg = 'Green', ctermfg = 'Green' })
-      vim.api.nvim_set_hl(0, 'CmpItemMenu', { fg = 'Magenta', ctermfg = 'Magenta' })
-
       cmp.setup({
         sources = {
           { name = 'copilot' },
