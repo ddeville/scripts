@@ -46,7 +46,7 @@ function _nvim_nightly_prebuilt {
   rm "$tmp_path"
 
   # Check whether it is a new version
-  new_version="$("$tmp_dir"/$foldername/bin/nvim --version | head -n 1)"
+  new_version="$("$tmp_dir/$foldername/bin/nvim" --version | head -n 1)"
   if [ -f "$NVIM_INSTALL_PATH/bin/nvim" ]; then
     cur_version="$($NVIM_INSTALL_PATH/bin/nvim --version | head -n 1)"
 
