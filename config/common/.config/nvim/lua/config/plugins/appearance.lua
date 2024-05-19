@@ -1,9 +1,7 @@
 return {
   'mhinz/vim-startify',
-  'ddeville/vim-base16-lightline',
   {
     'ellisonleao/gruvbox.nvim',
-    priority = 1000,
     config = function()
       require('gruvbox').setup({
         terminal_colors = true,
