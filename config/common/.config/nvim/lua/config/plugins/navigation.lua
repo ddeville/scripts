@@ -19,20 +19,52 @@ return {
     'ibhagwan/fzf-lua',
     config = function()
       local fzf = require('fzf-lua')
+      local actions = require('fzf-lua.actions')
       fzf.setup({
+        'max-perf',
         winopts = {
-          split = 'belowright new',
           border = 'single',
           preview = {
             hidden = 'hidden',
           },
         },
+        winopts_fn = function()
+          local split = 'belowright new'
+          local height = math.floor(vim.o.lines * 0.3)
+          return { split = split .. ' | resize ' .. tostring(height) }
+        end,
         files = {
           no_header = true,
           no_header_i = true,
+          multiprocess = true,
+          git_icons = false,
+          file_icons = false,
+          color_icons = false,
+          cwd_prompt = false,
+          actions = {
+            ['ctrl-g'] = { actions.toggle_ignore },
+          },
+          fd_opts = [[--type file --color=never --hidden --follow --strip-cwd-prefix --exclude .git]],
         },
         fzf_opts = {
+          ['--ansi'] = true,
           ['--layout'] = 'default',
+          ['--border'] = 'none',
+        },
+        fzf_colors = {
+          ['fg'] = { 'fg', 'CursorLine' },
+          ['bg'] = { 'bg', 'Normal' },
+          ['hl'] = { 'fg', 'Comment' },
+          ['fg+'] = { 'fg', 'Normal' },
+          ['bg+'] = { 'bg', 'CursorLine' },
+          ['hl+'] = { 'fg', 'Statement' },
+          ['info'] = { 'fg', 'PreProc' },
+          ['prompt'] = { 'fg', 'Conditional' },
+          ['pointer'] = { 'fg', 'Exception' },
+          ['marker'] = { 'fg', 'Keyword' },
+          ['spinner'] = { 'fg', 'Label' },
+          ['header'] = { 'fg', 'Comment' },
+          ['gutter'] = '-1',
         },
       })
       vim.keymap.set('n', '<leader>o', fzf.files, { silent = true })
