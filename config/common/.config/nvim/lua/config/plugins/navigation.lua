@@ -16,6 +16,30 @@ return {
     end,
   },
   {
+    'ibhagwan/fzf-lua',
+    config = function()
+      local fzf = require('fzf-lua')
+      fzf.setup({
+        winopts = {
+          split = 'belowright new',
+          border = 'single',
+          preview = {
+            hidden = 'hidden',
+          },
+        },
+        files = {
+          no_header = true,
+          no_header_i = true,
+        },
+        fzf_opts = {
+          ['--layout'] = 'default',
+        },
+      })
+      vim.keymap.set('n', '<leader>h', fzf.files, { silent = true })
+    end,
+  },
+
+  {
     'nvim-telescope/telescope.nvim',
     version = '*',
     config = function()
