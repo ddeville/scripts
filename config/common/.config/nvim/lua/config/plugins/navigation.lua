@@ -52,37 +52,21 @@ return {
           ['--border'] = 'none',
         },
         fzf_colors = {
-          -- Item (foreground / background / highlight)
-          ['fg'] = { 'fg', 'CursorLine' },
-          ['bg'] = { 'bg', 'Normal' },
-          ['hl'] = { 'fg', 'Comment' },
-          -- Current item (foreground / background / highlight)
-          ['fg+'] = { 'fg', 'Normal' },
-          ['bg+'] = { 'bg', 'CursorLine' },
-          ['hl+'] = { 'fg', 'Statement' },
-          -- Info line (match counters)
-          ['info'] = { 'fg', 'PreProc' },
-          -- Query string
-          ['query'] = '-1',
-          -- Query string when search is disabled
-          ['disabled'] = '-1',
-          -- Prompt before query (> )
-          ['prompt'] = { 'fg', 'Conditional' },
-          -- Pointer to the current line (>)
-          ['pointer'] = { 'fg', 'Exception' },
-          -- Multi-select marker (>)
-          ['marker'] = { 'fg', 'Keyword' },
-          -- Streaming input indicator
-          ['spinner'] = { 'fg', 'Label' },
-          -- Border around the window (--border and --preview)
-          ['border'] = '-1',
-          -- Header (--header or --header-lines)
-          ['header'] = { 'fg', 'Comment' },
-          -- Background of the gutter on the left
+          -- Just use the telescope theme that will match other pickers...
+          ['fg'] = { 'fg', 'TelescopeNormal' },
+          ['bg'] = { 'bg', 'TelescopeNormal' },
+          ['hl'] = { 'fg', 'TelescopeMatching' },
+          ['fg+'] = { 'fg', 'TelescopeSelection' },
+          ['bg+'] = { 'bg', 'TelescopeSelection' },
+          ['hl+'] = { 'fg', 'TelescopeMatching' },
+          ['info'] = { 'fg', 'TelescopeMultiSelection' },
+          ['border'] = { 'fg', 'TelescopeBorder' },
           ['gutter'] = '-1',
-          -- Preview window text and background
-          ['preview-fg'] = '-1',
-          ['preview-bg'] = '-1',
+          ['query'] = { 'fg', 'TelescopePromptNormal' },
+          ['prompt'] = { 'fg', 'TelescopePromptPrefix' },
+          ['pointer'] = { 'fg', 'TelescopeSelectionCaret' },
+          ['marker'] = { 'fg', 'TelescopeSelectionCaret' },
+          ['header'] = { 'fg', 'TelescopeTitle' },
         },
       })
       vim.keymap.set('n', '<leader>o', fzf.files, { silent = true })
