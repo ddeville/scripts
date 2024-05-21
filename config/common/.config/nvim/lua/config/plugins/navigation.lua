@@ -30,7 +30,7 @@ return {
         },
         winopts_fn = function()
           local split = 'belowright new'
-          local height = math.floor(vim.o.lines * 0.3)
+          local height = math.floor(vim.o.lines * 0.35)
           return { split = split .. ' | resize ' .. tostring(height) }
         end,
         files = {
