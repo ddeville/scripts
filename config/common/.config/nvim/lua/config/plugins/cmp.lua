@@ -15,7 +15,7 @@ return {
           { name = 'nvim_lua' },
           { name = 'vsnip' },
           { name = 'path' },
-          { name = 'buffer', keyword_length = 3 },
+          { name = 'buffer', keyword_length = 2 },
         },
         mapping = cmp.mapping.preset.insert({
           ['<C-e>'] = cmp.mapping.abort(),
