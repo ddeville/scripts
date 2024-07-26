@@ -23,6 +23,7 @@ return {
       fzf.setup({
         'max-perf',
         winopts = {
+          backdrop = false,
           border = 'single',
           preview = {
             hidden = 'hidden',
