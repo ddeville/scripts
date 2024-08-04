@@ -1,6 +1,7 @@
 #!/bin/bash
 
 dirs=(common)
+extras=()
 
 # Platform-specific stuff
 plat="$(uname)"
@@ -13,7 +14,8 @@ fi
 # OpenAI stuff
 if [ -d "$HOME/scripts-openai" ]; then
   dirs+=(openai)
+  extras+=(--ignore=authorized_keys)
 fi
 
-stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
-stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
+stow "${dirs[@]}" "${extras[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
+stow "${dirs[@]}" "${extras[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
