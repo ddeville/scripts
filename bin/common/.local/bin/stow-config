@@ -14,7 +14,7 @@ fi
 # OpenAI stuff
 if [ -d "$HOME/scripts-openai" ]; then
   dirs+=(openai)
-  extras+=(--ignore=authorized_keys)
+  extras+=(--ignore='.ssh/authorized_keys')
 fi
 
 stow "${dirs[@]}" "${extras[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
