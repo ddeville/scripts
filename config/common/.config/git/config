@@ -4,7 +4,6 @@
 [user]
     name = Damien Deville
     email = damien@ddeville.me
-    # NOTE: Reference https://developer.1password.com/docs/ssh/git-commit-signing
     signingkey = key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL9YoKFxv4ixFrJvRn3wUz5BSxtPjGk30tHGRc18BInN
 [includeIf "hasconfig:remote.*.url:git@github.openai:openai/**"]
     path = ~/.config/git/config_openai
