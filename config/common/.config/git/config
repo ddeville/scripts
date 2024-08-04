@@ -4,9 +4,7 @@
 [user]
     name = Damien Deville
     email = damien@ddeville.me
-    signingkey = key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL9YoKFxv4ixFrJvRn3wUz5BSxtPjGk30tHGRc18BInN
-[includeIf "hasconfig:remote.*.url:git@github.openai:openai/**"]
-    path = ~/.config/git/config_openai
+    signingkey = ~/.ssh/id_personal.pub
 [gpg]
     format = ssh
 [gpg "ssh"]
@@ -76,3 +74,6 @@
     logs = log --show-signature
 [init]
     defaultBranch = master
+
+[includeIf "hasconfig:remote.*.url:git@github.openai:openai/**"]
+    path = ~/.config/git/config_openai
