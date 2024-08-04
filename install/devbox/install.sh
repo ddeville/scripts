@@ -17,7 +17,7 @@ mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_STATE_HOME"
 
 # Latest git
-sudo add-apt-repository ppa:git-core/ppa
+sudo add-apt-repository ppa:git-core/ppa -y
 
 # Current LTS nodejs
 curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
