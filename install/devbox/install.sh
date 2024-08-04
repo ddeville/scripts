@@ -29,7 +29,6 @@ sudo apt-get -y install black \
   clang-format \
   cmake \
   curl \
-  fd-find \
   fish \
   gcc \
   gdb \
@@ -40,13 +39,10 @@ sudo apt-get -y install black \
   jq \
   ninja-build \
   nodejs \
-  ripgrep \
   stow \
   tmux \
   vim \
   wget
-
-sudo ln -s /usr/bin/fdfind /usr/local/bin/fd
 
 # Latest nvim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
@@ -71,6 +67,13 @@ sudo mv fzf /usr/local/bin/fzf
 RIPGREP_VERSION=14.1.0
 curl -LO https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}-1_amd64.deb
 sudo dpkg -i ripgrep_${RIPGREP_VERSION}-1_amd64.deb
+rm ripgrep_${RIPGREP_VERSION}-1_amd64.deb
+
+# Latest fd
+FD_VERSION=10.1.0
+curl -LO https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb
+sudo dpkg -i fd_${FD_VERSION}_amd64.deb
+rm fd_${FD_VERSION}_amd64.deb
 
 # Latest golang
 GOLANG_VERSION=1.22.2
