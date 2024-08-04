@@ -2,7 +2,7 @@
 
 set -eu
 
-NVIM_INSTALL_PATH="/opt/nvim/nightly"
+NVIM_INSTALL_PATH="/opt/nvim"
 
 function _setup {
   # Create install path if needed
