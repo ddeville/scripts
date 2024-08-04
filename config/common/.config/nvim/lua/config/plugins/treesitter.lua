@@ -41,7 +41,6 @@ return {
           'rust',
           'sql',
           'starlark',
-          'swift',
           'sxhkdrc',
           'terraform',
           'toml',
