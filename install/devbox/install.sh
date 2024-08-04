@@ -46,6 +46,12 @@ sudo apt-get -y install black \
   vim \
   wget
 
+curl -L0 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+tar xzvf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
+sudo rm -rf /opt/nvim
+sudo mv nvim-linux64 /opt/nvim
+sudo ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim
+
 if [ "$SHELL" != "/usr/bin/fish" ]; then
   sudo chsh "$USER" --shell /usr/bin/fish
 fi
