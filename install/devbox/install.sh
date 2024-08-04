@@ -16,8 +16,9 @@ export XDG_STATE_HOME="$HOME/.local/state"
 mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_STATE_HOME"
 
-# Latest git
+# Latest packages
 sudo add-apt-repository ppa:git-core/ppa -y
+sudo apt-add-repository ppa:fish-shell/release-3 -y
 
 # Current LTS nodejs
 curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -30,7 +31,6 @@ sudo apt-get -y install black \
   curl \
   fd-find \
   fish \
-  fzf \
   gcc \
   gdb \
   gh \
@@ -46,6 +46,8 @@ sudo apt-get -y install black \
   vim \
   wget
 
+sudo ln -s /usr/bin/fdfind /usr/local/bin/fd
+
 # Latest nvim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
@@ -53,16 +55,35 @@ sudo tar -C /opt -xzf nvim-linux64.tar.gz
 sudo mv /opt/nvim-linux64 /opt/nvim
 rm nvim-linux64.tar.gz
 
+# Latest bazelisk
+curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazelisk
+chmod +x bazelisk
+sudo mv bazelisk /usr/local/bin/bazel
+
+# Latest fzf
+FZF_VERSION=0.54.3
+curl -L https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_amd64.tar.gz -o fzf.tar.gz
+tar -xzf fzf.tar.gz
+rm fzf.tar.gz
+sudo mv fzf /usr/local/bin/fzf
+
+# Latest ripgrep
+RIPGREP_VERSION=14.1.0
+curl -LO https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}-1_amd64.deb
+sudo dpkg -i ripgrep_${RIPGREP_VERSION}-1_amd64.deb
+
 # Latest golang
-curl -L https://go.dev/dl/go1.22.5.linux-amd64.tar.gz -o go.tar.gz
+GOLANG_VERSION=1.22.2
+curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
 sudo rm -rf /opt/go
 sudo tar -C /opt -xzf go.tar.gz
 rm go.tar.gz
 
 # Latest rust
+RUST_VERSION=1.76.0
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
 "$XDG_DATA_HOME/cargo/bin/rustup" default stable
 "$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
