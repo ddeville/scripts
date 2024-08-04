@@ -7,6 +7,10 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
+GOLANG_VERSION=1.22.2
+RUST_VERSION=1.76.0
+NODE_VERSION=setup_20.x
+
 cd "$HOME"
 
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -21,7 +25,7 @@ sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
 
 # Current LTS nodejs
-curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 
 sudo apt-get update
 
@@ -57,33 +61,31 @@ chmod +x bazelisk
 sudo mv bazelisk /usr/local/bin/bazel
 
 # Latest fzf
-FZF_VERSION=0.54.3
-curl -L https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_amd64.tar.gz -o fzf.tar.gz
+FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
 tar -xzf fzf.tar.gz
 rm fzf.tar.gz
 sudo mv fzf /usr/local/bin/fzf
 
 # Latest ripgrep
-RIPGREP_VERSION=14.1.0
-curl -LO https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}-1_amd64.deb
-sudo dpkg -i ripgrep_${RIPGREP_VERSION}-1_amd64.deb
-rm ripgrep_${RIPGREP_VERSION}-1_amd64.deb
+RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep_"${RIPGREP_VERSION}"-1_amd64.deb -o ripgrep.deb
+sudo dpkg -i ripgrep.deb
+rm ripgrep.deb
 
 # Latest fd
-FD_VERSION=10.1.0
-curl -LO https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd_${FD_VERSION}_amd64.deb
-sudo dpkg -i fd_${FD_VERSION}_amd64.deb
-rm fd_${FD_VERSION}_amd64.deb
+FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
+sudo dpkg -i fd.deb
+rm fd.deb
 
 # Latest golang
-GOLANG_VERSION=1.22.2
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
 sudo rm -rf /opt/go
 sudo tar -C /opt -xzf go.tar.gz
 rm go.tar.gz
 
 # Latest rust
-RUST_VERSION=1.76.0
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
