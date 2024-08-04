@@ -46,7 +46,6 @@ fi
 rm -f "$HOME/.bashrc" "$HOME/.profile"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
 
-# Install shell plugins and terminfos
+# Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
-"$HOME/scripts/bin/macos/.local/bin/update-terminfo"
