@@ -13,12 +13,15 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-sudo apt-get -y install gpg
+if [ ! -f /etc/apt/keyrings/gierens.gpg ]; then
+  sudo apt-get -y install gpg
+  sudo mkdir -p /etc/apt/keyrings
+  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+fi
 
-sudo mkdir -p /etc/apt/keyrings
-wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+sudo add-apt-repository ppa:git-core/ppa
 sudo apt-get update
 
 sudo apt-get -y install black \
@@ -46,11 +49,11 @@ sudo apt-get -y install black \
   vim \
   wget
 
-curl -L0 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
 tar xzvf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
 sudo mv nvim-linux64 /opt/nvim
-sudo ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim
+sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
 
 if [ "$SHELL" != "/usr/bin/fish" ]; then
   sudo chsh "$USER" --shell /usr/bin/fish
