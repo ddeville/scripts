@@ -62,11 +62,16 @@ curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- -y --
 "$XDG_DATA_HOME/cargo/bin/rustup" default stable
 "$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
-# Install a few golang/rust programs
+# Install a few programs
 export PATH="/opt/nvim/bin:/opt/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
 
+go install golang.org/x/tools/gopls@latest
 go install github.com/bazelbuild/buildtools/buildifier@latest
+go install github.com/bufbuild/buf/cmd/buf@latest
+go install mvdan.cc/sh/v3/cmd/shfmt@latest
+
 cargo install eza
+cargo install stylua
 
 # Change shell to fish
 if [ "$SHELL" != "/usr/bin/fish" ]; then
