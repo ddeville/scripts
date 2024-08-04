@@ -13,13 +13,8 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-if [ ! -f /etc/apt/keyrings/gierens.gpg ]; then
-  sudo apt-get -y install gpg
-  sudo mkdir -p /etc/apt/keyrings
-  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-fi
+mkdir -p "$XDG_DATA_HOME"
+mkdir -p "$XDG_STATE_HOME"
 
 sudo add-apt-repository ppa:git-core/ppa
 sudo apt-get update
@@ -31,7 +26,6 @@ sudo apt-get -y install black \
   fd-find \
   fish \
   fzf \
-  eza \
   gcc \
   gdb \
   gh \
@@ -39,7 +33,6 @@ sudo apt-get -y install black \
   htop \
   isort \
   jq \
-  neovim \
   ninja-build \
   nodejs \
   npm \
@@ -49,12 +42,33 @@ sudo apt-get -y install black \
   vim \
   wget
 
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-tar xzvf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
+# Latest nvim
+curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
-sudo mv nvim-linux64 /opt/nvim
-sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+sudo tar -C /opt -xzf nvim-linux64.tar.gz
+sudo mv /opt/nvim-linux64 /opt/nvim
+rm nvim-linux64.tar.gz
 
+# Latest golang
+curl -L https://go.dev/dl/go1.22.5.linux-amd64.tar.gz -o go.tar.gz
+sudo rm -rf /opt/go
+sudo tar -C /opt -xzf go.tar.gz
+rm go.tar.gz
+
+# Latest rust
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
+"$XDG_DATA_HOME/cargo/bin/rustup" default stable
+"$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
+
+# Install a few golang/rust programs
+export PATH="/opt/nvim/bin:/opt/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
+
+go install github.com/bazelbuild/buildtools/buildifier@latest
+cargo install eza
+
+# Change shell to fish
 if [ "$SHELL" != "/usr/bin/fish" ]; then
   sudo chsh "$USER" --shell /usr/bin/fish
 fi
