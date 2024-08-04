@@ -40,7 +40,6 @@ sudo apt-get -y install black \
   jq \
   ninja-build \
   nodejs \
-  npm \
   ripgrep \
   stow \
   tmux \
