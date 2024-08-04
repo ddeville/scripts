@@ -1,25 +1,9 @@
 #!/bin/bash
 
-if [ -e "/opt/1Password/op-ssh-sign" ]; then
-  op_ssh_sign_path="/opt/1Password/op-ssh-sign"
-elif [ -e "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" ]; then
-  op_ssh_sign_path="/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-else
-  echo "op-ssh-sign isn't installed and signing commit will not work."
-  exit 1
+# If SSH_AUTH_SOCK is already set to a bound socket we can just use it since we're likely
+# on a server with a forwarded ssh-agent. If not, let's set it to the 1Password socket.
+if [[ -z $SSH_AUTH_SOCK || ! -S $SSH_AUTH_SOCK ]]; then
+  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 fi
 
-# If we are in tmux, we need to check whether there's an active ssh-agent being forwarded,
-# in which case we'll want to make sure that SSH_TTY is set before calling op-ssh-sign.
-#
-# This is because op-ssh-sign knows how to defer to the ssh-agent rather than trying locally
-# *only* if both SSH_AUTH_SOCK and SSH_TTY are set.
-# (see https://1password.community/discussion/comment/687388/#Comment_687388).
-#
-# Note that it doesn't actually seem to matter what value it is set to, it just needs to be set.
-
-if [[ -n $TMUX && -z $SSH_TTY && -S $SSH_AUTH_SOCK ]] && [[ $(tmux show-environment SSH_CONNECTION) == *=* ]]; then
-  exec env SSH_TTY=/dev/op-tmux-over-ssh $op_ssh_sign_path "$@"
-else
-  exec $op_ssh_sign_path "$@"
-fi
+exec ssh-keygen "$@"
