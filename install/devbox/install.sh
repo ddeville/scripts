@@ -38,7 +38,7 @@ sudo apt-get install black \
   wget
 
 if [ "$SHELL" != "/usr/bin/fish" ]; then
-  chsh --shell /usr/bin/fish
+  sudo chsh $USER --shell /usr/bin/fish
 fi
 
 # Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
