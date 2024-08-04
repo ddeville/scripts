@@ -79,8 +79,6 @@ pyenv rehash
 echo "Setting up 1Password"
 mkdir -p "$HOME/.1password"
 ln -fs "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
-sudo mkdir -p /opt/1Password
-sudo ln -fs "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" /opt/1Password/op-ssh-sign
 
 chflags nohidden "$HOME/Library"
 if [[ -d "$HOME/Applications" ]]; then
