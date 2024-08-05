@@ -22,6 +22,7 @@ add_to_path "$PYENV_ROOT/shims"
 # customly built packages
 add_to_path /opt/nvim/bin
 add_to_path /opt/lsp/bin
+add_to_path /usr/local/go/bin
 
 # various user binaries
 add_to_path "$HOME/bin"
