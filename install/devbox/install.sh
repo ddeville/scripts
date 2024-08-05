@@ -44,7 +44,7 @@ sudo apt-get -y install \
   htop \
   jq \
   libbz2-dev \
-  libevent \
+  libncurses-dev \
   libevent-dev \
   libffi-dev \
   liblzma-dev \
@@ -54,8 +54,6 @@ sudo apt-get -y install \
   libssl-dev \
   libxml2-dev \
   libxmlsec1-dev \
-  ncurses \
-  ncurses-dev \
   ninja-build \
   nodejs \
   pkg-config \
