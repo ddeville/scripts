@@ -112,33 +112,33 @@ sudo mv buildifier /usr/local/bin/buildifier
 
 # eza
 curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
-tar -xzf eza.tar.gz && rm eza.tar.gz
+tar -xzf eza.tar.gz
 sudo mv eza /usr/local/bin/eza
 
 # stylua
 curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
-unzip -o stylua.zip && rm stylua.zip
+unzip -o stylua.zip
 sudo mv stylua /usr/local/bin/stylua
 
 # buf
 curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
-tar -xzf buf.tar.gz && rm buf.tar.gz
+tar -xzf buf.tar.gz
 sudo mv buf /usr/local/bin/buf
 
 # ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep_"${RIPGREP_VERSION}"-1_amd64.deb -o ripgrep.deb
-sudo dpkg -i ripgrep.deb && rm ripgrep.deb
+sudo dpkg -i ripgrep.deb
 
 # fd
 FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
-sudo dpkg -i fd.deb && rm fd.deb
+sudo dpkg -i fd.deb
 
 # fzf
 FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
-tar -xzf fzf.tar.gz && rm fzf.tar.gz
+tar -xzf fzf.tar.gz
 sudo mv fzf /usr/local/bin/fzf
 
 # shfmt
@@ -151,6 +151,8 @@ sudo mv shfmt /usr/local/bin/shfmt
 /opt/go/bin/go install golang.org/x/tools/gopls@latest
 
 popd # $INSTALL_TMPDIR
+
+rm -rf "$INSTALL_TMPDIR"
 
 ##### Shell #####
 
