@@ -74,20 +74,20 @@ sudo apt-get -y install \
 
 ##### Toolchains #####
 
-# Golang
+# golang
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
 sudo rm -rf /opt/go
 sudo tar -C /opt -xzf go.tar.gz
 rm go.tar.gz
 
-# Rust
+# rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
 "$XDG_DATA_HOME/cargo/bin/rustup" default stable
 "$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
-# Python
+# python
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
 "$PYENV_ROOT/bin/pyenv" update
