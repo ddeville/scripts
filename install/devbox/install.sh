@@ -56,10 +56,10 @@ sudo apt-get -y install \
   htop \
   jq \
   libbz2-dev \
-  libncurses-dev \
   libevent-dev \
   libffi-dev \
   liblzma-dev \
+  libncurses-dev \
   libncursesw5-dev \
   libreadline-dev \
   libsqlite3-dev \
