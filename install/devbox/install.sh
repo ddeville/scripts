@@ -67,11 +67,11 @@ sudo apt-get -y install \
 
 ##### Toolchains #####
 
+PREFIX=/usr/local
+
 # golang
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
-sudo rm -rf /opt/go
-sudo tar -C /opt -xzf go.tar.gz
-rm go.tar.gz
+sudo tar -xzf go.tar.gz -C "$PREFIX"
 
 # rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
@@ -88,8 +88,6 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 
 ##### Programs #####
-
-PREFIX=/usr/local
 
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
