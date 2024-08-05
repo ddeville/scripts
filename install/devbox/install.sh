@@ -90,6 +90,10 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 
 ##### Programs #####
 
+INSTALL_TMPDIR="$(mktemp -d)"
+
+pushd "$INSTALL_TMPDIR"
+
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
@@ -113,7 +117,7 @@ sudo mv eza /usr/local/bin/eza
 
 # stylua
 curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
-unzip stylua.zip && rm stylua.zip
+unzip -o stylua.zip && rm stylua.zip
 sudo mv stylua /usr/local/bin/stylua
 
 # buf
@@ -145,6 +149,8 @@ sudo mv shfmt /usr/local/bin/shfmt
 
 # gopls
 /opt/go/bin/go install golang.org/x/tools/gopls@latest
+
+popd # $INSTALL_TMPDIR
 
 ##### Shell #####
 
