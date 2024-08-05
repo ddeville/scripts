@@ -7,10 +7,14 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
+##### Versions #####
+
 PYTHON_VERSION=3.11.8
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 NODE_VERSION=setup_20.x
+
+##### Setup #####
 
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
@@ -20,9 +24,10 @@ INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
 trap 'rm -rf $INSTALL_TMPDIR' EXIT
 
-##### Base packages #####
+PREFIX=/usr/local
 
-# Latest packages
+##### Base Packages #####
+
 sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
@@ -66,8 +71,6 @@ sudo apt-get -y install \
   zlib1g-dev
 
 ##### Toolchains #####
-
-PREFIX=/usr/local
 
 # golang
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
