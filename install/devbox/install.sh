@@ -90,44 +90,41 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 
 ##### Programs #####
 
+PREFIX=/usr/local
+
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
-sudo rm -rf /opt/nvim
-sudo tar -C /opt -xzf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
-sudo mv /opt/nvim-linux64 /opt/nvim
+sudo tar -xzf nvim-linux64.tar.gz -C "$PREFIX" --strip-components 1
 
 # tmux
-TMUX_TARBALL_URL="$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq --raw-output '.assets[0].browser_download_url')"
-curl -L "$TMUX_TARBALL_URL" -o tmux.tar.gz
-tar -xzf tmux.tar.gz
-pushd tmux-*/
-./configure --prefix=/usr/local
-make && sudo make install
-popd
+curl -L "$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq --raw-output '.assets[0].browser_download_url')" -o tmux.tar.gz
+tar -xzf tmux.tar.gz -C tmux --strip-components 1
+./tmux/configure --prefix="$PREFIX" && make -C tmux && sudo make -C tmux install
 
 # bazelisk
-curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazelisk
-chmod +x bazelisk
-sudo mv bazelisk /usr/local/bin/bazel
+curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
+chmod +x bazel && sudo mv bazel "$PREFIX"/bin/bazel
 
 # buildifier
-curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64.zip -o buildifier
-chmod +x buildifier
-sudo mv buildifier /usr/local/bin/buildifier
+curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 -o buildifier
+chmod +x buildifier && sudo mv buildifier "$PREFIX"/bin/buildifier
 
 # eza
 curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
-tar -xzf eza.tar.gz
-sudo mv eza /usr/local/bin/eza
+sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
 
 # stylua
 curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
-unzip -o stylua.zip
-sudo mv stylua /usr/local/bin/stylua
+unzip -o stylua.zip && sudo mv stylua "$PREFIX"/bin/stylua
 
 # buf
 curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
-tar -xzf buf.tar.gz -C /usr/local --strip-components 1
+sudo tar -xzf buf.tar.gz -C "$PREFIX" --strip-components 1
+
+# fzf
+FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
+sudo tar -xzf fzf.tar.gz -C "$PREFIX/bin"
 
 # ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
@@ -139,17 +136,10 @@ FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | 
 curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
 sudo dpkg -i fd.deb
 
-# fzf
-FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
-tar -xzf fzf.tar.gz
-sudo mv fzf /usr/local/bin/fzf
-
 # shfmt
 SHFMT_VERSION="$(curl -L https://api.github.com/repos/mvdan/sh/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/mvdan/sh/releases/download/"${SHFMT_VERSION}"/shfmt_"${SHFMT_VERSION}"_linux_amd64 -o shfmt
-chmod +x shfmt
-sudo mv shfmt /usr/local/bin/shfmt
+chmod +x shfmt && sudo mv shfmt "$PREFIX"/bin/shfmt
 
 # gopls
 /opt/go/bin/go install golang.org/x/tools/gopls@latest
