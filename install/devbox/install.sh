@@ -98,6 +98,9 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 "$PYENV_ROOT/bin/pyenv" update
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
+"$PYENV_ROOT/bin/pyenv" rehash
+
+export PATH="$PYENV_ROOT/shims:$CARGO_HOME/bin:$PREFIX/go/bin:$PATH"
 
 #########################
 ####### Programs ########
