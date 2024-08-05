@@ -127,8 +127,7 @@ sudo mv stylua /usr/local/bin/stylua
 
 # buf
 curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
-tar -xzf buf.tar.gz
-sudo mv buf /usr/local/bin/buf
+tar -xzf buf.tar.gz -C /usr/local --strip-components 1
 
 # ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
