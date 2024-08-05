@@ -84,7 +84,7 @@ curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --def
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
 "$PYENV_ROOT/bin/pyenv" update
-"$PYENV_ROOT/bin/pyenv" install "$PYTHON_VERSION"
+"$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 
 ##### Programs #####
