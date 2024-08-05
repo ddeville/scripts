@@ -28,8 +28,6 @@ mkdir -p "$XDG_STATE_HOME"
 sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
-
-# Current LTS nodejs
 curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 
 sudo apt-get update
