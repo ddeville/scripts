@@ -7,14 +7,18 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-##### Versions #####
+#########################
+####### Versions ########
+#########################
 
 PYTHON_VERSION=3.11.8
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 NODE_VERSION=setup_20.x
 
-##### Setup #####
+#########################
+######### Setup #########
+#########################
 
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
@@ -26,7 +30,9 @@ trap 'rm -rf $INSTALL_TMPDIR' EXIT
 
 PREFIX=/usr/local
 
+#########################
 ##### Base Packages #####
+#########################
 
 sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
@@ -70,7 +76,9 @@ sudo apt-get -y install \
   xz-utils \
   zlib1g-dev
 
-##### Toolchains #####
+#########################
+###### Toolchains #######
+#########################
 
 # golang
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
@@ -90,7 +98,9 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 
-##### Programs #####
+#########################
+####### Programs ########
+#########################
 
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
@@ -144,7 +154,9 @@ chmod +x shfmt && sudo mv shfmt "$PREFIX"/bin/shfmt
 # gopls
 /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
 
-##### Shell #####
+#########################
+######### Shell #########
+#########################
 
 # Change shell to fish
 if [ "$SHELL" != "/usr/bin/fish" ]; then
