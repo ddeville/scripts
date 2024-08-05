@@ -12,8 +12,6 @@ GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 NODE_VERSION=setup_20.x
 
-cd "$HOME"
-
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
@@ -21,6 +19,10 @@ export XDG_STATE_HOME="$HOME/.local/state"
 mkdir -p "$XDG_CONFIG_HOME"
 mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_STATE_HOME"
+
+INSTALL_TMPDIR="$(mktemp -d)"
+cd "$INSTALL_TMPDIR"
+trap 'rm -rf $INSTALL_TMPDIR' EXIT
 
 ##### Base packages #####
 
@@ -94,10 +96,6 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 
 ##### Programs #####
 
-INSTALL_TMPDIR="$(mktemp -d)"
-
-pushd "$INSTALL_TMPDIR"
-
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
@@ -162,10 +160,6 @@ sudo mv shfmt /usr/local/bin/shfmt
 
 # gopls
 /opt/go/bin/go install golang.org/x/tools/gopls@latest
-
-popd # $INSTALL_TMPDIR
-
-rm -rf "$INSTALL_TMPDIR"
 
 ##### Shell #####
 
