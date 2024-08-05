@@ -59,7 +59,6 @@ sudo apt-get -y install \
   pkg-config \
   stow \
   tk-dev \
-  tmux \
   unzip \
   vim \
   wget \
