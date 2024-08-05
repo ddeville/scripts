@@ -97,7 +97,7 @@ sudo tar -xzf nvim-linux64.tar.gz -C "$PREFIX" --strip-components 1
 
 # tmux
 curl -L "$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq --raw-output '.assets[0].browser_download_url')" -o tmux.tar.gz
-tar -xzf tmux.tar.gz -C tmux --strip-components 1
+mkdir -p tmux && tar -xzf tmux.tar.gz -C tmux --strip-components 1
 ./tmux/configure --prefix="$PREFIX" && make -C tmux && sudo make -C tmux install
 
 # bazelisk
