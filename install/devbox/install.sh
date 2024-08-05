@@ -7,6 +7,7 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
+PYTHON_VERSION=3.11
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 NODE_VERSION=setup_20.x
@@ -21,6 +22,7 @@ mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_STATE_HOME"
 
 # Latest packages
+sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
 
@@ -43,6 +45,8 @@ sudo apt-get -y install black \
   jq \
   ninja-build \
   nodejs \
+  python${PYTHON_VERSION} \
+  python${PYTHON_VERSION}-venv \
   stow \
   tmux \
   vim \
