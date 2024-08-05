@@ -60,6 +60,7 @@ sudo apt-get -y install \
   stow \
   tk-dev \
   tmux \
+  unzip \
   vim \
   wget \
   xz-utils \
@@ -111,8 +112,8 @@ tar -xzf eza.tar.gz && rm eza.tar.gz
 sudo mv eza /usr/local/bin/eza
 
 # stylua
-curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.tar.gz
-tar -xzf stylua.tar.gz && rm stylua.tar.gz
+curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
+unzip stylua.zip && rm stylua.zip
 sudo mv stylua /usr/local/bin/stylua
 
 # buf
