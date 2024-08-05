@@ -11,9 +11,10 @@ fi
 ####### Versions ########
 #########################
 
-PYTHON_VERSION=3.11.8
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
+PYTHON_VERSION=3.11.8
+
 NODE_VERSION=setup_20.x
 
 #########################
