@@ -139,7 +139,7 @@ curl -L https://github.com/mvdan/sh/releases/download/"${SHFMT_VERSION}"/shfmt_"
 chmod +x shfmt && sudo mv shfmt "$PREFIX"/bin/shfmt
 
 # gopls
-/opt/go/bin/go install golang.org/x/tools/gopls@latest
+/usr/local/go/bin/go install golang.org/x/tools/gopls@latest
 
 ##### Shell #####
 
