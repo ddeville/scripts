@@ -35,6 +35,7 @@ curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 sudo apt-get update
 
 sudo apt-get -y install \
+  bison \
   build-essential \
   clang-format \
   cmake \
@@ -47,6 +48,8 @@ sudo apt-get -y install \
   htop \
   jq \
   libbz2-dev \
+  libevent \
+  libevent-dev \
   libffi-dev \
   liblzma-dev \
   libncursesw5-dev \
@@ -55,8 +58,11 @@ sudo apt-get -y install \
   libssl-dev \
   libxml2-dev \
   libxmlsec1-dev \
+  ncurses \
+  ncurses-dev \
   ninja-build \
   nodejs \
+  pkg-config \
   stow \
   tk-dev \
   tmux \
