@@ -115,26 +115,6 @@ curl -L "$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq -
 mkdir -p tmux && tar -xzf tmux.tar.gz -C tmux --strip-components 1
 ./tmux/configure --prefix="$PREFIX" && make -C tmux && sudo make -C tmux install
 
-# bazelisk
-curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
-chmod +x bazel && sudo mv bazel "$PREFIX"/bin/bazel
-
-# buildifier
-curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 -o buildifier
-chmod +x buildifier && sudo mv buildifier "$PREFIX"/bin/buildifier
-
-# eza
-curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
-sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
-
-# stylua
-curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
-unzip -o stylua.zip && sudo mv stylua "$PREFIX"/bin/stylua
-
-# buf
-curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
-sudo tar -xzf buf.tar.gz -C "$PREFIX" --strip-components 1
-
 # fzf
 FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
@@ -149,6 +129,26 @@ sudo dpkg -i ripgrep.deb
 FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
 sudo dpkg -i fd.deb
+
+# eza
+curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
+
+# bazelisk
+curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
+chmod +x bazel && sudo mv bazel "$PREFIX"/bin/bazel
+
+# buf
+curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
+sudo tar -xzf buf.tar.gz -C "$PREFIX" --strip-components 1
+
+# buildifier
+curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 -o buildifier
+chmod +x buildifier && sudo mv buildifier "$PREFIX"/bin/buildifier
+
+# stylua
+curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
+unzip -o stylua.zip && sudo mv stylua "$PREFIX"/bin/stylua
 
 # shfmt
 SHFMT_VERSION="$(curl -L https://api.github.com/repos/mvdan/sh/releases/latest | jq --raw-output '.name')"
