@@ -34,7 +34,7 @@ curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 
 sudo apt-get update
 
-sudo apt-get -y install black \
+sudo apt-get -y install \
   build-essential \
   clang-format \
   cmake \
@@ -45,7 +45,6 @@ sudo apt-get -y install black \
   gh \
   git \
   htop \
-  isort \
   jq \
   libbz2-dev \
   libffi-dev \
