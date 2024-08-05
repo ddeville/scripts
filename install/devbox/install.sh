@@ -18,8 +18,11 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
+mkdir -p "$XDG_CONFIG_HOME"
 mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_STATE_HOME"
+
+##### Base packages #####
 
 # Latest packages
 sudo add-apt-repository universe -y
@@ -63,12 +66,7 @@ sudo apt-get -y install black \
   xz-utils \
   zlib1g-dev
 
-# Python
-export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
-[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
-"$PYENV_ROOT/bin/pyenv" update
-"$PYENV_ROOT/bin/pyenv" install "$PYTHON_VERSION"
-"$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
+##### Toolchains #####
 
 # Golang
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
@@ -83,47 +81,72 @@ curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --def
 "$XDG_DATA_HOME/cargo/bin/rustup" default stable
 "$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
-# Latest nvim
+# Python
+export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
+"$PYENV_ROOT/bin/pyenv" update
+"$PYENV_ROOT/bin/pyenv" install "$PYTHON_VERSION"
+"$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
+
+##### Programs #####
+
+# neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo rm -rf /opt/nvim
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
+sudo tar -C /opt -xzf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
 sudo mv /opt/nvim-linux64 /opt/nvim
-rm nvim-linux64.tar.gz
 
-# Latest bazelisk
+# bazelisk
 curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazelisk
 chmod +x bazelisk
 sudo mv bazelisk /usr/local/bin/bazel
 
-# Latest fzf
-FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
-tar -xzf fzf.tar.gz
-rm fzf.tar.gz
-sudo mv fzf /usr/local/bin/fzf
+# buildifier
+curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64.zip -o buildifier
+chmod +x buildifier
+sudo mv buildifier /usr/local/bin/buildifier
 
-# Latest ripgrep
+# eza
+curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
+tar -xzf eza.tar.gz && rm eza.tar.gz
+sudo mv eza /usr/local/bin/eza
+
+# stylua
+curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.tar.gz
+tar -xzf stylua.tar.gz && rm stylua.tar.gz
+sudo mv stylua /usr/local/bin/stylua
+
+# buf
+curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
+tar -xzf buf.tar.gz && rm buf.tar.gz
+sudo mv buf /usr/local/bin/buf
+
+# ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep_"${RIPGREP_VERSION}"-1_amd64.deb -o ripgrep.deb
-sudo dpkg -i ripgrep.deb
-rm ripgrep.deb
+sudo dpkg -i ripgrep.deb && rm ripgrep.deb
 
-# Latest fd
+# fd
 FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
-sudo dpkg -i fd.deb
-rm fd.deb
+sudo dpkg -i fd.deb && rm fd.deb
 
-# Install a few programs
-export PATH="/opt/nvim/bin:/opt/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
+# fzf
+FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
+tar -xzf fzf.tar.gz && rm fzf.tar.gz
+sudo mv fzf /usr/local/bin/fzf
 
-go install golang.org/x/tools/gopls@latest
-go install github.com/bazelbuild/buildtools/buildifier@latest
-go install github.com/bufbuild/buf/cmd/buf@latest
-go install mvdan.cc/sh/v3/cmd/shfmt@latest
+# shfmt
+SHFMT_VERSION="$(curl -L https://api.github.com/repos/mvdan/sh/releases/latest | jq --raw-output '.name')"
+curl -L https://github.com/mvdan/sh/releases/download/"${SHFMT_VERSION}"/shfmt_"${SHFMT_VERSION}"_linux_amd64 -o shfmt
+chmod +x shfmt
+sudo mv shfmt /usr/local/bin/shfmt
 
-cargo install eza
-cargo install stylua
+# gopls
+/opt/go/bin/go install golang.org/x/tools/gopls@latest
+
+##### Shell #####
 
 # Change shell to fish
 if [ "$SHELL" != "/usr/bin/fish" ]; then
