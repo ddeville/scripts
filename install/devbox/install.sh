@@ -7,7 +7,7 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-PYTHON_VERSION=3.11
+PYTHON_VERSION=3.11.8
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 NODE_VERSION=setup_20.x
@@ -32,6 +32,7 @@ curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 sudo apt-get update
 
 sudo apt-get -y install black \
+  build-essential \
   clang-format \
   cmake \
   curl \
@@ -43,14 +44,44 @@ sudo apt-get -y install black \
   htop \
   isort \
   jq \
+  libbz2-dev \
+  libffi-dev \
+  liblzma-dev \
+  libncursesw5-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  libssl-dev \
+  libxml2-dev \
+  libxmlsec1-dev \
   ninja-build \
   nodejs \
-  python${PYTHON_VERSION} \
-  python${PYTHON_VERSION}-venv \
   stow \
+  tk-dev \
   tmux \
   vim \
-  wget
+  wget \
+  xz-utils \
+  zlib1g-dev
+
+# Python
+export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
+"$PYENV_ROOT/bin/pyenv" update
+"$PYENV_ROOT/bin/pyenv" install "$PYTHON_VERSION"
+"$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
+
+# Golang
+curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
+sudo rm -rf /opt/go
+sudo tar -C /opt -xzf go.tar.gz
+rm go.tar.gz
+
+# Rust
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
+"$XDG_DATA_HOME/cargo/bin/rustup" default stable
+"$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
 # Latest nvim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
@@ -82,19 +113,6 @@ FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | 
 curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
 sudo dpkg -i fd.deb
 rm fd.deb
-
-# Latest golang
-curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
-sudo rm -rf /opt/go
-sudo tar -C /opt -xzf go.tar.gz
-rm go.tar.gz
-
-# Latest rust
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
-"$XDG_DATA_HOME/cargo/bin/rustup" default stable
-"$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
 
 # Install a few programs
 export PATH="/opt/nvim/bin:/opt/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
