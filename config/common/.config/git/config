@@ -1,6 +1,11 @@
 [core]
     editor = nvim
     excludesfile = ~/.config/git/gitignore_global
+    preloadIndex = true
+    filemode = true
+    precomposeUnicode = true
+    fsmonitor = true
+    untrackedCache = true
 [user]
     name = Damien Deville
     email = damien@ddeville.me
