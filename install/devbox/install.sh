@@ -106,6 +106,15 @@ sudo rm -rf /opt/nvim
 sudo tar -C /opt -xzf nvim-linux64.tar.gz && rm nvim-linux64.tar.gz
 sudo mv /opt/nvim-linux64 /opt/nvim
 
+# tmux
+TMUX_TARBALL_URL="$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq --raw-output '.assets[0].browser_download_url')"
+curl -L "$TMUX_TARBALL_URL" -o tmux.tar.gz
+tar -xzf tmux.tar.gz
+pushd tmux-*/
+./configure --prefix=/usr/local
+make && sudo make install
+popd
+
 # bazelisk
 curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazelisk
 chmod +x bazelisk
