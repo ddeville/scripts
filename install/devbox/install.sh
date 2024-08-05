@@ -88,8 +88,8 @@ sudo tar -xzf go.tar.gz -C "$PREFIX"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
-"$XDG_DATA_HOME/cargo/bin/rustup" default stable
-"$XDG_DATA_HOME/cargo/bin/rustup" component add rust-src rustfmt clippy
+"$CARGO_HOME/bin/rustup" default stable
+"$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
 
 # python
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
