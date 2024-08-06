@@ -82,9 +82,9 @@ sudo apt-get -y install \
 #########################
 
 # golang
+export GOPATH="$HOME/src/go"
 curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
 sudo tar -xzf go.tar.gz -C "$PREFIX"
-export GOPATH="$HOME/src/go"
 
 # rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
