@@ -49,7 +49,6 @@ sudo apt-get -y install \
   fish \
   gcc \
   gdb \
-  gh \
   git \
   htop \
   jq \
@@ -140,6 +139,11 @@ sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
 curl -L https://github.com/aristocratos/btop/releases/latest/download/btop-x86_64-linux-musl.tbz -o btop.tbz
 tar -xjf btop.tbz
 PREFIX=$PREFIX sudo make install -C btop
+
+# gh
+GH_VERSION="$(curl -L https://api.github.com/repos/cli/cli/releases/latest | jq --raw-output '.tag_name')"
+curl -L https://github.com/cli/cli/releases/download/"${GH_VERSION}"/gh_"${GH_VERSION:1}"_linux_amd64.deb -o gh.deb
+sudo dpkg -i gh.deb
 
 # bazelisk
 curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
