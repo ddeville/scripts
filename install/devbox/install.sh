@@ -14,8 +14,7 @@ fi
 GOLANG_VERSION=1.22.2
 RUST_VERSION=1.76.0
 PYTHON_VERSION=3.11.8
-
-NODE_VERSION=setup_20.x
+NODE_VERSION=22.6.0
 
 #########################
 ######### Setup #########
@@ -38,7 +37,6 @@ PREFIX=/usr/local
 sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
-curl -sL https://deb.nodesource.com/${NODE_VERSION} | sudo -E bash -
 
 sudo apt-get update
 
@@ -67,7 +65,6 @@ sudo apt-get -y install \
   libxml2-dev \
   libxmlsec1-dev \
   ninja-build \
-  nodejs \
   pkg-config \
   stow \
   tk-dev \
@@ -100,6 +97,10 @@ export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" rehash
+
+# nodejs
+curl -L https://nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz -o node.tar.gz
+sudo tar -xzf node.tar.gz -C "$PREFIX" --strip-components 1
 
 export PATH="$PYENV_ROOT/shims:$CARGO_HOME/bin:$PREFIX/go/bin:$PATH"
 
