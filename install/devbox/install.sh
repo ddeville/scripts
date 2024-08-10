@@ -136,6 +136,11 @@ sudo dpkg -i fd.deb
 curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
 sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
 
+# btop
+curl -L https://github.com/aristocratos/btop/releases/latest/download/btop-x86_64-linux-musl.tbz -o btop.tbz
+tar -xjf btop.tbz
+PREFIX=$PREFIX sudo make install -C btop
+
 # bazelisk
 curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
 chmod +x bazel && sudo mv bazel "$PREFIX"/bin/bazel
