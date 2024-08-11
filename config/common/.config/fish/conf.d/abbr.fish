@@ -4,6 +4,7 @@ alias realvim (which vim)
 alias vim nvim
 alias ll "eza --long --all"
 alias tree "eza --tree --level=3"
+alias g git
 alias gaa "git add -A; and git ci"
 alias gaaa "git add -A; and git ci --amend --no-edit"
 alias gaau "git add -A; and git cu"
@@ -11,6 +12,7 @@ alias gcm "git co master"
 alias grm "git rebase master"
 alias oo "open ."
 alias tf terraform
+alias t 'mkdir -p /tmp/scratch; and cd (mktemp --directory --tmpdir=/tmp/scratch (string split "/" $PWD --right --max=1 --fields=2).XXXXX)'
 
 # abbreviations
 abbr -a -g cdd "cd .."
