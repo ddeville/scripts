@@ -117,6 +117,8 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$XDG_TOOLCHAINS_H
 ####### Programs ########
 #########################
 
+# TODO(damien): Switch dpkg install to regular packages
+
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo tar -xzf nvim-linux64.tar.gz -C "$PREFIX" --strip-components 1
