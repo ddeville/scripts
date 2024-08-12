@@ -24,7 +24,6 @@ add_to_path "$XDG_TOOLCHAINS_HOME/rust/cargo/bin"
 add_to_path "$XDG_TOOLCHAINS_HOME/go/current/bin"
 add_to_path "$XDG_TOOLCHAINS_HOME/go/user/bin"
 add_to_path "$XDG_TOOLCHAINS_HOME/node/current/bin"
-# TODO(damien): terraform
 
 # user binaries
 add_to_path "$HOME/.local/bin"
