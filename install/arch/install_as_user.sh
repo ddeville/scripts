@@ -12,6 +12,7 @@ cd "$HOME"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
 
 # Make fish the default shell
 if [ "$SHELL" != "/usr/bin/fish" ]; then
@@ -19,8 +20,10 @@ if [ "$SHELL" != "/usr/bin/fish" ]; then
 fi
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
+export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
+mkdir -p "$CARGO_HOME"
+mkdir -p "$RUSTUP_HOME"
 rustup default stable
 rustup component add rust-src rustfmt clippy
 
@@ -47,7 +50,7 @@ rm -f .bashrc .profile
 scripts/bin/common/.local/bin/stow-config
 
 # Get pyenv ready
-export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 mkdir -p "$PYENV_ROOT"
 pyenv global system
 pyenv rehash
