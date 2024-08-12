@@ -29,7 +29,7 @@ if [[ ! -d $install_dir ]]; then
 
   curl -L "https://nodejs.org/download/release/v${version}/node-v${version}-${plat}-${arch}.tar.gz" -o node.tar.gz
   mkdir -p "$install_dir"
-  sudo tar -xzf node.tar.gz -C "$install_dir" --strip-components 1
+  tar -xzf node.tar.gz -C "$install_dir" --strip-components 1
 
   popd
 fi
