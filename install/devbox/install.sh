@@ -81,7 +81,7 @@ sudo apt-get -y install \
 
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
 "$PYENV_ROOT/bin/pyenv" update
