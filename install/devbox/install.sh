@@ -99,11 +99,13 @@ export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 
 # golang
 mkdir -p "$XDG_TOOLCHAINS_HOME/go"
+export GO_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/go/current/bin"
 export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
 "$HOME/scripts/bin/common/.local/bin/goswitch" $GOLANG_VERSION
 
 # nodejs
 mkdir -p "$XDG_TOOLCHAINS_HOME/node"
+export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
 "$HOME/scripts/bin/common/.local/bin/nodeswitch" $NODE_VERSION
 
 # terraform
@@ -111,7 +113,7 @@ mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
 curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | bash -s -- -b "$HOME/.local/bin"
 "$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" "$TERRAFORM_VERSION"
 
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$XDG_TOOLCHAINS_HOME/go/current/bin:$GOBIN:$XDG_TOOLCHAINS_HOME/node/current/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
 #########################
 ####### Programs ########
