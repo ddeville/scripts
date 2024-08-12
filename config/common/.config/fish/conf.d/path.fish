@@ -16,19 +16,23 @@ function add_to_path
     end
 end
 
+# language toolchains
 # make sure that this is before anything in the path (it overwrites others)
-add_to_path "$PYENV_ROOT/shims"
+add_to_path "$XDG_TOOLCHAINS_HOME/python/pyenv/shims"
+add_to_path "$XDG_TOOLCHAINS_HOME/rust/cargo/bin"
+add_to_path "$XDG_TOOLCHAINS_HOME/go/bin"
+# TODO(damien): nodejs
+# TODO(damien): terraform
+
+# user binaries
+add_to_path "$HOME/.local/bin"
+
+# DEPRECATED: binaries should go in ~/.local/bin
+add_to_path "$HOME/bin"
 
 # customly built packages
 add_to_path /opt/nvim/bin
 add_to_path /opt/lsp/bin
-add_to_path /usr/local/go/bin
-
-# various user binaries
-add_to_path "$HOME/bin"
-add_to_path "$HOME/.local/bin"
-add_to_path "$CARGO_HOME/bin"
-add_to_path "$HOME/src/go/bin"
 
 # brew install its stuff there on M1 macs
 add_to_path /opt/homebrew/bin
