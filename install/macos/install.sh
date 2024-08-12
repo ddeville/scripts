@@ -45,7 +45,7 @@ if ! grep -q "$brew_path/fish" /etc/shells; then
   sudo sh -c "echo $brew_path/fish >> /etc/shells"
 fi
 if [ "$SHELL" != "$brew_path/fish" ]; then
-  chsh -s $brew_path/fish
+  sudo chsh "$USER" --shell "$brew_path/fish"
 fi
 
 mkdir -p "$HOME/.local/share"
