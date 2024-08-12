@@ -81,34 +81,34 @@ sudo apt-get -y install \
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
 "$PYENV_ROOT/bin/pyenv" update
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" rehash
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 # rust
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
 export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
+export PATH="$CARGO_HOME/bin:$PATH"
 [ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
 "$CARGO_HOME/bin/rustup" toolchain "$RUST_VERSION"
 "$CARGO_HOME/bin/rustup" default stable
 "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
-export PATH="$CARGO_HOME/bin:$PATH"
 
 # golang
 mkdir -p "$XDG_TOOLCHAINS_HOME/go"
 export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
-"$HOME/scripts/bin/common/.local/bin/goswitch" $GOLANG_VERSION
 export PATH="$XDG_TOOLCHAINS_HOME/go/current/bin:$GOBIN:$PATH"
+"$HOME/scripts/bin/common/.local/bin/goswitch" $GOLANG_VERSION
 
 # nodejs
 mkdir -p "$XDG_TOOLCHAINS_HOME/node"
 # TODO(damien): Set appropriate env vars here...
-"$HOME/scripts/bin/common/.local/bin/nodeswitch" $NODE_VERSION
 export PATH="$XDG_TOOLCHAINS_HOME/node/current/bin:$PATH"
+"$HOME/scripts/bin/common/.local/bin/nodeswitch" $NODE_VERSION
 
 # terraform
 mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
