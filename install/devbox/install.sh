@@ -23,6 +23,7 @@ NODE_VERSION=22.6.0
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
 export XDG_STATE_HOME="$HOME/.local/state" && mkdir -p "$XDG_STATE_HOME"
+export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains" && mkdir -p "$XDG_TOOLCHAINS_HOME"
 
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
@@ -77,31 +78,41 @@ sudo apt-get -y install \
 ###### Toolchains #######
 #########################
 
-# golang
-export GOPATH="$HOME/src/go"
-curl -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz -o go.tar.gz
-sudo tar -xzf go.tar.gz -C "$PREFIX"
-
-# rust
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
-"$CARGO_HOME/bin/rustup" default stable
-"$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
-
 # python
+mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
 "$PYENV_ROOT/bin/pyenv" update
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" rehash
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+
+# rust
+mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
+export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
+export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
+curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
+"$CARGO_HOME/bin/rustup" default stable
+"$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
+export PATH="$CARGO_HOME/bin:$PATH"
+
+# golang
+mkdir -p "$XDG_TOOLCHAINS_HOME/go"
+export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
+"$HOME/scripts/bin/common/.local/bin/goswitch" $GOLANG_VERSION
+export PATH="$XDG_TOOLCHAINS_HOME/go/current/bin:$GOBIN:$PATH"
 
 # nodejs
-curl -L https://nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz -o node.tar.gz
-sudo tar -xzf node.tar.gz -C "$PREFIX" --strip-components 1
+mkdir -p "$XDG_TOOLCHAINS_HOME/node"
+# TODO(damien): Set appropriate env vars here...
+"$HOME/scripts/bin/common/.local/bin/nodeswitch" $NODE_VERSION
+export PATH="$XDG_TOOLCHAINS_HOME/node/current/bin:$PATH"
 
-export PATH="$PYENV_ROOT/shims:$CARGO_HOME/bin:$PREFIX/go/bin:$PATH"
+# terraform
+mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
+# TODO(damien): Install and run tfswitch here...
+# TODO(damien): Add tfswitch stuff to path
 
 #########################
 ####### Programs ########
