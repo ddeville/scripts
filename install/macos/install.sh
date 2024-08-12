@@ -12,6 +12,7 @@ cd "$HOME"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
 
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
@@ -48,15 +49,15 @@ if [ "$SHELL" != "$brew_path/fish" ]; then
   sudo chsh "$USER" --shell "$brew_path/fish"
 fi
 
-mkdir -p "$HOME/.local/share"
-
-export CARGO_HOME="$HOME/.local/share/cargo"
-export RUSTUP_HOME="$HOME/.local/share/rustup"
+export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
+export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
+mkdir -p "$CARGO_HOME"
+mkdir -p "$RUSTUP_HOME"
 if ! command -v rustup &>/dev/null; then
   curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 fi
-"$HOME"/.local/share/cargo/bin/rustup default stable
-"$HOME"/.local/share/cargo/bin/rustup component add rust-src rustfmt clippy
+"$CARGO_HOME"/bin/rustup default stable
+"$CARGO_HOME"/bin/rustup component add rust-src rustfmt clippy
 
 export PATH="$brew_path":$PATH
 
@@ -71,7 +72,7 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
 # Get pyenv ready
-export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
+export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 mkdir -p "$PYENV_ROOT"
 pyenv global system
 pyenv rehash
