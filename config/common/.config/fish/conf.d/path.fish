@@ -18,10 +18,12 @@ end
 
 # language toolchains
 # make sure that this is before anything in the path (it overwrites others)
+add_to_path "$XDG_TOOLCHAINS_HOME/python/pyenv/bin"
 add_to_path "$XDG_TOOLCHAINS_HOME/python/pyenv/shims"
 add_to_path "$XDG_TOOLCHAINS_HOME/rust/cargo/bin"
-add_to_path "$XDG_TOOLCHAINS_HOME/go/bin"
-# TODO(damien): nodejs
+add_to_path "$XDG_TOOLCHAINS_HOME/go/current/bin"
+add_to_path "$XDG_TOOLCHAINS_HOME/go/user/bin"
+add_to_path "$XDG_TOOLCHAINS_HOME/node/current/bin"
 # TODO(damien): terraform
 
 # user binaries
