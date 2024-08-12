@@ -92,7 +92,8 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
 export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
-curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
+[ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
+"$CARGO_HOME/bin/rustup" toolchain "$RUST_VERSION"
 "$CARGO_HOME/bin/rustup" default stable
 "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
 export PATH="$CARGO_HOME/bin:$PATH"
@@ -113,6 +114,7 @@ export PATH="$XDG_TOOLCHAINS_HOME/node/current/bin:$PATH"
 mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
 # TODO(damien): Install and run tfswitch here...
 # TODO(damien): Add tfswitch stuff to path
+# TODO(damien): Also install tfswitch from homebrew/AUR in other install scripts
 
 #########################
 ####### Programs ########
