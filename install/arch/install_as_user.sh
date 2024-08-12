@@ -15,7 +15,7 @@ export XDG_STATE_HOME="$HOME/.local/state"
 
 # Make fish the default shell
 if [ "$SHELL" != "/usr/bin/fish" ]; then
-  chsh --shell /usr/bin/fish
+  sudo chsh "$USER" --shell /usr/bin/fish
 fi
 
 # Paru needs `rust` but since we install `rustup` rather than `rust` we need to install a toolchain manually
