@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# TODO(damien): get version from $1
+version=""
+
+plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
+arch="$(uname -m)"
+
+case "$arch" in
+"x86_64")
+  arch="x64"
+  ;;
+esac
+
+toolchain_dir="$HOME/.local/toolchains/node"
+versions_dir="$toolchain_dir/versions"
+if [[ ! -d $versions_dir ]]; then
+  mkdir -p "$versions_dir"
+fi
+
+install_dir="$versions_dir/$version"
+
+if [[ ! -d $install_dir ]]; then
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf $tmpdir' EXIT
+
+  pushd "$tmpdir"
+
+  curl -L "https://nodejs.org/download/release/v${version}/node-v${version}-${plat}-${arch}.tar.gz" -o node.tar.gz
+  sudo tar -xzf node.tar.gz -C "$install_dir" --strip-components 1
+
+  popd
+fi
+
+ln -s "$install_dir" "$toolchain_dir/current"
