@@ -57,11 +57,10 @@ end
 set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/user/bin"
 
 # node
-# TODO(damien): setup nodejs here
-# TODO(damien): NODE_HOME, although I think it'll conflict with node installed by brew...
+# NOTE: we already add custom node toolchain to the path and `npm install` will auto-discover the node_modules...
 
 # terraform
-# TODO(damien): setup tfswitch here
+# NOTE: the only way to change tfswitch directories it via arguments, see `tfswitch.fish` function that does that...
 
 ############################
 ####### Applications #######
