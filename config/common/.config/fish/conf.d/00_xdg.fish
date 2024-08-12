@@ -51,8 +51,10 @@ set -x CARGO_HOME "$XDG_TOOLCHAINS_HOME/rust/cargo"
 set -x RUSTUP_HOME "$XDG_TOOLCHAINS_HOME/rust/rustup"
 
 # golang
-set -x GOPATH "$XDG_TOOLCHAINS_HOME/go"
-set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/bin"
+if not test -d "$XDG_TOOLCHAINS_HOME/go/user"
+    command mkdir -p "$XDG_TOOLCHAINS_HOME/go/user"
+end
+set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/user/bin"
 
 # node
 # TODO(damien): setup nodejs here
