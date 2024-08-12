@@ -1,4 +1,5 @@
 # XDG Base Directory Specification
+
 if not set -q XDG_CONFIG_HOME
     set -gx XDG_CONFIG_HOME "$HOME/.config"
 end
@@ -27,18 +28,48 @@ if not test -d "$XDG_STATE_HOME"
     command mkdir -p "$XDG_STATE_HOME"
 end
 
-# application specific env variables to enforce XDG
+############################
+######## Toolchains ########
+############################
+
+set -gx XDG_TOOLCHAINS_HOME "$HOME/.local/toolchains"
+if not test -d "$XDG_TOOLCHAINS_HOME"
+    command mkdir -p "$XDG_TOOLCHAINS_HOME"
+end
+
+# python
+if not test -d "$XDG_TOOLCHAINS_HOME/python"
+    command mkdir -p "$XDG_TOOLCHAINS_HOME/python"
+end
+set -x PYENV_ROOT "$XDG_TOOLCHAINS_HOME/python/pyenv"
+
+# rust
+if not test -d "$XDG_TOOLCHAINS_HOME/rust"
+    command mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
+end
+set -x CARGO_HOME "$XDG_TOOLCHAINS_HOME/rust/cargo"
+set -x RUSTUP_HOME "$XDG_TOOLCHAINS_HOME/rust/rustup"
+
+# golang
+set -x GOPATH "$XDG_TOOLCHAINS_HOME/go"
+set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/bin"
+
+# node
+# TODO(damien): setup nodejs here
+# TODO(damien): NODE_HOME, although I think it'll conflict with node installed by brew...
+
+# terraform
+# TODO(damien): setup tfswitch here
+
+############################
+####### Applications #######
+############################
 
 # readline
 set -x INPUTRC "$XDG_CONFIG_HOME/readline/inputrc"
 
 # python
-set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
-
-# rust
-set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
-set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 
 # node
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
@@ -74,6 +105,3 @@ set -x RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 
 # tmux
 set -x TMUX_PLUGIN_MANAGER_PATH "$XDG_DATA_HOME/tmux/plugins"
-
-# golang
-set -x GOPATH "$HOME/src/go"
