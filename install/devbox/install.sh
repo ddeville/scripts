@@ -15,7 +15,7 @@ PYTHON_VERSION=3.11.8
 RUST_VERSION=1.76.0
 GOLANG_VERSION=1.22.2
 NODE_VERSION=22.6.0
-TERRAFORM_VERSION=x.x.x
+TERRAFORM_VERSION=1.6.4
 
 #########################
 ######### Setup #########
@@ -116,6 +116,7 @@ mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
 # TODO(damien): Install and run tfswitch here...
 # TODO(damien): Add tfswitch stuff to path
 # TODO(damien): Also install tfswitch from homebrew/AUR in other install scripts
+"$TERRAFORM_VERSION"
 
 #########################
 ####### Programs ########
