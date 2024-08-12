@@ -2,8 +2,12 @@
 
 set -eu -o pipefail
 
-# TODO(damien): get version from $1
-version=""
+if [ $# -eq 0 ] || [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Usage: goswitch 1.2.3"
+  exit 1
+fi
+
+version="$1"
 
 plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
@@ -15,12 +19,7 @@ case "$arch" in
 esac
 
 toolchain_dir="$HOME/.local/toolchains/go"
-versions_dir="$toolchain_dir/versions"
-if [[ ! -d $versions_dir ]]; then
-  mkdir -p "$versions_dir"
-fi
-
-install_dir="$versions_dir/$version"
+install_dir="$toolchain_dir/versions/$version"
 
 if [[ ! -d $install_dir ]]; then
   tmpdir="$(mktemp -d)"
@@ -29,6 +28,7 @@ if [[ ! -d $install_dir ]]; then
   pushd "$tmpdir"
 
   curl -L "https://go.dev/dl/go${version}.${plat}-${arch}.tar.gz" -o go.tar.gz
+  mkdir -p "$install_dir"
   tar -xzf go.tar.gz -C "$install_dir" --strip-components 1
 
   popd
