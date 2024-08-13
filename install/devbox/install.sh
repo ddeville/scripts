@@ -36,6 +36,13 @@ PREFIX=/usr/local
 ##### Base Packages #####
 #########################
 
+# These are the base packages necessary to install/build other things on the system and for
+# which we don't really need the very latest version and can live with whatever version the
+# current distro happens to package.
+#
+# Note that for packages that have a ppa that tracks the latest version we opt for installing
+# the packages this way rather than building them ourself.
+
 sudo add-apt-repository universe -y
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt-add-repository ppa:fish-shell/release-3 -y
@@ -79,6 +86,13 @@ sudo apt-get -y install \
 ###### Toolchains #######
 #########################
 
+# Install language build toolchains.
+#
+# The idea with all of them is to install a toolchain manager (pyenv, rustup, tfswitch, etc...) that can
+# then be used to install a given version of the actual toolchain and point the PATH to it.
+# Toolchains get installed in the `~/.local/toolchains` directory and things get added to the PATH in the
+# usual fish path handling function.
+
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
@@ -119,6 +133,12 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 ####### Programs ########
 #########################
 
+# Install latest version of specific programs. These programs are pretty critical to day-to-day
+# workflows and having the latest version is either highly recommended or even required.
+#
+# Note that this started with a couple of programs and thus installing them manually made sense
+# but now that the list has grown it might be beneficial to switch to linuxbrew...
+
 # TODO(damien): Switch dpkg install to regular packages
 
 # neovim
@@ -134,6 +154,7 @@ mkdir -p tmux && tar -xzf tmux.tar.gz -C tmux --strip-components 1
 FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
 sudo tar -xzf fzf.tar.gz -C "$PREFIX/bin"
+# TODO(damien): there's a man page in the repo, we can download the latest source and copy it over
 
 # ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
