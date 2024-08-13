@@ -15,5 +15,16 @@ if [ -d "$HOME/scripts-openai" ]; then
   dirs+=(openai)
 fi
 
-stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
-stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
+# Don't support running stow if the git repo is dirty (since we're using `--adopt`)
+if [ -d "$HOME/scripts/.git" ] && [ -n "$(git -C "$HOME/scripts" status --porcelain)" ]; then
+  echo "ERROR: $HOME/scripts is dirty, please commit changes before running stow-config"
+  exit 1
+fi
+
+stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
+stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
+
+# Restore the content of the repo since we run with `--adopt`...
+if [ -d "$HOME/scripts/.git" ]; then
+  git -C "$HOME/scripts" restore .
+fi
