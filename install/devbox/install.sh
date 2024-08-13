@@ -217,7 +217,10 @@ fi
 
 # Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
 # configs that might have been created and that would prevent stow from completing successfully)
-rm -f "$HOME/.bashrc" "$HOME/.profile" "$HOME/.config/fish/config.fish" "$HOME/.config/htop/htoprc"
+[ ! -L "$HOME/.bashrc" ] && rm -f "$HOME/.bashrc"
+[ ! -L "$HOME/.profile" ] && rm -f "$HOME/.profile"
+[ ! -L "$HOME/.config/fish" ] && rm -rf "$HOME/.config/fish"
+[ ! -L "$HOME/.config/htop" ] && rm -rf "$HOME/.config/htop"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
 
 # Install shell plugins
