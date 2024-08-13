@@ -3,7 +3,7 @@ alias e nvim
 alias realvim (which vim)
 alias vim nvim
 alias ll "eza --long --all"
-alias tree "eza --tree --level=3"
+alias tree "eza --tree --level=3 --all"
 alias g git
 alias gaa "git add -A; and git ci"
 alias gaaa "git add -A; and git ci --amend --no-edit"
