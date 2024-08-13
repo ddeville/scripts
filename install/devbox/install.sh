@@ -10,9 +10,9 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-#########################
-####### Versions ########
-#########################
+###################################
+####### Toolchain versions ########
+###################################
 
 PYTHON_VERSION=3.11.8
 RUST_VERSION=1.76.0
@@ -20,9 +20,9 @@ GOLANG_VERSION=1.22.2
 NODE_VERSION=22.6.0
 TERRAFORM_VERSION=1.6.4
 
-#########################
-######### Setup #########
-#########################
+###################################
+############## Setup ##############
+###################################
 
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
@@ -35,9 +35,9 @@ trap 'rm -rf $INSTALL_TMPDIR' EXIT
 
 PREFIX=/usr/local
 
-#########################
-##### Base Packages #####
-#########################
+###################################
+########## Base Packages ##########
+###################################
 
 # These are the base packages necessary to install/build other things on the system and for
 # which we don't really need the very latest version and can live with whatever version the
@@ -85,9 +85,9 @@ sudo apt-get -y install \
   xz-utils \
   zlib1g-dev
 
-#########################
-###### Toolchains #######
-#########################
+###################################
+########### Toolchains ############
+###################################
 
 # Install language build toolchains.
 #
@@ -132,9 +132,9 @@ curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/i
 
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
-#########################
-####### Programs ########
-#########################
+###################################
+############ Programs #############
+###################################
 
 # Install latest version of specific programs. These programs are pretty critical to day-to-day
 # workflows and having the latest version is either highly recommended or even required.
@@ -207,9 +207,9 @@ chmod +x shfmt && sudo mv shfmt "$PREFIX"/bin/shfmt
 # gopls
 "$XDG_TOOLCHAINS_HOME/go/current/bin/go" install golang.org/x/tools/gopls@latest
 
-#########################
-######### Shell #########
-#########################
+###################################
+############## Shell ##############
+###################################
 
 # Change shell to fish
 if [ "$SHELL" != "/usr/bin/fish" ]; then
