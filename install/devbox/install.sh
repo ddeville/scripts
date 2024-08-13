@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# NOTE: This script is idempotent and can be run multiple times to update toolchains or
+# programs to the latest version.
+
 if [ "$(id -u)" -eq 0 ]; then
   echo "The script is running as root, please run as a the user."
   exit 1
