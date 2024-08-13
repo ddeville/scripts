@@ -142,8 +142,6 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 # Note that this started with a couple of programs and thus installing them manually made sense
 # but now that the list has grown it might be beneficial to switch to linuxbrew...
 
-# TODO(damien): Switch dpkg install to regular packages
-
 # neovim
 curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
 sudo tar -xzf nvim-linux64.tar.gz -C "$PREFIX" --strip-components 1
@@ -157,17 +155,18 @@ mkdir -p tmux && tar -xzf tmux.tar.gz -C tmux --strip-components 1
 FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
 curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
 sudo tar -xzf fzf.tar.gz -C "$PREFIX/bin"
-# TODO(damien): there's a man page in the repo, we can download the latest source and copy it over
 
 # ripgrep
 RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep_"${RIPGREP_VERSION}"-1_amd64.deb -o ripgrep.deb
-sudo dpkg -i ripgrep.deb
+curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep-"${RIPGREP_VERSION}"-x86_64-unknown-linux-musl.tar.gz -o rg.tar.gz
+mkdir -p ripgrep && tar xzf rg.tar.gz -C ripgrep --strip-components 1
+sudo mv ripgrep/rg "$PREFIX/bin/rg"
 
 # fd
 FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd_"${FD_VERSION:1}"_amd64.deb -o fd.deb
-sudo dpkg -i fd.deb
+curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd-"${FD_VERSION}"-x86_64-unknown-linux-musl.tar.gz -o fd.tar.gz
+mkdir -p fd && tar xzf fd.tar.gz -C fd --strip-components 1
+sudo mv fd/fd "$PREFIX/bin/fd"
 
 # eza
 curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
@@ -180,8 +179,8 @@ PREFIX=$PREFIX sudo make install -C btop
 
 # gh
 GH_VERSION="$(curl -L https://api.github.com/repos/cli/cli/releases/latest | jq --raw-output '.tag_name')"
-curl -L https://github.com/cli/cli/releases/download/"${GH_VERSION}"/gh_"${GH_VERSION:1}"_linux_amd64.deb -o gh.deb
-sudo dpkg -i gh.deb
+curl -L https://github.com/cli/cli/releases/download/"${GH_VERSION}"/gh_"${GH_VERSION:1}"_linux_amd64.tar.gz -o gh.tar.gz
+sudo tar -xzf gh.tar.gz -C "$PREFIX" --strip-components 1
 
 # bazelisk
 curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
