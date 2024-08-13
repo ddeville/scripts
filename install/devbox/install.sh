@@ -215,12 +215,7 @@ if [ "$SHELL" != "/usr/bin/fish" ]; then
   sudo chsh "$USER" --shell /usr/bin/fish
 fi
 
-# Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
-# configs that might have been created and that would prevent stow from completing successfully)
-[ ! -L "$HOME/.bashrc" ] && rm -f "$HOME/.bashrc"
-[ ! -L "$HOME/.profile" ] && rm -f "$HOME/.profile"
-[ ! -L "$HOME/.config/fish" ] && rm -rf "$HOME/.config/fish"
-[ ! -L "$HOME/.config/htop" ] && rm -rf "$HOME/.config/htop"
+# Run stow to put all the configs and bins in the right place.
 "$HOME/scripts/bin/common/.local/bin/stow-config"
 
 # Install shell plugins
