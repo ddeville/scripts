@@ -39,6 +39,10 @@ add_to_path /opt/lsp/bin
 add_to_path /opt/homebrew/bin
 add_to_path /opt/homebrew/sbin
 
+# brew install its stuff there on linux
+add_to_path /home/linuxbrew/.linuxbrew/bin
+add_to_path /home/linuxbrew/.linuxbrew/sbin
+
 # check whether xcode is installed and add its bin dir to the path if so
 if which xcode-select >/dev/null 2>&1; and set -l XC (xcode-select --print-path)
     add_to_path "$XC/usr/bin"
