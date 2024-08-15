@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ux
+set -eux -o pipefail
 
 # First update base16
 base16_path="$XDG_DATA_HOME/base16"
@@ -18,14 +18,14 @@ for repo in "${repos[@]}"; do
   # If the repo was never cloned, do so, otherwise just update it
   if [ -d "$path" ]; then
     # If the repo already exists, check if the remote has changed and update it if needed
-    pushd "$path" || exit 1
+    pushd "$path"
     current_remote_url=$(git remote get-url origin)
     if [ "$current_remote_url" != "$repo" ]; then
       git remote set-url origin "$repo"
     fi
     # Pull the latest changes
     git pull --rebase
-    popd || exit 1
+    popd
 
   else
     git clone "$repo" "$path"
