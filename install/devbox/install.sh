@@ -61,6 +61,7 @@ sudo apt-get -y install \
   ninja-build \
   pkg-config \
   procps \
+  readline \
   tk-dev \
   unzip \
   xz-utils \
