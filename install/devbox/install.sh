@@ -33,8 +33,6 @@ INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
 trap 'rm -rf $INSTALL_TMPDIR' EXIT
 
-PREFIX=/usr/local
-
 ###################################
 ########## Base Packages ##########
 ###################################
@@ -42,48 +40,31 @@ PREFIX=/usr/local
 # These are the base packages necessary to install/build other things on the system and for
 # which we don't really need the very latest version and can live with whatever version the
 # current distro happens to package.
-#
-# Note that for packages that have a ppa that tracks the latest version we opt for installing
-# the packages this way rather than building them ourself.
-
-sudo add-apt-repository universe -y
-sudo add-apt-repository ppa:git-core/ppa -y
-sudo apt-add-repository ppa:fish-shell/release-3 -y
 
 sudo apt-get update
 
 sudo apt-get -y install \
-  bison \
   build-essential \
-  clang-format \
   cmake \
   curl \
-  fish \
-  gcc \
-  gdb \
+  file \
   git \
-  htop \
-  jq \
-  libbz2-dev \
-  libevent-dev \
-  libffi-dev \
-  liblzma-dev \
-  libncurses-dev \
-  libncursesw5-dev \
-  libreadline-dev \
-  libsqlite3-dev \
-  libssl-dev \
-  libxml2-dev \
-  libxmlsec1-dev \
   ninja-build \
   pkg-config \
-  stow \
-  tk-dev \
+  procps \
   unzip \
-  vim \
-  wget \
-  xz-utils \
-  zlib1g-dev
+  xz-utils
+
+###################################
+############ Homebrew #############
+###################################
+
+if [ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+brew update
 
 ###################################
 ########### Toolchains ############
@@ -100,6 +81,8 @@ sudo apt-get -y install \
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
+export PYTHON_CONFIGURE_OPTS="--enable-optimizations --with-lto --disable-shared"
+export PYTHON_CFLAGS="-march=native -mtune=native"
 "$PYENV_ROOT/bin/pyenv" update
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
@@ -109,7 +92,7 @@ export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
 export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
-[ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=${RUST_VERSION} -y --no-modify-path
+[ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=none -y --no-modify-path --no-update-default-toolchain
 "$CARGO_HOME/bin/rustup" toolchain install "$RUST_VERSION"
 "$CARGO_HOME/bin/rustup" default stable
 "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
@@ -137,82 +120,63 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 ###################################
 
 # Install latest version of specific programs. These programs are pretty critical to day-to-day
-# workflows and having the latest version is either highly recommended or even required.
+# workflows and having the latest version is either highly recommended or even required, which
+# is why we install them with Homebrew rather than the local package manager.
+
+# Shell programs
+brew install \
+  bash \
+  bazelisk \
+  btop \
+  difftastic \
+  eza \
+  fd \
+  fish \
+  fzf \
+  gh \
+  git \
+  htop \
+  jq \
+  neovim \
+  ripgrep \
+  stow \
+  tmux \
+  vim \
+  wget
+
+# Formatters
+brew install \
+  black \
+  buildifier \
+  buf \
+  clang-format \
+  gopls \
+  isort \
+  ruff \
+  shellcheck \
+  shfmt \
+  stylua
+
+# Update all Brew formulas in case it's not the first time we run this script.
+brew upgrade
+
+# NOTE: Homebrew links a ton of dependencies into the main bin folder, which is
+# not necessarily something that we want since we want to use the programs from
+# the distro (which mimics what we actually run everywhere) and only use the
+# newer versions for things that we specifically install.
 #
-# Note that this started with a couple of programs and thus installing them manually made sense
-# but now that the list has grown it might be beneficial to switch to linuxbrew...
-
-# neovim
-curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz -o nvim-linux64.tar.gz
-sudo tar -xzf nvim-linux64.tar.gz -C "$PREFIX" --strip-components 1
-
-# tmux
-curl -L "$(curl -L https://api.github.com/repos/tmux/tmux/releases/latest | jq --raw-output '.assets[0].browser_download_url')" -o tmux.tar.gz
-mkdir -p tmux && tar -xzf tmux.tar.gz -C tmux --strip-components 1
-pushd tmux && ./configure --prefix="$PREFIX" && make && sudo make install && popd
-
-# fzf
-FZF_VERSION="$(curl -L https://api.github.com/repos/junegunn/fzf/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/junegunn/fzf/releases/download/v"${FZF_VERSION}"/fzf-"${FZF_VERSION}"-linux_amd64.tar.gz -o fzf.tar.gz
-sudo tar -xzf fzf.tar.gz -C "$PREFIX/bin"
-
-# ripgrep
-RIPGREP_VERSION="$(curl -L https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/BurntSushi/ripgrep/releases/download/"${RIPGREP_VERSION}"/ripgrep-"${RIPGREP_VERSION}"-x86_64-unknown-linux-musl.tar.gz -o rg.tar.gz
-mkdir -p ripgrep && tar xzf rg.tar.gz -C ripgrep --strip-components 1
-sudo mv ripgrep/rg "$PREFIX/bin/rg"
-
-# fd
-FD_VERSION="$(curl -L https://api.github.com/repos/sharkdp/fd/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/sharkdp/fd/releases/download/"${FD_VERSION}"/fd-"${FD_VERSION}"-x86_64-unknown-linux-musl.tar.gz -o fd.tar.gz
-mkdir -p fd && tar xzf fd.tar.gz -C fd --strip-components 1
-sudo mv fd/fd "$PREFIX/bin/fd"
-
-# eza
-curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -o eza.tar.gz
-sudo tar -xzf eza.tar.gz -C "$PREFIX/bin"
-
-# btop
-curl -L https://github.com/aristocratos/btop/releases/latest/download/btop-x86_64-linux-musl.tbz -o btop.tbz
-tar -xjf btop.tbz
-PREFIX=$PREFIX sudo make install -C btop
-
-# gh
-GH_VERSION="$(curl -L https://api.github.com/repos/cli/cli/releases/latest | jq --raw-output '.tag_name')"
-curl -L https://github.com/cli/cli/releases/download/"${GH_VERSION}"/gh_"${GH_VERSION:1}"_linux_amd64.tar.gz -o gh.tar.gz
-sudo tar -xzf gh.tar.gz -C "$PREFIX" --strip-components 1
-
-# bazelisk
-curl -L https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 -o bazel
-chmod +x bazel && sudo mv bazel "$PREFIX"/bin/bazel
-
-# buf
-curl -L https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64.tar.gz -o buf.tar.gz
-sudo tar -xzf buf.tar.gz -C "$PREFIX" --strip-components 1
-
-# buildifier
-curl -L https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 -o buildifier
-chmod +x buildifier && sudo mv buildifier "$PREFIX"/bin/buildifier
-
-# stylua
-curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
-unzip -o stylua.zip && sudo mv stylua "$PREFIX"/bin/stylua
-
-# shfmt
-SHFMT_VERSION="$(curl -L https://api.github.com/repos/mvdan/sh/releases/latest | jq --raw-output '.name')"
-curl -L https://github.com/mvdan/sh/releases/download/"${SHFMT_VERSION}"/shfmt_"${SHFMT_VERSION}"_linux_amd64 -o shfmt
-chmod +x shfmt && sudo mv shfmt "$PREFIX"/bin/shfmt
-
-# gopls
-"$XDG_TOOLCHAINS_HOME/go/current/bin/go" install golang.org/x/tools/gopls@latest
+# TODO(damien): We should be able to create a new folder that contains symlinks
+# to only the top-level programs we install by querying with "brew leaves".
 
 ###################################
 ############## Shell ##############
 ###################################
 
+FISH_PATH="/home/linuxbrew/.linuxbrew/bin/fish"
+
 # Change shell to fish
-if [ "$SHELL" != "/usr/bin/fish" ]; then
-  sudo chsh "$USER" --shell /usr/bin/fish
+if [ "$SHELL" != "$FISH_PATH" ]; then
+  sudo chsh "$USER" --shell "$FISH_PATH"
 fi
 
 # Run stow to put all the configs and bins in the right place.
