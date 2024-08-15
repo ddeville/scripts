@@ -53,7 +53,6 @@ sudo apt-get -y install \
   libncursesw5-dev \
   libffi-dev \
   liblzma-dev \
-  libreadline \
   libreadline-dev \
   libsqlite3-dev \
   libssl-dev \
@@ -152,6 +151,7 @@ brew install \
   htop \
   jq \
   neovim \
+  readline \
   ripgrep \
   stow \
   tmux \
