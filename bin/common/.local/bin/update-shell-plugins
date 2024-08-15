@@ -2,6 +2,19 @@
 
 set -eux -o pipefail
 
+# Parse command line options
+update=true
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --no-update) update=false ;;
+  *)
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+  esac
+  shift
+done
+
 # First update base16
 base16_path="$XDG_DATA_HOME/base16"
 
@@ -23,8 +36,10 @@ for repo in "${repos[@]}"; do
     if [ "$current_remote_url" != "$repo" ]; then
       git remote set-url origin "$repo"
     fi
-    # Pull the latest changes
-    git pull --rebase
+    # Pull the latest changes if we need to update
+    if $update; then
+      git pull --rebase
+    fi
     popd
 
   else
@@ -40,7 +55,11 @@ if [ ! -d "$lazy_path" ]; then
   git clone --filter=blob:none https://github.com/folke/lazy.nvim.git --branch=stable "$lazy_path"
 fi
 
-nvim --headless "+Lazy! sync" +qa
+if $update; then
+  nvim --headless "+Lazy! sync" +qa
+else
+  nvim --headless "+Lazy! restore" +qa
+fi
 
 # And finally tmux plugins
 tpm_path="$TMUX_PLUGIN_MANAGER_PATH/tpm"
@@ -56,4 +75,6 @@ if ! tmux info &>/dev/null; then
 fi
 
 "$TMUX_PLUGIN_MANAGER_PATH"/tpm/bin/install_plugins
-"$TMUX_PLUGIN_MANAGER_PATH"/tpm/bin/update_plugins all
+if $update; then
+  "$TMUX_PLUGIN_MANAGER_PATH"/tpm/bin/update_plugins all
+fi
