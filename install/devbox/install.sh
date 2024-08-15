@@ -184,4 +184,4 @@ fi
 
 # Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
-"$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
+"$HOME/scripts/bin/common/.local/bin/update-shell-plugins" --no-update
