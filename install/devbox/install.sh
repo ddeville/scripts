@@ -128,6 +128,7 @@ brew install \
   bash \
   bazelisk \
   btop \
+  curl \
   difftastic \
   eza \
   fd \
