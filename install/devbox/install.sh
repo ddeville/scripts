@@ -49,11 +49,22 @@ sudo apt-get -y install \
   curl \
   file \
   git \
+  libbz2-dev \
+  libncursesw5-dev \
+  libffi-dev \
+  liblzma-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  libssl-dev \
+  libxml2-dev \
+  libxmlsec1-dev \
   ninja-build \
   pkg-config \
   procps \
+  tk-dev \
   unzip \
-  xz-utils
+  xz-utils \
+  zlib1g-dev
 
 ###################################
 ############ Homebrew #############
