@@ -53,6 +53,7 @@ sudo apt-get -y install \
   libncursesw5-dev \
   libffi-dev \
   liblzma-dev \
+  libreadline \
   libreadline-dev \
   libsqlite3-dev \
   libssl-dev \
@@ -61,7 +62,6 @@ sudo apt-get -y install \
   ninja-build \
   pkg-config \
   procps \
-  readline \
   tk-dev \
   unzip \
   xz-utils \
@@ -99,6 +99,7 @@ export PYTHON_CFLAGS="-march=native -mtune=native"
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" rehash
+# TODO(damien): pyenv-virtualenv
 
 # rust
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
