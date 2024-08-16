@@ -189,11 +189,11 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 ############## Shell ##############
 ###################################
 
-FISH_PATH="/home/linuxbrew/.linuxbrew/bin/fish"
+FISH_BIN="/home/linuxbrew/.linuxbrew/bin/fish"
 
 # Change shell to fish
-if [ "$SHELL" != "$FISH_PATH" ]; then
-  sudo chsh "$USER" --shell "$FISH_PATH"
+if [ "$SHELL" != "$FISH_BIN" ]; then
+  sudo chsh "$USER" --shell "$FISH_BIN"
 fi
 
 # Run stow to put all the configs and bins in the right place.
