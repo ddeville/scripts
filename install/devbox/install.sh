@@ -200,4 +200,31 @@ fi
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins" --no-update
 
-# TODO(damien): Add systemd job to run this script at boot
+###################################
+############ Automation ###########
+###################################
+
+# Run the script on boot so that it sets up a few global things (like the default shell)
+# in scenarios where a devbox is recreated and only its home volume is preserved.
+
+SYSTEMD_HOME="$HOME/.config/systemd/user"
+mkdir -p "$SYSTEMD_HOME"
+
+DEVBOX_SERVICE="$SYSTEMD_HOME/setup-devbox.service"
+
+cat <<EOF >"$DEVBOX_SERVICE"
+[Unit]
+Description=Set up devbox
+
+[Service]
+Type=simple
+ExecStart=scripts/install/devbox/install.sh
+Restart=no
+
+[Install]
+WantedBy=default.target
+EOF
+
+# Enabling the service simply creates a symlink in $SYSTEMD_HOME so it will persist
+# across reboots where only the home volume is preserved.
+systemctl --user enable "$DEVBOX_SERVICE"
