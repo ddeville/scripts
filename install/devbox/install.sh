@@ -61,8 +61,11 @@ sudo apt-get -y install \
   ninja-build \
   pkg-config \
   procps \
+  stow \
   tk-dev \
   unzip \
+  vim \
+  wget \
   xz-utils \
   zlib1g-dev
 
@@ -139,7 +142,6 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 
 # Shell programs
 brew install \
-  bash \
   bazelisk \
   btop \
   curl \
@@ -153,12 +155,8 @@ brew install \
   htop \
   jq \
   neovim \
-  readline \
   ripgrep \
-  stow \
-  tmux \
-  vim \
-  wget
+  tmux
 
 # Formatters
 brew install \
