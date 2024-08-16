@@ -92,13 +92,13 @@ brew update
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
 [ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
+[ -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ] || git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_ROOT/plugins/pyenv-virtualenv"
 export PYTHON_CONFIGURE_OPTS="--enable-optimizations --with-lto --disable-shared"
 export PYTHON_CFLAGS="-march=native -mtune=native"
 "$PYENV_ROOT/bin/pyenv" update
 "$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
 "$PYENV_ROOT/bin/pyenv" rehash
-# TODO(damien): pyenv-virtualenv
 
 # rust
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
