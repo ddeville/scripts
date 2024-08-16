@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-# NOTE: This script is idempotent and can be run multiple times to update toolchains or
-# programs to the latest version.
+# NOTE: This script is idempotent and can be run multiple times to update
+# toolchains or programs to the latest version.
 
 if [ "$(id -u)" -eq 0 ]; then
-  echo "The script is running as root, please run as a the user."
+  echo "The script is running as root, please run as the user."
   exit 1
 fi
 
@@ -37,9 +37,9 @@ trap 'rm -rf $INSTALL_TMPDIR' EXIT
 ########## Base Packages ##########
 ###################################
 
-# These are the base packages necessary to install/build other things on the system and for
-# which we don't really need the very latest version and can live with whatever version the
-# current distro happens to package.
+# These are the base packages necessary to install/build other things on the
+# system and for which we don't really need the very latest version and can live
+# with whatever version the current distro happens to package.
 
 sudo apt-get update
 
@@ -83,10 +83,11 @@ brew update
 
 # Install language build toolchains.
 #
-# The idea with all of them is to install a toolchain manager (pyenv, rustup, tfswitch, etc...) that can
-# then be used to install a given version of the actual toolchain and point the PATH to it.
-# Toolchains get installed in the `~/.local/toolchains` directory and things get added to the PATH in the
-# usual fish path handling function.
+# For each toolchain, the idea is to install a toolchain manager (pyenv, rustup,
+# tfswitch, etc...) that can then be used to install a given version of the
+# actual toolchain and point the PATH to it.
+# Toolchains get installed in the `~/.local/toolchains` directory and things
+# get added to the PATH in the usual fish path handling function.
 
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
@@ -131,9 +132,10 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 ############ Programs #############
 ###################################
 
-# Install latest version of specific programs. These programs are pretty critical to day-to-day
-# workflows and having the latest version is either highly recommended or even required, which
-# is why we install them with Homebrew rather than the local package manager.
+# Install latest version of specific programs. These programs are pretty
+# critical to day-to-day development workflows and having the latest version
+# is either highly recommended or even required, which is why we install them
+# with Homebrew rather than the local (outdated) package manager.
 
 # Shell programs
 brew install \
@@ -204,8 +206,9 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 ############ Automation ###########
 ###################################
 
-# Run the script on boot so that it sets up a few global things (like the default shell)
-# in scenarios where a devbox is recreated and only its home volume is preserved.
+# Run the script on boot so that it can set up a few global things (like the
+# default shell) in scenarios where a devbox is recreated and only its home
+# volume is preserved.
 
 SYSTEMD_HOME="$HOME/.config/systemd/user"
 mkdir -p "$SYSTEMD_HOME"
@@ -226,5 +229,5 @@ WantedBy=default.target
 EOF
 
 # Enabling the service simply creates a symlink in $SYSTEMD_HOME so it will persist
-# across reboots where only the home volume is preserved.
+# across reboots when only the home volume is preserved.
 systemctl --user enable "$DEVBOX_SERVICE"
