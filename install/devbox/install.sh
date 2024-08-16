@@ -73,12 +73,15 @@ sudo apt-get -y install \
 ############ Homebrew #############
 ###################################
 
-if [ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+BREW_BIN="/home/linuxbrew/.linuxbrew/bin/brew"
+
+if [ ! -x "$BREW_BIN" ]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
-brew update
+
+"$BREW_BIN" update
 
 ###################################
 ########### Toolchains ############
@@ -141,7 +144,7 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 # with Homebrew rather than the local (outdated) package manager.
 
 # Shell programs
-brew install \
+"$BREW_BIN" install \
   bazelisk \
   btop \
   curl \
@@ -159,7 +162,7 @@ brew install \
   tmux
 
 # Formatters
-brew install \
+"$BREW_BIN" install \
   black \
   buildifier \
   buf \
@@ -172,7 +175,7 @@ brew install \
   stylua
 
 # Update all Brew formulas in case it's not the first time we run this script.
-brew upgrade
+"$BREW_BIN" upgrade
 
 # NOTE: Homebrew links a ton of dependencies into the main bin folder, which is
 # not necessarily something that we want since we want to use the programs from
