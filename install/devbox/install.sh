@@ -182,8 +182,11 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 # the distro (which mimics what we actually run everywhere) and only use the
 # newer versions for things that we specifically install.
 #
-# TODO(damien): We should be able to create a new folder that contains symlinks
-# to only the top-level programs we install by querying with "brew leaves".
+# For this reason we filter the leaf packages that we specifically installed
+# and symlinks their executables into a new directory. Our fish path handling
+# function will then prefer this directory (instead of the main linuxbrew one)
+# if it exists.
+"$HOME/scripts/bin/linux/.local/bin/filter-brew-leaf-packages"
 
 ###################################
 ############## Shell ##############
