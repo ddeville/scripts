@@ -10,7 +10,14 @@ if [ ! -d $LINUXBREW_PATH ]; then
   exit 1
 fi
 
-rm -rf $FILTERED_PATH
+if [ ! -d $FILTERED_PATH ]; then
+  echo "Directory for filtered packages was never created, will need to sudo."
+  sudo mkdir -p $FILTERED_PATH
+  sudo chown "$USER" $FILTERED_PATH
+  sudo chmod 775 $FILTERED_PATH
+fi
+
+rm -rf ${FILTERED_PATH:?}/bin ${FILTERED_PATH:?}/sbin
 mkdir -p $FILTERED_PATH/bin $FILTERED_PATH/sbin
 
 PACKAGES=$(brew leaves)
