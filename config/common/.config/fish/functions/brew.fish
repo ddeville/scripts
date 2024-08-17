@@ -1,4 +1,4 @@
-function pyenv
+function brew
     if not type -fq brew
         echo "brew is not installed, this is just a fish function wrapper!"
         return 1
