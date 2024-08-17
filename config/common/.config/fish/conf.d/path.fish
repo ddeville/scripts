@@ -41,7 +41,7 @@ add_to_path /opt/homebrew/sbin
 
 # brew install its stuff there on linux
 # note that we support filtering only the leaf packages so prefer that if we've opted in
-if test -e /home/linuxbrew/filtered
+if test -e /home/linuxbrew/.filtered
     add_to_path /home/linuxbrew/.filtered/bin
     add_to_path /home/linuxbrew/.filtered/sbin
 else
