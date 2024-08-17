@@ -40,8 +40,14 @@ add_to_path /opt/homebrew/bin
 add_to_path /opt/homebrew/sbin
 
 # brew install its stuff there on linux
-add_to_path /home/linuxbrew/.linuxbrew/bin
-add_to_path /home/linuxbrew/.linuxbrew/sbin
+# note that we support filtering only the leaf packages so prefer that if we've opted in
+if test -e /home/linuxbrew/filtered
+    add_to_path /home/linuxbrew/.filtered/bin
+    add_to_path /home/linuxbrew/.filtered/sbin
+else
+    add_to_path /home/linuxbrew/.linuxbrew/bin
+    add_to_path /home/linuxbrew/.linuxbrew/sbin
+end
 
 # check whether xcode is installed and add its bin dir to the path if so
 if which xcode-select >/dev/null 2>&1; and set -l XC (xcode-select --print-path)

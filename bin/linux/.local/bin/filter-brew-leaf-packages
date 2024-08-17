@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 LINUXBREW_PATH=/home/linuxbrew/.linuxbrew
-FILTERED_PATH=/home/linuxbrew/filtered
+FILTERED_PATH=/home/linuxbrew/.filtered
 
 if [ ! -d $LINUXBREW_PATH ]; then
   echo "Brew isn't installed on this system!"
