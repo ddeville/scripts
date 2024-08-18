@@ -167,7 +167,7 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
   shfmt \
   stylua
 
-# Update all Brew formulas in case it's not the first time we run this script.
+# Upgrade all Brew formulas in case it's not the first time we run this script.
 "$BREW_BIN" upgrade
 
 # NOTE: Homebrew links a ton of dependencies into the main bin folder, which is
