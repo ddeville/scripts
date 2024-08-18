@@ -73,13 +73,12 @@ sudo apt-get -y install \
 ############ Homebrew #############
 ###################################
 
-BREW_BIN="/home/linuxbrew/.linuxbrew/bin/brew"
+LINUXBREW_PATH="/home/linuxbrew/.linuxbrew"
+BREW_BIN="$LINUXBREW_PATH/bin/brew"
 
 if [ ! -x "$BREW_BIN" ]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
-
-export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
 
 "$BREW_BIN" update
 
@@ -188,11 +187,14 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 # if it exists.
 "$HOME/scripts/bin/linux/.local/bin/filter-brew-leaf-packages"
 
+LINUXBREW_FILTERED_PATH=/home/linuxbrew/.filtered
+export PATH="$LINUXBREW_FILTERED_PATH/bin:$LINUXBREW_FILTERED_PATH/sbin:$PATH"
+
 ###################################
 ############## Shell ##############
 ###################################
 
-FISH_BIN="/home/linuxbrew/.linuxbrew/bin/fish"
+FISH_BIN="$LINUXBREW_PATH/bin/fish"
 
 # Change shell to fish
 if [ "$SHELL" != "$FISH_BIN" ]; then
@@ -214,7 +216,7 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 # default shell) in scenarios where a devbox is recreated and only its home
 # volume is preserved.
 
-SYSTEMD_HOME="$HOME/.config/systemd/user"
+SYSTEMD_HOME="$XDG_CONFIG_HOME/systemd/user"
 mkdir -p "$SYSTEMD_HOME"
 
 DEVBOX_SERVICE="$SYSTEMD_HOME/setup-devbox.service"
