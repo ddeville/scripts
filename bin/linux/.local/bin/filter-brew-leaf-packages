@@ -21,9 +21,9 @@ rm -rf ${FILTERED_PATH:?}/bin ${FILTERED_PATH:?}/sbin
 mkdir -p $FILTERED_PATH/bin $FILTERED_PATH/sbin
 
 BREW_BIN="$LINUXBREW_PATH/bin/brew"
-PACKAGES=$($BREW_BIN leaves)
-
 ln -sf $BREW_BIN $FILTERED_PATH/bin/
+
+PACKAGES=$($BREW_BIN leaves)
 
 for pkg in $PACKAGES; do
   prefix=$($BREW_BIN --prefix "$pkg")
