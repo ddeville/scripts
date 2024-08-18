@@ -20,12 +20,13 @@ fi
 rm -rf ${FILTERED_PATH:?}/bin ${FILTERED_PATH:?}/sbin
 mkdir -p $FILTERED_PATH/bin $FILTERED_PATH/sbin
 
-PACKAGES=$(brew leaves)
+BREW_BIN="$LINUXBREW_PATH/bin/brew"
+PACKAGES=$($BREW_BIN leaves)
 
-ln -sf $LINUXBREW_PATH/bin/brew $FILTERED_PATH/bin/
+ln -sf $BREW_BIN $FILTERED_PATH/bin/
 
 for pkg in $PACKAGES; do
-  prefix=$(brew --prefix "$pkg")
+  prefix=$($BREW_BIN --prefix "$pkg")
 
   if [ -d "$prefix/bin" ]; then
     find "$prefix/bin" -type f -executable -exec ln -sf {} "$FILTERED_PATH/bin/" \;
