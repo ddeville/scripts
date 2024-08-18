@@ -72,9 +72,7 @@ sudo apt-get -y install \
 LINUXBREW_PATH="/home/linuxbrew/.linuxbrew"
 BREW_BIN="$LINUXBREW_PATH/bin/brew"
 
-if [ ! -x "$BREW_BIN" ]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+[ -x "$BREW_BIN" ] || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 "$BREW_BIN" update
 
