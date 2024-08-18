@@ -98,7 +98,7 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PAT
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
-[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | bash
+[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | /bin/bash
 [ -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ] || git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_ROOT/plugins/pyenv-virtualenv"
 export PYTHON_CONFIGURE_OPTS="--enable-optimizations --with-lto --disable-shared"
 export PYTHON_CFLAGS="-march=native -mtune=native"
@@ -129,7 +129,7 @@ export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
 
 # terraform
 mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
-curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | bash -s -- -b "$HOME/.local/bin"
+curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | /bin/bash -s -- -b "$HOME/.local/bin"
 "$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" "$TERRAFORM_VERSION"
 
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
