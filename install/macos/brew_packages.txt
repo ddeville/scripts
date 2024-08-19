@@ -3,6 +3,7 @@
 bash
 bat
 curl
+dasel
 difftastic
 dust
 eza
