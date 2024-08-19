@@ -149,6 +149,7 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
   gh \
   git \
   htop \
+  jless \
   jq \
   neovim \
   ripgrep \
