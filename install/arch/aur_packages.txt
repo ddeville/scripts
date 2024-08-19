@@ -2,6 +2,7 @@
 
 1password-cli
 buildifier-bin
+dasel-bin
 dropbox-cli
 flamegraph
 jl
