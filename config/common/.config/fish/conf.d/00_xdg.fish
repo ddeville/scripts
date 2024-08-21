@@ -54,6 +54,7 @@ set -x RUSTUP_HOME "$XDG_TOOLCHAINS_HOME/rust/rustup"
 if not test -d "$XDG_TOOLCHAINS_HOME/go/user"
     command mkdir -p "$XDG_TOOLCHAINS_HOME/go/user"
 end
+set -x GOPATH "$XDG_TOOLCHAINS_HOME/go/user"
 set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/user/bin"
 
 # node
