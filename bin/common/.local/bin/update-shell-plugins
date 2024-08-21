@@ -70,7 +70,7 @@ if [ ! -d "$tpm_path" ]; then
 fi
 
 # If tmux is running, make sure that we update the env variable in case it has a stale one
-if ! tmux info &>/dev/null; then
+if tmux info &>/dev/null; then
   tmux set-environment -g "TMUX_PLUGIN_MANAGER_PATH" "$XDG_DATA_HOME/tmux/plugins/"
 fi
 
