@@ -152,6 +152,7 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
   htop \
   jless \
   jq \
+  kubectl \
   neovim \
   ripgrep \
   tmux
