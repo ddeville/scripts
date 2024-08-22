@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ ! -d "$HOME/scripts-openai" ]; then
+  echo "Missing $HOME/scripts-openai directory"
+  exit 1
+fi
+
+TMPDIR="$(mktemp -d)"
+cd "$TMPDIR"
+trap 'rm -rf $TMPDIR' EXIT
+
+cp -R "$HOME/scripts-openai" "scripts-openai" 2>/dev/null
+
+cd scripts-openai
+
+if [ -d ".git" ]; then
+  git clean -ffxdq
+  rm -rf .git
+  rm -rf .github
+fi
+
+cd "$TMPDIR"
+
+export COPYFILE_DISABLE=1
+tar -cz --no-xattrs --exclude .DS_Store --exclude ._* -f scripts-openai.tar.gz scripts-openai
+
+CMD="echo \"$(base64 --input=scripts-openai.tar.gz)\" | base64 --decode > /tmp/scripts-openai.tar.gz && rm -rf ~/scripts-openai && tar -xzf /tmp/scripts-openai.tar.gz -C ~"
+
+if command -v pbcopy &>/dev/null; then
+  echo "$CMD" | pbcopy
+elif command -v xclip &>/dev/null; then
+  echo "$CMD" | xclip -selection clipboard
+fi
+
+echo "Run the following command to unpack (it was also copied to your clipboard):"
+echo ""
+echo "$CMD"
