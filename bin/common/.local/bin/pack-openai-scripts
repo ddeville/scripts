@@ -13,18 +13,13 @@ trap 'rm -rf $TMPDIR' EXIT
 
 cp -R "$HOME/scripts-openai" "scripts-openai" 2>/dev/null
 
-cd scripts-openai
-
-if [ -d ".git" ]; then
-  git clean -ffxdq
-  rm -rf .git
-  rm -rf .github
+if [ -d "scripts-openai/.git" ]; then
+  git -C scripts-openai clean -ffxdq
+  rm -rf scripts-openai/.git
+  rm -rf scripts-openai/.github
 fi
 
-cd "$TMPDIR"
-
-export COPYFILE_DISABLE=1
-tar -cz --no-xattrs --exclude .DS_Store --exclude ._* -f scripts-openai.tar.gz scripts-openai
+COPYFILE_DISABLE=1 tar -cz --no-xattrs --exclude .DS_Store --exclude ._* -f scripts-openai.tar.gz scripts-openai
 
 CMD="echo \"$(base64 --input=scripts-openai.tar.gz)\" | base64 --decode > /tmp/scripts-openai.tar.gz && rm -rf ~/scripts-openai && tar -xzf /tmp/scripts-openai.tar.gz -C ~"
 
