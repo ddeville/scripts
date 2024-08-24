@@ -10,6 +10,7 @@ alias gaaa "git add -A; and git ci --amend --no-edit"
 alias gaau "git add -A; and git cu"
 alias gcm "git co master"
 alias grm "git rebase master"
+alias o open
 alias oo "open ."
 alias tf terraform
 alias t 'mkdir -p /tmp/scratch; and cd (mktemp --directory --tmpdir=/tmp/scratch (string split "/" $PWD --right --max=1 --fields=2).XXXXX)'
