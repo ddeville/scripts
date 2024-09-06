@@ -127,7 +127,7 @@ local servers = {
 
   terraformls = {},
 
-  tsserver = {},
+  ts_ls = {},
 
   yamlls = {
     settings = {
