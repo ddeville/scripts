@@ -194,6 +194,9 @@ export PATH="$LINUXBREW_FILTERED_PATH/bin:$LINUXBREW_FILTERED_PATH/sbin:$PATH"
 FISH_BIN="$LINUXBREW_PATH/bin/fish"
 
 # Change shell to fish
+if ! grep -q "$FISH_BIN" /etc/shells; then
+  sudo sh -c "echo $FISH_BIN >> /etc/shells"
+fi
 [ "$SHELL" == "$FISH_BIN" ] || sudo chsh "$USER" --shell "$FISH_BIN"
 
 # Run stow to put all the configs and bins in the right place.
