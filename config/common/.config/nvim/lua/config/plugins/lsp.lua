@@ -127,7 +127,8 @@ local servers = {
 
   terraformls = {},
 
-  ts_ls = {},
+  -- TODO: Re-enable this but the switch from terraformls to ts_ls broke things...
+  -- ts_ls = {},
 
   yamlls = {
     settings = {
