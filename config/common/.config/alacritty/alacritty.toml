@@ -1,4 +1,4 @@
-import = [
+general.import = [
   "~/.config/alacritty/common.toml",
   "~/.config/alacritty/platform.toml",
   "~/.local/state/base16/base16-alacritty.toml"
