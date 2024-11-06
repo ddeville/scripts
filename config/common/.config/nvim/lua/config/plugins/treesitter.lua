@@ -12,7 +12,7 @@ return {
           'cpp',
           'css',
           'diff',
-          'dockerfile',
+          -- 'dockerfile',
           'fish',
           'git_config',
           'git_rebase',
