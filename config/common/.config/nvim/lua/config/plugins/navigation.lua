@@ -6,7 +6,8 @@ return {
         tools = { 'rg', 'git', 'grep' },
         highlight = 1,
         rg = {
-          grepprg = 'rg -H --no-heading --vimgrep',
+          -- TODO(damien): Remove --threads=3 once running on macos sequoia isn't so slow.. See https://github.com/BurntSushi/ripgrep/issues/2925
+          grepprg = 'rg -H --no-heading --vimgrep --threads=3',
         },
       }
 
