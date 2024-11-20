@@ -8,6 +8,13 @@ function fish_user_key_bindings
         end
     end
 
+    # On a linux devbox, fzf is likely installed from linuxbrew.
+    if test (uname) = Linux
+        if test -e "/home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.fish"
+            source /home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.fish
+        end
+    end
+
     # NOTE: When installing fzf via pacman on arch linux, the key bindings are
     # installed and sourced automatically from
     # `/usr/share/fish/vendor_functions.d/fzf_key_bindings.fish` but need to be
