@@ -33,7 +33,7 @@ if [[ $(hostname) == "framework" ]]; then
   # Restore the modifiers
   xmodmap -e "add control = Control_L Control_R"
   xmodmap -e "add mod1 = Alt_L Alt_R Alt_L Meta_L"
-  xmodmap -e "add mod4 = Super_L Super_R Super_L Hyper_L"
+  xmodmap -e "add mod4 = Super_L Super_R Super_L"
 
   TOUCHPAD="PIXA3854:00 093A:0274 Touchpad"
 
