@@ -10,6 +10,8 @@ alias gaaa "git add -A; and git ci --amend --no-edit"
 alias gaau "git add -A; and git cu"
 alias gcm "git co master"
 alias grm "git rebase master"
+alias grc "git rebase --continue"
+alias gra "git rebase --abort"
 alias o open
 alias oo "open ."
 alias tf terraform
