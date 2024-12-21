@@ -159,7 +159,6 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
 
 # Formatters
 "$BREW_BIN" install \
-  black \
   buildifier \
   buf \
   clang-format \

@@ -32,7 +32,6 @@ zoxide
 
 # =========== Development ===========
 
-black
 buildifier
 buf
 checkbashisms

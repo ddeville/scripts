@@ -8,18 +8,6 @@ return {
       command = 'shfmt',
       args = { '-filename', '$FILENAME', '--simplify', '--indent', '2' },
     }
-    conform.formatters.black = {
-      inherit = false,
-      command = 'black',
-      args = {
-        '--stdin-filename',
-        '$FILENAME',
-        '--quiet',
-        '--line-length',
-        '100',
-        '-',
-      },
-    }
 
     conform.setup({
       format_after_save = {
@@ -39,7 +27,7 @@ return {
         objc = { 'clang_format' },
         objcpp = { 'clang_format' },
         proto = { 'buf' },
-        python = { 'ruff', 'black', 'isort' },
+        python = { 'ruff', 'isort' },
         rust = { 'rustfmt' },
         sh = { 'shfmt' },
         terraform = { 'terraform_fmt' },
