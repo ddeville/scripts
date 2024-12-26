@@ -33,10 +33,8 @@ track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}'
 cmd=("$tool" "$input_file")
 
 # Remove all metadata
-# Note that ideally we would use `-itags all=clear` which would remove all tags but it seems
-# like it ends up rewriting the entire file which is very slow...
-# So instead just remove the one that are either annoying or known to cause problems in Plex.
-cmd+=("-itags" "tool=NULL:encoder=NULL:title=NULL:artist=NULL:show=NULL")
+# Disabled because it needs to rewrite the entire file which is very slow...
+# cmd+=("-itags" "all=clear")
 
 # Set language on all tracks
 for track_id in $track_ids; do
