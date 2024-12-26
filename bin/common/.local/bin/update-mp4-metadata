@@ -33,8 +33,7 @@ track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}'
 cmd=("$tool" "$input_file")
 
 # Remove all metadata
-# Disabled because it needs to rewrite the entire file which is very slow...
-# cmd+=("-itags" "all=clear")
+cmd+=("-itags" "all=clear")
 
 # Set language on all tracks
 for track_id in $track_ids; do
