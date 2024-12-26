@@ -1,0 +1,54 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <input_file>"
+  exit 1
+fi
+
+input_file="$1"
+
+if [ ! -f "$input_file" ]; then
+  echo "Error: File '$input_file' does not exist."
+  exit 1
+fi
+
+if [[ ${input_file##*.} != "mp4" ]]; then
+  echo "Error: File '$input_file' is not an MP4 file."
+  exit 1
+fi
+
+allowed_langs=("en" "es" "fr" "he" "it" "ja" "ru" "sv")
+read -r -p "Movie language (${allowed_langs[*]}): " lang_code
+
+if [[ ! " ${allowed_langs[*]} " =~ $lang_code ]]; then
+  echo "Error: Invalid language code. Choose from: ${allowed_langs[*]}"
+  exit 1
+fi
+
+temp_file="${input_file}.out"
+
+tool="MP4Box"
+
+# Retrieve the IDs of all tracks in the file
+track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}')
+
+cmd=("$tool" "-add" "$input_file" "-new" "$temp_file")
+
+# Remove all metadata
+cmd+=("-set-meta" "0")
+
+# Set language on all tracks
+for track_id in $track_ids; do
+  cmd+=("-lang" "${track_id}=${lang_code}")
+done
+
+echo "Running: ${cmd[*]}"
+
+if "${cmd[@]}"; then
+  mv "$temp_file" "$input_file"
+  echo "Metadata updated successfully. Original file replaced."
+else
+  echo "Error: Failed to update metadata."
+  rm -f "$temp_file"
+  exit 1
+fi
