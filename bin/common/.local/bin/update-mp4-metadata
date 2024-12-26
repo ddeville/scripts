@@ -1,5 +1,7 @@
 #!/bin/bash
 
+tool="MP4Box"
+
 if [ -z "$1" ]; then
   echo "Usage: $0 <input_file>"
   exit 1
@@ -17,6 +19,11 @@ if [[ ${input_file##*.} != "mp4" ]]; then
   exit 1
 fi
 
+if ! command -v $tool &>/dev/null; then
+  echo "Error: MP4Box is not installed. Please install it and try again."
+  exit 1
+fi
+
 allowed_langs=("en" "es" "fr" "he" "it" "ja" "ru" "sv")
 read -r -p "Movie language (${allowed_langs[*]}): " lang_code
 
@@ -24,8 +31,6 @@ if [[ ! " ${allowed_langs[*]} " =~ $lang_code ]]; then
   echo "Error: Invalid language code. Choose from: ${allowed_langs[*]}"
   exit 1
 fi
-
-tool="MP4Box"
 
 # Retrieve the IDs of all tracks in the file
 track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}')
