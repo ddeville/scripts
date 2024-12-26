@@ -25,17 +25,18 @@ if [[ ! " ${allowed_langs[*]} " =~ $lang_code ]]; then
   exit 1
 fi
 
-temp_file="${input_file}.out"
-
 tool="MP4Box"
 
 # Retrieve the IDs of all tracks in the file
 track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}')
 
-cmd=("$tool" "-add" "$input_file" "-new" "$temp_file")
+cmd=("$tool" "$input_file")
 
 # Remove all metadata
-cmd+=("-set-meta" "0")
+# Note that ideally we would use `-itags all=clear` which would remove all tags but it seems
+# like it ends up rewriting the entire file which is very slow...
+# So instead just remove the one that are either annoying or known to cause problems in Plex.
+cmd+=("-itags" "tool=NULL:encoder=NULL:title=NULL:artist=NULL:show=NULL")
 
 # Set language on all tracks
 for track_id in $track_ids; do
@@ -43,12 +44,4 @@ for track_id in $track_ids; do
 done
 
 echo "Running: ${cmd[*]}"
-
-if "${cmd[@]}"; then
-  mv "$temp_file" "$input_file"
-  echo "Metadata updated successfully. Original file replaced."
-else
-  echo "Error: Failed to update metadata."
-  rm -f "$temp_file"
-  exit 1
-fi
+"${cmd[@]}"
