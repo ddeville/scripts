@@ -29,7 +29,7 @@ cfg.font_rules = {
   },
 }
 cfg.font_size = is_macos and 14 or 10
-cfg.line_height = 1.15
+cfg.line_height = 1.2
 
 -- Window
 cfg.hide_tab_bar_if_only_one_tab = true
