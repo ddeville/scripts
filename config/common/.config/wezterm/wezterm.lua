@@ -33,7 +33,7 @@ cfg.line_height = 1.2
 
 -- Window
 cfg.hide_tab_bar_if_only_one_tab = true
-cfg.window_padding = { left = 4, right = 4, top = 2, bottom = 2 }
+cfg.window_padding = { left = 4, right = 4, top = 6, bottom = 6 }
 cfg.max_fps = 120
 cfg.prefer_egl = true
 
