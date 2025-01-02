@@ -37,4 +37,8 @@ cfg.window_padding = { left = 4, right = 4, top = 6, bottom = 6 }
 cfg.max_fps = 120
 cfg.prefer_egl = true
 
+wezterm.on('format-window-title', function(tab, pane, tabs, panes, config)
+  return 'Wezterm'
+end)
+
 return cfg
