@@ -137,6 +137,8 @@ local servers = {
       },
     },
   },
+
+  tilt_ls = {},
 }
 
 -- This is a list of servers that are already installed on the machine and are not managed by Mason
