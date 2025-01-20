@@ -22,7 +22,7 @@ return {
       local fzf = require('fzf-lua')
       local actions = require('fzf-lua.actions')
       fzf.setup({
-        'max-perf',
+        'ivy',
         winopts = {
           backdrop = false,
           border = 'single',
@@ -30,11 +30,6 @@ return {
             hidden = 'hidden',
           },
         },
-        winopts_fn = function()
-          local split = 'belowright new'
-          local height = math.floor(vim.o.lines * 0.35)
-          return { split = split .. ' | resize ' .. tostring(height) }
-        end,
         files = {
           no_header = true,
           no_header_i = true,
