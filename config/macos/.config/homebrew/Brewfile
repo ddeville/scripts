@@ -44,8 +44,8 @@ brew "clang-format"
 brew "cmake"
 brew "colima"
 brew "docker"
-brew "docker-buildx", postinstall: "mkdir -p ${HOME}/.docker/cli-plugins && ln -sf ${HOME}/.docker/cli-plugins/docker-buildx /opt/homebrew/opt/docker-buildx/bin/docker-buildx"
-brew "docker-compose", postinstall: "mkdir -p ${HOME}/.docker/cli-plugins && ln -sf ${HOME}/.docker/cli-plugins/docker-compose /opt/homebrew/opt/docker-buildx/bin/docker-compose"
+brew "docker-buildx", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-buildx $HOME/.docker/cli-plugins/docker-buildx"
+brew "docker-compose", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-compose $HOME/.docker/cli-plugins/docker-compose"
 brew "golang"
 brew "isort"
 brew "luarocks"
@@ -79,7 +79,7 @@ cask "font-anonymice-nerd-font"
 
 cask "1password/tap/1password-cli", args: { no_quarantine: true }
 cask "1password", args: { no_quarantine: true }
-cask "alacritty", args: { no_quarantine: true }, postinstall: "${HOME}/scripts/bin/macos/.local/bin/codesign-alacritty"
+cask "alacritty", args: { no_quarantine: true }, postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
 cask "alfred@4", args: { no_quarantine: true }
 cask "dropbox", args: { no_quarantine: true }
 cask "google-chrome", args: { no_quarantine: true }
