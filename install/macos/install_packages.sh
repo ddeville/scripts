@@ -17,4 +17,4 @@ if [ ! -x $brew ]; then
 fi
 
 $brew update
-$brew bundle install --file="$script_dir/../../config/macos/homebrew/Brewfile" --no-lock --upgrade --cleanup
+$brew bundle install --file="$script_dir/../../config/macos/.config/homebrew/Brewfile" --no-lock --upgrade --cleanup
