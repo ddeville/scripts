@@ -1,0 +1,90 @@
+tap "1password/tap"
+tap "github/gh"
+
+cask_args appdir: "/Applications"
+
+# ============== Shell ==============
+
+brew "bash"
+brew "bat"
+brew "curl"
+brew "dasel"
+brew "difftastic"
+brew "dust"
+brew "eza"
+brew "fd"
+brew "fish"
+brew "fzf"
+brew "gh"
+brew "git"
+brew "htop"
+brew "hyperfine"
+brew "koenbollen/public/jl"
+brew "jless"
+brew "jq"
+brew "lazygit"
+brew "neofetch"
+brew "neovim"
+brew "openssh"
+brew "readline"
+brew "ripgrep"
+brew "stow"
+brew "teamookla/speedtest/speedtest"
+brew "tmux"
+brew "vim"
+brew "wget"
+brew "zoxide"
+
+# =========== Development ===========
+
+brew "buildifier"
+brew "buf"
+brew "checkbashisms"
+brew "clang-format"
+brew "cmake"
+brew "colima"
+brew "docker"
+brew "docker-buildx", postinstall: "mkdir -p ${HOME}/.docker/cli-plugins && ln -sf ${HOME}/.docker/cli-plugins/docker-buildx /opt/homebrew/opt/docker-buildx/bin/docker-buildx"
+brew "docker-compose", postinstall: "mkdir -p ${HOME}/.docker/cli-plugins && ln -sf ${HOME}/.docker/cli-plugins/docker-compose /opt/homebrew/opt/docker-buildx/bin/docker-compose"
+brew "golang"
+brew "isort"
+brew "luarocks"
+brew "ninja"
+brew "node"
+brew "pyenv"
+brew "pyenv-virtualenv"
+brew "ruff"
+brew "shellcheck"
+brew "shfmt"
+brew "stylua"
+brew "terraform"
+
+# =============== LSP ===============
+
+brew "bash-language-server"
+brew "gopls"
+brew "lua-language-server"
+brew "pyright"
+brew "rust-analyzer"
+brew "terraform-ls"
+brew "typescript-language-server"
+brew "yaml-language-server"
+
+# ============== Fonts ==============
+
+cask "font-anonymous-pro"
+cask "font-anonymice-nerd-font"
+
+# ============== Apps ===============
+
+cask "1password/tap/1password-cli", args: { no_quarantine: true, require_sha: true }
+cask "1password", args: { no_quarantine: true, require_sha: true }
+cask "alacritty", args: { no_quarantine: true, require_sha: true }, postinstall: "${HOME}/scripts/bin/macos/.local/bin/codesign-alacritty"
+cask "alfred@4", args: { no_quarantine: true, require_sha: true }
+cask "dropbox", args: { no_quarantine: true, require_sha: true }
+cask "google-chrome", args: { no_quarantine: true, require_sha: true }
+cask "istat-menus", args: { no_quarantine: true, require_sha: true }
+cask "mos", args: { no_quarantine: true, require_sha: true }
+cask "soundsource", args: { no_quarantine: true }
+cask "spotify", args: { no_quarantine: true, require_sha: true }
+cask "stay", args: { no_quarantine: true, require_sha: true }
