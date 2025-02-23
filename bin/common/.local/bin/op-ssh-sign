@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# If SSH_AUTH_SOCK is already set to a bound socket we can just use it since we're likely
-# on a server with a forwarded ssh-agent. If not, let's set it to the 1Password socket.
-if [[ -z $SSH_AUTH_SOCK || ! -S $SSH_AUTH_SOCK ]]; then
+# If SSH_AUTH_SOCK is set to a bound socket (not set by launchd on macos) we can just use it since
+# we're likely on a server with a forwarded ssh-agent. If not, let's set it to the 1Password socket.
+if [[ -z $SSH_AUTH_SOCK || ! -S $SSH_AUTH_SOCK || $SSH_AUTH_SOCK == /private/tmp/com.apple.launchd.* ]]; then
   export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 fi
 
