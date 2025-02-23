@@ -18,7 +18,7 @@ alias tf terraform
 alias t 'mkdir -p /tmp/scratch; and cd (mktemp --directory --tmpdir=/tmp/scratch (string split "/" $PWD --right --max=1 --fields=2).XXXXX)'
 
 if test (uname) = Darwin
-    alias bus 'brew update; and brew bundle install --file="$HOME/scripts/install/macos/Brewfile" --no-lock --upgrade --cleanup'
+    alias bus 'brew update; and brew bundle install --file="$HOME/.config/homebrew/Brewfile" --no-lock --upgrade --cleanup'
 end
 
 # abbreviations
