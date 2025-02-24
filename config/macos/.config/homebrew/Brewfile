@@ -56,7 +56,7 @@ brew "ruff"
 brew "shellcheck"
 brew "shfmt"
 brew "stylua"
-brew "terraform"
+brew "warrensbox/tap/tfswitch"
 
 # =============== LSP ===============
 
