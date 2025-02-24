@@ -80,5 +80,5 @@
 [init]
     defaultBranch = master
 
-[includeIf "hasconfig:remote.*.url:git@github.openai:openai/**"]
+[includeIf "hasconfig:remote.*.url:*@github.openai:openai/**"]
     path = ~/.config/git/config_openai
