@@ -1,7 +1,7 @@
 tap "1password/tap"
 tap "github/gh"
 
-cask_args appdir: "/Applications", require_sha: true
+cask_args appdir: "/Applications", require_sha: true, no_quarantine: true
 
 # ============== Shell ==============
 
@@ -77,14 +77,14 @@ cask "font-anonymice-nerd-font"
 
 # ============== Apps ===============
 
-cask "1password/tap/1password-cli", args: { no_quarantine: true }
-cask "1password", args: { no_quarantine: true }
-cask "alacritty", args: { no_quarantine: true }, postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
-cask "alfred@4", args: { no_quarantine: true }
-cask "dropbox", args: { no_quarantine: true }
-cask "google-chrome", args: { no_quarantine: true, require_sha: false }
-cask "istat-menus", args: { no_quarantine: true, require_sha: false }
-cask "mos", args: { no_quarantine: true }
-cask "soundsource", args: { no_quarantine: true, require_sha: false }
-cask "spotify", args: { no_quarantine: true, require_sha: false }
-cask "stay", args: { no_quarantine: true }
+cask "1password/tap/1password-cli"
+cask "1password"
+cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
+cask "alfred@4"
+cask "dropbox"
+cask "google-chrome", args: { require_sha: false }
+cask "istat-menus", args: { require_sha: false }
+cask "mos"
+cask "soundsource", args: { require_sha: false }
+cask "spotify", args: { require_sha: false }
+cask "stay"
