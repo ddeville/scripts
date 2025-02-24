@@ -39,6 +39,7 @@ brew "zoxide"
 
 # =========== Development ===========
 
+brew "bash-language-server"
 brew "buildifier"
 brew "buf"
 brew "checkbashisms"
@@ -49,27 +50,23 @@ brew "docker"
 brew "docker-buildx", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-buildx $HOME/.docker/cli-plugins/docker-buildx"
 brew "docker-compose", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-compose $HOME/.docker/cli-plugins/docker-compose"
 brew "golang"
+brew "gopls"
 brew "isort"
 brew "luarocks"
+brew "lua-language-server"
 brew "ninja"
 brew "node"
 brew "pyenv"
 brew "pyenv-virtualenv"
+brew "pyright"
 brew "ruff"
+brew "rust-analyzer"
 brew "shellcheck"
 brew "shfmt"
 brew "stylua"
-brew "warrensbox/tap/tfswitch"
-
-# =============== LSP ===============
-
-brew "bash-language-server"
-brew "gopls"
-brew "lua-language-server"
-brew "pyright"
-brew "rust-analyzer"
 brew "terraform-ls"
 brew "typescript-language-server"
+brew "warrensbox/tap/tfswitch"
 brew "yaml-language-server"
 
 # ============== Fonts ==============
