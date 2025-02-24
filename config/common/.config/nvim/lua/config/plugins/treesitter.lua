@@ -38,6 +38,7 @@ return {
           'proto',
           'python',
           'regex',
+          'ruby',
           'rust',
           'sql',
           'starlark',
@@ -55,8 +56,9 @@ return {
         },
       })
 
-      -- Use the starlark config for tiltfile
-      vim.treesitter.language.register('starlark', 'tiltfile')
+      -- Use the starlark config for custom filetype
+      vim.treesitter.language.register('starlark', { 'tiltfile' })
+      vim.treesitter.language.register('ruby', { 'brewfile' })
     end,
     build = function()
       pcall(require('nvim-treesitter.install').update({ with_sync = true }))
