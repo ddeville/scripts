@@ -208,4 +208,36 @@ return {
     end,
   },
   'ddeville/telescope-vim-bookmarks.nvim',
+  {
+    'stevearc/oil.nvim',
+    config = function()
+      local oil = require('oil')
+
+      oil.setup({
+        columns = {
+          'icon',
+        },
+        view_options = {
+          show_hidden = true,
+          -- By default oil.nvim dims hidden entries which is annoying to look at (on top of hiding them by default).
+          -- While we already use `show_hidden = true` to show them let's switch to no consider any file as hidden
+          -- so that it always shows them using the right highlight.
+          is_hidden_file = function(name, bufnr)
+            return false
+          end,
+          natural_order = 'fast',
+          case_insensitive = false,
+          sort = {
+            { 'type', 'asc' },
+            { 'name', 'asc' },
+          },
+        },
+      })
+
+      vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open parent directory' })
+    end,
+    -- Alternatively can use 'nvim-tree/nvim-web-devicons'
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    lazy = false,
+  },
 }
