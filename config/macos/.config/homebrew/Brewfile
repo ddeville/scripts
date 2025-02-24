@@ -83,6 +83,7 @@ cask "1password/tap/1password-cli"
 cask "1password"
 cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
 cask "alfred@4"
+cask "apparency", args: { require_sha: false }
 cask "dropbox"
 cask "google-chrome", args: { require_sha: false }
 cask "istat-menus", args: { require_sha: false }
@@ -90,3 +91,4 @@ cask "mos"
 cask "soundsource", args: { require_sha: false }
 cask "spotify", args: { require_sha: false }
 cask "stay"
+cask "suspicious-package", args: { require_sha: false }
