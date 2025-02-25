@@ -3,4 +3,4 @@
 set -eu -o pipefail
 
 brew update
-brew bundle install --global --file="$HOME/.config/homebrew/Brewfile" --no-lock --upgrade --cleanup
+brew bundle install --global --file="$HOME/.config/homebrew/Brewfile.common" --no-lock --upgrade --cleanup
