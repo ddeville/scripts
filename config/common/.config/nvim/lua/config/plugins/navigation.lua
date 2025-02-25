@@ -214,6 +214,7 @@ return {
       local oil = require('oil')
 
       oil.setup({
+        skip_confirm_for_simple_edits = true,
         columns = {
           'icon',
         },
