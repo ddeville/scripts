@@ -163,7 +163,6 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN
   buf \
   clang-format \
   gopls \
-  isort \
   ruff \
   shellcheck \
   shfmt \
