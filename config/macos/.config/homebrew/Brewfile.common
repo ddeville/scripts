@@ -52,7 +52,6 @@ brew "docker-buildx", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sf
 brew "docker-compose", postinstall: "mkdir -p $HOME/.docker/cli-plugins && ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-compose $HOME/.docker/cli-plugins/docker-compose"
 brew "golang"
 brew "gopls"
-brew "isort"
 brew "luarocks"
 brew "lua-language-server"
 brew "ninja"
