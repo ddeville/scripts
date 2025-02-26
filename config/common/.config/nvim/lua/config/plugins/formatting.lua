@@ -27,8 +27,7 @@ return {
         objc = { 'clang_format' },
         objcpp = { 'clang_format' },
         proto = { 'buf' },
-        -- TODO(damien): Switch from `isort` to `ruff_organize_imports`
-        python = { 'ruff_fix', 'ruff_format', 'isort' },
+        python = { 'ruff_fix', 'ruff_format', 'ruff_organize_imports' },
         rust = { 'rustfmt' },
         sh = { 'shfmt' },
         terraform = { 'terraform_fmt' },
