@@ -83,6 +83,7 @@ cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alac
 cask "alfred@4"
 cask "apparency", args: { require_sha: false }
 cask "google-chrome", args: { require_sha: false }
+cask "hex-fiend"
 cask "istat-menus", args: { require_sha: false }
 cask "mos"
 cask "soundsource", args: { require_sha: false }
