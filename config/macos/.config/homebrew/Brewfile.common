@@ -39,6 +39,7 @@ brew "zoxide"
 # =========== Development ===========
 
 brew "bash-language-server"
+brew "bazelisk"
 brew "buildifier"
 brew "buf"
 brew "checkbashisms"
