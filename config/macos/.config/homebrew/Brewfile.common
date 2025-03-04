@@ -86,7 +86,6 @@ cask "google-chrome", args: { require_sha: false }
 cask "hex-fiend"
 cask "istat-menus", args: { require_sha: false }
 cask "mos"
-cask "soundsource", args: { require_sha: false }
 cask "spotify", args: { require_sha: false }
 cask "stay"
 cask "suspicious-package", args: { require_sha: false }
