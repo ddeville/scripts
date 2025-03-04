@@ -1,2 +1,3 @@
 cask "arq"
 cask "dropbox"
+cask "soundsource", args: { require_sha: false }
