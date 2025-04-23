@@ -14,5 +14,12 @@ elif [[ -f "$homebrew_dir/Brewfile.home" ]]; then
 fi
 
 brew update
+
+echo -e "\033[34m==>\033[0m Installing from bundle..."
 brew bundle install --file="$brewfile" --upgrade --cleanup
+
+echo -e "\033[34m==>\033[0m Running brew upgrade..."
+brew upgrade
+
+echo -e "\033[34m==>\033[0m Running brew cleanup..."
 brew cleanup
