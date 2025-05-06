@@ -1,8 +1,12 @@
-function cdg --description "Change directory to the nearest parent that is the root of a git repository"
-    while test $PWD != /
-        if test -d .git
+function cdg --description "Change to the nearest parent that is a git root"
+    set -l target $PWD
+
+    while test $target != /
+        if test -d "$target/.git"
             break
         end
-        cd ..
+        set target (dirname $target)
     end
+
+    cd $target
 end
