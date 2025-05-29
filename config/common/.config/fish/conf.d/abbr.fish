@@ -18,6 +18,7 @@ alias tf terraform
 alias t 'mkdir -p /tmp/scratch; and cd (mktemp --directory --tmpdir=/tmp/scratch (string split "/" $PWD --right --max=1 --fields=2).XXXXX)'
 alias k kubectl
 alias kc 'kubectl config'
+alias kcu 'kubectl config use-context'
 
 # abbreviations
 abbr -a -g cdd "cd .."
