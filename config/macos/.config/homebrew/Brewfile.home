@@ -1,4 +1,5 @@
 brew "ffmpeg"
+brew "mkvtoolnix"
 brew "yt-dlp"
 
 cask "arq"
