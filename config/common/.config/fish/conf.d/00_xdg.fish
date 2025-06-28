@@ -74,6 +74,7 @@ set -x INPUTRC "$XDG_CONFIG_HOME/readline/inputrc"
 set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
 
 # node
+set -x NPM_CONFIG_PREFIX "$HOME/.local"
 set -x NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/config"
 set -x NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
 set -x NODE_REPL_HISTORY "$XDG_STATE_HOME/node/history"
