@@ -116,28 +116,26 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- setup diagnostics
-vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-  signs = true,
-  underline = true,
-  virtual_text = {
-    spacing = 4,
-    severity = { min = vim.diagnostic.severity.WARN }, -- Basically show all messages
-  },
-  update_in_insert = false,
-})
-
 vim.diagnostic.config({
   severity_sort = true,
-  signs = true,
-  virtual_text = true,
+  underline = true,
+  update_in_insert = false,
+  virtual_text = {
+    spacing = 4,
+    -- Show WARN and above in virtual text
+    severity = { min = vim.diagnostic.severity.WARN },
+  },
+  signs = {
+    priority = 40, -- Keep signs above most others (e.g., VCS)
+    text = {
+      [vim.diagnostic.severity.ERROR] = 'E',
+      [vim.diagnostic.severity.WARN] = 'W',
+      [vim.diagnostic.severity.INFO] = 'I',
+      [vim.diagnostic.severity.HINT] = 'H',
+    },
+  },
   float = { scope = 'line' },
 })
-
--- setup gutter signs for diagnostics
-vim.fn.sign_define('DiagnosticSignError', { text = 'E', texthl = 'DiagnosticSignError', priority = 40 })
-vim.fn.sign_define('DiagnosticSignWarn', { text = 'W', texthl = 'DiagnosticSignWarn', priority = 30 })
-vim.fn.sign_define('DiagnosticSignInfo', { text = 'I', texthl = 'DiagnosticDefaultInfo', priority = 20 })
-vim.fn.sign_define('DiagnosticSignHint', { text = 'H', texthl = 'DiagnosticDefaultHint', priority = 10 })
 
 -- diagnostic highlights
 vim.api.nvim_set_hl(0, 'DiagnosticError', { fg = 'Red', ctermfg = 'Red' })
