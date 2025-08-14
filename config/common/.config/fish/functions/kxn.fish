@@ -1,4 +1,4 @@
-function kxs
+function kxn
     if test (count $argv) -ne 2
         echo "Usage: kx <context> <ns>"
         return 1

@@ -1,4 +1,4 @@
-function kns
+function kn
     if test (count $argv) -eq 0
         echo "Usage: kns <namespace>"
         return 1
