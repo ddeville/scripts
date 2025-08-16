@@ -1,6 +1,6 @@
 function kk
     if test (count $argv) -eq 0
-        echo "Usage: kk <context>"
+        echo "Usage: kk <context> <... args ...>"
         return 1
     end
     if test (count $argv) -eq 1
