@@ -89,7 +89,7 @@ cask "1password"
 cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
 cask "alfred@4"
 cask "apparency", args: { require_sha: false }
-cask "chatgpt"
+cask "chatgpt" if Hardware::CPU.arm?
 cask "google-chrome", args: { require_sha: false }
 cask "hex-fiend"
 cask "istat-menus", args: { require_sha: false }
