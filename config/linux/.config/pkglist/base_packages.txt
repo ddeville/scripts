@@ -212,8 +212,8 @@ tex-gyre-fonts
 ttf-anonymous-pro
 ttf-anonymouspro-nerd
 ttf-dejavu
-ttf-font-awesome
 ttf-liberation
 ttf-linux-libertine
 ttf-opensans
+woff2-font-awesome
 xorg-fonts-misc
