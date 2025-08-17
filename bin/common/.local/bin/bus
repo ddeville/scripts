@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
 if [ "$(uname)" = "Darwin" ]; then
   homebrew_dir="$HOME/.config/homebrew"
 
