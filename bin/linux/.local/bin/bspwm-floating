@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Make all window in desktop identified by $1 floating, either when added or moved into this desktop.
+# Make all windows in the desktop identified by $1 floating, either when added or moved into this desktop.
 
 FLOATING_DESKTOP_ID=$(bspc query -D -d "$1")
 
