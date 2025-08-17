@@ -91,6 +91,8 @@ htop
 hyperfine
 jless
 jq
+just
+jwt-cli
 lazygit
 man-db
 man-pages
@@ -105,17 +107,21 @@ tree-sitter-cli
 unzip
 vim
 wget
+yq
 zip
 zoxide
 
 # =========== Development ===========
 
+bazelisk
 buf
 checkbashisms
 clang
 cmake
 gdb
 go
+helm
+kubectl
 luarocks
 ninja
 nodejs

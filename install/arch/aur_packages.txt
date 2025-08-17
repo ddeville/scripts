@@ -9,6 +9,10 @@ jl
 pyenv-virtualenv
 sysz
 
+# =========== Development ===========
+
+openai-codex-bin
+
 # =============== LSP ===============
 
 terraform-ls
