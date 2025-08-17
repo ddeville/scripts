@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ "$(uname)" = "Darwin" ]; then
+  homebrew_dir="$HOME/.config/homebrew"
+
+  brewfile="$(mktemp -d)/Brewfile"
+  cat "$homebrew_dir/Brewfile.common" >"$brewfile"
+
+  if [[ -f "$homebrew_dir/Brewfile.openai" ]]; then
+    cat "$homebrew_dir/Brewfile.openai" >>"$brewfile"
+  elif [[ -f "$homebrew_dir/Brewfile.home" ]]; then
+    cat "$homebrew_dir/Brewfile.home" >>"$brewfile"
+  fi
+
+  brew update
+
+  echo -e "\033[34m==>\033[0m Installing from bundle..."
+  brew bundle install --file="$brewfile" --upgrade --cleanup
+
+  echo -e "\033[34m==>\033[0m Running brew upgrade..."
+  brew upgrade
+
+  echo -e "\033[34m==>\033[0m Running brew cleanup..."
+  brew cleanup
+elif [ "$(uname)" = "Linux" ]; then
+  echo "Installing on linux"
+else
+  echo "Unsupported platform: $(uname)"
+  exit 1
+fi
