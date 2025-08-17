@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu -o pipefail
-
 if [ "$(uname)" = "Darwin" ]; then
   homebrew_dir="$HOME/.config/homebrew"
 
@@ -25,7 +23,24 @@ if [ "$(uname)" = "Darwin" ]; then
   echo -e "\033[34m==>\033[0m Running brew cleanup..."
   brew cleanup
 elif [ "$(uname)" = "Linux" ]; then
-  echo "Installing on linux"
+  if command -v paru >/dev/null 2>&1; then
+    pkglist_dir="$HOME/.config/pkglist"
+
+    mapfile -t pkgs < <(
+      cat "$pkglist_dir"/{base_packages.txt,aur_packages.txt} 2>/dev/null |
+        sed 's/#.*//' |
+        awk 'NF' |
+        sort -u
+    )
+
+    paru -Syyu --needed -- "${pkgs[@]}"
+  elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get upgrade
+  else
+    echo "No known package manager"
+    exit 1
+  fi
 else
   echo "Unsupported platform: $(uname)"
   exit 1
