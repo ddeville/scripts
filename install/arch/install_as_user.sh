@@ -29,7 +29,7 @@ rustup component add rust-src rustfmt clippy
 
 # Install Paru
 if ! command -v paru &>/dev/null; then
-  git clone --depth=1 https://aur.archlinux.org/paru.git paru
+  git clone --depth=1 https://aur.archlinux.org/paru-bin.git paru
   pushd paru || exit 1
   makepkg -si
   popd || exit 1
