@@ -157,8 +157,9 @@ return {
         capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
         -- Third add any override from the current server config
         config.capabilities = vim.tbl_deep_extend('force', capabilities, config.capabilities or {})
-
-        require('lspconfig')[name].setup(config)
+        -- Finally, configure
+        vim.lsp.config(name, config)
+        vim.lsp.enable(name)
       end
     end,
     dependencies = {
