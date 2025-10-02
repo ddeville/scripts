@@ -24,7 +24,7 @@ return {
         'ivy',
         winopts = {
           backdrop = false,
-          height = 0.35,
+          height = 1,
           preview = {
             hidden = 'hidden',
           },
