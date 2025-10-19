@@ -8,7 +8,7 @@ app_path="${1:-/Applications/Alacritty.app}"
 # with whatever Apple's codesign requirements are...
 apple_codesign_version=0.22.0
 if [ "$(command -v rcodesign &>/dev/null && rcodesign --version | awk '{print $NF}')" != "$apple_codesign_version" ]; then
-  cargo install apple-codesign --version $apple_codesign_version --force
+  "$HOME"/.local/toolchains/rust/cargo/bin/cargo install apple-codesign --version $apple_codesign_version --force
 fi
 
 op_cert_name="Apple Developer ID Application Certificate"
