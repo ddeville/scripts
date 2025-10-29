@@ -73,14 +73,6 @@ local servers = {
             reportUnnecessaryTypeIgnoreComment = 'warning',
           },
         },
-        venvPath = (function()
-          local pyenv_root = os.getenv('PYENV_ROOT')
-          if pyenv_root ~= nil then
-            return pyenv_root .. '/versions'
-          else
-            return nil
-          end
-        end)(),
       },
     },
   },

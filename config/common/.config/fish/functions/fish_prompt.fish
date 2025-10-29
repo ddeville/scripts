@@ -10,7 +10,7 @@ function fish_prompt
             echo (git symbolic-ref HEAD 2>/dev/null | sed -e "s|^refs/heads/||")
         end
 
-        function _pyenv_virtualenv_name
+        function _virtualenv_name
             echo (basename "$VIRTUAL_ENV")
         end
     end
@@ -31,7 +31,7 @@ function fish_prompt
     set -l hostname_ $host_color(hostname -s)
 
     if set -q VIRTUAL_ENV
-        set -l venv_name $venv_color(_pyenv_virtualenv_name)
+        set -l venv_name $venv_color(_virtualenv_name)
         set venv_info "$normal_color:[$venv_name]$normal_color"
 
     end
