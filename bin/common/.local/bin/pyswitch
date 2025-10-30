@@ -10,7 +10,11 @@ fi
 version="$1"
 
 uv python install "$version"
-bin="$(uv python find "$version")"
 
-ln -sf "$bin" "$HOME/.local/bin/python"
-ln -sf "$bin" "$HOME/.local/bin/python3"
+bin="$(uv python find "$version")"
+out="$HOME/.local/bin"
+
+ln -sf "$bin" "$out/python"
+ln -sf "$bin" "$out/python3"
+
+echo "$out/python" now points to "$version"
