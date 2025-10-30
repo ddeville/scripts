@@ -21,13 +21,16 @@
     defaultBranch = master
 [fetch]
     writeCommitGraph = true
+    parallel = 8
 [checkout]
-    workers = 4
+    workers = 8
 [commit]
     gpgsign = true
 [push]
     default = simple
     autoSetupRemote = true
+[pack]
+    threads = 16
 [gc]
     writeCommitGraph = true
 [maintenance]
