@@ -82,7 +82,7 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 
 # Install language build toolchains.
 #
-# For each toolchain, the idea is to install a toolchain manager (pyenv, rustup,
+# For each toolchain, the idea is to install a toolchain manager (uv, rustup,
 # tfswitch, etc...) that can then be used to install a given version of the
 # actual toolchain and point the PATH to it.
 # Toolchains get installed in the `~/.local/toolchains` directory and things
@@ -90,15 +90,8 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
-[ -d "$PYENV_ROOT" ] || curl -L https://pyenv.run | /bin/bash
-[ -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ] || git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_ROOT/plugins/pyenv-virtualenv"
-export PYTHON_CONFIGURE_OPTS="--enable-optimizations --with-lto --disable-shared"
-export PYTHON_CFLAGS="-march=native -mtune=native"
-"$PYENV_ROOT/bin/pyenv" update
-"$PYENV_ROOT/bin/pyenv" install --skip-existing "$PYTHON_VERSION"
-"$PYENV_ROOT/bin/pyenv" global "$PYTHON_VERSION"
-"$PYENV_ROOT/bin/pyenv" rehash
+curl -LsSf https://astral.sh/uv/install.sh | /bin/sh
+uv python install "$PYTHON_VERSION"
 
 # rust
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
@@ -125,7 +118,7 @@ mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
 curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | /bin/bash -s -- -b "$HOME/.local/bin"
 "$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" "$TERRAFORM_VERSION"
 
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
+export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
 ###################################
 ############ Programs #############
