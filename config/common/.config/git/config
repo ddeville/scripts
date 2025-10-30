@@ -10,54 +10,18 @@
     name = Damien Deville
     email = damien@ddeville.me
     signingkey = ~/.ssh/id_personal.pub
+[init]
+    defaultBranch = master
+[commit]
+    gpgsign = true
+[push]
+    default = simple
+    autoSetupRemote = true
 [gpg]
     format = ssh
 [gpg "ssh"]
     program = op-ssh-sign
     allowedSignersFile = ~/.config/git/allowed_signers
-[commit]
-    gpgsign = true
-[diff]
-    tool = difftastic
-    algorithm = patience
-    compactionHeuristic = true
-[difftool]
-    prompt = false
-[difftool "difftastic"]
-    cmd = difft "$LOCAL" "$REMOTE"
-[merge]
-    tool = vimdiff
-    conflictstyle = zdiff3
-[mergetool]
-    prompt = false
-    keepBackup = false
-[mergetool "vimdiff"]
-    layout = (LOCAL,BASE,REMOTE)/MERGED
-[pager]
-    difftool = true
-[push]
-    default = simple
-    autoSetupRemote = true
-[color]
-    ui = auto
-[color "branch"]
-    current = yellow bold
-    local = green bold
-    remote = cyan bold
-[color "diff"]
-    meta = yellow bold
-    frag = magenta bold
-    old = red bold
-    new = green bold
-    whitespace = red reverse
-[color "status"]
-    added = green bold
-    changed = yellow bold
-    untracked = red bold
-[filter "media"]
-    clean = git-media-clean %f
-    smudge = git-media-smudge %f
-    required = true
 [alias]
     st = status
     br = branch -vv
@@ -77,8 +41,40 @@
     authors = shortlog -s -n -e
     ls = log --graph --pretty='%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]' --abbrev-commit --date=short
     logs = log --show-signature
-[init]
-    defaultBranch = master
+[diff]
+    tool = difftastic
+    algorithm = patience
+    compactionHeuristic = true
+[difftool]
+    prompt = false
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+[merge]
+    tool = vimdiff
+    conflictstyle = zdiff3
+[mergetool]
+    prompt = false
+    keepBackup = false
+[mergetool "vimdiff"]
+    layout = (LOCAL,BASE,REMOTE)/MERGED
+[pager]
+    difftool = true
+[color]
+    ui = auto
+[color "branch"]
+    current = yellow bold
+    local = green bold
+    remote = cyan bold
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[color "status"]
+    added = green bold
+    changed = yellow bold
+    untracked = red bold
 
 [includeIf "hasconfig:remote.*.url:*@github.openai:openai/**"]
     path = ~/.config/git/config_openai
