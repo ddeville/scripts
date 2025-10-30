@@ -41,8 +41,8 @@ end
 if not test -d "$XDG_TOOLCHAINS_HOME/python"
     command mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 end
+set -x UV_PYTHON_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/uv/python"
 set -x VENV_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/venv"
-# TODO(damien): uv support
 
 # rust
 if not test -d "$XDG_TOOLCHAINS_HOME/rust"
