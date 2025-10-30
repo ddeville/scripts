@@ -49,12 +49,6 @@ paru -S --needed "${aur_packages[@]}" || true # we don't want to fail the whole 
 rm -f .bashrc .profile
 scripts/bin/common/.local/bin/stow-config
 
-# Get pyenv ready
-export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
-mkdir -p "$PYENV_ROOT"
-pyenv global system
-pyenv rehash
-
 # Setup the shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 scripts/bin/common/.local/bin/update-shell-plugins
