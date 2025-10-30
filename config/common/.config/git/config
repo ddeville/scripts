@@ -10,8 +10,12 @@
     name = Damien Deville
     email = damien@ddeville.me
     signingkey = ~/.ssh/id_personal.pub
+[feature]
+    manyFiles = true
 [init]
     defaultBranch = master
+[checkout]
+    workers = 4
 [commit]
     gpgsign = true
 [push]
@@ -22,6 +26,8 @@
 [gpg "ssh"]
     program = op-ssh-sign
     allowedSignersFile = ~/.config/git/allowed_signers
+[remote "origin"]
+    prune = true
 [alias]
     st = status
     br = branch -vv
