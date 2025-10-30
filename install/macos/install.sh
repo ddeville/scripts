@@ -71,12 +71,6 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
 "$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
-# Get pyenv ready
-export PYENV_ROOT="$XDG_TOOLCHAINS_HOME/python/pyenv"
-mkdir -p "$PYENV_ROOT"
-pyenv global system
-pyenv rehash
-
 echo "Setting up 1Password"
 mkdir -p "$HOME/.1password"
 ln -fs "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "$HOME/.1password/agent.sock"
