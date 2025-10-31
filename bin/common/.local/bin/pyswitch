@@ -12,7 +12,7 @@ version="$1"
 uv python install "$version"
 
 bin="$(uv python find "$version")"
-out="$HOME/.local/bin"
+out="$XDG_TOOLCHAINS_HOME/python/uv/bin"
 
 ln -sf "$bin" "$out/python"
 ln -sf "$bin" "$out/python3"
