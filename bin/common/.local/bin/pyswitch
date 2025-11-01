@@ -2,17 +2,24 @@
 
 set -eu -o pipefail
 
-if [ $# -eq 0 ] || [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Usage: pyswitch 1.2.3"
+if [ $# -eq 0 ] || { [[ $1 != "system" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
+  echo "Usage: pyswitch <1.2.3|system>"
   exit 1
 fi
 
 version="$1"
 
+out="$XDG_TOOLCHAINS_HOME/python/uv/bin"
+
+if [[ $version == "system" ]]; then
+  rm -f "$out/python" "$out/python3"
+  echo "$out/python" was unlinked
+  exit 0
+fi
+
 uv python install "$version"
 
 bin="$(uv python find "$version")"
-out="$XDG_TOOLCHAINS_HOME/python/uv/bin"
 
 ln -sf "$bin" "$out/python"
 ln -sf "$bin" "$out/python3"
