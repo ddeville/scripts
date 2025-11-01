@@ -72,8 +72,12 @@ set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/user/bin"
 # readline
 set -x INPUTRC "$XDG_CONFIG_HOME/readline/inputrc"
 
-# python
+# python (3.13+ supports PYTHON_HISTORY, older ones still need PYTHONSTARTUP)
+set -x PYTHON_HISTORY "$XDG_STATE_HOME/python/history"
 set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
+
+# sqlite
+set -x SQLITE_HISTORY "$XDG_STATE_HOME/sqlite3/history"
 
 # node
 set -x NPM_CONFIG_PREFIX "$HOME/.local"
