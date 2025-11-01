@@ -1,7 +1,5 @@
 # aliases
 alias e nvim
-alias realvim (which vim)
-alias vim nvim
 alias ll "eza --long --all"
 alias tree "eza --tree --level=3 --all"
 alias g git
