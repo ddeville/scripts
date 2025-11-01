@@ -2,8 +2,8 @@
 
 set -eu -o pipefail
 
-if [ $# -eq 0 ] || [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Usage: goswitch 1.2.3"
+if [ $# -eq 0 ] || { [[ $1 != "system" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
+  echo "Usage: goswitch <1.2.3|system>"
   exit 1
 fi
 
@@ -19,6 +19,14 @@ case "$arch" in
 esac
 
 toolchain_dir="$HOME/.local/toolchains/go"
+current_dir="$toolchain_dir/current"
+
+if [[ $version == "system" ]]; then
+  rm -f "$current_dir"
+  echo "$toolchain_dir/current" was unlinked
+  exit 0
+fi
+
 install_dir="$toolchain_dir/versions/$version"
 
 if [[ ! -d $install_dir ]]; then
