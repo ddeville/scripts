@@ -12,12 +12,14 @@ version="$1"
 out="$XDG_TOOLCHAINS_HOME/python/uv/bin"
 
 if [[ $version == "system" ]]; then
+  uv python pin --rm || true
   rm -f "$out/python" "$out/python3"
   echo "$out/python" was unlinked
   exit 0
 fi
 
 uv python install "$version"
+uv python pin --global "$version"
 
 bin="$(uv python find "$version")"
 
