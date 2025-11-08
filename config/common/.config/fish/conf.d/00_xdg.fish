@@ -38,26 +38,26 @@ if not test -d "$XDG_TOOLCHAINS_HOME"
 end
 
 # python
-if not test -d "$XDG_TOOLCHAINS_HOME/python"
-    command mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-end
 set -x UV_PYTHON_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/uv/python"
 set -x UV_PYTHON_BIN_DIR "$XDG_TOOLCHAINS_HOME/python/uv/bin"
 set -x VENV_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/venv"
+if not test -d "$UV_PYTHON_BIN_DIR"
+    command mkdir -p "$UV_PYTHON_BIN_DIR"
+end
 
 # rust
-if not test -d "$XDG_TOOLCHAINS_HOME/rust"
-    command mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
-end
 set -x CARGO_HOME "$XDG_TOOLCHAINS_HOME/rust/cargo"
 set -x RUSTUP_HOME "$XDG_TOOLCHAINS_HOME/rust/rustup"
+if not test -d "$CARGO_HOME"
+    command mkdir -p "$CARGO_HOME"
+end
 
 # golang
-if not test -d "$XDG_TOOLCHAINS_HOME/go/user"
-    command mkdir -p "$XDG_TOOLCHAINS_HOME/go/user"
-end
 set -x GOPATH "$XDG_TOOLCHAINS_HOME/go/user"
 set -x GOBIN "$XDG_TOOLCHAINS_HOME/go/user/bin"
+if not test -d "$GOBIN"
+    command mkdir -p "$GOBIN"
+end
 
 # node
 # NOTE: we already add custom node toolchain to the path and `npm install` will auto-discover the node_modules...
