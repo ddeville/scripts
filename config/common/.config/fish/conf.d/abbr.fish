@@ -17,6 +17,7 @@ alias gcm "git co master"
 alias grm "git rebase master"
 alias grc "git rebase --continue"
 alias gra "git rebase --abort"
+alias gcb 'function _gcb; git checkout -b damien/$argv[1]; end; _gcb'
 
 alias e nvim
 alias tf terraform
