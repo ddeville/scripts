@@ -7,7 +7,7 @@ HEAD="$(git branch --show-current)"
 
 OUTPUT="$(mktemp /tmp/gh-pr-create.XXXXXX)"
 
-gh pr create --base="$BASE" --head="$HEAD" --fill | tee "$OUTPUT"
+gh pr create --base="$BASE" --head="$HEAD" --fill 2>&1 | tee "$OUTPUT"
 
 if url=$(grep -Eo 'https://github\.com/[[:alnum:]/._-]+/pull/[0-9]+' "$OUTPUT" | head -n1); then
   open "$url"
