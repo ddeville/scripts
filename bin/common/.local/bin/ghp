@@ -5,7 +5,7 @@ set -eu -o pipefail
 BASE="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
 HEAD="$(git branch --show-current)"
 
-OUTPUT="$(mktemp /tmp/gh-pr-create.XXXXXX.log)"
+OUTPUT="$(mktemp /tmp/gh-pr-create.XXXXXX)"
 
 gh pr create --base="$BASE" --head="$HEAD" --fill | tee "$OUTPUT"
 
