@@ -2,13 +2,11 @@
 
 set -eu -o pipefail
 
-BASE="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
-HEAD="$(git branch --show-current)"
+BASE=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's@^origin/@@')
+# BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+HEAD=$(git branch --show-current)
 
-OUTPUT="$(mktemp /tmp/gh-pr-create.XXXXXX)"
+gh pr create --base="$BASE" --head="$HEAD" --fill
 
-gh pr create --base="$BASE" --head="$HEAD" --fill 2>&1 | tee "$OUTPUT"
-
-if url=$(grep -Eo 'https://github\.com/[[:alnum:]/._-]+/pull/[0-9]+' "$OUTPUT" | head -n1); then
-  open "$url"
-fi
+URL=$(gh pr view "$HEAD" --json url -q .url)
+open "$URL" 2>/dev/null
