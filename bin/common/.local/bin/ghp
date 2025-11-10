@@ -8,4 +8,4 @@ HEAD="$(git branch --show-current)"
 TITLE="$(git log -1 --pretty=%s)"
 BODY="$(git log -1 --pretty=%b)"
 
-gh pr create --base="$BASE" --head="$HEAD" --title="$TITLE" --body="$BODY"
+gh pr create --base="$BASE" --head="$HEAD" --title="$TITLE" --body="$BODY" --web
