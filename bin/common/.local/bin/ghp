@@ -5,4 +5,10 @@ set -eu -o pipefail
 BASE="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
 HEAD="$(git branch --show-current)"
 
-gh pr create --base="$BASE" --head="$HEAD" --fill
+OUTPUT="$(mktemp /tmp/gh-pr-create.XXXXXX.log)"
+
+gh pr create --base="$BASE" --head="$HEAD" --fill | tee "$OUTPUT"
+
+if url=$(grep -Eo 'https://github\.com/[[:alnum:]/._-]+/pull/[0-9]+' "$OUTPUT" | head -n1); then
+  open "$url"
+fi
