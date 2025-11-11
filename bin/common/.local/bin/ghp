@@ -3,10 +3,39 @@
 set -eu -o pipefail
 
 BASE=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's@^origin/@@')
-# BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 HEAD=$(git branch --show-current)
+
+ensure_pushed() {
+  if ! git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
+    echo "No upstream for $HEAD → pushing and setting upstream..."
+    git push -u origin "$HEAD"
+    return
+  fi
+
+  ahead=$(git rev-list --count '@{u}..' || echo 0)
+  behind=$(git rev-list --count '..@{u}' || echo 0)
+
+  if ((behind > 0)); then
+    echo "Branch $HEAD is behind its upstream by $behind commit(s)."
+    read -r -p "Force push anyway? [y/N] " answer
+    case "$answer" in
+    [yY] | [yY][eE][sS])
+      echo "Force-pushing $HEAD..."
+      git push --force
+      ;;
+    *)
+      echo "Aborting push."
+      exit 1
+      ;;
+    esac
+  elif ((ahead > 0)); then
+    echo "Branch $HEAD is ahead of upstream by $ahead commit(s) → pushing..."
+    git push
+  fi
+}
+
+ensure_pushed
 
 gh pr create --base="$BASE" --head="$HEAD" --fill
 
-URL=$(gh pr view "$HEAD" --json url -q .url)
-open "$URL" 2>/dev/null
+open "$(gh pr view "$HEAD" --json url -q .url)"
