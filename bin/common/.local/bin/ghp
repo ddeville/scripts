@@ -7,7 +7,7 @@ HEAD=$(git branch --show-current)
 
 ensure_pushed() {
   if ! git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
-    echo "No upstream for $HEAD → pushing and setting upstream..."
+    echo "No upstream for $HEAD → pushing..."
     git push -u origin "$HEAD"
     return
   fi
