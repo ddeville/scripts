@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+gh pr merge --admin --delete-branch --squash
