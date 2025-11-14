@@ -1,3 +1,3 @@
 function gcm
-    command git checkout master
+    git checkout master
 end

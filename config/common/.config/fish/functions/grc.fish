@@ -1,3 +1,3 @@
 function grc
-    command git rebase --continue
+    git rebase --continue
 end
