@@ -1,3 +1,3 @@
 function gra
-    command git rebase --abort
+    git rebase --abort
 end

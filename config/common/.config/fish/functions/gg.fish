@@ -3,5 +3,5 @@ function gg
         echo "Usage: gg <name>"
         return 1
     end
-    command git checkout -b damien/$argv[1]
+    git checkout -b damien/$argv[1]
 end

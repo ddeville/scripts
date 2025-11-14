@@ -1,4 +1,4 @@
 function gaa
-    command git add -A
-    command git commit
+    git add -A
+    git commit
 end

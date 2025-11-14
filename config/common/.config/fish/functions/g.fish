@@ -1,7 +1,7 @@
 function g
     if test (count $argv) -eq 0
-        command git status
+        git status
     else
-        command git $argv
+        git $argv
     end
 end
