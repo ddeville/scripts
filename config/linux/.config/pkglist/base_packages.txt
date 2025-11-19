@@ -42,6 +42,7 @@ openbsd-netcat
 openssh
 rsync
 systemd-resolvconf
+tailscale
 usbutils
 wireguard-tools
 
