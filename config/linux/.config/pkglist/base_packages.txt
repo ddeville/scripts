@@ -137,6 +137,7 @@ shellcheck
 shfmt
 stylua
 terraform
+uv
 
 # =============== LSP ===============
 
