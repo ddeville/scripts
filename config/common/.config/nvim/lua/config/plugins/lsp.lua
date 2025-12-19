@@ -41,40 +41,8 @@ local servers = {
     },
   },
 
-  pyright = {
-    settings = {
-      python = {
-        analysis = {
-          autoSearchPaths = true,
-          diagnosticMode = 'workspace',
-          typeCheckingMode = 'basic',
-          useLibraryCodeForTypes = true,
-          diagnosticSeverityOverrides = {
-            reportMissingImports = false,
-            reportMissingTypeStubs = false,
-            reportPrivateImportUsage = false,
-            reportGeneralTypeIssues = 'information',
-            reportUnusedClass = 'warning',
-            reportUnusedFunction = 'warning',
-            reportDuplicateImport = 'warning',
-            reportUntypedFunctionDecorator = 'warning',
-            reportUntypedClassDecorator = 'warning',
-            reportUntypedBaseClass = 'warning',
-            reportUntypedNamedTuple = 'warning',
-            reportTypeCommentUsage = 'warning',
-            reportIncompatibleMethodOverride = 'warning',
-            reportIncompatibleVariableOverride = 'warning',
-            reportInconsistentConstructor = 'warning',
-            reportUninitializedInstanceVariable = 'warning',
-            reportUnnecessaryIsInstance = 'warning',
-            reportUnnecessaryCast = 'warning',
-            reportUnnecessaryComparison = 'warning',
-            reportUnnecessaryContains = 'warning',
-            reportUnnecessaryTypeIgnoreComment = 'warning',
-          },
-        },
-      },
-    },
+  ty = {
+    settings = {},
   },
 
   rust_analyzer = {
