@@ -110,14 +110,14 @@ return {
   {
     'neovim/nvim-lspconfig',
     config = function()
+      vim.lsp.config('*', {
+        capabilities = vim.tbl_deep_extend(
+          'force',
+          vim.lsp.protocol.make_client_capabilities(),
+          require('cmp_nvim_lsp').default_capabilities()
+        ),
+      })
       for name, config in pairs(servers) do
-        -- First get the default capabilities of the neovim client
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        -- Second add the cmp-specific capabilities
-        capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-        -- Third add any override from the current server config
-        config.capabilities = vim.tbl_deep_extend('force', capabilities, config.capabilities or {})
-        -- Finally, configure
         vim.lsp.config(name, config)
         vim.lsp.enable(name)
       end
