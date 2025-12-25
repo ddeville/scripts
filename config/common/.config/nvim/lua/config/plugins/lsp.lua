@@ -135,11 +135,10 @@ return {
               server_names[#server_names + 1] = name
             end
           end
-          -- TODO: Re-enable once pyright stop getting stuck installing...
-          -- require('mason-lspconfig').setup({
-          --   ensure_installed = server_names,
-          --   automatic_installation = true,
-          -- })
+          require('mason-lspconfig').setup({
+            ensure_installed = server_names,
+            automatic_installation = true,
+          })
         end,
       },
     },
