@@ -142,8 +142,8 @@ terraform
 bash-language-server
 gopls
 lua-language-server
-pyright
 rust-analyzer
+ty
 typescript-language-server
 yaml-language-server
 
