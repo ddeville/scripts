@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eux -o pipefail
 
 tmp_dir="$(mktemp -d)"
 
