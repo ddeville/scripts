@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eu -o pipefail
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "The script needs to be run as root."

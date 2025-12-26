@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eu -o pipefail
 
 # NOTE: Remember to add to completions when adding a new server type
 
