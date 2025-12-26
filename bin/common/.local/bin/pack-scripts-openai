@@ -9,7 +9,7 @@ fi
 
 TMPDIR="$(mktemp -d)"
 cd "$TMPDIR"
-trap 'rm -rf $TMPDIR' EXIT
+trap 'rm -rf "$TMPDIR"' EXIT
 
 cp -R "$HOME/scripts-openai" "scripts-openai" 2>/dev/null
 
