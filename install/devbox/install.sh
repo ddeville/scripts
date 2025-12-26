@@ -27,7 +27,7 @@ export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains" && mkdir -p "$XDG_TOOLCHAIN
 
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
-trap 'rm -rf $INSTALL_TMPDIR' EXIT
+trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
 
 ###################################
 ########## Base Packages ##########
