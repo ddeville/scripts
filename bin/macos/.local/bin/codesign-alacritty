@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eu -o pipefail
 
 app_path="${1:-/Applications/Alacritty.app}"
 
@@ -16,7 +16,7 @@ op_cert_name="Apple Developer ID Application Certificate"
 op_api_key_name="iTunes Connect API Key" # pragma: allowlist secret
 
 tmp_dir="$(mktemp -d)"
-trap 'rm -rf $tmp_dir' EXIT
+trap 'rm -rf "$tmp_dir"' EXIT
 
 tmp_app_path="$tmp_dir/Alacritty.app"
 cp -R "$app_path" "$tmp_app_path"
