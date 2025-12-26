@@ -17,13 +17,13 @@ hwclock --systohc
 sed -i "/#en_US.UTF-8 UTF-8/s/#//" /etc/locale.gen
 locale-gen
 
-echo "LANG=en_US.UTF-8" >>/etc/locale.conf
-echo "$HOSTNAME" >>/etc/hostname
-{
-  echo "127.0.0.1 localhost"
-  echo "::1       localhost"
-  echo "127.0.1.1 $HOSTNAME.localdomain $HOSTNAME"
-} >>/etc/hosts
+printf "LANG=en_US.UTF-8\n" >/etc/locale.conf
+printf "%s\n" "$HOSTNAME" >/etc/hostname
+cat >/etc/hosts <<EOF
+127.0.0.1 localhost
+::1       localhost
+127.0.1.1 ${HOSTNAME}.localdomain ${HOSTNAME}
+EOF
 
 printf "\e[1;32m==> Setting root password\n\e[0m"
 passwd
