@@ -6,6 +6,7 @@ linux-headers
 lsb-release
 pacman-contrib
 pkg-config
+sudo
 xdg-user-dirs
 xdg-utils
 
