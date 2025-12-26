@@ -40,7 +40,7 @@ fi
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
 
 # Install AUR packages with Paru
-readarray -t aur_packages < <(grep -Ev "^#|^$" "config/linux/.config/pkglist/aur_packages.txt")
+readarray -t aur_packages < <(grep -Ev "^#|^$" "scripts/config/linux/.config/pkglist/aur_packages.txt")
 paru -Syy
 paru -S --needed "${aur_packages[@]}" || true # we don't want to fail the whole install if a package is broken
 
