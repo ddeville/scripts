@@ -73,10 +73,10 @@ vim.opt.splitright = true
 vim.g.nojoinspaces = true
 
 -- netrw
-vim.gnetrw_localrmdir = 'rm -r'
-vim.gnetrw_liststyle = 4
-vim.gnetrw_winsize = 85
-vim.gnetrw_browse_split = 0
+vim.g.netrw_localrmdir = 'rm -r'
+vim.g.netrw_liststyle = 4
+vim.g.netrw_winsize = 85
+vim.g.netrw_browse_split = 0
 
 -- don't give |ins-completion-menu| messages.
 vim.opt.shortmess:append({ c = true })
