@@ -91,6 +91,7 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 curl -LsSf https://astral.sh/uv/install.sh | /bin/sh
+export PATH="$HOME/.local/bin:$PATH"
 uv python install "$PYTHON_VERSION"
 
 # rust
