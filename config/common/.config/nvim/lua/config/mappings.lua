@@ -4,11 +4,9 @@ vim.keymap.set('n', '<space>', '<nop>')
 
 -- disable arrow keys
 vim.keymap.set('', '<up>', '<nop>')
-vim.keymap.set('', '<up>', '<nop>')
 vim.keymap.set('', '<down>', '<nop>')
 vim.keymap.set('', '<left>', '<nop>')
 vim.keymap.set('', '<right>', '<nop>')
-vim.keymap.set('i', '<up>', '<nop>')
 vim.keymap.set('i', '<up>', '<nop>')
 vim.keymap.set('i', '<down>', '<nop>')
 vim.keymap.set('i', '<left>', '<nop>')
