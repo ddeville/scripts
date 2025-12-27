@@ -10,7 +10,7 @@ sysz
 
 # =========== Development ===========
 
-openai-codex-bin
+kind-bin
 
 # =============== LSP ===============
 
