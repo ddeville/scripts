@@ -83,6 +83,7 @@ dialog
 difftastic
 duf
 duplicity
+fastfetch
 fd
 fzf
 git
@@ -98,7 +99,6 @@ jwt-cli
 lazygit
 man-db
 man-pages
-neofetch
 neovim
 playerctl
 ripgrep
