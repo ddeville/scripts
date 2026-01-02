@@ -72,9 +72,8 @@ end
 # readline
 set -x INPUTRC "$XDG_CONFIG_HOME/readline/inputrc"
 
-# python (3.13+ supports PYTHON_HISTORY, older ones still need PYTHONSTARTUP)
+# python
 set -x PYTHON_HISTORY "$XDG_STATE_HOME/python/history"
-set -x PYTHONSTARTUP "$XDG_CONFIG_HOME/python/startup"
 
 # sqlite
 set -x SQLITE_HISTORY "$XDG_STATE_HOME/sqlite3/history"
