@@ -111,9 +111,9 @@ XF86AudioNext
 
 # screen brightness
 XF86MonBrightnessDown
-	brightnessctl set 10%-
+	brightnessctl set 5%-
 XF86MonBrightnessUp
-	brightnessctl set 10%+
+	brightnessctl set 5%+
 
 # dunst
 ctrl + period
