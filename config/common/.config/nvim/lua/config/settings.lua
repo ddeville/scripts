@@ -70,7 +70,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 -- don't add an extra space when joining lines
-vim.g.nojoinspaces = true
+vim.opt.joinspaces = false
 
 -- netrw
 vim.g.netrw_localrmdir = 'rm -r'
