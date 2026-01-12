@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
 tool="MP4Box"
 
 if [ -z "$1" ]; then
