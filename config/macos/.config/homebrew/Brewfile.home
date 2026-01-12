@@ -1,4 +1,5 @@
 brew "ffmpeg"
+brew "mp4box"
 brew "yt-dlp"
 
 cask "arq"
