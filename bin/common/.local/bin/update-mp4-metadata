@@ -39,24 +39,15 @@ if ! $valid_lang; then
   exit 1
 fi
 
-# Retrieve the IDs of video/audio tracks in the file.
-track_ids=$(
-  "$tool" -info "$input_file" 2>&1 |
-    awk '
-      /Track #[0-9]+/ {
-        if (match($0, /#([0-9]+)/, m)) {
-          if ($0 ~ /Video/ || $0 ~ /Audio/) print m[1]
-        }
-      }
-    '
-)
+# Retrieve the IDs of all tracks in the file.
+track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}')
 
 cmd=("$tool" "$input_file")
 
 # Remove all metadata.
 cmd+=("-itags" "all=clear")
 
-# Set language on the tracks.
+# Set language on all tracks.
 for track_id in $track_ids; do
   cmd+=("-lang" "${track_id}=${lang_code}")
 done
