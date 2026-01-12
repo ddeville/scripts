@@ -28,17 +28,7 @@ fi
 
 lang_code=$(
   MP4Box -languages 2>&1 |
-    awk '
-      match($0, / \([^)]+\)$/) {
-        codes = substr($0, RSTART + 2, RLENGTH - 3)
-        split(codes, parts, " - ")
-        code2 = parts[2]
-        gsub(/[ \t]+/, "", code2)
-        if (code2 != "") {
-          print
-        }
-      }
-    ' |
+    awk '/ - [a-z][a-z]\)$/ { print }' |
     fzf --prompt="Movie language: " |
     awk '
       match($0, / \([^)]+\)$/) {
