@@ -29,7 +29,7 @@ read -r -p "Movie language (${allowed_langs[*]}): " lang_code
 
 valid_lang=false
 for lang in "${allowed_langs[@]}"; do
-  if [[ "$lang" == "$lang_code" ]]; then
+  if [[ $lang == "$lang_code" ]]; then
     valid_lang=true
     break
   fi
@@ -39,15 +39,24 @@ if ! $valid_lang; then
   exit 1
 fi
 
-# Retrieve the IDs of all tracks in the file
-track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}')
+# Retrieve the IDs of video/audio tracks in the file.
+track_ids=$(
+  "$tool" -info "$input_file" 2>&1 |
+    awk '
+      /Track #[0-9]+/ {
+        if (match($0, /#([0-9]+)/, m)) {
+          if ($0 ~ /Video/ || $0 ~ /Audio/) print m[1]
+        }
+      }
+    '
+)
 
 cmd=("$tool" "$input_file")
 
-# Remove all metadata
+# Remove all metadata.
 cmd+=("-itags" "all=clear")
 
-# Set language on all tracks
+# Set language on the tracks.
 for track_id in $track_ids; do
   cmd+=("-lang" "${track_id}=${lang_code}")
 done
