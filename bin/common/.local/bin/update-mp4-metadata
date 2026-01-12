@@ -27,7 +27,14 @@ fi
 allowed_langs=("en" "es" "fr" "he" "it" "ja" "ru" "sv")
 read -r -p "Movie language (${allowed_langs[*]}): " lang_code
 
-if [[ ! " ${allowed_langs[*]} " =~ $lang_code ]]; then
+valid_lang=false
+for lang in "${allowed_langs[@]}"; do
+  if [[ "$lang" == "$lang_code" ]]; then
+    valid_lang=true
+    break
+  fi
+done
+if ! $valid_lang; then
   echo "Error: Invalid language code. Choose from: ${allowed_langs[*]}"
   exit 1
 fi
