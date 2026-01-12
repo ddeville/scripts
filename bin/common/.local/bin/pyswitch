@@ -16,7 +16,11 @@ venv_src="$VENV_INSTALL_DIR/global-$version"
 venv_dst="$HOME/.venv"
 
 # Remove the global venv first since `uv python find` would match it.
-rm -f "$venv_dst"
+if [ -L "$venv_dst" ]; then
+  rm -f "$venv_dst"
+elif [ -d "$venv_dst" ]; then
+  rm -rf "$venv_dst"
+fi
 bin="$(uv python find "$version")"
 
 # Create a venv for this version and symlink it into HOME so that uv can find it.
