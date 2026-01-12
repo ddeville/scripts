@@ -45,7 +45,7 @@ track_ids=$("$tool" -info "$input_file" 2>&1 | grep '# Track' | awk '{print $3}'
 cmd=("$tool" "$input_file")
 
 # Remove all metadata.
-cmd+=("-itags" "all=clear")
+cmd+=("-itags" "clear")
 
 # Set language on all tracks.
 for track_id in $track_ids; do
