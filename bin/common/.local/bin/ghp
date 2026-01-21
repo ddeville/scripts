@@ -37,4 +37,4 @@ ensure_pushed() {
 ensure_pushed
 
 gh pr create --base="$BASE" --head="$HEAD" --fill
-gh pr view --web
+gh pr view "$HEAD" --web
