@@ -37,5 +37,4 @@ ensure_pushed() {
 ensure_pushed
 
 gh pr create --base="$BASE" --head="$HEAD" --fill
-
-open "$(gh pr view "$HEAD" --json url -q .url)"
+gh pr view --web
