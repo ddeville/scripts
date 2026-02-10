@@ -79,7 +79,7 @@ set -x PYTHON_HISTORY "$XDG_STATE_HOME/python/history"
 set -x SQLITE_HISTORY "$XDG_STATE_HOME/sqlite3/history"
 
 # codex
-set -x CODEX_HOME "$XDG_CONFIG_HOME/codex"
+set -x CODEX_HOME "$HOME/.codex"
 
 # node
 set -x NPM_CONFIG_PREFIX "$HOME/.local"
