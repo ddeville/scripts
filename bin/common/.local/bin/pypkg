@@ -9,3 +9,9 @@ mkdir -p "$global_dir"
 touch "$requirements_file"
 
 "${EDITOR:-vi}" "$requirements_file"
+
+if [ -s "$requirements_file" ]; then
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf "$tmpdir"' EXIT
+  env -u VIRTUAL_ENV uv run --directory "$tmpdir" --no-project --with-requirements "$requirements_file" -- python -c 'pass'
+fi
