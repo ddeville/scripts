@@ -10,4 +10,3 @@ alias topm "top -o mem"
 
 alias e nvim
 alias tf terraform
-alias py "uv run python"
