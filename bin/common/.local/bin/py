@@ -2,28 +2,10 @@
 
 set -eu -o pipefail
 
-force_global=0
-if [ "${1:-}" = "--global" ]; then
-  force_global=1
-  shift
-fi
-
-if [ -n "${VIRTUAL_ENV:-}" ] && [ "$force_global" -eq 0 ]; then
-  exec python "$@"
-fi
-
-cmd=(uv run --no-project)
-
-version_file="$XDG_CONFIG_HOME/uv/.python-version"
-if [ -f "$version_file" ]; then
-  version="$(tr -d '[:space:]' <"$version_file")"
-  if [ -n "$version" ]; then
-    cmd+=(--python "$version")
-  fi
-fi
-
 requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
-if [ -s "$requirements_file" ]; then
+cmd=(uv run)
+
+if [ -f "$requirements_file" ]; then
   cmd+=(--with-requirements "$requirements_file")
 fi
 
