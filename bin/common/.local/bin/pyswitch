@@ -11,4 +11,4 @@ version="$1"
 
 uv python install "$version"
 uv python pin --global "$version"
-echo "Global uv Python pin is now $version"
+echo "Global uv Python pin is now $(uv python pin --global)"
