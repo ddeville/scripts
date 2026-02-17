@@ -44,6 +44,9 @@ set -x VENV_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/venv"
 if not test -d "$UV_PYTHON_BIN_DIR"
     command mkdir -p "$UV_PYTHON_BIN_DIR"
 end
+if not test -d "$VENV_INSTALL_DIR"
+    command mkdir -p "$VENV_INSTALL_DIR"
+end
 
 # rust
 set -x CARGO_HOME "$XDG_TOOLCHAINS_HOME/rust/cargo"
