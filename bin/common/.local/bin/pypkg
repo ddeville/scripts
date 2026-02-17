@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+toolchain_dir="$XDG_TOOLCHAINS_HOME/python/metadata"
+requirements_file="$toolchain_dir/requirements.txt"
+
+mkdir -p "$toolchain_dir"
+touch "$requirements_file"
+
+"${EDITOR:-vi}" "$requirements_file"

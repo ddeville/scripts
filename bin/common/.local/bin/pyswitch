@@ -2,33 +2,16 @@
 
 set -eu -o pipefail
 
-if [ $# -eq 0 ] || [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Usage: pyswitch <1.2.3>"
+if [ $# -ne 1 ]; then
+  echo "Usage: pyswitch <python-request>"
   exit 1
 fi
 
 version="$1"
+toolchain_dir="$XDG_TOOLCHAINS_HOME/python/metadata"
+version_file="$toolchain_dir/version"
 
+mkdir -p "$toolchain_dir"
 uv python install "$version"
-uv python pin --global "$version"
-
-venv_src="$VENV_INSTALL_DIR/global-$version"
-venv_dst="$HOME/.venv"
-
-# Remove the global venv first since `uv python find` would match it.
-if [ -L "$venv_dst" ]; then
-  rm -f "$venv_dst"
-elif [ -d "$venv_dst" ]; then
-  rm -rf "$venv_dst"
-fi
-bin="$(uv python find "$version")"
-
-# Create a venv for this version and symlink it into HOME so that uv can find it.
-uv venv --python "$version" --allow-existing "$venv_src"
-ln -sf "$venv_src" "$venv_dst"
-
-# Also symlink the unversioned python to the current global one.
-ln -sf "$bin" "$UV_PYTHON_BIN_DIR/python"
-ln -sf "$bin" "$UV_PYTHON_BIN_DIR/python3"
-
-echo "$UV_PYTHON_BIN_DIR/python" now points to "$version"
+printf '%s\n' "$version" >"$version_file"
+echo "$version_file now contains $version"
