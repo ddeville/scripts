@@ -41,6 +41,12 @@
 - In the final response, list which files were modified.
 - In the final response, state what validation was run.
 - In the final response, note residual risks or follow-up suggestions.
+- Stop and ask when requirements are ambiguous or when a change is high-risk.
+- If task scope expands materially beyond the original request, call it out and confirm before proceeding.
+
+## Solution Bias
+
+- Prefer simpler solutions and lower complexity by default unless there is a clear, measurable need for additional complexity.
 
 ## Environment Conventions
 
