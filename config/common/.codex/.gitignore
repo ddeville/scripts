@@ -1,4 +1,6 @@
 *
 !.gitignore
 !AGENTS.md
-!skills/personal
+!skills/
+!skills/personal/
+!skills/personal/**
