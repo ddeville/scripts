@@ -2,10 +2,10 @@
 
 set -eu -o pipefail
 
-toolchain_dir="$XDG_TOOLCHAINS_HOME/python/metadata"
-requirements_file="$toolchain_dir/requirements.txt"
+global_dir="$XDG_TOOLCHAINS_HOME/python/global"
+requirements_file="$global_dir/requirements.txt"
 
-mkdir -p "$toolchain_dir"
+mkdir -p "$global_dir"
 touch "$requirements_file"
 
 "${EDITOR:-vi}" "$requirements_file"

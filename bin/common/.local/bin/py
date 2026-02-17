@@ -12,14 +12,9 @@ if [ -n "${VIRTUAL_ENV:-}" ] && [ "$force_global" -eq 0 ]; then
   exec python "$@"
 fi
 
-toolchain_dir="$XDG_TOOLCHAINS_HOME/python/metadata"
-version_file="$toolchain_dir/version"
-requirements_file="$toolchain_dir/requirements.txt"
-
-mkdir -p "$toolchain_dir"
-
 cmd=(uv run --no-project)
 
+version_file="$XDG_CONFIG_HOME/uv/.python-version"
 if [ -f "$version_file" ]; then
   version="$(tr -d '[:space:]' <"$version_file")"
   if [ -n "$version" ]; then
@@ -27,6 +22,7 @@ if [ -f "$version_file" ]; then
   fi
 fi
 
+requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
 if [ -s "$requirements_file" ]; then
   cmd+=(--with-requirements "$requirements_file")
 fi

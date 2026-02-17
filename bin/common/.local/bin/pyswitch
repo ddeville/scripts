@@ -8,10 +8,7 @@ if [ $# -ne 1 ]; then
 fi
 
 version="$1"
-toolchain_dir="$XDG_TOOLCHAINS_HOME/python/metadata"
-version_file="$toolchain_dir/version"
 
-mkdir -p "$toolchain_dir"
 uv python install "$version"
-printf '%s\n' "$version" >"$version_file"
-echo "$version_file now contains $version"
+uv python pin --global "$version"
+echo "Global uv Python pin is now $version"
