@@ -23,7 +23,7 @@ function fish_greeting
         echo $l_color" Uptime:     "$r_color(uptime | sed -E 's/.*(up.*), [[:digit:]]+ user.*/\1/')
         echo $l_color" User:       "$r_color(id -un)
         echo $l_color" Hostname:   "$r_color(uname -n)
-        echo $l_color" Disk usage: "$r_color(df -H -l | grep -E '/System/Volumes/Data$' | awk '{printf "%s available (%s used)\n", $4, $5}')
+        echo $l_color" Disk usage: "$r_color(begin; df -H /System/Volumes/Data 2>/dev/null; or df -H / 2>/dev/null; end | awk 'NR==2 {printf "%s available (%s used)\n", $4, $5}')
     else
         echo $l_color" OS:         "$r_color(uname -rs)
         echo $l_color" Uptime:     "$r_color(uptime -p)
