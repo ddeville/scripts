@@ -6,7 +6,7 @@
   "cmp-vsnip": { "branch": "main", "commit": "989a8a73c44e926199bfd05fa7a516d51f2d2752" },
   "conform.nvim": { "branch": "master", "commit": "c2526f1cde528a66e086ab1668e996d162c75f4f" },
   "fidget.nvim": { "branch": "main", "commit": "7fa433a83118a70fe24c1ce88d5f0bd3453c0970" },
-  "fzf-lua": { "branch": "main", "commit": "5921997472574fca3880b62949eb8679dc6f5afc" },
+  "fzf-lua": { "branch": "main", "commit": "b2c0603216adb92c6bba81053bc996d7ae95b77a" },
   "gruvbox.nvim": { "branch": "main", "commit": "561126520034a1dac2f78ab063db025d12555998" },
   "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
   "lualine.nvim": { "branch": "master", "commit": "47f91c416daef12db467145e16bed5bbfe00add8" },
