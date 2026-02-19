@@ -9,6 +9,6 @@ fi
 
 version="$1"
 
-uv python install --default "$version"
+uv python install --default "$version" --preview-features python-install-default
 uv python pin --global "$version"
 echo "Global uv Python pin is now $(uv python pin --global)"
