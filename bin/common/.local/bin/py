@@ -2,6 +2,10 @@
 
 set -eu -o pipefail
 
+if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
+  exec "$VIRTUAL_ENV/bin/python" "$@"
+fi
+
 requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
 cmd=(uv run)
 
