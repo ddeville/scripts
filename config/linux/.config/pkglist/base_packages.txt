@@ -94,6 +94,7 @@ htop
 hyperfine
 jless
 jq
+jujutsu
 just
 jwt-cli
 lazygit
