@@ -2,16 +2,4 @@
 
 set -eu -o pipefail
 
-if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
-  exec "$VIRTUAL_ENV/bin/python" "$@"
-fi
-
-requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
-cmd=(uv run)
-
-if [ -f "$requirements_file" ]; then
-  cmd+=(--with-requirements "$requirements_file")
-fi
-
-cmd+=(python "$@")
-exec "${cmd[@]}"
+exec pyrun python "$@"
