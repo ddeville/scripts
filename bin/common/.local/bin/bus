@@ -23,7 +23,7 @@ if [ "$(uname)" = "Darwin" ]; then
   brew upgrade
 
   echo -e "\033[34m==>\033[0m Running brew cleanup..."
-  brew cleanup
+  brew cleanup --prune=3
 elif [ "$(uname)" = "Linux" ]; then
   if command -v paru >/dev/null 2>&1; then
     pkglist_dir="$HOME/.config/pkglist"
