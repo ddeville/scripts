@@ -137,6 +137,7 @@ ruff
 rustup
 shellcheck
 shfmt
+staticcheck
 stylua
 terraform
 uv
