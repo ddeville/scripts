@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: pyrun <command> [args...]"
+  exit 1
+fi
+
+if [ -n "${VIRTUAL_ENV:-}" ] && [ -d "$VIRTUAL_ENV/bin" ]; then
+  export PATH="$VIRTUAL_ENV/bin:$PATH"
+  exec "$@"
+fi
+
+cmd=(uv run)
+
+requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
+if [ -f "$requirements_file" ]; then
+  cmd+=(--with-requirements "$requirements_file")
+fi
+
+cmd+=(-- "$@")
+
+exec "${cmd[@]}"
