@@ -3,7 +3,7 @@ tap "koenbollen/public"
 tap "teamookla/speedtest"
 tap "warrensbox/tap"
 
-cask_args appdir: "/Applications", require_sha: true, no_quarantine: true
+cask_args appdir: "/Applications", require_sha: true
 
 # ============== Shell ==============
 
