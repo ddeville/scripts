@@ -91,14 +91,14 @@ cask "1password"
 cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
 cask "alfred"
 cask "apparency"
-cask "archaeology"
+cask "archaeology", args: { require_sha: false }
 cask "chatgpt" if Hardware::CPU.arm?
 cask "codex"
 cask "codex-app" if Hardware::CPU.arm?
-cask "google-chrome"
+cask "google-chrome", args: { require_sha: false }
 cask "hex-fiend"
-cask "istat-menus"
+cask "istat-menus", args: { require_sha: false }
 cask "mos"
-cask "spotify"
+cask "spotify", args: { require_sha: false }
 cask "stay"
 cask "suspicious-package"
