@@ -17,4 +17,4 @@ touch "$requirements_file"
 
 global_venv="$global_dir/venv"
 env -u VIRTUAL_ENV uv venv --allow-existing --python "$python_request" "$global_venv"
-env -u VIRTUAL_ENV uv pip sync --refresh --python "$global_venv/bin/python" --allow-empty-requirements "$requirements_file"
+env -u VIRTUAL_ENV uv pip install --upgrade --refresh --python "$global_venv/bin/python" --requirements "$requirements_file"
