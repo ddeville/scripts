@@ -12,13 +12,20 @@ if [ -n "${VIRTUAL_ENV-}" ] && [ -d "$VIRTUAL_ENV/bin" ]; then
   exec "$@"
 fi
 
-cmd=(uv run)
+global_dir="$XDG_TOOLCHAINS_HOME/python/global"
+global_venv="$global_dir/venv"
+requirements_file="$global_dir/requirements.txt"
 
-requirements_file="$XDG_TOOLCHAINS_HOME/python/global/requirements.txt"
+if [ -d "$global_venv/bin" ]; then
+  export VIRTUAL_ENV="$global_venv"
+  export PATH="$global_venv/bin:$PATH"
+  exec "$@"
+fi
+
+cmd=(uv run)
 if [ -f "$requirements_file" ]; then
   cmd+=(--with-requirements "$requirements_file")
 fi
-
 cmd+=(-- "$@")
 
 exec "${cmd[@]}"
