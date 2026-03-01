@@ -11,4 +11,15 @@ version="$1"
 
 uv python install --default "$version" --preview-features python-install-default
 uv python pin --global "$version"
+
+global_dir="$XDG_TOOLCHAINS_HOME/python/global"
+mkdir -p "$global_dir"
+
+requirements_file="$global_dir/requirements.txt"
+touch "$requirements_file"
+
+global_venv="$global_dir/venv"
+env -u VIRTUAL_ENV uv venv --clear --python "$version" "$global_venv"
+env -u VIRTUAL_ENV uv pip sync -p "$global_venv/bin/python" --allow-empty-requirements "$requirements_file"
+
 echo "Global uv Python pin is now $(uv python pin --global)"

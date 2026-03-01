@@ -2,16 +2,19 @@
 
 set -eu -o pipefail
 
+python_request="$(uv python pin --global 2>/dev/null || true)"
+if [ -z "$python_request" ]; then
+  echo "No global uv Python is pinned. Run: pyswitch <python-request>" >&2
+  exit 1
+fi
+
 global_dir="$XDG_TOOLCHAINS_HOME/python/global"
-requirements_file="$global_dir/requirements.txt"
-
 mkdir -p "$global_dir"
-touch "$requirements_file"
 
+requirements_file="$global_dir/requirements.txt"
+touch "$requirements_file"
 "${EDITOR:-vi}" "$requirements_file"
 
-if [ -s "$requirements_file" ]; then
-  tmpdir="$(mktemp -d)"
-  trap 'rm -rf "$tmpdir"' EXIT
-  env -u VIRTUAL_ENV uv run --directory "$tmpdir" --no-project --with-requirements "$requirements_file" -- python -c 'pass'
-fi
+global_venv="$global_dir/venv"
+env -u VIRTUAL_ENV uv venv --allow-existing --python "$python_request" "$global_venv"
+env -u VIRTUAL_ENV uv pip sync -p "$global_venv/bin/python" --allow-empty-requirements "$requirements_file"
