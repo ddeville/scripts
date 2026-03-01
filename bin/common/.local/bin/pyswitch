@@ -20,6 +20,6 @@ touch "$requirements_file"
 
 global_venv="$global_dir/venv"
 env -u VIRTUAL_ENV uv venv --clear --python "$version" "$global_venv"
-env -u VIRTUAL_ENV uv pip sync -p "$global_venv/bin/python" --allow-empty-requirements "$requirements_file"
+env -u VIRTUAL_ENV uv pip sync --python "$global_venv/bin/python" --allow-empty-requirements "$requirements_file"
 
 echo "Global uv Python pin is now $(uv python pin --global)"
