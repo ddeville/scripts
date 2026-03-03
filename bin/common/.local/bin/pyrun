@@ -19,6 +19,7 @@ requirements_file="$global_dir/requirements.txt"
 if [ -d "$global_venv/bin" ]; then
   export VIRTUAL_ENV="$global_venv"
   export PATH="$global_venv/bin:$PATH"
+  unset PYTHONHOME
   exec "$@"
 fi
 
