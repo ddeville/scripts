@@ -8,5 +8,7 @@ alias oo "open ."
 alias topc "top -o cpu"
 alias topm "top -o mem"
 
+alias jll "jl --max-field-length=0"
+
 alias e nvim
 alias tf terraform
