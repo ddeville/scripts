@@ -42,5 +42,5 @@ if [[ ! -d $install_dir ]]; then
   popd >/dev/null
 fi
 
-ln -sf "$install_dir" "$toolchain_dir/current"
+ln -s "$install_dir" "$current_dir"
 echo "$toolchain_dir/current" now points to "$version"
