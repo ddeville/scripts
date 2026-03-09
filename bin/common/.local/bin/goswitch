@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-if [ $# -ne 1 ]; then
+if [ $# -eq 0 ] || { [[ $1 != "system" && $1 != "latest" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
   echo "Usage: goswitch <1.2.3|latest|system>"
   exit 1
 fi
