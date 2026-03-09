@@ -2,21 +2,12 @@
 
 set -eu -o pipefail
 
-if [ $# -eq 0 ] || { [[ $1 != "system" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
-  echo "Usage: nodeswitch <1.2.3|system>"
+if [ $# -eq 0 ] || { [[ $1 != "system" && $1 != "latest" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
+  echo "Usage: nodeswitch <1.2.3|latest|system>"
   exit 1
 fi
 
 version="$1"
-
-plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
-arch="$(uname -m)"
-
-case "$arch" in
-"x86_64")
-  arch="x64"
-  ;;
-esac
 
 toolchain_dir="$HOME/.local/toolchains/node"
 current_dir="$toolchain_dir/current"
@@ -27,7 +18,27 @@ if [[ $version == "system" ]]; then
   exit 0
 fi
 
+if [[ $version == "latest" ]]; then
+  version="$(curl -fsSL "https://nodejs.org/dist/index.json" |
+    grep -oE '"version":"v[0-9]+\.[0-9]+\.[0-9]+"' |
+    head -n 1 |
+    sed -E 's/^"version":"v([0-9]+\.[0-9]+\.[0-9]+)"$/\1/')"
+  if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Could not resolve latest stable Node.js version." >&2
+    exit 1
+  fi
+fi
+
 install_dir="$toolchain_dir/versions/$version"
+
+plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
+arch="$(uname -m)"
+
+case "$arch" in
+"x86_64")
+  arch="x64"
+  ;;
+esac
 
 if [[ ! -d $install_dir ]]; then
   tmpdir="$(mktemp -d)"
