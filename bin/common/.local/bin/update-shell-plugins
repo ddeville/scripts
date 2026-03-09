@@ -19,13 +19,15 @@ done
 base16_path="$XDG_DATA_HOME/base16"
 
 repos=(
-  "https://github.com/tinted-theming/base16-shell.git"
-  "https://github.com/tinted-theming/base16-tmux.git"
-  "https://github.com/tinted-theming/base16-fzf.git"
-  "https://github.com/aarowill/base16-alacritty.git"
+  "https://github.com/tinted-theming/base16-shell.git origin/main"
+  # Pinned to a commit before they changed gruvbox tab background to match base16-alacritty background...
+  "https://github.com/tinted-theming/base16-tmux.git f8ca8735cff140ba51239f18177e7f43f9733826"
+  "https://github.com/tinted-theming/base16-fzf.git origin/main"
+  "https://github.com/aarowill/base16-alacritty.git origin/master"
 )
 
-for repo in "${repos[@]}"; do
+for repo_spec in "${repos[@]}"; do
+  read -r repo ref <<<"$repo_spec"
   folder_name=$(echo "$repo" | cut -d/ -f5 | cut -d. -f1)
   path="$base16_path/$folder_name"
   # If the repo was never cloned, do so, otherwise just update it
@@ -36,14 +38,17 @@ for repo in "${repos[@]}"; do
     if [ "$current_remote_url" != "$repo" ]; then
       git remote set-url origin "$repo"
     fi
-    # Pull the latest changes if we need to update
     if $update; then
-      git pull --rebase
+      git fetch origin
     fi
+    git checkout --detach "$ref"
     popd
 
   else
     git clone "$repo" "$path"
+    pushd "$path"
+    git checkout --detach "$ref"
+    popd
   fi
 done
 
