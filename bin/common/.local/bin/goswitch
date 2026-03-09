@@ -2,12 +2,31 @@
 
 set -eu -o pipefail
 
-if [ $# -eq 0 ] || { [[ $1 != "system" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
-  echo "Usage: goswitch <1.2.3|system>"
+if [ $# -ne 1 ]; then
+  echo "Usage: goswitch <1.2.3|latest|system>"
   exit 1
 fi
 
 version="$1"
+
+toolchain_dir="$XDG_TOOLCHAINS_HOME/go"
+current_dir="$toolchain_dir/current"
+
+if [[ $version == "system" ]]; then
+  rm -f "$current_dir"
+  echo "$toolchain_dir/current" was unlinked
+  exit 0
+fi
+
+if [[ $version == "latest" ]]; then
+  version="$(curl -fsSL "https://go.dev/VERSION?m=text" | awk 'NR==1{sub(/^go/, "", $0); print; exit}')"
+  if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Could not resolve latest stable Go version." >&2
+    exit 1
+  fi
+fi
+
+install_dir="$toolchain_dir/versions/$version"
 
 plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
@@ -17,17 +36,6 @@ case "$arch" in
   arch="amd64"
   ;;
 esac
-
-toolchain_dir="$HOME/.local/toolchains/go"
-current_dir="$toolchain_dir/current"
-
-if [[ $version == "system" ]]; then
-  rm -f "$current_dir"
-  echo "$toolchain_dir/current" was unlinked
-  exit 0
-fi
-
-install_dir="$toolchain_dir/versions/$version"
 
 if [[ ! -d $install_dir ]]; then
   tmpdir="$(mktemp -d)"
@@ -42,5 +50,6 @@ if [[ ! -d $install_dir ]]; then
   popd >/dev/null
 fi
 
-ln -sf "$install_dir" "$current_dir"
+rm -f "$current_dir"
+ln -s "$install_dir" "$current_dir"
 echo "$toolchain_dir/current" now points to "$version"
