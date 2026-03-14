@@ -19,7 +19,11 @@ if [[ $version == "system" ]]; then
 fi
 
 if [[ $version == "latest" ]]; then
-  version="$(curl -fsSL "https://go.dev/VERSION?m=text" | awk 'NR==1{sub(/^go/, "", $0); print; exit}')"
+  version="$(curl -fsSL "https://go.dev/VERSION?m=text" |
+    awk 'NR == 1 {
+      version = $0
+      sub(/^go/, "", version)
+    } END { print version }')"
   if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Could not resolve latest stable Go version." >&2
     exit 1
