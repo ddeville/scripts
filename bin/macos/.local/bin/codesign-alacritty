@@ -4,6 +4,11 @@ set -eu -o pipefail
 
 app_path="${1:-/Applications/Alacritty.app}"
 
+if [ -n "${SKIP_ALACRITTY_CODESIGN-}" ]; then
+  echo "Skipping Alacritty codesign because SKIP_ALACRITTY_CODESIGN is set"
+  exit 0
+fi
+
 # Pinned to a specific version to not randomly break but it should be updated frequently to keep compatibility
 # with whatever Apple's codesign requirements are...
 apple_codesign_version=0.22.0

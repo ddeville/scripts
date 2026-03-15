@@ -32,6 +32,7 @@ fi
 export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 
 # We can now install all the packages
+export SKIP_ALACRITTY_CODESIGN=1
 "$HOME/scripts/install/macos/install_packages.sh"
 
 arch_name="$(uname -m)"
