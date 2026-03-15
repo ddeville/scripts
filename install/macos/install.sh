@@ -119,14 +119,23 @@ defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 2
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 
-defaults write com.apple.loginwindow TALLogoutSavesState -bool true
+defaults write com.apple.activitymonitor OpenMainWindow -bool true
+defaults write com.apple.activitymonitor ShowCategory -int 100
+defaults write com.apple.activitymonitor SortColumn -string "CPUUsage"
+defaults write com.apple.activitymonitor SortDirection -int 0
+defaults write com.apple.activitymonitor UpdatePeriod -int 1
 
-defaults write com.apple.dock show-recents -int 0
+defaults write com.apple.airplay showInMenuBarIfPresent -bool false
+
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
 defaults write com.apple.dock autohide -int 1
-defaults write com.apple.dock mru-spaces -bool false
 defaults write com.apple.dock magnification -int 0
 defaults write com.apple.dock mineffect "scale"
 defaults write com.apple.dock minimize-to-application -int 1
+defaults write com.apple.dock mru-spaces -bool false
+defaults write com.apple.dock show-recents -int 0
 defaults write com.apple.dock wvous-bl-corner -int 4
 defaults write com.apple.dock wvous-bl-modifier -int 0
 defaults write com.apple.dock wvous-br-corner -int 3
@@ -136,22 +145,18 @@ defaults write com.apple.dock wvous-tl-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 2
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
-defaults write com.apple.finder NewWindowTarget -string "PfHm"
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+defaults write com.apple.finder NewWindowTarget -string "PfHm"
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
 
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 
-defaults write com.apple.activitymonitor OpenMainWindow -bool true
-defaults write com.apple.activitymonitor ShowCategory -int 100
-defaults write com.apple.activitymonitor UpdatePeriod -int 1
-defaults write com.apple.activitymonitor SortColumn -string "CPUUsage"
-defaults write com.apple.activitymonitor SortDirection -int 0
+defaults write com.apple.menuextra.battery '{ ShowPercent = NO; }'
 
 defaults write com.apple.siri StatusMenuVisible -bool false
-defaults write com.apple.menuextra.battery '{ ShowPercent = NO; }'
-defaults write com.apple.airplay showInMenuBarIfPresent -bool false
 
 defaults write com.apple.textedit RichText -int 0
 
