@@ -86,28 +86,35 @@ fi
 spctl developer-mode enable-terminal
 
 # shellcheck disable=SC2016
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
-defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticTextCompletionEnabled -bool false
-defaults write NSGlobalDomain KeyRepeat -int 2
-defaults write NSGlobalDomain InitialKeyRepeat -int 15
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 defaults write NSGlobalDomain AppleAccentColor -int 3
+defaults write NSGlobalDomain AppleActionOnDoubleClick -string "Maximize"
 defaults write NSGlobalDomain AppleAquaColorVariant -int 1
 defaults write NSGlobalDomain AppleHighlightColor "0.752941 0.964706 0.678431 Green"
 defaults write NSGlobalDomain AppleInterfaceStyle "Dark"
 defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -int 0
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+defaults write NSGlobalDomain AppleReduceDesktopTinting -bool true
+defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true
 defaults write NSGlobalDomain AppleShowAllExtensions -int 1
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 defaults write NSGlobalDomain ContextMenuGesture -int 0
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticTextCompletionEnabled -bool false
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
+defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
+defaults write NSGlobalDomain SLSMenuBarUseBlurredAppearance -int 1
+defaults write NSGlobalDomain WebAutomaticSpellingCorrectionEnabled -bool false
+defaults write NSGlobalDomain com.apple.swipescrolldirection -int 1
 defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 2
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
