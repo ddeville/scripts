@@ -27,4 +27,4 @@ elif [[ -f "$homebrew_dir/Brewfile.home" ]]; then
 fi
 
 $brew update
-$brew bundle install --file="$brewfile" --no-lock --upgrade --cleanup
+$brew bundle install --file="$brewfile" --upgrade --cleanup
