@@ -203,11 +203,16 @@ hidutil property --set '{
 }'
 
 # Make sure that Spotify doesn't start on login...
-mkdir -p "$HOME/Library/Application\ Support/Spotify"
-touch "$HOME/Library/Application\ Support/Spotify/prefs"
-if ! grep -q "app.autostart-mode" "$HOME/Library/Application\ Support/Spotify/prefs"; then
-  echo 'app.autostart-mode="off"' >>"$HOME/Library/Application\ Support/Spotify/prefs"
-  echo 'app.autostart-banner-seen=true' >>"$HOME/Library/Application\ Support/Spotify/prefs"
+spotify_prefs_dir="$HOME/Library/Application Support/Spotify"
+spotify_prefs_file="$spotify_prefs_dir/prefs"
+mkdir -p "$spotify_prefs_dir"
+touch "$spotify_prefs_file"
+if ! grep -q "app.autostart-mode" "$spotify_prefs_file"; then
+  {
+    echo 'app.autostart-mode="off"'
+    echo 'app.autostart-banner-seen=true'
+    echo 'app.autostart-configured=true'
+  } >>"$spotify_prefs_file"
 fi
 
 # If `scripts` was downloaded as an archive, clone the git repo instead
