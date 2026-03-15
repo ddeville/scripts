@@ -157,6 +157,7 @@ defaults write com.apple.loginwindow TALLogoutSavesState -bool true
 defaults write com.apple.menuextra.battery '{ ShowPercent = NO; }'
 
 defaults write com.apple.siri StatusMenuVisible -bool false
+defaults write com.apple.siri VoiceTriggerUserEnabled -bool false
 
 defaults write com.apple.textedit RichText -int 0
 
