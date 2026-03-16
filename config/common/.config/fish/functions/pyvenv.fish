@@ -1,10 +1,5 @@
 function pyvenv --description "Activate the global Python venv"
-    set -l toolchains_home "$XDG_TOOLCHAINS_HOME"
-    if test -z "$toolchains_home"
-        set toolchains_home "$HOME/.local/toolchains"
-    end
-
-    set -l global_venv "$toolchains_home/python/global/venv/global"
+    set -l global_venv "$VENV_INSTALL_DIR/global"
     set -l activate_path "$global_venv/bin/activate.fish"
 
     if not test -e "$activate_path"
