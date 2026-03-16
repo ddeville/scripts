@@ -13,5 +13,6 @@ function pyvenv --description "Activate the global Python venv"
     end
 
     set -e PYTHONHOME
+    set -l VIRTUAL_ENV_DISABLE_PROMPT 1
     source "$activate_path"
 end
