@@ -4,7 +4,7 @@ function pyvenv --description "Activate the global Python venv"
         set toolchains_home "$HOME/.local/toolchains"
     end
 
-    set -l global_venv "$toolchains_home/python/global/venv"
+    set -l global_venv "$toolchains_home/python/global/venv/global"
     set -l activate_path "$global_venv/bin/activate.fish"
 
     if not test -e "$activate_path"

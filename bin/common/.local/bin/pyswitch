@@ -39,7 +39,10 @@ mkdir -p "$global_dir"
 requirements_file="$global_dir/requirements.txt"
 touch "$requirements_file"
 
-global_venv="$global_dir/venv"
+venv_dir="$global_dir/venv"
+mkdir -p "$venv_dir"
+
+global_venv="$venv_dir/global"
 env -u VIRTUAL_ENV uv venv --clear --python "$version" "$global_venv"
 env -u VIRTUAL_ENV uv pip install --upgrade --python "$global_venv/bin/python" --requirements "$requirements_file"
 
