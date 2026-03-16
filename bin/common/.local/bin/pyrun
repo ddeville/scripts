@@ -13,7 +13,7 @@ if [ -n "${VIRTUAL_ENV-}" ] && [ -d "$VIRTUAL_ENV/bin" ]; then
 fi
 
 global_dir="$XDG_TOOLCHAINS_HOME/python/global"
-global_venv="$global_dir/venv/global"
+global_venv="$VENV_INSTALL_DIR/global"
 requirements_file="$global_dir/requirements.txt"
 
 if [ -d "$global_venv/bin" ]; then
