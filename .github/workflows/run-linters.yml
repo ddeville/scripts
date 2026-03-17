@@ -45,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@v2
+        uses: ludeeus/action-shellcheck@master
         with:
           severity: style
   shfmt:
@@ -72,7 +72,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run fish_indent
-        uses: ddeville/fish-indent-action@v0
+        uses: ddeville/fish-indent-action@master
   vint:
     # This runs `vint`: https://github.com/Vimjas/vint
     name: Vint
@@ -81,4 +81,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: vint
-        uses: ddeville/vint-action@v0
+        uses: ddeville/vint-action@master
