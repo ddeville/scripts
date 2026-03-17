@@ -1,9 +1,24 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -Eeuo pipefail
 
 if [ "$(id -u)" -eq 0 ]; then
   echo "The script is running as root, please run as the user."
+  exit 1
+fi
+
+trap 'echo "ERROR: install.sh failed at line $LINENO: $BASH_COMMAND" >&2' ERR
+
+echo "Running macOS install preflight"
+sudo -v
+
+arch_name="$(uname -m)"
+macos_version="$(sw_vers -productVersion)"
+macos_build="$(sw_vers -buildVersion)"
+echo "macOS $macos_version ($macos_build) on $arch_name"
+
+if ! pgrep -xu "$USER" Dock >/dev/null; then
+  echo "This installer must be run from an interactive Aqua login session." >&2
   exit 1
 fi
 
@@ -35,7 +50,6 @@ export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 export SKIP_ALACRITTY_CODESIGN=1
 "$HOME/scripts/install/macos/install_packages.sh"
 
-arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then
   brew_path=/opt/homebrew/bin
 else
