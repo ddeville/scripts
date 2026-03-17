@@ -54,7 +54,7 @@ export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 mkdir -p "$CARGO_HOME"
 mkdir -p "$RUSTUP_HOME"
-if ! command -v rustup &>/dev/null; then
+if [ ! -x "$CARGO_HOME"/bin/rustup ]; then
   curl -fsSL https://sh.rustup.rs | /bin/sh -s -- -y --no-modify-path
 fi
 "$CARGO_HOME"/bin/rustup default stable
