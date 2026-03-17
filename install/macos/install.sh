@@ -112,7 +112,7 @@ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" "^\$d"
 defaults write NSGlobalDomain SLSMenuBarUseBlurredAppearance -int 1
 defaults write NSGlobalDomain WebAutomaticSpellingCorrectionEnabled -bool false
 defaults write NSGlobalDomain com.apple.swipescrolldirection -int 1
