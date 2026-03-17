@@ -27,7 +27,7 @@ tmp_app_path="$tmp_dir/Alacritty.app"
 cp -R "$app_path" "$tmp_app_path"
 
 # Download the new icon and copy it to the app bundle.
-icon_name="$(plutil -p "$tmp_app_path/Contents/Info.plist" | grep CFBundleIconFile | awk -F '=>' '{print $2}' | tr -d ' "\n')"
+icon_name="$(plutil -p "$tmp_app_path/Contents/Info.plist" | grep CFBundleIconFile | awk -F '=>' '{print $2}' | tr -d ' "\n"')"
 curl -L "https://www.dropbox.com/s/jrsj4vnd69995ox/Alacritty.icns" -o "$tmp_dir/$icon_name"
 mv "$tmp_dir/$icon_name" "$tmp_app_path/Contents/Resources/$icon_name"
 
