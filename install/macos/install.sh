@@ -204,11 +204,15 @@ hidutil property --set '{
 }'
 
 # Set some file associations
-duti -s org.alacritty public.unix-executable all
-duti -s com.apple.TextEdit .yaml all
-duti -s com.apple.TextEdit .yml all
+duti -s com.apple.TextEdit public.yaml all
+duti -s com.apple.TextEdit public.json all
 duti -s com.apple.TextEdit .toml all
-duti -s com.apple.TextEdit .json all
+duti -s com.apple.TextEdit .srt all
+duti -s com.google.Chrome http
+duti -s com.google.Chrome https
+duti -s com.google.Chrome public.html all
+duti -s com.google.Chrome public.xhtml all
+duti -s org.alacritty public.unix-executable all
 
 # Make sure that Spotify doesn't start on login...
 spotify_prefs_dir="$HOME/Library/Application Support/Spotify"
