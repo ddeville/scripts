@@ -176,7 +176,7 @@ defaults write org.alacritty AppleFontSmoothing -int 0
 
 # Nigthshift
 core_brightness_defaults_key="CBUser-$(dscl . -read ~ GeneratedUID | sed 's/GeneratedUID: //')"
-core_brightness_defaults_value='{
+core_brightness_defaults_val='{
   CBBlueLightReductionCCTTargetRaw = "3550.0";
   CBBlueReductionStatus =     {
     AutoBlueReductionEnabled = 1;
@@ -195,7 +195,7 @@ core_brightness_defaults_value='{
   };
   CBColorAdaptationEnabled = 0;
 }'
-sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist "$core_brightness_defaults_key" "$core_brightness_defaults_value"
+sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist "$core_brightness_defaults_key" "$core_brightness_defaults_val"
 
 # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
 hidutil property --set '{
@@ -204,6 +204,19 @@ hidutil property --set '{
     "HIDKeyboardModifierMappingDst": 0x7000000E0,
   }]
 }'
+read -r vendor_id product_id < <(
+  hidutil list --ndjson | jq -r '
+    select(
+      ."Built-In" == true and
+      .PrimaryUsagePage == 1 and
+      .PrimaryUsage == 6
+    )
+    | "\(.VendorID) \(.ProductID)"
+  ' | head -n1
+)
+modifiermapping_key="com.apple.keyboard.modifiermapping.$vendor_id-$product_id-0"
+modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771300; }'
+defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array "$modifiermapping_val"
 
 # Set some file associations
 duti -s com.apple.TextEdit public.yaml all
