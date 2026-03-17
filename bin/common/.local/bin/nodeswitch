@@ -20,9 +20,10 @@ fi
 
 if [[ $version == "latest" ]]; then
   version="$(curl -fsSL "https://nodejs.org/dist/index.json" |
-    awk -F'"' '$2 == "version" && version == "" {
-      version = $4
-      sub(/^v/, "", version)
+    awk 'version == "" && /"version":"v[0-9]+\.[0-9]+\.[0-9]+"/ {
+      version = $0
+      sub(/^.*"version":"v/, "", version)
+      sub(/".*$/, "", version)
     } END { print version }')"
   if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Could not resolve latest stable Node.js version." >&2
