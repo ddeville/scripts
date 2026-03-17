@@ -37,11 +37,11 @@ install_command_line_tools() {
 
   sudo touch "$clt_placeholder"
   clt_label="$(
-    /usr/sbin/softwareupdate -l 2>/dev/null \
-      | sed -n 's/^ *\\* Label: *//p' \
-      | grep 'Command Line Tools' \
-      | sort -V \
-      | tail -n1 || true
+    /usr/sbin/softwareupdate -l 2>/dev/null |
+      sed -n 's/^ *\\* Label: *//p' |
+      grep 'Command Line Tools' |
+      sort -V |
+      tail -n1 || true
   )"
 
   if [[ -z $clt_label ]]; then
@@ -245,7 +245,7 @@ read -r vendor_id product_id < <(
   ' | head -n1
 )
 modifiermapping_key="com.apple.keyboard.modifiermapping.$vendor_id-$product_id-0"
-modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771300; }'
+modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; }'
 defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array "$modifiermapping_val"
 
 # Set some file associations
