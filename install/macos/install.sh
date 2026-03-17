@@ -29,19 +29,35 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
 
+install_command_line_tools() {
+  local clt_label clt_placeholder
+
+  clt_placeholder="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
+  trap 'sudo rm -f "$clt_placeholder"' RETURN
+
+  sudo touch "$clt_placeholder"
+  clt_label="$(
+    /usr/sbin/softwareupdate -l 2>/dev/null \
+      | sed -n 's/^ *\\* Label: *//p' \
+      | grep 'Command Line Tools' \
+      | sort -V \
+      | tail -n1 || true
+  )"
+
+  if [[ -z $clt_label ]]; then
+    echo "Unable to find a Command Line Tools update via softwareupdate." >&2
+    return 1
+  fi
+
+  echo "Installing $clt_label"
+  sudo "/usr/sbin/softwareupdate" "-i" "$clt_label"
+  sudo "/usr/bin/xcode-select" "--switch" "/Library/Developer/CommandLineTools"
+}
+
 # First install Xcode Command Line Tools if needed
 if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
   echo "Installing Xcode Command Line Tools"
-  # This temporary file prompts the 'softwareupdate' utility to list the Command Line Tools
-  clt_placeholder="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
-  sudo touch "$clt_placeholder"
-  clt_label="$(/usr/sbin/softwareupdate -l | grep -B 1 -E 'Command Line Tools' | awk -F'*' '/^ *\*/ {print $2}' | sed -e 's/^ *Label: //' -e 's/^ *//' | sort -V | tail -n1)"
-  if [[ -n $clt_label ]]; then
-    echo "Installing $clt_label"
-    sudo "/usr/sbin/softwareupdate" "-i" "$clt_label"
-    sudo "/usr/bin/xcode-select" "--switch" "/Library/Developer/CommandLineTools"
-  fi
-  sudo rm -f "$clt_placeholder"
+  install_command_line_tools
 fi
 
 export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
