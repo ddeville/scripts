@@ -234,17 +234,20 @@ hidutil property --set '{
     "HIDKeyboardModifierMappingDst": 0x7000000E0,
   }]
 }'
-read -r vendor_id product_id < <(
+modifiermapping_key="$(
   hidutil list --ndjson | jq -r '
     select(
       ."Built-In" == true and
       .PrimaryUsagePage == 1 and
       .PrimaryUsage == 6
     )
-    | "\(.VendorID) \(.ProductID)"
+    | "com.apple.keyboard.modifiermapping.\(.VendorID)-\(.ProductID)-0"
   ' | head -n1
-)
-modifiermapping_key="com.apple.keyboard.modifiermapping.$vendor_id-$product_id-0"
+)"
+if [[ -z $modifiermapping_key ]]; then
+  echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
+  exit 1
+fi
 modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; }'
 defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array "$modifiermapping_val"
 
