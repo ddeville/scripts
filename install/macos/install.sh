@@ -112,13 +112,15 @@ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
 defaults write NSGlobalDomain NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" "^\$d"
 defaults write NSGlobalDomain SLSMenuBarUseBlurredAppearance -int 1
 defaults write NSGlobalDomain WebAutomaticSpellingCorrectionEnabled -bool false
 defaults write NSGlobalDomain com.apple.swipescrolldirection -int 1
 defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 0
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 2
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
+
+# shellcheck disable=SC2016
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict "Lock Screen" '^$d'
 
 defaults write com.apple.activitymonitor OpenMainWindow -bool true
 defaults write com.apple.activitymonitor ShowCategory -int 100
