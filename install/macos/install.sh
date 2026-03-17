@@ -203,6 +203,13 @@ hidutil property --set '{
   }]
 }'
 
+# Set some file associations
+duti -s org.alacritty public.unix-executable all
+duti -s com.apple.TextEdit .yaml all
+duti -s com.apple.TextEdit .yml all
+duti -s com.apple.TextEdit .toml all
+duti -s com.apple.TextEdit .json all
+
 # Make sure that Spotify doesn't start on login...
 spotify_prefs_dir="$HOME/Library/Application Support/Spotify"
 spotify_prefs_file="$spotify_prefs_dir/prefs"
