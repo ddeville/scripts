@@ -238,7 +238,6 @@ modifiermapping_key="$(
     | "com.apple.keyboard.modifiermapping.\(.VendorID)-\(.ProductID)-0"
   ' | head -n1
 )"
-modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; }'
 if [[ -z $modifiermapping_key ]]; then
   echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
 else
@@ -248,7 +247,10 @@ else
       "HIDKeyboardModifierMappingDst": 0x7000000E0,
     }]
   }'
-  defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array "$modifiermapping_val"
+  defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array '{
+    HIDKeyboardModifierMappingSrc = 30064771129;
+    HIDKeyboardModifierMappingDst = 30064771296;
+  }'
 fi
 
 # Set some file associations
