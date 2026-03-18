@@ -238,9 +238,7 @@ modifiermapping="$(
     | "com.apple.keyboard.modifiermapping.\(.VendorID)-\(.ProductID)-0"
   ' | head -n1
 )"
-if [[ -z $modifiermapping ]]; then
-  echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
-else
+if [[ -n $modifiermapping ]]; then
   hidutil property --set '{
     "UserKeyMapping": [{
       "HIDKeyboardModifierMappingSrc": 0x700000039,
@@ -251,6 +249,8 @@ else
     HIDKeyboardModifierMappingSrc = 30064771129;
     HIDKeyboardModifierMappingDst = 30064771296;
   }'
+else
+  echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
 fi
 
 # Set some file associations
