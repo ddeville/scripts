@@ -228,12 +228,6 @@ core_brightness_defaults_val='{
 sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist "$core_brightness_defaults_key" "$core_brightness_defaults_val"
 
 # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
-hidutil property --set '{
-  "UserKeyMapping": [{
-    "HIDKeyboardModifierMappingSrc": 0x700000039,
-    "HIDKeyboardModifierMappingDst": 0x7000000E0,
-  }]
-}'
 modifiermapping_key="$(
   hidutil list --ndjson | jq -r '
     select(
@@ -248,6 +242,12 @@ modifiermapping_val='{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardM
 if [[ -z $modifiermapping_key ]]; then
   echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
 else
+  hidutil property --set '{
+    "UserKeyMapping": [{
+      "HIDKeyboardModifierMappingSrc": 0x700000039,
+      "HIDKeyboardModifierMappingDst": 0x7000000E0,
+    }]
+  }'
   defaults -currentHost write NSGlobalDomain "$modifiermapping_key" -array "$modifiermapping_val"
 fi
 
