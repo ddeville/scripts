@@ -253,6 +253,13 @@ else
   echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
 fi
 
+# Use touch id for sudo
+sudo_local_pam="/etc/pam.d/sudo_local"
+if [ ! -e "$sudo_local_pam" ]; then
+  echo "Enabling Touch ID for sudo"
+  printf '%s\n' 'auth       sufficient     pam_tid.so' | sudo tee "$sudo_local_pam" >/dev/null
+fi
+
 # Set some file associations
 duti -s com.apple.TextEdit public.yaml all
 duti -s com.apple.TextEdit public.json all
