@@ -3,6 +3,7 @@
 set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../lib/toolchain-switch.bash
 source "$script_dir/../lib/python-toolchain.bash"
 
 if [ $# -ne 1 ]; then
