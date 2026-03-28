@@ -46,10 +46,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Install shellcheck
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
       - name: Run ShellCheck
         run: |
           tmpfile="$(mktemp)"
@@ -57,7 +53,11 @@ jobs:
           git ls-files -z |
             while IFS= read -r -d '' path; do
               case "$path" in
-                bin/*|install/*|config/common/.profile|config/common/.bashrc)
+                config/common/.profile|config/common/.bashrc)
+                  printf '%s\0' "$path" >>"$tmpfile"
+                  continue
+                  ;;
+                bin/*|install/*)
                   ;;
                 *)
                   continue
@@ -77,7 +77,11 @@ jobs:
             done
 
           if [ -s "$tmpfile" ]; then
+            count="$(tr -cd '\0' <"$tmpfile" | wc -c | tr -d ' ')"
+            echo "Running ShellCheck on $count file(s)"
             xargs -0 shellcheck -S style -x -P SCRIPTDIR <"$tmpfile"
+          else
+            echo "No shell files selected for ShellCheck"
           fi
 
           rm -f "$tmpfile"
