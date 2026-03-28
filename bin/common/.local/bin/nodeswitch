@@ -9,7 +9,7 @@ fi
 
 version="$1"
 
-toolchain_dir="$HOME/.local/toolchains/node"
+toolchain_dir="$XDG_TOOLCHAINS_HOME/node"
 current_dir="$toolchain_dir/current"
 
 if [[ $version == "system" ]]; then
