@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/../lib/python-toolchain.bash"
+
 if [ $# -eq 0 ]; then
   echo "Usage: pyrun <command> [args...]"
   exit 1
@@ -12,20 +15,16 @@ if [ -n "${VIRTUAL_ENV-}" ] && [ -d "$VIRTUAL_ENV/bin" ]; then
   exec "$@"
 fi
 
-global_dir="$XDG_TOOLCHAINS_HOME/python/global"
-global_venv="$VENV_INSTALL_DIR/global"
-requirements_file="$global_dir/requirements.txt"
-
-if [ -d "$global_venv/bin" ]; then
-  export VIRTUAL_ENV="$global_venv"
-  export PATH="$global_venv/bin:$PATH"
+if [ -d "$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin" ]; then
+  export VIRTUAL_ENV="$PYTHON_TOOLCHAIN_GLOBAL_VENV"
+  export PATH="$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin:$PATH"
   unset PYTHONHOME
   exec "$@"
 fi
 
 cmd=(uv run)
-if [ -f "$requirements_file" ]; then
-  cmd+=(--with-requirements "$requirements_file")
+if [ -f "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE" ]; then
+  cmd+=(--with-requirements "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE")
 fi
 cmd+=(-- "$@")
 

@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/../lib/python-toolchain.bash"
+
 if [ $# -ne 1 ]; then
   echo "Usage: pyswitch <1.2.3|latest|system>"
   exit 1
@@ -33,14 +36,8 @@ fi
 uv python install --default "$version" --preview-features python-install-default
 uv python pin --global "$version"
 
-global_dir="$XDG_TOOLCHAINS_HOME/python/global"
-mkdir -p "$global_dir"
-
-requirements_file="$global_dir/requirements.txt"
-touch "$requirements_file"
-
-global_venv="$VENV_INSTALL_DIR/global"
-env -u VIRTUAL_ENV uv venv --clear --python "$version" "$global_venv"
-env -u VIRTUAL_ENV uv pip install --upgrade --python "$global_venv/bin/python" --requirements "$requirements_file"
+python_toolchain_ensure_requirements_file
+env -u VIRTUAL_ENV uv venv --clear --python "$version" "$PYTHON_TOOLCHAIN_GLOBAL_VENV"
+env -u VIRTUAL_ENV uv pip install --upgrade --python "$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin/python" --requirements "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 
 echo "Global uv Python pin is now $(uv python pin --global)"
