@@ -3,7 +3,6 @@
 set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=../lib/python-toolchain.bash
 source "$script_dir/../lib/python-toolchain.bash"
 
 python_request="$(uv python pin --global 2>/dev/null || true)"
