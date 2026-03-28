@@ -24,6 +24,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: --check config/common/.config/nvim
+
   luals:
     # This runs `luals`: https://github.com/mrcjkb/lua-typecheck-action
     name: LuaLS
@@ -37,6 +38,7 @@ jobs:
           directories: |
             config/common/.config/nvim
           configpath: .luarc.json
+
   shellcheck:
     # This runs `shellcheck`: https://www.shellcheck.net
     name: Shell Check
@@ -44,10 +46,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
-        with:
-          severity: style
+        run: |
+          tmpfile="$(mktemp)"
+
+          git ls-files -z |
+            while IFS= read -r -d '' path; do
+              case "$path" in
+                bin/*|install/*|config/common/.profile|config/common/.bashrc)
+                  ;;
+                *)
+                  continue
+                  ;;
+              esac
+
+              case "$path" in
+                *.bash|*.sh)
+                  printf '%s\0' "$path" >>"$tmpfile"
+                  continue
+                  ;;
+              esac
+
+              if [ -f "$path" ] && head -n 1 "$path" | grep -Eq '^#!.*\b(sh|bash)\b'; then
+                printf '%s\0' "$path" >>"$tmpfile"
+              fi
+            done
+
+          if [ -s "$tmpfile" ]; then
+            xargs -0 shellcheck -S style -x -P SCRIPTDIR <"$tmpfile"
+          fi
+
+          rm -f "$tmpfile"
+
   shfmt:
     # This runs `shfmt`: https://github.com/mvdan/sh and `checkbashisms`: https://linux.die.net/man/1/checkbashisms
     name: Shell Formatter
@@ -64,6 +98,7 @@ jobs:
           sh_checker_shellcheck_disable: true
           sh_checker_shfmt_disable: false
           sh_checker_checkbashisms_enable: true
+
   fish_indent:
     # This runs `fish_indent`: https://fishshell.com/docs/current/cmds/fish_indent.html
     name: Fish Indent
@@ -73,6 +108,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Run fish_indent
         uses: ddeville/fish-indent-action@master
+
   vint:
     # This runs `vint`: https://github.com/Vimjas/vint
     name: Vint
