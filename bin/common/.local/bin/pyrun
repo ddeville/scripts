@@ -4,7 +4,6 @@ set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/../lib/python-toolchain.bash"
-export bad="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ $# -eq 0 ]; then
   echo "Usage: pyrun <command> [args...]"
