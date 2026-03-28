@@ -2,19 +2,18 @@
 
 set -eu -o pipefail
 
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+source "$script_dir/../lib/python-toolchain.bash"
+
 python_request="$(uv python pin --global 2>/dev/null || true)"
 if [ -z "$python_request" ]; then
   echo "No global uv Python is pinned. Run: pyswitch <python-request>" >&2
   exit 1
 fi
 
-global_dir="$XDG_TOOLCHAINS_HOME/python/global"
-mkdir -p "$global_dir"
+python_toolchain_ensure_requirements_file
+"${EDITOR:-vi}" "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 
-requirements_file="$global_dir/requirements.txt"
-touch "$requirements_file"
-"${EDITOR:-vi}" "$requirements_file"
-
-global_venv="$VENV_INSTALL_DIR/global"
-env -u VIRTUAL_ENV uv venv --allow-existing --python "$python_request" "$global_venv"
-env -u VIRTUAL_ENV uv pip install --upgrade --refresh --python "$global_venv/bin/python" --requirements "$requirements_file"
+env -u VIRTUAL_ENV uv venv --allow-existing --python "$python_request" "$PYTHON_TOOLCHAIN_GLOBAL_VENV"
+env -u VIRTUAL_ENV uv pip install --upgrade --refresh --python "$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin/python" --requirements "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
