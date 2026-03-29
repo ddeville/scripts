@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: kn <namespace>" >&2
+  exit 1
+fi
+
+exec kubectl config set-context --current "--namespace=$1"

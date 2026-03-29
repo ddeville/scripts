@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -eq 0 ]; then
+  exec kubectl get pod
+else
+  exec kubectl "$@"
+fi
