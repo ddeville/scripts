@@ -51,9 +51,11 @@ read -r answer
 case "$answer" in
 [yY] | [yY][eE][sS])
   git -C "$main_worktree_root" worktree remove "$repo_root"
-  git -C "$main_worktree_root" branch -d "$branch_name"
   echo "Removed worktree: $repo_root"
+
+  git -C "$main_worktree_root" branch -d "$branch_name"
   echo "Deleted branch: $branch_name"
+
   if $tmux_session_exists; then
     tmux kill-session -t "$session_name"
     echo "Killed tmux session: $session_name"
