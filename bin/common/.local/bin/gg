@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: gg <name>" >&2
+  exit 1
+fi
+
+exec git checkout -b "damien/$1"
