@@ -15,6 +15,7 @@
 
 - When running Git commands, disable fsmonitor for that command to avoid spawning persistent fsmonitor daemons from agent activity.
 - Use: `git -c core.fsmonitor=false <subcommand> ...`
+- Unless you are writing a script or code in general on behalf of the user, in which case you don't need to disable fsmonitor in the git commands that you write.
 - Do not change the user's global or repository fsmonitor configuration unless explicitly asked.
 - Do not commit or push unless explicitly requested.
 - Do not amend existing commits unless explicitly requested.
