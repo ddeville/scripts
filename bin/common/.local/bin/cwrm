@@ -2,33 +2,108 @@
 
 set -eu -o pipefail
 
-repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-if [ -z "$repo_root" ]; then
-  echo "cwrm must be run inside a Git repository." >&2
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/../lib/cw.bash"
+
+if [ $# -gt 1 ]; then
+  echo "Usage: cwrm [worktree]" >&2
   exit 1
 fi
 
-branch_name="$(git branch --show-current)"
+current_repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+target_name="${1-}"
+repo_root=""
+
+if [ -z "$target_name" ]; then
+  repo_root="$current_repo_root"
+  if [ -z "$repo_root" ]; then
+    echo "cwrm must be run inside a linked worktree when no worktree name is given." >&2
+    exit 1
+  fi
+else
+  if [ -n "$current_repo_root" ]; then
+    current_repo_name="$(cw_repo_name "$current_repo_root")"
+    prefixed_target_name="${current_repo_name}-${target_name}"
+
+    while IFS= read -r line; do
+      case "$line" in
+      worktree\ *)
+        candidate_root="${line#worktree }"
+        candidate_feature_name="$(cw_feature_name "$candidate_root")"
+        candidate_session_name="$(cw_session_name "$current_repo_name" "$candidate_feature_name")"
+
+        if [ "$target_name" = "$candidate_root" ] ||
+          [ "$target_name" = "$candidate_feature_name" ] ||
+          [ "$target_name" = "$candidate_session_name" ] ||
+          [ "$prefixed_target_name" = "$candidate_session_name" ]; then
+          repo_root="$candidate_root"
+          break
+        fi
+        ;;
+      esac
+    done < <(git -C "$current_repo_root" worktree list --porcelain)
+  fi
+
+  if [ -z "$repo_root" ] && [ -d "$target_name" ]; then
+    repo_root="$(git -C "$target_name" rev-parse --show-toplevel 2>/dev/null || true)"
+  fi
+
+  if [ -z "$repo_root" ]; then
+    echo "Could not resolve worktree: $target_name" >&2
+    exit 1
+  fi
+fi
+
+branch_name="$(git -C "$repo_root" branch --show-current)"
 if [ -z "$branch_name" ]; then
-  echo "cwrm must be run on a branch." >&2
+  echo "cwrm must target a worktree on a branch." >&2
   exit 1
 fi
 
-git_dir="$(git rev-parse --path-format=absolute --git-dir)"
-common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+repo_name="$(cw_repo_name "$(git -C "$repo_root" rev-parse --show-toplevel)")"
+feature_name="$(cw_feature_name "$repo_root")"
+session_name="$(cw_session_name "$repo_name" "$feature_name")"
+
+git_dir="$(git -C "$repo_root" rev-parse --path-format=absolute --git-dir)"
+common_dir="$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)"
 
 if [ "$git_dir" = "$common_dir" ]; then
-  echo "cwrm only works from a linked worktree, not the main checkout." >&2
+  echo "cwrm only works on a linked worktree, not the main checkout." >&2
   exit 1
 fi
 
-main_worktree_root="$(cd "$common_dir/.." && pwd -P)"
+main_worktree_root="$(cw_main_worktree_root "$repo_root")"
+tmux_session_exists=false
+current_tmux_session=""
 
-printf 'Delete worktree "%s" and branch "%s"? [y/N] ' "$repo_root" "$branch_name"
+if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session_name" 2>/dev/null; then
+  tmux_session_exists=true
+  if [ -n "${TMUX-}" ]; then
+    current_tmux_session="$(tmux display-message -p '#S')"
+  fi
+fi
+
+if $tmux_session_exists; then
+  printf 'Delete tmux session "%s", worktree "%s", and branch "%s"? [y/N] ' "$session_name" "$repo_root" "$branch_name"
+else
+  printf 'Delete worktree "%s" and branch "%s"? [y/N] ' "$repo_root" "$branch_name"
+fi
 read -r answer
 
 case "$answer" in
 [yY] | [yY][eE][sS])
+  if $tmux_session_exists; then
+    if [ "$current_tmux_session" = "$session_name" ]; then
+      fallback_session="$(tmux list-sessions -F '#S' | awk -v target="$session_name" '$0 != target { print; exit }')"
+      if [ -z "$fallback_session" ]; then
+        echo "Cannot kill the current tmux session without another session to switch to." >&2
+        exit 1
+      fi
+      tmux switch-client -t "$fallback_session"
+    fi
+    tmux kill-session -t "$session_name"
+    echo "Killed tmux session: $session_name"
+  fi
   git -C "$main_worktree_root" worktree remove "$repo_root"
   git -C "$main_worktree_root" branch -d "$branch_name"
   echo "Removed worktree: $repo_root"
