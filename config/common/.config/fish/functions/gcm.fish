@@ -1,3 +1,4 @@
 function gcm
-    git checkout master
+    set default (git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's@^origin/@@')
+    git checkout $default
 end
