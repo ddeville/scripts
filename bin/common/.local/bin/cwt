@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 source "$script_dir/../lib/cw.bash"
 
 if [ $# -ne 1 ]; then
