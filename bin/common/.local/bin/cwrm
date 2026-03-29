@@ -36,13 +36,9 @@ feature_name="$(cw_feature_name "$repo_root")"
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
 
 tmux_session_exists=false
-current_tmux_session=""
 
 if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session_name" 2>/dev/null; then
   tmux_session_exists=true
-  if [ -n "${TMUX-}" ]; then
-    current_tmux_session="$(tmux display-message -p '#S')"
-  fi
 fi
 
 if $tmux_session_exists; then
@@ -55,14 +51,6 @@ read -r answer
 case "$answer" in
 [yY] | [yY][eE][sS])
   if $tmux_session_exists; then
-    if [ "$current_tmux_session" = "$session_name" ]; then
-      fallback_session="$(tmux list-sessions -F '#S' | awk -v target="$session_name" '$0 != target { print; exit }')"
-      if [ -z "$fallback_session" ]; then
-        echo "Cannot kill the current tmux session without another session to switch to." >&2
-        exit 1
-      fi
-      tmux switch-client -t "$fallback_session"
-    fi
     tmux kill-session -t "$session_name"
     echo "Killed tmux session: $session_name"
   fi
