@@ -22,10 +22,6 @@ if [ -z "$branch_name" ]; then
   exit 1
 fi
 
-repo_name="$(cw_repo_name "$repo_root")"
-feature_name="$(cw_feature_name "$repo_root")"
-session_name="$(cw_session_name "$repo_name" "$feature_name")"
-
 git_dir="$(git rev-parse --path-format=absolute --git-dir)"
 common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
 
@@ -35,6 +31,10 @@ if [ "$git_dir" = "$common_dir" ]; then
 fi
 
 main_worktree_root="$(cw_main_worktree_root "$repo_root")"
+repo_name="$(cw_repo_name "$main_worktree_root")"
+feature_name="$(cw_feature_name "$repo_root")"
+session_name="$(cw_session_name "$repo_name" "$feature_name")"
+
 tmux_session_exists=false
 current_tmux_session=""
 
