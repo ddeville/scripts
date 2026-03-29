@@ -32,7 +32,6 @@ add_to_path "$HOME/bin"
 
 # customly built packages
 add_to_path /opt/nvim/bin
-add_to_path /opt/lsp/bin
 
 # brew install its stuff there on M1 macs
 add_to_path /opt/homebrew/bin
