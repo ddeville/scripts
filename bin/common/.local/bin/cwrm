@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$repo_root" ]; then
+  echo "cwrm must be run inside a Git repository." >&2
+  exit 1
+fi
+
+branch_name="$(git branch --show-current)"
+if [ -z "$branch_name" ]; then
+  echo "cwrm must be run on a branch." >&2
+  exit 1
+fi
+
+git_dir="$(git rev-parse --path-format=absolute --git-dir)"
+common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+
+if [ "$git_dir" = "$common_dir" ]; then
+  echo "cwrm only works from a linked worktree, not the main checkout." >&2
+  exit 1
+fi
+
+main_worktree_root="$(cd "$common_dir/.." && pwd -P)"
+
+printf 'Delete worktree "%s" and branch "%s"? [y/N] ' "$repo_root" "$branch_name"
+read -r answer
+
+case "$answer" in
+[yY] | [yY][eE][sS])
+  git -C "$main_worktree_root" worktree remove "$repo_root"
+  git -C "$main_worktree_root" branch -d "$branch_name"
+  echo "Removed worktree: $repo_root"
+  echo "Deleted branch: $branch_name"
+  ;;
+*)
+  echo "Aborted."
+  ;;
+esac
