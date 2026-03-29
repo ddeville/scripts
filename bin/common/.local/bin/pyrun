@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 source "$script_dir/../lib/python-toolchain.bash"
 
 if [ $# -eq 0 ]; then
