@@ -33,8 +33,8 @@ if [ -z "$default_branch" ]; then
 fi
 
 repo_name="$(basename "$repo_root")"
-worktree_name="${repo_name}-${feature_name}"
-worktree_path="$GIT_SRC_WORKTREE_DIR/$worktree_name"
+repo_worktree_dir="$GIT_SRC_WORKTREE_DIR/$repo_name"
+worktree_path="$repo_worktree_dir/$feature_name"
 
 if [ -e "$worktree_path" ]; then
   echo "Worktree path already exists: $worktree_path" >&2
@@ -45,6 +45,8 @@ if git rev-parse --verify --quiet "$branch_name" >/dev/null; then
   echo "Branch already exists: $branch_name" >&2
   exit 1
 fi
+
+mkdir -p "$repo_worktree_dir"
 
 git worktree add -b "$branch_name" "$worktree_path" "$default_branch"
 
