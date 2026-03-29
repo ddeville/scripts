@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cw_repo_name() {
   basename "$1"
 }
