@@ -119,3 +119,9 @@ set -x RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 
 # tmux
 set -x TMUX_PLUGIN_MANAGER_PATH "$XDG_DATA_HOME/tmux/plugins"
+
+# git
+set -x GIT_SRC_WORKTREE_DIR "$HOME/src/worktrees"
+if not test -d "$GIT_SRC_WORKTREE_DIR"
+    command mkdir -p "$GIT_SRC_WORKTREE_DIR"
+end
