@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+script_dir=$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 
 arch_name="$(uname -m)"
 if [ "${arch_name}" = "arm64" ]; then

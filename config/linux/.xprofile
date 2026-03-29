@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}" || ${BASH_SOURCE[0]})")" &>/dev/null && pwd)
+SCRIPT_DIR=$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 
 if [[ $(hostname) == "arch" ]]; then
   # This is my home machine with two monitors
