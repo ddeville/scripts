@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: kk <context> <... args ...>" >&2
+  exit 1
+fi
+
+context="$1"
+shift
+
+if [ $# -eq 0 ]; then
+  exec kubectl --context="$context" get pod
+else
+  exec kubectl --context="$context" "$@"
+fi

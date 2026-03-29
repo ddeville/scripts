@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -ne 2 ]; then
+  echo "Usage: kxn <context> <namespace>" >&2
+  exit 1
+fi
+
+kubectl config use-context "$1"
+exec kubectl config set-context --current --namespace "$2"
