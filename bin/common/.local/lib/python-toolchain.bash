@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # shellcheck disable=SC2034
 
 PYTHON_TOOLCHAIN_GLOBAL_DIR="$XDG_TOOLCHAINS_HOME/python/global"
