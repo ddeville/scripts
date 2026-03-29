@@ -5,67 +5,29 @@ set -eu -o pipefail
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/../lib/cw.bash"
 
-if [ $# -gt 1 ]; then
-  echo "Usage: cwrm [worktree]" >&2
+if [ $# -ne 0 ]; then
+  echo "Usage: cwrm" >&2
   exit 1
 fi
 
-current_repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-target_name="${1-}"
-repo_root=""
-
-if [ -z "$target_name" ]; then
-  repo_root="$current_repo_root"
-  if [ -z "$repo_root" ]; then
-    echo "cwrm must be run inside a linked worktree when no worktree name is given." >&2
-    exit 1
-  fi
-else
-  if [ -n "$current_repo_root" ]; then
-    current_repo_name="$(cw_repo_name "$current_repo_root")"
-    prefixed_target_name="${current_repo_name}-${target_name}"
-
-    while IFS= read -r line; do
-      case "$line" in
-      worktree\ *)
-        candidate_root="${line#worktree }"
-        candidate_feature_name="$(cw_feature_name "$candidate_root")"
-        candidate_session_name="$(cw_session_name "$current_repo_name" "$candidate_feature_name")"
-
-        if [ "$target_name" = "$candidate_root" ] ||
-          [ "$target_name" = "$candidate_feature_name" ] ||
-          [ "$target_name" = "$candidate_session_name" ] ||
-          [ "$prefixed_target_name" = "$candidate_session_name" ]; then
-          repo_root="$candidate_root"
-          break
-        fi
-        ;;
-      esac
-    done < <(git -C "$current_repo_root" worktree list --porcelain)
-  fi
-
-  if [ -z "$repo_root" ] && [ -d "$target_name" ]; then
-    repo_root="$(git -C "$target_name" rev-parse --show-toplevel 2>/dev/null || true)"
-  fi
-
-  if [ -z "$repo_root" ]; then
-    echo "Could not resolve worktree: $target_name" >&2
-    exit 1
-  fi
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$repo_root" ]; then
+  echo "cwrm must be run inside a linked worktree." >&2
+  exit 1
 fi
 
-branch_name="$(git -C "$repo_root" branch --show-current)"
+branch_name="$(git branch --show-current 2>/dev/null || true)"
 if [ -z "$branch_name" ]; then
   echo "cwrm must target a worktree on a branch." >&2
   exit 1
 fi
 
-repo_name="$(cw_repo_name "$(git -C "$repo_root" rev-parse --show-toplevel)")"
+repo_name="$(cw_repo_name "$repo_root")"
 feature_name="$(cw_feature_name "$repo_root")"
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
 
-git_dir="$(git -C "$repo_root" rev-parse --path-format=absolute --git-dir)"
-common_dir="$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)"
+git_dir="$(git rev-parse --path-format=absolute --git-dir)"
+common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
 
 if [ "$git_dir" = "$common_dir" ]; then
   echo "cwrm only works on a linked worktree, not the main checkout." >&2
