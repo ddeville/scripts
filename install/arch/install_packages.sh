@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+script_dir=$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 pkglist_dir=$(realpath "$script_dir/../../config/linux/.config/pkglist")
 
 # Install all the base packages
