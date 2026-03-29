@@ -17,6 +17,11 @@ if [ ! -d "$GIT_SRC_WORKTREE_DIR" ]; then
   exit 1
 fi
 
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "tmux is not installed." >&2
+  exit 1
+fi
+
 feature_name="$1"
 branch_name="damien/cw/$feature_name"
 
@@ -35,6 +40,8 @@ fi
 repo_name="$(basename "$repo_root")"
 repo_worktree_dir="$GIT_SRC_WORKTREE_DIR/$repo_name"
 worktree_path="$repo_worktree_dir/$feature_name"
+session_name="${repo_name}-${feature_name//\//-}"
+printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
 
 if [ -e "$worktree_path" ]; then
   echo "Worktree path already exists: $worktree_path" >&2
@@ -46,11 +53,28 @@ if git rev-parse --verify --quiet "$branch_name" >/dev/null; then
   exit 1
 fi
 
+if tmux has-session -t "$session_name" 2>/dev/null; then
+  echo "tmux session already exists: $session_name" >&2
+  exit 1
+fi
+
 mkdir -p "$repo_worktree_dir"
 
 git worktree add -b "$branch_name" "$worktree_path" "$default_branch"
+
+tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
+tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
+tmux new-window -t "$session_name:" -n codex -d -c "$repo_root" "$codex_command"
+tmux select-window -t "$session_name:codex"
 
 echo "Created worktree:"
 echo "  path: $worktree_path"
 echo "  branch: $branch_name"
 echo "  base: $default_branch"
+echo "  tmux: $session_name"
+
+if [ -n "${TMUX-}" ]; then
+  tmux switch-client -t "$session_name"
+else
+  tmux attach-session -t "$session_name"
+fi
