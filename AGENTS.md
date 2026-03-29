@@ -23,6 +23,8 @@ Useful local lint checks (matching CI intent):
 
 ## Coding Style & Naming Conventions
 - Shell scripts should be POSIX/Bash-friendly, executable, and lint-clean.
+- Write shell helpers and alias-like commands as Bash scripts under `bin/` by default.
+- Only keep a helper as a Fish function when it must change the current shell state, such as `cd`, `export`, or similar shell-local mutations.
 - Keep shell formatting consistent with CI (`shfmt` indent `2`, simplify enabled).
 - Lua style follows `.stylua.toml`; avoid ad-hoc style changes.
 - Prefer descriptive script names (`nodeswitch`, `update-shell-plugins`) over abbreviations.
