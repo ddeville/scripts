@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+default_branch="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's@^origin/@@')"
+
+if [ -z "$default_branch" ]; then
+  echo "Could not determine the default branch from refs/remotes/origin/HEAD." >&2
+  exit 1
+fi
+
+exec git checkout "$default_branch"
