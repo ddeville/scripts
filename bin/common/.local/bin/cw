@@ -65,6 +65,7 @@ git worktree add -b "$branch_name" "$worktree_path" "$default_branch"
 tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
 tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
 tmux new-window -t "$session_name:" -n codex -d -c "$repo_root" "$codex_command"
+tmux set-option -t "$session_name" @display_name "$feature_name"
 tmux select-window -t "$session_name:codex"
 
 echo "Created worktree:"
