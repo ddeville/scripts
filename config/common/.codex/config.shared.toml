@@ -1,0 +1,26 @@
+# Model
+
+model = "gpt-5.4"
+
+personality = "pragmatic"
+model_reasoning_effort = "high"
+
+# Sandbox
+
+sandbox_mode = "workspace-write"
+web_search = "cached"
+
+# Approvals
+
+approvals_reviewer = "guardian_subagent"
+approval_policy = "on-request"
+
+[features]
+smart_approvals = true
+guardian_approval = true
+
+# UI
+
+[tui]
+theme = "gruvbox-dark"
+notification_method = "auto"
