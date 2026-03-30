@@ -15,12 +15,24 @@ web_search = "cached"
 approvals_reviewer = "guardian_subagent"
 approval_policy = "on-request"
 
-[features]
-smart_approvals = true
-guardian_approval = true
-
 # UI
 
 [tui]
 theme = "gruvbox-dark"
 notification_method = "auto"
+
+# Plugins
+
+[plugins."github@openai-curated"]
+enabled = true
+
+# Features
+
+suppress_unstable_features_warning = true
+
+[features]
+codex_git_commit = true
+guardian_approval = true
+image_detail_original = true
+image_generation = true
+smart_approvals = true
