@@ -1,12 +1,9 @@
-function cdg --description "Change to the nearest parent that is a git root"
-    set -l target $PWD
+function cdg --description "Change to the current git repo root"
+    set -l root (git rev-parse --show-toplevel 2>/dev/null)
 
-    while test $target != /
-        if test -d "$target/.git"
-            break
-        end
-        set target (dirname $target)
+    if test -z "$root"
+        return 1
     end
 
-    cd $target
+    cd "$root"
 end
