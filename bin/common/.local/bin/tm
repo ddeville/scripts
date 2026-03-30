@@ -33,8 +33,6 @@ tmux new-session -s "$session_name" -n repo -d -c "$workdir"
 tmux new-window -t "$session_name:" -n editor -d -c "$workdir"
 tmux new-window -t "$session_name:" -n codex -d -c "$workdir"
 
-tmux set-option -t "$session_name" @display_name "$session_name"
-
 tmux send-keys -t "$session_name:editor" "$EDITOR" C-m
 tmux send-keys -t "$session_name:codex" "codex" C-m
 
