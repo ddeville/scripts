@@ -121,18 +121,22 @@ def main() -> int:
     )
     if removed_paths:
         print(
-            "codex-render-config: existing config.toml entries not present in shared config will be removed:",
-            file=sys.stderr,
+            "codex-render-config: removing entries from config.toml:",
+            *removed_paths,
+            sep="\n  - ",
         )
-        for path in removed_paths:
-            print(f"  - {path}", file=sys.stderr)
 
     for table_name in sorted(PRESERVED_TABLES):
         if table_name in existing:
             rendered[table_name] = existing[table_name]
 
+    if existing == rendered:
+        return 0
+
+    rendered_text = dump_toml(rendered)
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    config_path.write_text(dump_toml(rendered), encoding="utf-8")
+    config_path.write_text(rendered_text, encoding="utf-8")
+
     print(f"codex-render-config: wrote {config_path}", file=sys.stderr)
 
     return 0
