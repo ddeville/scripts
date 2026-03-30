@@ -27,4 +27,5 @@ stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
 # Restore the content of the repo since we run with `--adopt`...
 if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" restore .
+  git -C "$HOME/scripts" clean --force -d -- config bin
 fi
