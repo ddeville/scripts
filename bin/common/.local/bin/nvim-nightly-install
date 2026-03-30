@@ -23,16 +23,35 @@ function _nvim_nightly_prebuilt {
   _setup
 
   # Get the download URL for the nightly package for the current platform
-  if [ "$(uname)" = "Darwin" ]; then
-    filename="nvim-macos-$(uname -m).tar.gz"
-    foldername="nvim-macos-$(uname -m)"
-  elif [ "$(uname)" = "Linux" ]; then
-    filename="nvim-linux64.tar.gz"
-    foldername="nvim-linux64"
-  else
-    echo "Unsupported platform: $(uname)"
+  platform="$(uname)"
+  arch="$(uname -m)"
+
+  case "$platform" in
+  Darwin)
+    filename="nvim-macos-${arch}.tar.gz"
+    foldername="nvim-macos-${arch}"
+    ;;
+  Linux)
+    case "$arch" in
+    x86_64)
+      filename="nvim-linux-x86_64.tar.gz"
+      foldername="nvim-linux-x86_64"
+      ;;
+    arm64 | aarch64)
+      filename="nvim-linux-arm64.tar.gz"
+      foldername="nvim-linux-arm64"
+      ;;
+    *)
+      echo "Unsupported Linux architecture: $arch"
+      exit 1
+      ;;
+    esac
+    ;;
+  *)
+    echo "Unsupported platform: $platform"
     exit 1
-  fi
+    ;;
+  esac
   url="https://github.com/neovim/neovim/releases/download/nightly/$filename"
 
   # Download the archive to a temp directory
