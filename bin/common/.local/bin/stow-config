@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 dirs=(common)
 
 # Platform-specific stuff
@@ -30,4 +34,4 @@ if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" clean --force -d -- config bin
 fi
 
-"$HOME/scripts/bin/common/.local/bin/codex-render-config"
+"$script_dir/codex-render-config"
