@@ -2,6 +2,11 @@
 
 set -eu -o pipefail
 
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <token>" >&2
+  exit 1
+fi
+
 token="$1"
 
 account_id=$(curl -sL https://api.fastmail.com/.well-known/jmap -H "Authorization: Bearer $token" -H "Content-Type: application/json" |

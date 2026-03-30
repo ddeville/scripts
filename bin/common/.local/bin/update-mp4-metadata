@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 tool="MP4Box"
 
-if [ -z "$1" ]; then
+if [ $# -ne 1 ]; then
   echo "Usage: $0 <input_file>"
   exit 1
 fi
