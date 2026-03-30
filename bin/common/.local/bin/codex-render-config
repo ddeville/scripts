@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+import tomllib
+
+PRESERVED_TABLES = {"notice", "projects"}
+BARE_KEY_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def load_toml(path: Path) -> dict:
+    return tomllib.loads(path.read_text())
+
+
+def deep_merge(base: dict, override: dict) -> dict:
+    merged = dict(base)
+    for key, val in override.items():
+        existing = merged.get(key)
+        if isinstance(existing, dict) and isinstance(val, dict):
+            merged[key] = deep_merge(existing, val)
+        else:
+            merged[key] = val
+    return merged
+
+
+def iter_leaf_paths(val: object, prefix: tuple[str, ...] = ()) -> list[tuple[str, ...]]:
+    if isinstance(val, dict):
+        paths: list[tuple[str, ...]] = []
+        for key, child in val.items():
+            paths.extend(iter_leaf_paths(child, prefix + (key,)))
+        return paths or [prefix]
+    return [prefix]
+
+
+def collect_non_preserved_paths(config: dict) -> list[str]:
+    paths: list[str] = []
+    for key, val in config.items():
+        if key in PRESERVED_TABLES:
+            continue
+        for path in iter_leaf_paths(val, (key,)):
+            paths.append(".".join(path))
+    return paths
+
+
+def format_key(key: str) -> str:
+    return key if BARE_KEY_RE.fullmatch(key) else json.dumps(key)
+
+
+def format_value(val: object) -> str:
+    if isinstance(val, bool):
+        return "true" if val else "false"
+    if isinstance(val, int):
+        return str(val)
+    if isinstance(val, float):
+        return repr(val)
+    if isinstance(val, str):
+        return json.dumps(val)
+    if isinstance(val, list):
+        return "[" + ", ".join(format_value(item) for item in val) + "]"
+    raise TypeError(f"unsupported TOML value type: {type(val).__name__}")
+
+
+def emit_table(lines: list[str], path: tuple[str, ...], table: dict) -> None:
+    scalar_items: list[tuple[str, object]] = []
+    child_tables: list[tuple[str, dict]] = []
+
+    for key, val in table.items():
+        if isinstance(val, dict):
+            child_tables.append((key, val))
+        else:
+            scalar_items.append((key, val))
+
+    if path and (scalar_items or not child_tables):
+        lines.append("[" + ".".join(format_key(part) for part in path) + "]")
+
+    for key, val in scalar_items:
+        lines.append(f"{format_key(key)} = {format_value(val)}")
+
+    if scalar_items and child_tables:
+        lines.append("")
+
+    for index, (key, val) in enumerate(child_tables):
+        emit_table(lines, path + (key,), val)
+        if index != len(child_tables) - 1:
+            lines.append("")
+
+
+def dump_toml(config: dict) -> str:
+    lines: list[str] = []
+    emit_table(lines, (), config)
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def main() -> int:
+    codex_home = Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser()
+    shared_path = codex_home / "config.shared.toml"
+    override_path = codex_home / "config.shared.override.toml"
+    config_path = codex_home / "config.toml"
+
+    if not shared_path.exists():
+        print(
+            f"codex-render-config: no shared config found at {shared_path}; skipping",
+            file=sys.stderr,
+        )
+        return 0
+
+    rendered = load_toml(shared_path)
+
+    if override_path.exists():
+        rendered = deep_merge(rendered, load_toml(override_path))
+
+    existing = load_toml(config_path) if config_path.exists() else {}
+
+    removed_paths = sorted(
+        set(collect_non_preserved_paths(existing))
+        - set(collect_non_preserved_paths(rendered))
+    )
+    if removed_paths:
+        print(
+            "codex-render-config: existing config.toml entries not present in shared config will be removed:",
+            file=sys.stderr,
+        )
+        for path in removed_paths:
+            print(f"  - {path}", file=sys.stderr)
+
+    for table_name in sorted(PRESERVED_TABLES):
+        if table_name in existing:
+            rendered[table_name] = existing[table_name]
+
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(dump_toml(rendered), encoding="utf-8")
+    print(f"codex-render-config: wrote {config_path}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

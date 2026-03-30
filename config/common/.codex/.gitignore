@@ -1,6 +1,8 @@
 *
 !.gitignore
 !AGENTS.md
+!config.shared.toml
+!config.shared.override.toml
 !skills/
 !skills/personal/
 !skills/personal/**

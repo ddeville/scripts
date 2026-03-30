@@ -29,3 +29,5 @@ if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" restore .
   git -C "$HOME/scripts" clean --force -d -- config bin
 fi
+
+"$HOME/scripts/bin/common/.local/bin/codex-render-config"
