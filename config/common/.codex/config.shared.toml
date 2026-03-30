@@ -1,9 +1,8 @@
 # Model
 
 model = "gpt-5.4"
-
-personality = "pragmatic"
 model_reasoning_effort = "high"
+personality = "pragmatic"
 
 # Sandbox
 
@@ -12,8 +11,8 @@ web_search = "cached"
 
 # Approvals
 
-approvals_reviewer = "guardian_subagent"
 approval_policy = "on-request"
+approvals_reviewer = "guardian_subagent"
 
 # UI
 
