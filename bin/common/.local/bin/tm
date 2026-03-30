@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: tm <path> [session-name]" >&2
+  exit 1
+fi
+
+workdir="$(realpath -- "$1")"
+
+if [ ! -d "$workdir" ]; then
+  echo "Path is not a directory: $1" >&2
+  exit 1
+fi
+
+session_name="${2-$(basename -- "$workdir")}"
+
+while :; do
+  if [ -z "$session_name" ]; then
+    echo "Session name cannot be empty." >&2
+  elif ! tmux has-session -t "$session_name" 2>/dev/null; then
+    break
+  else
+    printf 'tmux session "%s" already exists.\n' "$session_name" >&2
+  fi
+
+  printf 'Enter a different session name: '
+  read -r session_name
+done
+
+tmux new-session -s "$session_name" -n repo -d -c "$workdir"
+tmux new-window -t "$session_name:" -n editor -d -c "$workdir"
+tmux new-window -t "$session_name:" -n codex -d -c "$workdir"
+
+tmux set-option -t "$session_name" @display_name "$session_name"
+
+tmux send-keys -t "$session_name:editor" "$EDITOR $(printf '%q' "$workdir")" C-m
+tmux send-keys -t "$session_name:codex" "codex" C-m
+
+tmux select-window -t "$session_name:repo"
+
+echo "Created tmux session:"
+echo "  session: $session_name"
+echo "  workdir: $workdir"
+
+if [ -n "${TMUX-}" ]; then
+  tmux switch-client -t "$session_name"
+else
+  tmux attach-session -t "$session_name"
+fi
