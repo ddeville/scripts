@@ -134,6 +134,7 @@ def main() -> int:
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(dump_toml(rendered), encoding="utf-8")
     print(f"codex-render-config: wrote {config_path}", file=sys.stderr)
+
     return 0
 
 
