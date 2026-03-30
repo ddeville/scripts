@@ -25,9 +25,6 @@ if ! command -v tmux >/dev/null 2>&1; then
   exit 1
 fi
 
-feature_name="$1"
-branch_name="$(cw_branch_name "$feature_name")"
-
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$repo_root" ]; then
   echo "cw must be run inside a Git repository." >&2
@@ -40,10 +37,15 @@ if [ -z "$default_branch" ]; then
   exit 1
 fi
 
+feature_name="$1"
+
+branch_name="$(cw_branch_name "$feature_name")"
 repo_name="$(cw_repo_name "$repo_root")"
 repo_worktree_dir="$GIT_SRC_WORKTREE_DIR/$repo_name"
 worktree_path="$repo_worktree_dir/$feature_name"
+
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
+
 printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
 
 if [ -e "$worktree_path" ]; then
