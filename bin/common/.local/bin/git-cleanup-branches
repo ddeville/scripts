@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
 # Cleanup local branches that used to have an upstream that was deleted
 
 git fetch --prune &>/dev/null
