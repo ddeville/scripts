@@ -6,7 +6,7 @@ script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)
 source "$script_dir/../lib/cw.bash"
 
 if [ $# -ne 1 ]; then
-  echo "Usage: cw <feature>"
+  echo "Usage: cwt <feature>"
   exit 1
 fi
 
@@ -25,9 +25,19 @@ if ! command -v tmux >/dev/null 2>&1; then
   exit 1
 fi
 
+if [ -z "${EDITOR-}" ]; then
+  echo "EDITOR is not set." >&2
+  exit 1
+fi
+
+if ! command -v codex >/dev/null 2>&1; then
+  echo "codex is not installed." >&2
+  exit 1
+fi
+
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$repo_root" ]; then
-  echo "cw must be run inside a Git repository." >&2
+  echo "cwt must be run inside a Git repository." >&2
   exit 1
 fi
 
@@ -38,6 +48,11 @@ if [ -z "$default_branch" ]; then
 fi
 
 feature_name="$1"
+
+if [[ $feature_name == */* ]]; then
+  echo "Feature name must not contain /: $feature_name" >&2
+  exit 1
+fi
 
 branch_name="$(cw_branch_name "$feature_name")"
 repo_name="$(cw_repo_name "$repo_root")"
