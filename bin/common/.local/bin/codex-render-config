@@ -5,6 +5,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import cast
 
 import tomllib
 
@@ -30,7 +31,7 @@ def deep_merge(base: dict, override: dict) -> dict:
 def iter_leaf_paths(val: object, prefix: tuple[str, ...] = ()) -> list[tuple[str, ...]]:
     if isinstance(val, dict):
         paths: list[tuple[str, ...]] = []
-        for key, child in val.items():
+        for key, child in cast(dict[str, object], val).items():
             paths.extend(iter_leaf_paths(child, prefix + (key,)))
         return paths or [prefix]
     return [prefix]
