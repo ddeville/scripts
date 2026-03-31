@@ -5,8 +5,8 @@ set -eu -o pipefail
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 source "$script_dir/../lib/cw.bash"
 
-if [ $# -ne 1 ]; then
-  echo "Usage: cwt <feature>"
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: cwt <feature> [base-branch]"
   exit 1
 fi
 
@@ -41,16 +41,24 @@ if [ -z "$repo_root" ]; then
   exit 1
 fi
 
-default_branch="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
-if [ -z "$default_branch" ]; then
-  echo "Could not determine the default branch from refs/remotes/origin/HEAD." >&2
-  exit 1
-fi
-
 feature_name="$1"
+base_ref="${2-}"
 
 if [[ $feature_name == */* ]]; then
   echo "Feature name must not contain /: $feature_name" >&2
+  exit 1
+fi
+
+if [ -z "$base_ref" ]; then
+  base_ref="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+  if [ -z "$base_ref" ]; then
+    echo "Could not determine the default branch from refs/remotes/origin/HEAD." >&2
+    exit 1
+  fi
+fi
+
+if ! git rev-parse --verify --quiet "${base_ref}^{commit}" >/dev/null; then
+  echo "Base branch does not exist: $base_ref" >&2
   exit 1
 fi
 
@@ -80,7 +88,7 @@ fi
 
 mkdir -p "$repo_worktree_dir"
 
-git worktree add -b "$branch_name" "$worktree_path" "$default_branch"
+git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
 tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
 tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
@@ -91,7 +99,7 @@ tmux select-window -t "$session_name:codex"
 echo "Created worktree:"
 echo "  path: $worktree_path"
 echo "  branch: $branch_name"
-echo "  base: $default_branch"
+echo "  base: $base_ref"
 echo "  tmux: $session_name"
 
 if [ -n "${TMUX-}" ]; then
