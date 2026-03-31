@@ -193,20 +193,25 @@ if [ "$use_tmux" = on ]; then
   fi
 fi
 
-echo "Created worktree:"
-echo "  path: $worktree_path"
-echo "  branch: $branch_name"
-echo "  base: $base_ref"
 if [ "$use_tmux" = on ]; then
-  echo "  tmux: $session_name"
+  tmux_status="$session_name"
 else
-  echo "  tmux: disabled"
+  tmux_status="disabled"
 fi
+
 if [ "$use_codex" = on ]; then
-  echo "  codex: enabled"
+  codex_status="enabled"
 else
-  echo "  codex: disabled"
+  codex_status="disabled"
 fi
+
+printf '%s\n' \
+  "Created worktree:" \
+  "  path: $worktree_path" \
+  "  branch: $branch_name" \
+  "  base: $base_ref" \
+  "  tmux: $tmux_status" \
+  "  codex: $codex_status"
 
 if [ "$use_tmux" = on ]; then
   if [ -n "${TMUX-}" ]; then
