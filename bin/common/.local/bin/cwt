@@ -104,10 +104,6 @@ if [ ! -d "$GIT_SRC_WORKTREE_DIR" ]; then
   exit 1
 fi
 
-if [ "$use_tmux" = off ]; then
-  use_codex=off
-fi
-
 if [ "$use_tmux" = on ]; then
   if ! command -v tmux >/dev/null 2>&1; then
     echo "tmux is not installed." >&2
@@ -118,6 +114,8 @@ if [ "$use_tmux" = on ]; then
     echo "EDITOR is not set." >&2
     exit 1
   fi
+else
+  use_codex=off
 fi
 
 if [ "$use_codex" = on ] && ! command -v codex >/dev/null 2>&1; then
@@ -139,6 +137,7 @@ fi
 
 if [ -z "$base_ref" ]; then
   base_ref="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+
   if [ -z "$base_ref" ]; then
     echo "Could not determine the default branch from refs/remotes/origin/HEAD." >&2
     exit 1
@@ -155,10 +154,6 @@ repo_name="$(cw_repo_name "$repo_root")"
 repo_worktree_dir="$GIT_SRC_WORKTREE_DIR/$repo_name"
 worktree_path="$repo_worktree_dir/$feature_name"
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
-
-if [ "$use_codex" = on ]; then
-  printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
-fi
 
 if [ -e "$worktree_path" ]; then
   echo "Worktree path already exists: $worktree_path" >&2
@@ -180,6 +175,8 @@ mkdir -p "$repo_worktree_dir"
 git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
 if [ "$use_tmux" = on ]; then
+  printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+
   tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
   tmux set-option -t "$session_name" @display_name "$feature_name"
 
