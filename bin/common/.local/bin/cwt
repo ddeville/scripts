@@ -94,10 +94,6 @@ parse_cwt_args() {
 
 parse_cwt_args "$@"
 
-if [ "$use_tmux" = off ]; then
-  use_codex=off
-fi
-
 if [ -z "${GIT_SRC_WORKTREE_DIR-}" ]; then
   echo "GIT_SRC_WORKTREE_DIR is not set." >&2
   exit 1
@@ -106,6 +102,10 @@ fi
 if [ ! -d "$GIT_SRC_WORKTREE_DIR" ]; then
   echo "GIT_SRC_WORKTREE_DIR is not a directory: $GIT_SRC_WORKTREE_DIR" >&2
   exit 1
+fi
+
+if [ "$use_tmux" = off ]; then
+  use_codex=off
 fi
 
 if [ "$use_tmux" = on ]; then
@@ -126,6 +126,7 @@ if [ "$use_codex" = on ] && ! command -v codex >/dev/null 2>&1; then
 fi
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+
 if [ -z "$repo_root" ]; then
   echo "cwt must be run inside a Git repository." >&2
   exit 1
@@ -153,7 +154,6 @@ branch_name="$(cw_branch_name "$feature_name")"
 repo_name="$(cw_repo_name "$repo_root")"
 repo_worktree_dir="$GIT_SRC_WORKTREE_DIR/$repo_name"
 worktree_path="$repo_worktree_dir/$feature_name"
-
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
 
 if [ "$use_codex" = on ]; then
@@ -181,42 +181,24 @@ git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
 if [ "$use_tmux" = on ]; then
   tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
+  tmux set-option -t "$session_name" @display_name "$feature_name"
+
   tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
+
   if [ "$use_codex" = on ]; then
     tmux new-window -t "$session_name:" -n codex -d -c "$repo_root" "$codex_command"
-  fi
-  tmux set-option -t "$session_name" @display_name "$feature_name"
-  if [ "$use_codex" = on ]; then
     tmux select-window -t "$session_name:codex"
-  else
-    tmux select-window -t "$session_name:editor"
   fi
-fi
 
-if [ "$use_tmux" = on ]; then
-  tmux_status="$session_name"
-else
-  tmux_status="disabled"
-fi
-
-if [ "$use_codex" = on ]; then
-  codex_status="enabled"
-else
-  codex_status="disabled"
-fi
-
-printf '%s\n' \
-  "Created worktree:" \
-  "  path: $worktree_path" \
-  "  branch: $branch_name" \
-  "  base: $base_ref" \
-  "  tmux: $tmux_status" \
-  "  codex: $codex_status"
-
-if [ "$use_tmux" = on ]; then
   if [ -n "${TMUX-}" ]; then
     tmux switch-client -t "$session_name"
   else
     tmux attach-session -t "$session_name"
   fi
 fi
+
+printf '%s\n' \
+  "Created worktree:" \
+  "  path: $worktree_path" \
+  "  branch: $branch_name" \
+  "  base: $base_ref"
