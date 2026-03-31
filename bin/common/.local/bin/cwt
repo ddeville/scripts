@@ -5,9 +5,97 @@ set -eu -o pipefail
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 source "$script_dir/../lib/cw.bash"
 
-if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-  echo "Usage: cwt <feature> [base-branch]"
+print_help() {
+  printf '%s\n' \
+    "Create a linked worktree for a feature branch." \
+    "" \
+    "Usage:" \
+    "  cwt [--[no-]tmux] [--[no-]codex] [--base <branch>] [--] <feature>" \
+    "" \
+    "Arguments:" \
+    "  <feature>        Feature/worktree name" \
+    "" \
+    "Options:" \
+    "  --[no-]tmux      Start a tmux session; default: on" \
+    "  --[no-]codex     Start a Codex window/session; default: on" \
+    "  --base <branch>  Base branch to use" \
+    "  -h, --help       Show this help text"
+}
+
+die() {
+  print_help >&2
+  echo >&2
+  echo "$1" >&2
   exit 1
+}
+
+parse_cwt_args() {
+  use_tmux="on"
+  use_codex="on"
+  base_ref=""
+  feature_name=""
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+    --tmux)
+      use_tmux="on"
+      ;;
+    --no-tmux)
+      use_tmux="off"
+      ;;
+    --codex)
+      use_codex="on"
+      ;;
+    --no-codex)
+      use_codex="off"
+      ;;
+    --base)
+      shift
+      [ $# -gt 0 ] || die "Missing value for --base."
+      base_ref="$1"
+      ;;
+    --base=*)
+      base_ref="${1#--base=}"
+      [ -n "$base_ref" ] || die "Missing value for --base."
+      ;;
+    -h | --help)
+      print_help
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    --*)
+      die "Unknown option: $1"
+      ;;
+    *)
+      if [ -n "$feature_name" ]; then
+        die "Unexpected argument: $1"
+      fi
+      feature_name="$1"
+      ;;
+    esac
+    shift
+  done
+
+  while [ $# -gt 0 ]; do
+    if [ -n "$feature_name" ]; then
+      die "Unexpected argument: $1"
+    fi
+    feature_name="$1"
+    shift
+  done
+
+  if [ -z "$feature_name" ]; then
+    die "Missing required argument: <feature>."
+  fi
+}
+
+parse_cwt_args "$@"
+
+if [ "$use_tmux" = off ]; then
+  use_codex=off
 fi
 
 if [ -z "${GIT_SRC_WORKTREE_DIR-}" ]; then
@@ -20,17 +108,19 @@ if [ ! -d "$GIT_SRC_WORKTREE_DIR" ]; then
   exit 1
 fi
 
-if ! command -v tmux >/dev/null 2>&1; then
-  echo "tmux is not installed." >&2
-  exit 1
+if [ "$use_tmux" = on ]; then
+  if ! command -v tmux >/dev/null 2>&1; then
+    echo "tmux is not installed." >&2
+    exit 1
+  fi
+
+  if [ -z "${EDITOR-}" ]; then
+    echo "EDITOR is not set." >&2
+    exit 1
+  fi
 fi
 
-if [ -z "${EDITOR-}" ]; then
-  echo "EDITOR is not set." >&2
-  exit 1
-fi
-
-if ! command -v codex >/dev/null 2>&1; then
+if [ "$use_codex" = on ] && ! command -v codex >/dev/null 2>&1; then
   echo "codex is not installed." >&2
   exit 1
 fi
@@ -40,9 +130,6 @@ if [ -z "$repo_root" ]; then
   echo "cwt must be run inside a Git repository." >&2
   exit 1
 fi
-
-feature_name="$1"
-base_ref="${2-}"
 
 if [[ $feature_name == */* ]]; then
   echo "Feature name must not contain /: $feature_name" >&2
@@ -69,7 +156,9 @@ worktree_path="$repo_worktree_dir/$feature_name"
 
 session_name="$(cw_session_name "$repo_name" "$feature_name")"
 
-printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+if [ "$use_codex" = on ]; then
+  printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+fi
 
 if [ -e "$worktree_path" ]; then
   echo "Worktree path already exists: $worktree_path" >&2
@@ -81,7 +170,7 @@ if git rev-parse --verify --quiet "$branch_name" >/dev/null; then
   exit 1
 fi
 
-if tmux has-session -t "$session_name" 2>/dev/null; then
+if [ "$use_tmux" = on ] && tmux has-session -t "$session_name" 2>/dev/null; then
   echo "tmux session already exists: $session_name" >&2
   exit 1
 fi
@@ -90,20 +179,39 @@ mkdir -p "$repo_worktree_dir"
 
 git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
-tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
-tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
-tmux new-window -t "$session_name:" -n codex -d -c "$repo_root" "$codex_command"
-tmux set-option -t "$session_name" @display_name "$feature_name"
-tmux select-window -t "$session_name:codex"
+if [ "$use_tmux" = on ]; then
+  tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
+  tmux new-window -t "$session_name:" -n editor -d -c "$worktree_path" "$EDITOR"
+  if [ "$use_codex" = on ]; then
+    tmux new-window -t "$session_name:" -n codex -d -c "$repo_root" "$codex_command"
+  fi
+  tmux set-option -t "$session_name" @display_name "$feature_name"
+  if [ "$use_codex" = on ]; then
+    tmux select-window -t "$session_name:codex"
+  else
+    tmux select-window -t "$session_name:editor"
+  fi
+fi
 
 echo "Created worktree:"
 echo "  path: $worktree_path"
 echo "  branch: $branch_name"
 echo "  base: $base_ref"
-echo "  tmux: $session_name"
-
-if [ -n "${TMUX-}" ]; then
-  tmux switch-client -t "$session_name"
+if [ "$use_tmux" = on ]; then
+  echo "  tmux: $session_name"
 else
-  tmux attach-session -t "$session_name"
+  echo "  tmux: disabled"
+fi
+if [ "$use_codex" = on ]; then
+  echo "  codex: enabled"
+else
+  echo "  codex: disabled"
+fi
+
+if [ "$use_tmux" = on ]; then
+  if [ -n "${TMUX-}" ]; then
+    tmux switch-client -t "$session_name"
+  else
+    tmux attach-session -t "$session_name"
+  fi
 fi
