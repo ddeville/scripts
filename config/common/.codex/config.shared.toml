@@ -32,5 +32,3 @@ suppress_unstable_features_warning = true
 [features]
 codex_git_commit = true
 guardian_approval = true
-image_detail_original = true
-image_generation = true
