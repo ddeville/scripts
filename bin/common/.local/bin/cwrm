@@ -17,10 +17,6 @@ if [ -z "$repo_root" ]; then
 fi
 
 branch_name="$(git branch --show-current 2>/dev/null || true)"
-if [ -z "$branch_name" ]; then
-  echo "cwrm must target a worktree on a branch." >&2
-  exit 1
-fi
 
 git_dir="$(git rev-parse --path-format=absolute --git-dir)"
 common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
@@ -41,10 +37,14 @@ if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session_name" 2>/dev
   tmux_session_exists=true
 fi
 
-if $tmux_session_exists; then
+if $tmux_session_exists && [ -n "$branch_name" ]; then
   printf 'Delete tmux session "%s", worktree "%s", and branch "%s"? [y/N] ' "$session_name" "$repo_root" "$branch_name"
-else
+elif $tmux_session_exists; then
+  printf 'Delete tmux session "%s" and worktree "%s"? [y/N] ' "$session_name" "$repo_root"
+elif [ -n "$branch_name" ]; then
   printf 'Delete worktree "%s" and branch "%s"? [y/N] ' "$repo_root" "$branch_name"
+else
+  printf 'Delete worktree "%s"? [y/N] ' "$repo_root"
 fi
 read -r answer
 
@@ -53,8 +53,10 @@ case "$answer" in
   git -C "$main_worktree_root" worktree remove "$repo_root"
   echo "Removed worktree: $repo_root"
 
-  git -C "$main_worktree_root" branch -d "$branch_name"
-  echo "Deleted branch: $branch_name"
+  if [ -n "$branch_name" ]; then
+    git -C "$main_worktree_root" branch -d "$branch_name"
+    echo "Deleted branch: $branch_name"
+  fi
 
   if $tmux_session_exists; then
     tmux kill-session -t "$session_name"
