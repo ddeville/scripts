@@ -26,6 +26,12 @@ if [ "$git_dir" = "$common_dir" ]; then
   exit 1
 fi
 
+if cw_repo_is_dirty; then
+  echo "cwrm only works on a clean worktree." >&2
+  echo "Remove local changes first." >&2
+  exit 1
+fi
+
 main_worktree_root="$(cw_main_worktree_root "$repo_root")"
 repo_name="$(cw_repo_name "$main_worktree_root")"
 feature_name="$(cw_feature_name "$repo_root")"
