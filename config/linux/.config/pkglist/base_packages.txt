@@ -164,7 +164,6 @@ lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 lxappearance
 maim
-nitrogen
 picom
 polybar
 redshift
@@ -190,7 +189,6 @@ virt-manager
 
 # ========== Virtualization =========
 
-bridge-utils
 dmidecode
 dnsmasq
 docker
