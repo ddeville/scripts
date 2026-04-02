@@ -22,6 +22,11 @@ terraform-ls
 dropbox
 google-chrome
 nautilus-dropbox
+nitrogen
+
+# ========== Virtualization =========
+
+bridge-utils
 
 # ============== Fonts ==============
 
