@@ -10,7 +10,7 @@ print_help() {
     "Create a linked worktree for a feature branch." \
     "" \
     "Usage:" \
-    "  cwt [--[no-]tmux] [--[no-]codex] [--base <branch>] [--] <feature>" \
+    "  cwt [--[no-]tmux] [--[no-]codex] [--[no-]branch] [--base <branch>] [--] <feature>" \
     "" \
     "Arguments:" \
     "  <feature>        Feature/worktree name" \
@@ -18,6 +18,7 @@ print_help() {
     "Options:" \
     "  --[no-]tmux      Start a tmux session; default: on" \
     "  --[no-]codex     Start a Codex window/session; default: on" \
+    "  --[no-]branch    Create a branch for the worktree; default: on" \
     "  --base <branch>  Base branch to use" \
     "  -h, --help       Show this help text"
 }
@@ -32,6 +33,7 @@ die() {
 parse_cwt_args() {
   use_tmux="on"
   use_codex="on"
+  use_branch="on"
   base_ref=""
   feature_name=""
 
@@ -48,6 +50,12 @@ parse_cwt_args() {
       ;;
     --no-codex)
       use_codex="off"
+      ;;
+    --branch)
+      use_branch="on"
+      ;;
+    --no-branch)
+      use_branch="off"
       ;;
     --base)
       shift
@@ -160,7 +168,7 @@ if [ -e "$worktree_path" ]; then
   exit 1
 fi
 
-if git rev-parse --verify --quiet "$branch_name" >/dev/null; then
+if [ "$use_branch" = on ] && git rev-parse --verify --quiet "$branch_name" >/dev/null; then
   echo "Branch already exists: $branch_name" >&2
   exit 1
 fi
@@ -172,7 +180,13 @@ fi
 
 mkdir -p "$repo_worktree_dir"
 
-git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
+if [ "$use_branch" = on ]; then
+  git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
+  branch_display="$branch_name"
+else
+  git worktree add --detach "$worktree_path" "$base_ref"
+  branch_display="detached"
+fi
 
 if [ "$use_tmux" = on ]; then
   printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
@@ -197,5 +211,5 @@ fi
 printf '%s\n' \
   "Created worktree:" \
   "  path: $worktree_path" \
-  "  branch: $branch_name" \
+  "  branch: $branch_display" \
   "  base: $base_ref"
