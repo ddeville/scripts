@@ -26,3 +26,7 @@ cw_main_worktree_root() {
   common_dir="$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)"
   cd "$common_dir/.." && pwd -P
 }
+
+cw_repo_is_dirty() {
+  ! git diff --quiet --no-ext-diff || ! git diff --cached --quiet --no-ext-diff || [ -n "$(git ls-files --others --exclude-standard)" ]
+}
