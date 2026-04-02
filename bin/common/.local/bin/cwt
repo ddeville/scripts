@@ -144,6 +144,12 @@ if [[ $feature_name == */* ]]; then
 fi
 
 if [ -z "$base_ref" ]; then
+  if ! git diff --quiet --no-ext-diff || ! git diff --cached --quiet --no-ext-diff || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    echo "Current worktree has local changes." >&2
+    echo "Commit or stash them first, or pass --base <ref> explicitly." >&2
+    exit 1
+  fi
+
   base_ref="$(git branch --show-current 2>/dev/null || true)"
 
   if [ -z "$base_ref" ]; then
