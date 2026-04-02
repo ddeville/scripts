@@ -144,10 +144,10 @@ if [[ $feature_name == */* ]]; then
 fi
 
 if [ -z "$base_ref" ]; then
-  base_ref="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+  base_ref="$(git branch --show-current 2>/dev/null || true)"
 
   if [ -z "$base_ref" ]; then
-    echo "Could not determine the default branch from refs/remotes/origin/HEAD." >&2
+    echo "Could not determine the current branch." >&2
     exit 1
   fi
 fi
