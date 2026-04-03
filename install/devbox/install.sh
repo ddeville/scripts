@@ -14,11 +14,11 @@ fi
 ############## Setup ##############
 ###################################
 
-PYTHON_VERSION=3.12.9
-RUST_VERSION=1.89.0
-GOLANG_VERSION=1.25.0
-NODE_VERSION=24.6.0
-TERRAFORM_VERSION=1.12.2
+PYTHON_VERSION=3.14.3
+RUST_VERSION=1.94.0
+GOLANG_VERSION=1.26.1
+NODE_VERSION=25.8.2
+TERRAFORM_VERSION=1.14.8
 
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
