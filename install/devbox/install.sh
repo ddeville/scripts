@@ -146,21 +146,29 @@ export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
   htop \
   jless \
   jq \
-  kubectl \
+  kubernetes-cli \
   neovim \
   ripgrep \
-  tmux
+  tmux \
+  uv
 
 # Formatters
 "$BREW_BIN" install \
+  bash-language-server \
   buildifier \
   buf \
+  checkbashisms \
   clang-format \
   gopls \
   ruff \
   shellcheck \
   shfmt \
-  stylua
+  staticcheck \
+  stylua \
+  terraform-ls \
+  tree-sitter \
+  ty \
+  yaml-language-server
 
 # Upgrade all Brew formulas in case it's not the first time we run this script.
 "$BREW_BIN" upgrade
