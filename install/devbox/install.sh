@@ -66,6 +66,9 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 [ -x "$BREW_BIN" ] || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 "$BREW_BIN" update
+"$BREW_BIN" bundle install --file="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
+
+export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
 ###################################
 ########### Toolchains ############
@@ -81,7 +84,6 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-curl -LsSf https://astral.sh/uv/install.sh | /bin/sh
 export PATH="$HOME/.local/bin:$PATH"
 "$HOME/scripts/bin/common/.local/bin/pyswitch" latest
 
@@ -111,15 +113,6 @@ curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/i
 "$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" --latest
 
 export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
-
-###################################
-############ Programs #############
-###################################
-
-echo -e "\033[34m==>\033[0m Installing from bundle..."
-"$BREW_BIN" bundle install --file="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
-
-export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
 ###################################
 ############## Shell ##############
