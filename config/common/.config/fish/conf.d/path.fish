@@ -1,17 +1,25 @@
-# clean up existing path before resourcing it so that starting tmux doesn't end
-# up with duplicated entries in the path (and the default paths prepended to the
-# front) - this is because this config file is loaded twice when starting tmux.
+# clean up PATH before resourcing it so that starting tmux doesn't end up with
+# duplicated entries.
+# on macOS, reset the default PATH from path_helper first.
 if test -e /usr/libexec/path_helper
-    set PATH ""
+    set PATH
     eval (/usr/libexec/path_helper -c)
 end
 
-# set up a list to collect the new path entries
+# de-duplicate the inherited/default PATH before prepending custom entries.
+set CLEAN_PATH
+for p in $PATH
+    if not contains -- $p $CLEAN_PATH
+        set CLEAN_PATH $CLEAN_PATH $p
+    end
+end
+
+# set up a list to collect the new path entries.
 set PATH_ENTRIES
 
 function add_to_path
     set -l p $argv[1]
-    if test -e $p; and not contains $p $PATH_ENTRIES
+    if test -e $p; and not contains -- $p $PATH_ENTRIES
         set PATH_ENTRIES $PATH_ENTRIES $p
     end
 end
@@ -52,7 +60,18 @@ if which xcode-select >/dev/null 2>&1; and set -l XC (xcode-select --print-path)
     add_to_path "$XC/usr/bin"
 end
 
-# we can now set the new entries in front of the path
-set -x PATH $PATH_ENTRIES $PATH
+# we can now set the new entries in front of the path without introducing
+# duplicates if this file is sourced more than once.
+set FINAL_PATH $PATH_ENTRIES
+for p in $CLEAN_PATH
+    if not contains -- $p $FINAL_PATH
+        set FINAL_PATH $FINAL_PATH $p
+    end
+end
+
+set -x PATH $FINAL_PATH
+
+set -e CLEAN_PATH
+set -e FINAL_PATH
 set -e PATH_ENTRIES
 functions -e add_to_path
