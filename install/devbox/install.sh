@@ -116,53 +116,8 @@ export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 ############ Programs #############
 ###################################
 
-# Install latest version of specific programs. These programs are pretty
-# critical to day-to-day development workflows and having the latest version
-# is either highly recommended or even required, which is why we install them
-# with Homebrew rather than the local (outdated) package manager.
-
-# Shell programs
-"$BREW_BIN" install \
-  bazelisk \
-  btop \
-  curl \
-  dasel \
-  difftastic \
-  eza \
-  fd \
-  fish \
-  fzf \
-  gh \
-  git \
-  htop \
-  jless \
-  jq \
-  kubernetes-cli \
-  neovim \
-  ripgrep \
-  tmux \
-  uv
-
-# Formatters
-"$BREW_BIN" install \
-  bash-language-server \
-  buildifier \
-  buf \
-  checkbashisms \
-  clang-format \
-  gopls \
-  ruff \
-  shellcheck \
-  shfmt \
-  staticcheck \
-  stylua \
-  terraform-ls \
-  tree-sitter \
-  ty \
-  yaml-language-server
-
-# Upgrade all Brew formulas in case it's not the first time we run this script.
-"$BREW_BIN" upgrade
+echo -e "\033[34m==>\033[0m Installing from bundle..."
+"$BREW_BIN" bundle install --file="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
 
 export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
