@@ -164,19 +164,7 @@ export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 # Upgrade all Brew formulas in case it's not the first time we run this script.
 "$BREW_BIN" upgrade
 
-# NOTE: Homebrew links a ton of dependencies into the main bin folder, which is
-# not necessarily something that we want since we want to use the programs from
-# the distro (which mimics what we actually run everywhere) and only use the
-# newer versions for things that we specifically install.
-#
-# For this reason we filter the leaf packages that we specifically installed
-# and symlink their executables into a new directory. Our fish path handling
-# function will then prefer this directory (instead of the main linuxbrew one)
-# if it exists.
-"$HOME/scripts/bin/linux/.local/bin/filter-brew-leaf-packages"
-
-LINUXBREW_FILTERED_PATH=/home/linuxbrew/.filtered
-export PATH="$LINUXBREW_FILTERED_PATH/bin:$LINUXBREW_FILTERED_PATH/sbin:$PATH"
+export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
 ###################################
 ############## Shell ##############
