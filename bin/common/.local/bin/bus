@@ -39,6 +39,19 @@ elif [ "$(uname)" = "Linux" ]; then
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update
     sudo apt-get upgrade
+
+    if [ -d /home/linuxbrew ] && command -v brew >/dev/null 2>&1; then
+      brew update
+
+      echo -e "\033[34m==>\033[0m Installing from bundle..."
+      brew bundle install --file="$HOME/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
+
+      echo -e "\033[34m==>\033[0m Running brew upgrade..."
+      brew upgrade
+
+      echo -e "\033[34m==>\033[0m Running brew cleanup..."
+      brew cleanup --prune=3
+    fi
   else
     echo "No known package manager"
     exit 1
