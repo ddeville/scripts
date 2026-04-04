@@ -10,20 +10,11 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-###################################
-############## Setup ##############
-###################################
-
-PYTHON_VERSION=3.14.3
-RUST_VERSION=1.94.0
-GOLANG_VERSION=1.26.1
-NODE_VERSION=25.8.2
-TERRAFORM_VERSION=1.14.8
-
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
 export XDG_STATE_HOME="$HOME/.local/state" && mkdir -p "$XDG_STATE_HOME"
 export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains" && mkdir -p "$XDG_TOOLCHAINS_HOME"
+export VENV_INSTALL_DIR="$XDG_TOOLCHAINS_HOME/python/venv" && mkdir -p "$VENV_INSTALL_DIR"
 
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
@@ -92,14 +83,14 @@ BREW_BIN="$LINUXBREW_PATH/bin/brew"
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
 curl -LsSf https://astral.sh/uv/install.sh | /bin/sh
 export PATH="$HOME/.local/bin:$PATH"
-uv python install "$PYTHON_VERSION"
+"$HOME/scripts/bin/common/.local/bin/pyswitch" latest
 
 # rust
 mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
 export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 [ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=none -y --no-modify-path --no-update-default-toolchain
-"$CARGO_HOME/bin/rustup" toolchain install "$RUST_VERSION"
+"$CARGO_HOME/bin/rustup" toolchain install stable
 "$CARGO_HOME/bin/rustup" default stable
 "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
 
@@ -107,17 +98,17 @@ export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 mkdir -p "$XDG_TOOLCHAINS_HOME/go"
 export GO_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/go/current/bin"
 export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
-"$HOME/scripts/bin/common/.local/bin/goswitch" $GOLANG_VERSION
+"$HOME/scripts/bin/common/.local/bin/goswitch" latest
 
 # nodejs
 mkdir -p "$XDG_TOOLCHAINS_HOME/node"
 export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
-"$HOME/scripts/bin/common/.local/bin/nodeswitch" $NODE_VERSION
+"$HOME/scripts/bin/common/.local/bin/nodeswitch" latest
 
 # terraform
 mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
 curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | /bin/bash -s -- -b "$HOME/.local/bin"
-"$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" "$TERRAFORM_VERSION"
+"$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" --latest
 
 export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
