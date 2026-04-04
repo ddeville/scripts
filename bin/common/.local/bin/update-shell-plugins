@@ -38,7 +38,7 @@ for repo_spec in "${repos[@]}"; do
     if [ "$current_remote_url" != "$repo" ]; then
       git remote set-url origin "$repo"
     fi
-    if $update; then
+    if $update || ! git rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
       git fetch origin
     fi
     git checkout --detach "$ref"
