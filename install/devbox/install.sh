@@ -38,6 +38,7 @@ trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
 sudo apt-get update
 
 sudo apt-get -y install \
+  bubblewrap \
   build-essential \
   cmake \
   curl \
