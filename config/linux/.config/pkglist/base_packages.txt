@@ -33,7 +33,7 @@ firewalld
 freerdp
 inetutils
 ipset
-iptables-nft
+iptables
 libvncserver
 networkmanager
 network-manager-applet
