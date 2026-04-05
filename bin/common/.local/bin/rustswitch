@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -ne 1 ] || { [[ $1 != "latest" ]] && [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; }; then
+  echo "Usage: rustswitch <1.2.3|latest>"
+  exit 1
+fi
+
+if ! command -v rustup >/dev/null 2>&1; then
+  echo "rustup is not installed." >&2
+  exit 1
+fi
+
+toolchain="$1"
+if [[ $toolchain == "latest" ]]; then
+  toolchain="stable"
+fi
+
+rustup toolchain install "$toolchain"
+rustup default "$toolchain"
+
+echo "Rust default toolchain is now $(rustup show active-toolchain | awk 'NR == 1 { print $1 }')"
