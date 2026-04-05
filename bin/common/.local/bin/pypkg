@@ -5,14 +5,13 @@ set -eu -o pipefail
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 source "$script_dir/../lib/python-toolchain.bash"
 
-python_request="$(uv python pin --global 2>/dev/null || true)"
-if [ -z "$python_request" ]; then
+version="$(uv python pin --global 2>/dev/null || true)"
+if [ -z "$version" ]; then
   echo "No global uv Python is pinned. Run: pyswitch <python-request>" >&2
   exit 1
 fi
 
-python_toolchain_ensure_requirements_file
+mkdir -p "$(basename "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE")" && touch "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 "${EDITOR:-vi}" "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 
-env -u VIRTUAL_ENV uv venv --allow-existing --python "$python_request" "$PYTHON_TOOLCHAIN_GLOBAL_VENV"
-env -u VIRTUAL_ENV uv pip install --upgrade --refresh --python "$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin/python" --requirements "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
+python_toolchain_sync_global_venv "$version" --allow-existing
