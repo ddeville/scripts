@@ -36,8 +36,6 @@ fi
 uv python install --default "$version" --preview-features python-install-default
 uv python pin --global "$version"
 
-python_toolchain_ensure_requirements_file
-env -u VIRTUAL_ENV uv venv --clear --python "$version" "$PYTHON_TOOLCHAIN_GLOBAL_VENV"
-env -u VIRTUAL_ENV uv pip install --upgrade --python "$PYTHON_TOOLCHAIN_GLOBAL_VENV/bin/python" --requirements "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
+python_toolchain_sync_global_venv "$version" --clear
 
 echo "Global uv Python pin is now $(uv python pin --global)"
