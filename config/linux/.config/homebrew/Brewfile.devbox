@@ -50,5 +50,9 @@ brew "tree-sitter"
 brew "ty"
 brew "typescript-language-server"
 brew "uv"
-brew "warrensbox/tap/tfswitch"
 brew "yaml-language-server"
+
+# ============== Apps ===============
+
+cask "codex"
+cask "warrensbox/tap/tfswitch"
