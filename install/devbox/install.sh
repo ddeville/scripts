@@ -157,7 +157,7 @@ Description=Set up devbox
 
 [Service]
 Type=simple
-ExecStart=scripts/install/devbox/install.sh
+ExecStart=%h/scripts/install/devbox/install.sh
 Restart=no
 
 [Install]
