@@ -3,6 +3,7 @@
 import json
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 from typing import cast
@@ -125,6 +126,7 @@ def main() -> int:
             "codex-render-config: removing entries from config.toml:",
             *removed_paths,
             sep="\n  - ",
+            file=sys.stderr,
         )
 
     for table_name in sorted(PRESERVED_TABLES):
@@ -134,8 +136,17 @@ def main() -> int:
     if existing == rendered:
         return 0
 
-    rendered_text = dump_toml(rendered)
     config_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if config_path.exists():
+        backup_path = config_path.with_name(config_path.name + ".bak")
+        shutil.copy2(config_path, backup_path)
+        print(
+            f"codex-render-config: backed up {config_path} to {backup_path}",
+            file=sys.stderr,
+        )
+
+    rendered_text = dump_toml(rendered)
     config_path.write_text(rendered_text, encoding="utf-8")
 
     print(f"codex-render-config: wrote {config_path}", file=sys.stderr)
