@@ -10,9 +10,6 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-echo "Running devbox install preflight"
-sudo -v
-
 sudo adduser "$USER" sudo
 echo "${USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
 sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
