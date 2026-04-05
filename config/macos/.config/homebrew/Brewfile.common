@@ -79,7 +79,6 @@ brew "tree-sitter"
 brew "ty"
 brew "typescript-language-server"
 brew "uv"
-brew "warrensbox/tap/tfswitch"
 brew "yaml-language-server"
 
 # ============== Fonts ==============
@@ -105,3 +104,4 @@ cask "mos"
 cask "spotify", args: { require_sha: false }
 cask "stay"
 cask "suspicious-package"
+cask "warrensbox/tap/tfswitch"
