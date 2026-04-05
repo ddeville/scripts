@@ -11,7 +11,7 @@ if [ -z "$version" ]; then
   exit 1
 fi
 
-mkdir -p "$(basename "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE")" && touch "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
+mkdir -p "$(dirname "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE")" && touch "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 "${EDITOR:-vi}" "$PYTHON_TOOLCHAIN_REQUIREMENTS_FILE"
 
 python_toolchain_sync_global_venv "$version" --allow-existing
