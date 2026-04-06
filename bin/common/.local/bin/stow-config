@@ -25,6 +25,18 @@ if [ -d "$HOME/scripts/.git" ] && [ -n "$(git -C "$HOME/scripts" status --porcel
   exit 1
 fi
 
+# Keep a few target paths as real directories so Stow links their contents
+# individually instead of folding the whole directory into one symlink.
+unfolded_paths=(
+  "$HOME/.codex"
+  "$HOME/.local/bin"
+  "$HOME/.ssh"
+)
+
+for p in "${unfolded_paths[@]}"; do
+  mkdir -p "$p"
+done
+
 stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
 stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
 
