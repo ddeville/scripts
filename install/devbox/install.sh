@@ -14,11 +14,12 @@ sudo adduser "$USER" sudo
 echo "${USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
 sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
 
+export PATH="$HOME/.local/bin:$PATH"
+
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
 export XDG_STATE_HOME="$HOME/.local/state" && mkdir -p "$XDG_STATE_HOME"
 export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains" && mkdir -p "$XDG_TOOLCHAINS_HOME"
-export VENV_INSTALL_DIR="$XDG_TOOLCHAINS_HOME/python/venv" && mkdir -p "$VENV_INSTALL_DIR"
 
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
@@ -89,7 +90,8 @@ export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
 # python
 mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-export PATH="$HOME/.local/bin:$PATH"
+export PY_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/python/uv/bin"
+export VENV_INSTALL_DIR="$XDG_TOOLCHAINS_HOME/python/venv" && mkdir -p "$VENV_INSTALL_DIR"
 "$HOME/scripts/bin/common/.local/bin/pyswitch" latest
 
 # rust
@@ -113,10 +115,11 @@ export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
 
 # terraform
 mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
-curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/master/install.sh | /bin/bash -s -- -b "$HOME/.local/bin"
-"$HOME/.local/bin/tfswitch" --install "$XDG_TOOLCHAINS_HOME/terraform" --bin "$HOME/.local/bin/terraform" --latest
+export TF_INSTALL_PATH="$XDG_TOOLCHAINS_HOME/terraform"
+export TF_BINARY_PATH="$HOME/.local/bin/terraform"
+tfswitch --latest
 
-export PATH="$CARGO_HOME/bin:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
+export PATH="$CARGO_HOME/bin:$PY_TOOLCHAIN_BIN:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
 ###################################
 ############## Shell ##############
