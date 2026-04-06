@@ -66,7 +66,11 @@ end
 # NOTE: we already add custom node toolchain to the path and `npm install` will auto-discover the node_modules...
 
 # terraform
-# NOTE: the only way to change tfswitch directories it via arguments, see `tfswitch.fish` function that does that...
+set -x TF_INSTALL_PATH "$XDG_TOOLCHAINS_HOME/terraform"
+set -x TF_BINARY_PATH "$HOME/.local/bin/terraform"
+if not test -d "$TF_INSTALL_PATH"
+    command mkdir -p "$TF_INSTALL_PATH"
+end
 
 ############################
 ####### Applications #######
