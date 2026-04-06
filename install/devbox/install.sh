@@ -97,9 +97,8 @@ mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
 export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
 export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 [ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=none -y --no-modify-path --no-update-default-toolchain
-"$CARGO_HOME/bin/rustup" toolchain install stable
-"$CARGO_HOME/bin/rustup" default stable
 "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
+"$HOME/scripts/bin/common/.local/bin/rustswitch" latest
 
 # golang
 mkdir -p "$XDG_TOOLCHAINS_HOME/go"
