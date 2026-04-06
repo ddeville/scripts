@@ -37,8 +37,8 @@ for p in "${unfolded_paths[@]}"; do
   mkdir -p "$p"
 done
 
-stow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
-stow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
+stow --restow "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
+stow --restow "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
 
 # Restore the content of the repo since we run with `--adopt`...
 if [ -d "$HOME/scripts/.git" ]; then
