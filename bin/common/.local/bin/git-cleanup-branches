@@ -6,12 +6,17 @@ set -eu -o pipefail
 
 git fetch --prune &>/dev/null
 
-for branch in $(git branch -vv | grep -o -E '^[\* ]+\S+' | tr -d '* '); do
-  upstream=$(git rev-parse --abbrev-ref --symbolic-full-name "${branch}@{upstream}" 2>/dev/null)
-  if [ -n "${upstream}" ]; then
-    if ! git show-ref --quiet "refs/remotes/${upstream}"; then
+current_branch=$(git symbolic-ref --quiet --short HEAD || true)
+
+git branch --format='%(refname:short)%09%(upstream:track)' |
+  while IFS=$'\t' read -r branch upstream_track; do
+    if [ "${upstream_track}" = "[gone]" ]; then
+      if [ "${branch}" = "${current_branch}" ]; then
+        echo "Skipping current branch '${branch}'"
+        continue
+      fi
+
       echo "Deleting branch '${branch}'"
       git branch -D "${branch}"
     fi
-  fi
-done
+  done
