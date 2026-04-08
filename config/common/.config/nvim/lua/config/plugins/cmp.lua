@@ -4,7 +4,6 @@ return {
     event = 'InsertEnter',
     config = function()
       vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-      vim.opt.shortmess:append('c')
 
       local cmp = require('cmp')
 
