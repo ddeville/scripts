@@ -13,7 +13,6 @@ return {
           { name = 'copilot' },
           { name = 'nvim_lsp' },
           { name = 'nvim_lua' },
-          { name = 'vsnip' },
           { name = 'path' },
           { name = 'buffer', keyword_length = 2 },
         },
@@ -32,7 +31,6 @@ return {
               copilot = '[Copilot]',
               nvim_lsp = '[LSP]',
               nvim_lua = '[API]',
-              vsnip = '[Snip]',
               path = '[Path]',
               buffer = '[Buf]',
             }
@@ -42,7 +40,7 @@ return {
         },
         snippet = {
           expand = function(args)
-            vim.fn['vsnip#anonymous'](args.body)
+            vim.snippet.expand(args.body)
           end,
         },
       })
@@ -52,8 +50,6 @@ return {
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lua',
-      'hrsh7th/vim-vsnip',
-      'hrsh7th/cmp-vsnip',
     },
   },
 }
