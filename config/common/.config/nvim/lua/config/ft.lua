@@ -1,11 +1,16 @@
 -- setup filetype for tiltfile
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   pattern = { 'Tiltfile', '*.Tiltfile' },
-  command = 'set filetype=tiltfile',
+  callback = function()
+    vim.bo.filetype = 'tiltfile'
+  end,
 })
 
 -- setup filetype for Brewfile
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   pattern = { 'Brewfile' },
-  command = 'set filetype=brewfile syntax=brewfile',
+  callback = function()
+    vim.bo.filetype = 'brewfile'
+    vim.bo.syntax = 'brewfile'
+  end,
 })
