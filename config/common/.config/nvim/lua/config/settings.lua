@@ -139,26 +139,17 @@ vim.diagnostic.config({
 })
 
 -- diagnostic highlights
-vim.api.nvim_set_hl(0, 'DiagnosticError', { fg = 'Red', ctermfg = 'Red' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError', { fg = 'Red', ctermfg = 'Red', underline = true })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextError', { fg = 'Red', ctermfg = 'Red' })
-vim.api.nvim_set_hl(0, 'DiagnosticFloatingError', { fg = 'Red', ctermfg = 'Red' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignError', { fg = 'Red', ctermfg = 'Red' })
+local diagnostic_colors = {
+  Error = 'Red',
+  Warn = 'Yellow',
+  Info = 'White',
+  Hint = 'Gray',
+}
 
-vim.api.nvim_set_hl(0, 'DiagnosticWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { fg = 'Yellow', ctermfg = 'Yellow', underline = true })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticFloatingWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignWarn', { fg = 'Yellow', ctermfg = 'Yellow' })
-
-vim.api.nvim_set_hl(0, 'DiagnosticInfo', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { fg = 'White', ctermfg = 'White', underline = true })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfo', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticFloatingInfo', { fg = 'White', ctermfg = 'White' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignInfo', { fg = 'White', ctermfg = 'White' })
-
-vim.api.nvim_set_hl(0, 'DiagnosticHint', { fg = 'Gray', ctermfg = 'Gray' })
-vim.api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { fg = 'Gray', ctermfg = 'Gray', underline = true })
-vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHint', { fg = 'Gray', ctermfg = 'Gray' })
-vim.api.nvim_set_hl(0, 'DiagnosticFloatingHint', { fg = 'Gray', ctermfg = 'Gray' })
-vim.api.nvim_set_hl(0, 'DiagnosticSignHint', { fg = 'Gray', ctermfg = 'Gray' })
+for severity, color in pairs(diagnostic_colors) do
+  vim.api.nvim_set_hl(0, 'Diagnostic' .. severity, { fg = color, ctermfg = color })
+  vim.api.nvim_set_hl(0, 'DiagnosticUnderline' .. severity, { fg = color, ctermfg = color, underline = true })
+  vim.api.nvim_set_hl(0, 'DiagnosticVirtualText' .. severity, { fg = color, ctermfg = color })
+  vim.api.nvim_set_hl(0, 'DiagnosticFloating' .. severity, { fg = color, ctermfg = color })
+  vim.api.nvim_set_hl(0, 'DiagnosticSign' .. severity, { fg = color, ctermfg = color })
+end
