@@ -159,7 +159,7 @@ return {
     'kosayoda/nvim-lightbulb',
     config = function()
       -- Display an indicator in the sign column when a code action is available
-      vim.fn.sign_define('LightBulbSign', { text = '▶', texthl = 'LspDiagnosticsDefaultInformation' })
+      vim.fn.sign_define('LightBulbSign', { text = '▶', texthl = 'DiagnosticSignInfo' })
       require('nvim-lightbulb').setup({
         autocmd = { enabled = true },
         sign = {
