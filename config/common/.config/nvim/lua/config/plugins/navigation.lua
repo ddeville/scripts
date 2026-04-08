@@ -169,7 +169,6 @@ return {
       telescope.load_extension('vim_bookmarks')
     end,
     dependencies = {
-      'nvim-lua/popup.nvim',
       'nvim-lua/plenary.nvim',
     },
   },
