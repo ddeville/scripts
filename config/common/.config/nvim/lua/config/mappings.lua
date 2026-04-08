@@ -13,16 +13,20 @@ vim.keymap.set('i', '<left>', '<nop>')
 vim.keymap.set('i', '<right>', '<nop>')
 
 -- search current selection in visual mode with */#
-vim.cmd([[
-function! DamienVSetSearch()
-  let temp = @@
-  norm! gvy
-  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
-  let @@ = temp
-endfunction
-]])
-vim.keymap.set('v', '*', ':<C-u>call DamienVSetSearch()<CR>//<CR><c-o>')
-vim.keymap.set('v', '#', ':<C-u>call DamienVSetSearch()<CR>??<CR><c-o>')
+function _G.VisualSetSearch()
+  local saved_register = vim.fn.getreg('"')
+  local saved_register_type = vim.fn.getregtype('"')
+
+  vim.cmd.normal({ 'gvy', bang = true })
+
+  local pattern = vim.fn.escape(vim.fn.getreg('"'), '\\')
+  pattern = pattern:gsub('\n', [[\n]])
+  vim.fn.setreg('/', [[\V]] .. pattern)
+  vim.fn.setreg('"', saved_register, saved_register_type)
+end
+
+vim.keymap.set('v', '*', ':<C-u>lua VisualSetSearch()<CR>//<CR><C-o>')
+vim.keymap.set('v', '#', ':<C-u>lua VisualSetSearch()<CR>??<CR><C-o>')
 
 -- move lines up and down when in visual mode
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
