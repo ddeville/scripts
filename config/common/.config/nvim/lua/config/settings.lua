@@ -98,7 +98,7 @@ local highlight_ag = vim.api.nvim_create_augroup('HighlightOnYank', { clear = tr
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_ag,
   callback = function()
-    vim.highlight.on_yank({ timeout = 350 })
+    vim.hl.on_yank({ timeout = 350 })
   end,
 })
 
@@ -110,10 +110,9 @@ vim.lsp.log.set_level('off')
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('LspDisableSemanticTokensProvider', {}),
   callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client.server_capabilities then
-      client.server_capabilities.semanticTokensProvider = nil
-    end
+    vim.lsp.semantic_tokens.enable(false, {
+      bufnr = args.buf,
+    })
   end,
 })
 
