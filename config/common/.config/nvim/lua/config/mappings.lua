@@ -67,9 +67,6 @@ end)
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('LspKeymapConfig', {}),
   callback = function(args)
-    -- enable completion triggered by <c-x><c-o>
-    vim.bo[args.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-
     -- buffer local mappings.
     local opts = { buffer = args.buf }
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
