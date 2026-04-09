@@ -107,6 +107,7 @@ local pre_installed_servers = {
 return {
   {
     'neovim/nvim-lspconfig',
+    event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       vim.lsp.config('*', {
         capabilities = vim.tbl_deep_extend(
@@ -121,6 +122,9 @@ return {
       end
     end,
     dependencies = {
+      {
+        'williamboman/mason.nvim',
+      },
       {
         'williamboman/mason-lspconfig.nvim',
         version = '*',
@@ -139,35 +143,33 @@ return {
           })
         end,
       },
+      {
+        'j-hui/fidget.nvim',
+        config = function()
+          require('fidget').setup({
+            progress = {
+              display = {
+                progress_icon = { pattern = 'bouncing_bar' },
+                done_ttl = 1,
+              },
+            },
+          })
+        end,
+      },
+      {
+        'kosayoda/nvim-lightbulb',
+        config = function()
+          vim.fn.sign_define('LightBulbSign', { text = '▶', texthl = 'DiagnosticSignInfo' })
+          require('nvim-lightbulb').setup({
+            autocmd = { enabled = true },
+            sign = {
+              enabled = true,
+              text = '▶',
+              hl = 'LightBulbSign',
+            },
+          })
+        end,
+      },
     },
-  },
-  {
-    'j-hui/fidget.nvim',
-    config = function()
-      -- LSP Status
-      require('fidget').setup({
-        progress = {
-          display = {
-            progress_icon = { pattern = 'bouncing_bar' },
-            done_ttl = 1,
-          },
-        },
-      })
-    end,
-  },
-  {
-    'kosayoda/nvim-lightbulb',
-    config = function()
-      -- Display an indicator in the sign column when a code action is available
-      vim.fn.sign_define('LightBulbSign', { text = '▶', texthl = 'DiagnosticSignInfo' })
-      require('nvim-lightbulb').setup({
-        autocmd = { enabled = true },
-        sign = {
-          enabled = true,
-          text = '▶',
-          hl = 'LightBulbSign',
-        },
-      })
-    end,
   },
 }
