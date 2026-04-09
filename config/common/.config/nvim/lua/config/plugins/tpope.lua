@@ -6,5 +6,8 @@ return {
   'tpope/vim-rhubarb',
   'tpope/vim-sleuth',
   'tpope/vim-surround',
-  'tpope/vim-unimpaired',
+  {
+    'tpope/vim-unimpaired',
+    event = 'VeryLazy',
+  },
 }
