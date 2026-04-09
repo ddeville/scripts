@@ -1,6 +1,11 @@
 return {
   {
     'mhinz/vim-grepper',
+    keys = {
+      { '<leader>f', '<cmd>Grepper -tool rg<CR>', mode = 'n', silent = true },
+      { 'gs', '<plug>(GrepperOperator)', mode = 'n', remap = true },
+      { 'gs', '<plug>(GrepperOperator)', mode = 'x', remap = true },
+    },
     config = function()
       vim.g.grepper = {
         tools = { 'rg', 'git', 'grep' },
@@ -9,14 +14,20 @@ return {
           grepprg = 'rg -H --no-heading --vimgrep',
         },
       }
-
-      vim.keymap.set('n', '<leader>f', ':Grepper -tool rg<CR>', { noremap = true, silent = true })
-      vim.keymap.set('n', 'gs', '<plug>(GrepperOperator)', { remap = true })
-      vim.keymap.set('x', 'gs', '<plug>(GrepperOperator)', { remap = true })
     end,
   },
   {
     'ibhagwan/fzf-lua',
+    keys = {
+      {
+        '<leader>o',
+        function()
+          require('fzf-lua').files()
+        end,
+        mode = 'n',
+        silent = true,
+      },
+    },
     config = function()
       local fzf = require('fzf-lua')
       local actions = require('fzf-lua.actions')
@@ -65,24 +76,59 @@ return {
           ['header'] = { 'fg', 'TelescopeTitle' },
         },
       })
-      vim.keymap.set('n', '<leader>o', fzf.files, { silent = true })
     end,
   },
 
   {
     'nvim-telescope/telescope.nvim',
     version = '*',
+    keys = {
+      {
+        '<leader>;',
+        function()
+          require('telescope.builtin').buffers()
+        end,
+        mode = 'n',
+      },
+      {
+        ';',
+        function()
+          require('telescope.builtin').buffers()
+        end,
+        mode = 'n',
+      },
+      {
+        '<leader>t',
+        function()
+          require('telescope.builtin').find_files()
+        end,
+        mode = 'n',
+      },
+      {
+        '<leader>g',
+        function()
+          require('telescope.builtin').git_files()
+        end,
+        mode = 'n',
+      },
+      {
+        '<leader>s',
+        function()
+          require('telescope.builtin').git_status()
+        end,
+        mode = 'n',
+      },
+      {
+        '//',
+        function()
+          require('telescope.builtin').current_buffer_fuzzy_find()
+        end,
+        mode = 'n',
+      },
+    },
     config = function()
       local telescope = require('telescope')
-      local builtin = require('telescope.builtin')
       local actions = require('telescope.actions')
-
-      vim.keymap.set('n', '<leader>;', builtin.buffers)
-      vim.keymap.set('n', ';', builtin.buffers)
-      vim.keymap.set('n', '<leader>t', builtin.find_files)
-      vim.keymap.set('n', '<leader>g', builtin.git_files)
-      vim.keymap.set('n', '<leader>s', builtin.git_status)
-      vim.keymap.set('n', '//', builtin.current_buffer_fuzzy_find)
 
       telescope.setup({
         defaults = {
@@ -170,14 +216,15 @@ return {
     end,
     dependencies = {
       'nvim-lua/plenary.nvim',
+      {
+        'nvim-telescope/telescope-fzf-native.nvim',
+        build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
+        cond = function()
+          return vim.fn.executable('cmake') == 1
+        end,
+      },
+      'ddeville/telescope-vim-bookmarks.nvim',
     },
-  },
-  {
-    'nvim-telescope/telescope-fzf-native.nvim',
-    build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
-    cond = function()
-      return vim.fn.executable('cmake') == 1
-    end,
   },
   {
     'mattesgroeger/vim-bookmarks',
@@ -187,27 +234,24 @@ return {
       vim.g.bookmark_display_annotation = true
       vim.g.bookmark_show_toggle_warning = false
 
-      local bookmarks = require('telescope').extensions.vim_bookmarks
+      vim.keymap.set('n', 'ma', function()
+        require('telescope').extensions.vim_bookmarks.all({
+          layout_strategy = 'vertical',
+        })
+      end)
 
-      local common_settings = {
-        layout_strategy = 'vertical',
-      }
-
-      local function all()
-        bookmarks.all(common_settings)
-      end
-
-      local function current_file()
-        bookmarks.current_file(common_settings)
-      end
-
-      vim.keymap.set('n', 'ma', all)
-      vim.keymap.set('n', 'mb', current_file)
+      vim.keymap.set('n', 'mb', function()
+        require('telescope').extensions.vim_bookmarks.current_file({
+          layout_strategy = 'vertical',
+        })
+      end)
     end,
   },
-  'ddeville/telescope-vim-bookmarks.nvim',
   {
     'stevearc/oil.nvim',
+    keys = {
+      { '-', '<cmd>Oil<CR>', desc = 'Open parent directory', mode = 'n' },
+    },
     config = function()
       local oil = require('oil')
 
@@ -232,11 +276,8 @@ return {
           },
         },
       })
-
-      vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open parent directory' })
     end,
     -- Alternatively can use 'nvim-tree/nvim-web-devicons'
     dependencies = { { 'echasnovski/mini.icons', opts = {} } },
-    lazy = false,
   },
 }
