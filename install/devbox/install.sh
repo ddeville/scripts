@@ -143,6 +143,13 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins" --no-update
 
 ###################################
+############## Codex ##############
+###################################
+
+# Need by bubblewrap to create users.
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+###################################
 ############ Automation ###########
 ###################################
 
