@@ -40,6 +40,8 @@ end
 # python
 set -x UV_PYTHON_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/uv/python"
 set -x UV_PYTHON_BIN_DIR "$XDG_TOOLCHAINS_HOME/python/uv/bin"
+set -x UV_TOOL_BIN_DIR "$XDG_TOOLCHAINS_HOME/python/uv/bin"
+set -x UV_TOOL_DIR "$XDG_TOOLCHAINS_HOME/python/uv/tools"
 set -x VENV_INSTALL_DIR "$XDG_TOOLCHAINS_HOME/python/venv"
 if not test -d "$UV_PYTHON_BIN_DIR"
     command mkdir -p "$UV_PYTHON_BIN_DIR"
