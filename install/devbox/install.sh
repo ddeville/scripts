@@ -146,7 +146,7 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 ############## Codex ##############
 ###################################
 
-# Need by bubblewrap to create users.
+# Needed by bubblewrap in codex to create users.
 sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
 ###################################
