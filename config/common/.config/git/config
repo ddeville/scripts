@@ -6,7 +6,7 @@
 [gpg "ssh"]
     program = op-ssh-sign
     allowedSignersFile = ~/.config/git/allowed_signers
-    defaultKeyCommand = ~/.config/git/default-signing-key-personal
+    defaultKeyCommand = ssh-signing-key-personal
 [core]
     editor = nvim
     excludesfile = ~/.config/git/gitignore_global
