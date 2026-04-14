@@ -63,6 +63,9 @@ if [[ -r $allowed_signers ]]; then
     emit_key "$signing_key"
     exit 0
   fi
+
+  echo "No personal SSH signing key from the active agent is listed in $allowed_signers." >&2
+  exit 1
 fi
 
 key_count=$(awk 'NF >= 2 { count++ } END { print count + 0 }' <<<"$agent_keys")
