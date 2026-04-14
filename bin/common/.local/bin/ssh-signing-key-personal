@@ -6,7 +6,7 @@ preferred_key="$HOME/.ssh/id_personal.pub"
 allowed_signers="$HOME/.config/git/allowed_signers"
 fallback_sock="$HOME/.1password/agent.sock"
 
-if [[ -z ${SSH_AUTH_SOCK:-} || ! -S ${SSH_AUTH_SOCK:-} || ${SSH_AUTH_SOCK:-} == /private/tmp/com.apple.launchd.* ]]; then
+if [[ -z ${SSH_AUTH_SOCK-} || ! -S ${SSH_AUTH_SOCK-} || ${SSH_AUTH_SOCK-} == /private/tmp/com.apple.launchd.* ]]; then
   export SSH_AUTH_SOCK="$fallback_sock"
 fi
 
