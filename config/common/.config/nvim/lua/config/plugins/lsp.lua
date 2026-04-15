@@ -1,5 +1,5 @@
 local function normalize_path(path)
-  return vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ':p')):gsub('/$', '')
+  return (vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ':p')):gsub('/$', ''))
 end
 
 local ty_root_blacklist =
