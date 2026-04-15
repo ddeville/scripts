@@ -1,3 +1,10 @@
+local function normalize_path(path)
+  return vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ':p')):gsub('/$', '')
+end
+
+local ty_root_blacklist =
+  vim.tbl_map(normalize_path, vim.split(vim.env.NVIM_TY_ROOT_BLACKLIST or '', ':', { plain = true, trimempty = true }))
+
 local servers = {
   bashls = {},
 
@@ -42,6 +49,12 @@ local servers = {
   },
 
   ty = {
+    root_dir = function(bufnr, on_dir)
+      local root = vim.fs.root(bufnr, { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt' })
+      if root and not vim.tbl_contains(ty_root_blacklist, normalize_path(root)) then
+        on_dir(root)
+      end
+    end,
     settings = {},
   },
 
