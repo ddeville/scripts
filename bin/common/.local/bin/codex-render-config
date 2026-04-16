@@ -10,7 +10,7 @@ from typing import cast
 
 import tomllib
 
-PRESERVED_TABLES = {"notice", "projects"}
+PRESERVED_TABLES = {"notice", "marketplaces", "plugins", "projects"}
 BARE_KEY_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
