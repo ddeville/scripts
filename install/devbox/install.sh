@@ -40,6 +40,7 @@ sudo apt-get update
 sudo apt-get -y install \
   bubblewrap \
   build-essential \
+  clang-format \
   cmake \
   curl \
   file \
