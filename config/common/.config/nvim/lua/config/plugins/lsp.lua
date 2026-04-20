@@ -109,8 +109,7 @@ local servers = {
 
   terraformls = {},
 
-  -- TODO: Re-enable this but the switch from terraformls to ts_ls broke things...
-  -- ts_ls = {},
+  ts_ls = {},
 
   yamlls = {
     filetypes = { 'yaml' },
