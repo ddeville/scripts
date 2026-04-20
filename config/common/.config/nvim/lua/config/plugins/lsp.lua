@@ -127,6 +127,13 @@ local pre_installed_servers = {
   sourcekit = true,
 }
 
+local function should_skip_server(name)
+  if name == 'sourcekit' and vim.uv.os_uname().sysname ~= 'Darwin' then
+    return true
+  end
+  return false
+end
+
 return {
   {
     'neovim/nvim-lspconfig',
@@ -140,8 +147,10 @@ return {
         ),
       })
       for name, config in pairs(servers) do
-        vim.lsp.config(name, config)
-        vim.lsp.enable(name)
+        if not should_skip_server(name) then
+          vim.lsp.config(name, config)
+          vim.lsp.enable(name)
+        end
       end
     end,
     dependencies = {
@@ -156,7 +165,7 @@ return {
         config = function()
           local server_names = {}
           for name, _ in pairs(servers) do
-            if pre_installed_servers[name] == nil then
+            if pre_installed_servers[name] == nil and not should_skip_server(name) then
               server_names[#server_names + 1] = name
             end
           end
