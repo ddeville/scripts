@@ -45,8 +45,8 @@ return {
           no_header_i = true,
           multiprocess = true,
           git_icons = false,
-          file_icons = false,
-          color_icons = false,
+          file_icons = 'mini',
+          color_icons = true,
           cwd_prompt = false,
           actions = {
             ['ctrl-g'] = { actions.toggle_ignore },
@@ -77,6 +77,7 @@ return {
         },
       })
     end,
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
   },
 
   {
