@@ -59,6 +59,8 @@ local function setup_treesitter()
   -- Use existing parsers for custom filetypes.
   vim.treesitter.language.register('starlark', { 'tiltfile' })
   vim.treesitter.language.register('ruby', { 'brewfile' })
+  vim.treesitter.language.register('terraform', { 'terraform-vars' })
+  vim.treesitter.language.register('go', { 'gowork', 'gotmpl' })
 
   vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('TreesitterHighlight', { clear = true }),
