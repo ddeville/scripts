@@ -113,6 +113,7 @@ local servers = {
   -- ts_ls = {},
 
   yamlls = {
+    filetypes = { 'yaml' },
     settings = {
       yaml = {
         keyOrdering = false,
