@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run Stylua
-        uses: JohnnyMorganz/stylua-action@v4
+        uses: JohnnyMorganz/stylua-action@76fd70c03e6340ceaf673366712db9b20560b402 # v5.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run LuaLS
-        uses: mrcjkb/lua-typecheck-action@v1
+        uses: mrcjkb/lua-typecheck-action@08d5ead5db7b1c8457aa7a0e566240b680b34588 # v1.1.0
         with:
           directories: |
             config/common/.config/nvim
@@ -97,7 +97,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run shfmt and checkbashisms
-        uses: luizm/action-sh-checker@master
+        uses: luizm/action-sh-checker@883217215b11c1fabbf00eb1a9a041f62d74c744 # v0.10.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SHFMT_OPTS: --simplify --indent 2
@@ -114,7 +114,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run fish_indent
-        uses: ddeville/fish-indent-action@master
+        uses: ddeville/fish-indent-action@f1c1ead425e5899a3f145668506c57c5e9dc627e # v0.2.0
 
   vint:
     # This runs `vint`: https://github.com/Vimjas/vint
@@ -124,4 +124,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: vint
-        uses: ddeville/vint-action@master
+        uses: ddeville/vint-action@91d05b1f8f84702bf4cf9c25ec06811d9a8db267 # v0.1.0
