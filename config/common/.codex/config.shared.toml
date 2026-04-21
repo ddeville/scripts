@@ -14,6 +14,10 @@ web_search = "cached"
 approval_policy = "on-request"
 approvals_reviewer = "guardian_subagent"
 
+# Features
+
+suppress_unstable_features_warning = true
+
 # UI
 
 [tui]
@@ -26,8 +30,6 @@ notification_method = "auto"
 enabled = true
 
 # Features
-
-suppress_unstable_features_warning = true
 
 [features]
 codex_git_commit = true
