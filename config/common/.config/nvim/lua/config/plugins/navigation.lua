@@ -34,7 +34,6 @@ return {
       fzf.setup({
         'ivy',
         file_icon_padding = ' ',
-        nbsp = '\xc2\xa0',
         winopts = {
           backdrop = false,
           height = 1,
