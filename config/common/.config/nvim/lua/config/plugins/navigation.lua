@@ -33,6 +33,8 @@ return {
       local actions = require('fzf-lua.actions')
       fzf.setup({
         'ivy',
+        file_icon_padding = ' ',
+        nbsp = '\xc2\xa0',
         winopts = {
           backdrop = false,
           height = 1,
@@ -45,7 +47,7 @@ return {
           no_header_i = true,
           multiprocess = true,
           git_icons = false,
-          file_icons = 'mini',
+          file_icons = 'devicons',
           color_icons = true,
           cwd_prompt = false,
           actions = {
@@ -77,7 +79,7 @@ return {
         },
       })
     end,
-    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
 
   {
@@ -278,7 +280,6 @@ return {
         },
       })
     end,
-    -- Alternatively can use 'nvim-tree/nvim-web-devicons'
-    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
 }
