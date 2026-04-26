@@ -23,6 +23,7 @@ suppress_unstable_features_warning = true
 [tui]
 theme = "gruvbox-dark"
 notification_method = "auto"
+status_line = ["model-with-reasoning", "current-dir", "run-state", "context-used"]
 
 # Plugins
 
