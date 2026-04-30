@@ -46,8 +46,11 @@ return {
           no_header_i = true,
           multiprocess = true,
           git_icons = false,
-          file_icons = 'devicons',
-          color_icons = true,
+          -- TODO(damien): This slows down searches a lot in a large repo...
+          -- file_icons = 'devicons',
+          -- color_icons = true,
+          file_icons = false,
+          color_icons = false,
           cwd_prompt = false,
           actions = {
             ['ctrl-g'] = { actions.toggle_ignore },
