@@ -58,7 +58,7 @@ wait_for_tunnel() {
     if ! kill -0 "$ssh_pid" 2>/dev/null; then
       ssh_status=0
       wait "$ssh_pid" || ssh_status=$?
-      echo "rcodex: ssh tunnel exited with status $ssh_status before Codex was reachable" >&2
+      echo "rcodex: ssh tunnel exited with status $ssh_status before codex was reachable" >&2
       return 1
     fi
 
@@ -90,7 +90,7 @@ if port_is_open; then
 fi
 
 if ! codex login status >/dev/null 2>&1; then
-  echo "rcodex: remote Codex login status failed" >&2
+  echo "rcodex: remote codex login status failed" >&2
   echo $(rcodex_shell_quote "$login_hint") >&2
   exit 1
 fi
@@ -106,7 +106,7 @@ for attempt in {1..100}; do
 
   if ! kill -0 "\$server_pid" 2>/dev/null; then
     rm -f "\$pid_file"
-    echo "rcodex: remote Codex app-server exited during startup" >&2
+    echo "rcodex: remote codex app-server exited during startup" >&2
     echo "rcodex: log: \$log_file" >&2
     exit 1
   fi
@@ -114,7 +114,7 @@ for attempt in {1..100}; do
   sleep 0.2
 done
 
-echo "rcodex: timed out starting remote Codex app-server" >&2
+echo "rcodex: timed out starting remote codex app-server" >&2
 echo "rcodex: log: \$log_file" >&2
 exit 1
 EOF
@@ -142,9 +142,9 @@ if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
 fi
 
-echo "rcodex: ensuring Codex is running on $host:$RCODEX_REMOTE_PORT" >&2
+echo "rcodex: ensuring codex is running on $host:$RCODEX_REMOTE_PORT" >&2
 script=$(remote_ensure_script)
-rcodex_run_remote "rcodex" "ensure remote Codex app-server" "$host" "$script" || exit 1
+rcodex_run_remote "rcodex" "ensure remote codex app-server" "$host" "$script" || exit 1
 
 local_port=$(choose_local_port)
 
@@ -156,7 +156,7 @@ ssh_cmd=(
   "$host"
 )
 
-echo "rcodex: connecting to Codex on $host:$RCODEX_REMOTE_PORT via local port $local_port" >&2
+echo "rcodex: connecting to codex on $host:$RCODEX_REMOTE_PORT via local port $local_port" >&2
 
 "${ssh_cmd[@]}" &
 ssh_pid=$!
