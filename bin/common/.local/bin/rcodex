@@ -9,18 +9,18 @@ local_port_range_end=17438
 
 usage() {
   cat <<'EOF'
-Usage: codex-remote <host> [-- <codex-args>...]
+Usage: rcodex <host> [-- <codex-args>...]
 
 Connect a local Codex TUI to a Codex app-server reachable only over SSH.
 
 Examples:
-  codex-remote host -- --cd src/project
-  codex-remote host -- --model gpt-5.2
+  rcodex host -- --cd src/project
+  rcodex host -- --model gpt-5.2
 EOF
 }
 
 die() {
-  echo "codex-remote: $*" >&2
+  echo "rcodex: $*" >&2
   exit 1
 }
 
@@ -61,7 +61,7 @@ wait_for_tunnel() {
     fi
 
     if ! kill -0 "$ssh_pid" 2>/dev/null; then
-      echo "codex-remote: ssh exited before Codex was reachable" >&2
+      echo "rcodex: ssh exited before Codex was reachable" >&2
       wait "$ssh_pid" || true
       return 1
     fi
@@ -69,13 +69,13 @@ wait_for_tunnel() {
     sleep 0.2
   done
 
-  echo "codex-remote: timed out waiting for ws://127.0.0.1:$local_port" >&2
+  echo "rcodex: timed out waiting for ws://127.0.0.1:$local_port" >&2
   return 1
 }
 
 remote_ensure_script() {
   local login_hint
-  login_hint="codex-remote: run: ssh $(shell_quote "$host") codex login"
+  login_hint="rcodex: run: ssh $(shell_quote "$host") codex login"
 
   cat <<EOF
 set -eu
@@ -87,7 +87,7 @@ port_is_open() {
 }
 
 if ! command -v codex >/dev/null 2>&1; then
-  echo "codex-remote: remote codex binary not found" >&2
+  echo "rcodex: remote codex binary not found" >&2
   exit 127
 fi
 
@@ -96,13 +96,13 @@ if port_is_open; then
 fi
 
 if ! codex login status >/dev/null 2>&1; then
-  echo "codex-remote: remote Codex login status failed" >&2
+  echo "rcodex: remote Codex login status failed" >&2
   echo $(shell_quote "$login_hint") >&2
   exit 1
 fi
 
 cd "\$HOME"
-log_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/codex-remote"
+log_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
 mkdir -p "\$log_dir"
 log_file="\$log_dir/app-server-\$port.log"
 
@@ -115,16 +115,16 @@ for _ in {1..100}; do
   fi
 
   if ! kill -0 "\$server_pid" 2>/dev/null; then
-    echo "codex-remote: remote Codex app-server exited during startup" >&2
-    echo "codex-remote: log: \$log_file" >&2
+    echo "rcodex: remote Codex app-server exited during startup" >&2
+    echo "rcodex: log: \$log_file" >&2
     exit 1
   fi
 
   sleep 0.2
 done
 
-echo "codex-remote: timed out starting remote Codex app-server" >&2
-echo "codex-remote: log: \$log_file" >&2
+echo "rcodex: timed out starting remote Codex app-server" >&2
+echo "rcodex: log: \$log_file" >&2
 exit 1
 EOF
 }
@@ -170,7 +170,7 @@ if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
 fi
 
-echo "codex-remote: ensuring Codex is running on $host:$remote_port" >&2
+echo "rcodex: ensuring Codex is running on $host:$remote_port" >&2
 script=$(remote_ensure_script)
 # shellcheck disable=SC2029
 ssh "$host" "bash -lc $(shell_quote "$script")"
@@ -183,7 +183,7 @@ ssh_cmd=(
 )
 
 ssh_cmd+=(-N)
-echo "codex-remote: connecting to Codex on $host:$remote_port via local port $local_port" >&2
+echo "rcodex: connecting to Codex on $host:$remote_port via local port $local_port" >&2
 
 "${ssh_cmd[@]}" &
 ssh_pid=$!
