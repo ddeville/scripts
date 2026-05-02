@@ -4,9 +4,6 @@ set -eu -o pipefail
 
 remote_port=17338
 
-local_port_range_start=17338
-local_port_range_end=17538
-
 usage() {
   cat <<'EOF'
 Usage: rcodex <host> [codex-args...]
@@ -37,16 +34,17 @@ port_is_open() {
 }
 
 choose_local_port() {
-  local port
+  local attempt port
 
-  for ((port = local_port_range_start; port <= local_port_range_end; port++)); do
+  for ((attempt = 0; attempt < 256; attempt++)); do
+    port=$((49152 + RANDOM % 16384))
     if ! port_is_open "$port"; then
       printf '%s\n' "$port"
       return 0
     fi
   done
 
-  die "no free local port found in $local_port_range_start-$local_port_range_end"
+  die "could not find a free local port"
 }
 
 wait_for_tunnel() {
