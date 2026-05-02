@@ -10,6 +10,13 @@ usage() {
 Usage: rcodex-stop <host>
 
 Stop a remote Codex app-server started by rcodex.
+
+Environment:
+  REMOTE_PORT  Remote app-server port; default: 17338
+
+Examples:
+  rcodex-stop host
+  REMOTE_PORT=17339 rcodex-stop host
 EOF
 }
 

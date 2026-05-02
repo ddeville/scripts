@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RCODEX_REMOTE_PORT=17338
+RCODEX_REMOTE_PORT=${REMOTE_PORT:-17338}
 
 rcodex_shell_quote() {
   local value quoted

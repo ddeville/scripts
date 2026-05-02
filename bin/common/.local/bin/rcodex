@@ -11,8 +11,12 @@ Usage: rcodex <host> [codex-args...]
 
 Connect a local Codex TUI to a Codex app-server reachable only over SSH.
 
+Environment:
+  REMOTE_PORT  Remote app-server port; default: 17338
+
 Examples:
   rcodex host --cd src/project
+  REMOTE_PORT=17339 rcodex host
   rcodex host --model gpt-5.5
 EOF
 }
