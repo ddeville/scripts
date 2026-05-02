@@ -9,13 +9,13 @@ local_port_range_end=17538
 
 usage() {
   cat <<'EOF'
-Usage: rcodex <host> [-- <codex-args>...]
+Usage: rcodex <host> [codex-args...]
 
 Connect a local Codex TUI to a Codex app-server reachable only over SSH.
 
 Examples:
-  rcodex host -- --cd src/project
-  rcodex host -- --model gpt-5.2
+  rcodex host --cd src/project
+  rcodex host --model gpt-5.2
 EOF
 }
 
@@ -129,40 +129,24 @@ exit 1
 EOF
 }
 
-host=
-codex_args=()
+if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
+  usage
+  exit 0
+fi
 
-while [[ $# -gt 0 ]]; do
-  case $1 in
-  --)
-    shift
-    codex_args=("$@")
-    break
-    ;;
-  -h | --help)
-    usage
-    exit 0
-    ;;
-  -*)
-    usage >&2
-    die "unknown option: $1"
-    ;;
-  *)
-    if [[ -n $host ]]; then
-      usage >&2
-      die "unexpected argument: $1"
-    fi
-    host=$1
-    ;;
-  esac
-
-  shift
-done
-
-[[ -n $host ]] || {
+[[ $# -gt 0 ]] || {
   usage >&2
   die "host is required"
 }
+
+if [[ $1 == -* ]]; then
+  usage >&2
+  die "host is required before codex args"
+fi
+
+host=$1
+shift
+codex_args=("$@")
 
 local_port=$(choose_local_port)
 
