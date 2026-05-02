@@ -2,14 +2,7 @@
 
 RCODEX_REMOTE_PORT=${REMOTE_PORT:-17338}
 
-rcodex_shell_quote() {
-  local value quoted
-  value=$1
-  quoted=${value//\'/\'\\\'\'}
-  printf "'%s'" "$quoted"
-}
-
-rcodex_remote_common_script() {
+RCODEX_REMOTE_PRELUDE=$(
   cat <<EOF
 set -eu
 
@@ -20,6 +13,13 @@ state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
 pid_file="\$state_dir/app-server-\$port.pid"
 log_file="\$state_dir/app-server-\$port.log"
 EOF
+)
+
+rcodex_shell_quote() {
+  local value quoted
+  value=$1
+  quoted=${value//\'/\'\\\'\'}
+  printf "'%s'" "$quoted"
 }
 
 rcodex_run_remote() {
@@ -33,7 +33,7 @@ rcodex_run_remote() {
   print_success_output=${5-}
 
   script_parts=(
-    "$(rcodex_remote_common_script)"
+    "$RCODEX_REMOTE_PRELUDE"
     "$script"
   )
   script=$(printf '%s\n' "${script_parts[@]}")
