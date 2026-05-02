@@ -34,10 +34,9 @@ port_is_open() {
 }
 
 choose_local_port() {
-  local attempt port
+  local port
 
-  for ((attempt = 0; attempt < 256; attempt++)); do
-    port=$((49152 + RANDOM % 16384))
+  for ((port = remote_port; port < remote_port + 200; port++)); do
     if ! port_is_open "$port"; then
       printf '%s\n' "$port"
       return 0
@@ -149,8 +148,6 @@ host=$1
 shift
 codex_args=("$@")
 
-local_port=$(choose_local_port)
-
 if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
 fi
@@ -159,6 +156,8 @@ echo "rcodex: ensuring Codex is running on $host:$remote_port" >&2
 script=$(remote_ensure_script)
 # shellcheck disable=SC2029
 ssh "$host" "bash -lc $(shell_quote "$script")"
+
+local_port=$(choose_local_port)
 
 ssh_cmd=(
   ssh
