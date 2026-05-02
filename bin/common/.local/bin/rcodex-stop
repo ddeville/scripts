@@ -1,0 +1,91 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+remote_port=17338
+
+usage() {
+  cat <<'EOF'
+Usage: rcodex-stop <host>
+
+Stop a remote Codex app-server started by rcodex.
+EOF
+}
+
+die() {
+  echo "rcodex-stop: $*" >&2
+  exit 1
+}
+
+shell_quote() {
+  local value quoted
+  value=$1
+  quoted=${value//\'/\'\\\'\'}
+  printf "'%s'" "$quoted"
+}
+
+remote_stop_script() {
+  cat <<EOF
+set -eu
+
+port=$remote_port
+state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
+pid_file="\$state_dir/app-server-\$port.pid"
+
+if [[ ! -f "\$pid_file" ]]; then
+  echo "rcodex-stop: no pid file at \$pid_file" >&2
+  exit 0
+fi
+
+server_pid=\$(cat "\$pid_file")
+case "\$server_pid" in
+  ''|*[!0-9]*)
+    echo "rcodex-stop: invalid pid file: \$pid_file" >&2
+    exit 1
+    ;;
+esac
+
+if kill "\$server_pid" 2>/dev/null; then
+  rm -f "\$pid_file"
+  echo "rcodex-stop: signaled remote Codex app-server pid \$server_pid" >&2
+else
+  rm -f "\$pid_file"
+  echo "rcodex-stop: pid \$server_pid was not running; removed stale pid file" >&2
+fi
+EOF
+}
+
+if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+[[ $# -eq 1 ]] || {
+  usage >&2
+  die "host is required"
+}
+
+if [[ $1 == -* ]]; then
+  usage >&2
+  die "host is required"
+fi
+
+host=$1
+script=$(remote_stop_script)
+
+set +e
+# shellcheck disable=SC2029
+stop_output=$(ssh "$host" "bash -c $(shell_quote "$script")" 2>&1)
+stop_status=$?
+set -e
+
+if ((stop_status != 0)); then
+  echo "rcodex-stop: failed to stop remote Codex app-server on $host:$remote_port (ssh status $stop_status)" >&2
+  stop_output=${stop_output//$'\n'/ }
+  echo "rcodex-stop: output: ${stop_output:-<empty>}" >&2
+  exit 1
+fi
+
+if [[ -n $stop_output ]]; then
+  printf '%s\n' "$stop_output" >&2
+fi
