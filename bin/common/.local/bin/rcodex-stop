@@ -42,7 +42,7 @@ esac
 
 if kill "\$server_pid" 2>/dev/null; then
   rm -f "\$pid_file"
-  echo "rcodex-stop: signaled remote Codex app-server pid \$server_pid" >&2
+  echo "rcodex-stop: signaled remote codex app-server pid \$server_pid" >&2
 else
   rm -f "\$pid_file"
   echo "rcodex-stop: pid \$server_pid was not running; removed stale pid file" >&2
@@ -67,4 +67,4 @@ fi
 
 host=$1
 script=$(remote_stop_script)
-rcodex_run_remote "rcodex-stop" "stop remote Codex app-server" "$host" "$script" print || exit 1
+rcodex_run_remote "rcodex-stop" "stop remote codex app-server" "$host" "$script" print || exit 1
