@@ -47,7 +47,7 @@ choose_local_port() {
 }
 
 wait_for_tunnel() {
-  local local_port wait_seconds attempts i
+  local local_port wait_seconds attempts i ssh_status
   local_port=$1
   wait_seconds=20
   attempts=$((wait_seconds * 5))
@@ -58,8 +58,9 @@ wait_for_tunnel() {
     fi
 
     if ! kill -0 "$ssh_pid" 2>/dev/null; then
-      echo "rcodex: ssh exited before Codex was reachable" >&2
-      wait "$ssh_pid" || true
+      ssh_status=0
+      wait "$ssh_pid" || ssh_status=$?
+      echo "rcodex: ssh tunnel exited with status $ssh_status before Codex was reachable" >&2
       return 1
     fi
 
@@ -76,6 +77,8 @@ remote_ensure_script() {
 
   cat <<EOF
 set -eu
+
+PATH="\$HOME/.local/bin:\$HOME/bin:\$PATH"
 
 port=$remote_port
 
@@ -154,8 +157,19 @@ fi
 
 echo "rcodex: ensuring Codex is running on $host:$remote_port" >&2
 script=$(remote_ensure_script)
+
+set +e
 # shellcheck disable=SC2029
-ssh "$host" "bash -lc $(shell_quote "$script")"
+remote_ensure_output=$(ssh "$host" "bash -c $(shell_quote "$script")" 2>&1)
+remote_ensure_status=$?
+set -e
+
+if ((remote_ensure_status != 0)); then
+  echo "rcodex: failed to ensure remote Codex app-server on $host:$remote_port (ssh status $remote_ensure_status)" >&2
+  remote_ensure_output=${remote_ensure_output//$'\n'/ }
+  echo "rcodex: output: ${remote_ensure_output:-<empty>}" >&2
+  exit 1
+fi
 
 local_port=$(choose_local_port)
 
