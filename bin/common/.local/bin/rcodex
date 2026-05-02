@@ -149,7 +149,6 @@ fi
 
 host=$1
 shift
-codex_args=("$@")
 
 if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
@@ -200,10 +199,8 @@ trap 'trap - EXIT; cleanup; exit 143' TERM
 
 wait_for_tunnel "$local_port" || exit 1
 
-client_cmd=(codex --remote "ws://127.0.0.1:$local_port" "${codex_args[@]}")
-
 set +e
-"${client_cmd[@]}"
+codex --remote "ws://127.0.0.1:$local_port" "$@"
 client_status=$?
 set -e
 
