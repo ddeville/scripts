@@ -24,11 +24,18 @@ EOF
 
 rcodex_run_remote() {
   local command_name action host script print_success_output output status
+  local script_parts
   command_name=$1
   action=$2
   host=$3
   script=$4
   print_success_output=${5-}
+
+  script_parts=(
+    "$(rcodex_remote_common_script)"
+    "$script"
+  )
+  script=$(printf '%s\n' "${script_parts[@]}")
 
   set +e
   # shellcheck disable=SC2029
