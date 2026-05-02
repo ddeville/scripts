@@ -89,6 +89,12 @@ if ! command -v codex >/dev/null 2>&1; then
   exit 127
 fi
 
+cd "\$HOME"
+state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
+mkdir -p "\$state_dir"
+pid_file="\$state_dir/app-server-\$port.pid"
+log_file="\$state_dir/app-server-\$port.log"
+
 if port_is_open; then
   exit 0
 fi
@@ -99,13 +105,9 @@ if ! codex login status >/dev/null 2>&1; then
   exit 1
 fi
 
-cd "\$HOME"
-log_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
-mkdir -p "\$log_dir"
-log_file="\$log_dir/app-server-\$port.log"
-
 nohup codex app-server --listen "ws://127.0.0.1:\$port" >"\$log_file" 2>&1 &
 server_pid=\$!
+printf '%s\n' "\$server_pid" >"\$pid_file"
 
 for attempt in {1..100}; do
   if port_is_open; then
@@ -113,6 +115,7 @@ for attempt in {1..100}; do
   fi
 
   if ! kill -0 "\$server_pid" 2>/dev/null; then
+    rm -f "\$pid_file"
     echo "rcodex: remote Codex app-server exited during startup" >&2
     echo "rcodex: log: \$log_file" >&2
     exit 1
