@@ -2,7 +2,8 @@
 
 set -eu -o pipefail
 
-remote_port=17338
+script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
+source "$script_dir/../lib/rcodex.bash"
 
 usage() {
   cat <<'EOF'
@@ -17,20 +18,9 @@ die() {
   exit 1
 }
 
-shell_quote() {
-  local value quoted
-  value=$1
-  quoted=${value//\'/\'\\\'\'}
-  printf "'%s'" "$quoted"
-}
-
 remote_stop_script() {
   cat <<EOF
-set -eu
-
-port=$remote_port
-state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
-pid_file="\$state_dir/app-server-\$port.pid"
+$(rcodex_remote_common_script)
 
 if [[ ! -f "\$pid_file" ]]; then
   echo "rcodex-stop: no pid file at \$pid_file" >&2
@@ -72,20 +62,4 @@ fi
 
 host=$1
 script=$(remote_stop_script)
-
-set +e
-# shellcheck disable=SC2029
-stop_output=$(ssh "$host" "bash -c $(shell_quote "$script")" 2>&1)
-stop_status=$?
-set -e
-
-if ((stop_status != 0)); then
-  echo "rcodex-stop: failed to stop remote Codex app-server on $host:$remote_port (ssh status $stop_status)" >&2
-  stop_output=${stop_output//$'\n'/ }
-  echo "rcodex-stop: output: ${stop_output:-<empty>}" >&2
-  exit 1
-fi
-
-if [[ -n $stop_output ]]; then
-  printf '%s\n' "$stop_output" >&2
-fi
+rcodex_run_remote "rcodex-stop" "stop remote Codex app-server" "$host" "$script" print || exit 1
