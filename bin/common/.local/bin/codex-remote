@@ -2,11 +2,10 @@
 
 set -eu -o pipefail
 
-remote_port=17338
-local_port_start=17338
-local_port_end=17438
-local_port=
-wait_seconds=20
+default_remote_port=17338
+
+local_port_range_start=17338
+local_port_range_end=17438
 
 usage() {
   cat <<'EOF'
@@ -46,18 +45,20 @@ port_is_open() {
 choose_local_port() {
   local port
 
-  for ((port = local_port_start; port <= local_port_end; port++)); do
+  for ((port = local_port_range_start; port <= local_port_range_end; port++)); do
     if ! port_is_open "$port"; then
-      local_port=$port
+      printf '%s\n' "$port"
       return 0
     fi
   done
 
-  die "no free local port found in $local_port_start-$local_port_end"
+  die "no free local port found in $local_port_range_start-$local_port_range_end"
 }
 
 wait_for_tunnel() {
-  local attempts i
+  local local_port wait_seconds attempts i
+  local_port=$1
+  wait_seconds=20
   attempts=$((wait_seconds * 5))
 
   for ((i = 0; i < attempts; i++)); do
@@ -110,6 +111,7 @@ remote_start_script() {
 
 start=false
 remote_cwd=
+remote_port=$default_remote_port
 host=
 codex_args=()
 
@@ -127,6 +129,9 @@ while [[ $# -gt 0 ]]; do
     [[ $# -ge 2 ]] || die "$1 requires a directory"
     remote_cwd=$2
     shift
+    ;;
+  --cd=*)
+    remote_cwd=${1#*=}
     ;;
   --remote-port)
     [[ $# -ge 2 ]] || die "$1 requires a port"
@@ -162,7 +167,7 @@ done
 }
 
 valid_port "$remote_port" || die "invalid remote port: $remote_port"
-choose_local_port
+local_port=$(choose_local_port)
 
 if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
@@ -199,7 +204,7 @@ trap cleanup EXIT
 trap 'trap - EXIT; cleanup; exit 130' INT
 trap 'trap - EXIT; cleanup; exit 143' TERM
 
-wait_for_tunnel || exit 1
+wait_for_tunnel "$local_port" || exit 1
 
 client_cmd=(codex --remote "ws://127.0.0.1:$local_port")
 
