@@ -15,7 +15,7 @@ Connect a local Codex TUI to a Codex app-server reachable only over SSH.
 
 Examples:
   rcodex host --cd src/project
-  rcodex host --model gpt-5.2
+  rcodex host --model gpt-5.5
 EOF
 }
 
