@@ -2,7 +2,8 @@
 
 set -eu -o pipefail
 
-remote_port=17338
+script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
+source "$script_dir/../lib/rcodex.bash"
 
 usage() {
   cat <<'EOF'
@@ -21,13 +22,6 @@ die() {
   exit 1
 }
 
-shell_quote() {
-  local value quoted
-  value=$1
-  quoted=${value//\'/\'\\\'\'}
-  printf "'%s'" "$quoted"
-}
-
 port_is_open() {
   local port=$1
   (exec 3<>"/dev/tcp/127.0.0.1/$port") >/dev/null 2>&1
@@ -36,7 +30,7 @@ port_is_open() {
 choose_local_port() {
   local port
 
-  for ((port = remote_port; port < remote_port + 200; port++)); do
+  for ((port = RCODEX_REMOTE_PORT; port < RCODEX_REMOTE_PORT + 200; port++)); do
     if ! port_is_open "$port"; then
       printf '%s\n' "$port"
       return 0
@@ -73,14 +67,10 @@ wait_for_tunnel() {
 
 remote_ensure_script() {
   local login_hint
-  login_hint="rcodex: run: ssh $(shell_quote "$host") codex login"
+  login_hint="rcodex: run: ssh $(rcodex_shell_quote "$host") codex login"
 
   cat <<EOF
-set -eu
-
-PATH="\$HOME/.local/bin:\$HOME/bin:\$PATH"
-
-port=$remote_port
+$(rcodex_remote_common_script)
 
 port_is_open() {
   (exec 3<>"/dev/tcp/127.0.0.1/\$port") >/dev/null 2>&1
@@ -92,10 +82,7 @@ if ! command -v codex >/dev/null 2>&1; then
 fi
 
 cd "\$HOME"
-state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
 mkdir -p "\$state_dir"
-pid_file="\$state_dir/app-server-\$port.pid"
-log_file="\$state_dir/app-server-\$port.log"
 
 if port_is_open; then
   exit 0
@@ -103,7 +90,7 @@ fi
 
 if ! codex login status >/dev/null 2>&1; then
   echo "rcodex: remote Codex login status failed" >&2
-  echo $(shell_quote "$login_hint") >&2
+  echo $(rcodex_shell_quote "$login_hint") >&2
   exit 1
 fi
 
@@ -154,21 +141,9 @@ if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
 fi
 
-echo "rcodex: ensuring Codex is running on $host:$remote_port" >&2
+echo "rcodex: ensuring Codex is running on $host:$RCODEX_REMOTE_PORT" >&2
 script=$(remote_ensure_script)
-
-set +e
-# shellcheck disable=SC2029
-remote_ensure_output=$(ssh "$host" "bash -c $(shell_quote "$script")" 2>&1)
-remote_ensure_status=$?
-set -e
-
-if ((remote_ensure_status != 0)); then
-  echo "rcodex: failed to ensure remote Codex app-server on $host:$remote_port (ssh status $remote_ensure_status)" >&2
-  remote_ensure_output=${remote_ensure_output//$'\n'/ }
-  echo "rcodex: output: ${remote_ensure_output:-<empty>}" >&2
-  exit 1
-fi
+rcodex_run_remote "rcodex" "ensure remote Codex app-server" "$host" "$script" || exit 1
 
 local_port=$(choose_local_port)
 
@@ -176,11 +151,11 @@ ssh_cmd=(
   ssh
   -N
   -o ExitOnForwardFailure=yes
-  -L "127.0.0.1:$local_port:127.0.0.1:$remote_port"
+  -L "127.0.0.1:$local_port:127.0.0.1:$RCODEX_REMOTE_PORT"
   "$host"
 )
 
-echo "rcodex: connecting to Codex on $host:$remote_port via local port $local_port" >&2
+echo "rcodex: connecting to Codex on $host:$RCODEX_REMOTE_PORT via local port $local_port" >&2
 
 "${ssh_cmd[@]}" &
 ssh_pid=$!
