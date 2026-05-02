@@ -25,6 +25,7 @@ EOF
 rcodex_run_remote() {
   local command_name action host script print_success_output output status
   local script_parts
+
   command_name=$1
   action=$2
   host=$3
