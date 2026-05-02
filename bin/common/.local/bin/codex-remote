@@ -1,0 +1,217 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+remote_port=17338
+local_port_start=17338
+local_port_end=17438
+local_port=
+wait_seconds=20
+
+usage() {
+  cat <<'EOF'
+Usage: codex-remote [--start] [-C dir] [--remote-port port] <host> [-- <codex-args>...]
+
+Connect a local Codex TUI to a Codex app-server reachable only over SSH.
+
+Examples:
+  codex-remote --start -C ~/src/project host
+  codex-remote --remote-port 17339 host
+  codex-remote host -- --model gpt-5.2
+EOF
+}
+
+die() {
+  echo "codex-remote: $*" >&2
+  exit 1
+}
+
+shell_quote() {
+  local value quoted
+  value=$1
+  quoted=${value//\'/\'\\\'\'}
+  printf "'%s'" "$quoted"
+}
+
+valid_port() {
+  local port=$1
+  [[ $port =~ ^[0-9]+$ ]] && ((10#$port >= 1 && 10#$port <= 65535))
+}
+
+port_is_open() {
+  local port=$1
+  (exec 3<>"/dev/tcp/127.0.0.1/$port") >/dev/null 2>&1
+}
+
+choose_local_port() {
+  local port
+
+  for ((port = local_port_start; port <= local_port_end; port++)); do
+    if ! port_is_open "$port"; then
+      local_port=$port
+      return 0
+    fi
+  done
+
+  die "no free local port found in $local_port_start-$local_port_end"
+}
+
+wait_for_tunnel() {
+  local attempts i
+  attempts=$((wait_seconds * 5))
+
+  for ((i = 0; i < attempts; i++)); do
+    if port_is_open "$local_port"; then
+      return 0
+    fi
+
+    if ! kill -0 "$ssh_pid" 2>/dev/null; then
+      echo "codex-remote: ssh exited before Codex was reachable" >&2
+      wait "$ssh_pid" || true
+      return 1
+    fi
+
+    sleep 0.2
+  done
+
+  echo "codex-remote: timed out waiting for ws://127.0.0.1:$local_port" >&2
+  return 1
+}
+
+remote_start_script() {
+  local q_cwd
+  q_cwd=$(shell_quote "$remote_cwd")
+
+  printf 'if ! command -v codex >/dev/null 2>&1; then\n'
+  printf '  echo "codex-remote: remote codex binary not found" >&2\n'
+  printf '  exit 127\n'
+  printf 'fi\n'
+
+  if [[ -n $remote_cwd ]]; then
+    printf 'if [ ! -d %s ]; then\n' "$q_cwd"
+    printf '  echo %s >&2\n' "$(shell_quote "codex-remote: remote working directory does not exist: $remote_cwd")"
+    printf '  exit 1\n'
+    printf 'fi\n'
+  fi
+
+  printf 'if ! codex login status >/dev/null 2>&1; then\n'
+  printf '  echo "codex-remote: remote Codex login status failed" >&2\n'
+  printf '  echo %s >&2\n' "$(shell_quote "codex-remote: run: ssh $(shell_quote "$host") codex login")"
+  printf '  exit 1\n'
+  printf 'fi\n'
+
+  if [[ -n $remote_cwd ]]; then
+    printf 'cd %s\n' "$q_cwd"
+    printf 'exec codex -C %s app-server --listen ws://127.0.0.1:%s\n' "$q_cwd" "$remote_port"
+  else
+    printf 'exec codex app-server --listen ws://127.0.0.1:%s\n' "$remote_port"
+  fi
+}
+
+start=false
+remote_cwd=
+host=
+codex_args=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --)
+    shift
+    codex_args=("$@")
+    break
+    ;;
+  --start)
+    start=true
+    ;;
+  -C | --cd)
+    [[ $# -ge 2 ]] || die "$1 requires a directory"
+    remote_cwd=$2
+    shift
+    ;;
+  --remote-port)
+    [[ $# -ge 2 ]] || die "$1 requires a port"
+    remote_port=$2
+    shift
+    ;;
+  --remote-port=*)
+    remote_port=${1#*=}
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  -*)
+    usage >&2
+    die "unknown option: $1"
+    ;;
+  *)
+    if [[ -n $host ]]; then
+      usage >&2
+      die "unexpected argument: $1"
+    fi
+    host=$1
+    ;;
+  esac
+
+  shift
+done
+
+[[ -n $host ]] || {
+  usage >&2
+  die "host is required"
+}
+
+valid_port "$remote_port" || die "invalid remote port: $remote_port"
+choose_local_port
+
+if ! command -v codex >/dev/null 2>&1; then
+  die "local codex binary not found"
+fi
+
+ssh_cmd=(
+  ssh
+  -o ExitOnForwardFailure=yes
+  -L "127.0.0.1:$local_port:127.0.0.1:$remote_port"
+  "$host"
+)
+
+if $start; then
+  script=$(remote_start_script)
+  ssh_cmd+=("sh -lc $(shell_quote "$script")")
+  echo "codex-remote: starting Codex on $host:$remote_port via local port $local_port" >&2
+else
+  ssh_cmd+=(-N)
+  echo "codex-remote: connecting to Codex on $host:$remote_port via local port $local_port" >&2
+fi
+
+"${ssh_cmd[@]}" &
+ssh_pid=$!
+
+# shellcheck disable=SC2329
+cleanup() {
+  if kill -0 "$ssh_pid" 2>/dev/null; then
+    kill "$ssh_pid" 2>/dev/null || true
+    wait "$ssh_pid" 2>/dev/null || true
+  fi
+}
+
+trap cleanup EXIT
+trap 'trap - EXIT; cleanup; exit 130' INT
+trap 'trap - EXIT; cleanup; exit 143' TERM
+
+wait_for_tunnel || exit 1
+
+client_cmd=(codex --remote "ws://127.0.0.1:$local_port")
+
+if [[ -n $remote_cwd ]]; then
+  client_cmd+=(-C "$remote_cwd")
+fi
+
+client_cmd+=("${codex_args[@]}")
+
+set +e
+"${client_cmd[@]}"
+client_status=$?
+set -e
+
+exit "$client_status"
