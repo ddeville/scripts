@@ -164,7 +164,7 @@ echo "rcodex: connecting to Codex on $host:$RCODEX_REMOTE_PORT via local port $l
 "${ssh_cmd[@]}" &
 ssh_pid=$!
 
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 cleanup() {
   if kill -0 "$ssh_pid" 2>/dev/null; then
     kill "$ssh_pid" 2>/dev/null || true
