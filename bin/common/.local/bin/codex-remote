@@ -2,20 +2,19 @@
 
 set -eu -o pipefail
 
-default_remote_port=17338
+remote_port=17338
 
 local_port_range_start=17338
 local_port_range_end=17438
 
 usage() {
   cat <<'EOF'
-Usage: codex-remote [--start] [-C dir] [--remote-port port] <host> [-- <codex-args>...]
+Usage: codex-remote <host> [-- <codex-args>...]
 
 Connect a local Codex TUI to a Codex app-server reachable only over SSH.
 
 Examples:
-  codex-remote --start -C ~/src/project host
-  codex-remote --remote-port 17339 host
+  codex-remote host -- --cd src/project
   codex-remote host -- --model gpt-5.2
 EOF
 }
@@ -30,11 +29,6 @@ shell_quote() {
   value=$1
   quoted=${value//\'/\'\\\'\'}
   printf "'%s'" "$quoted"
-}
-
-valid_port() {
-  local port=$1
-  [[ $port =~ ^[0-9]+$ ]] && ((10#$port >= 1 && 10#$port <= 65535))
 }
 
 port_is_open() {
@@ -79,39 +73,62 @@ wait_for_tunnel() {
   return 1
 }
 
-remote_start_script() {
-  local q_cwd
-  q_cwd=$(shell_quote "$remote_cwd")
+remote_ensure_script() {
+  local login_hint
+  login_hint="codex-remote: run: ssh $(shell_quote "$host") codex login"
 
-  printf 'if ! command -v codex >/dev/null 2>&1; then\n'
-  printf '  echo "codex-remote: remote codex binary not found" >&2\n'
-  printf '  exit 127\n'
-  printf 'fi\n'
+  cat <<EOF
+set -eu
 
-  if [[ -n $remote_cwd ]]; then
-    printf 'if [ ! -d %s ]; then\n' "$q_cwd"
-    printf '  echo %s >&2\n' "$(shell_quote "codex-remote: remote working directory does not exist: $remote_cwd")"
-    printf '  exit 1\n'
-    printf 'fi\n'
-  fi
+port=$remote_port
 
-  printf 'if ! codex login status >/dev/null 2>&1; then\n'
-  printf '  echo "codex-remote: remote Codex login status failed" >&2\n'
-  printf '  echo %s >&2\n' "$(shell_quote "codex-remote: run: ssh $(shell_quote "$host") codex login")"
-  printf '  exit 1\n'
-  printf 'fi\n'
-
-  if [[ -n $remote_cwd ]]; then
-    printf 'cd %s\n' "$q_cwd"
-    printf 'exec codex -C %s app-server --listen ws://127.0.0.1:%s\n' "$q_cwd" "$remote_port"
-  else
-    printf 'exec codex app-server --listen ws://127.0.0.1:%s\n' "$remote_port"
-  fi
+port_is_open() {
+  (exec 3<>"/dev/tcp/127.0.0.1/\$port") >/dev/null 2>&1
 }
 
-start=false
-remote_cwd=
-remote_port=$default_remote_port
+if ! command -v codex >/dev/null 2>&1; then
+  echo "codex-remote: remote codex binary not found" >&2
+  exit 127
+fi
+
+if port_is_open; then
+  exit 0
+fi
+
+if ! codex login status >/dev/null 2>&1; then
+  echo "codex-remote: remote Codex login status failed" >&2
+  echo $(shell_quote "$login_hint") >&2
+  exit 1
+fi
+
+cd "\$HOME"
+log_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/codex-remote"
+mkdir -p "\$log_dir"
+log_file="\$log_dir/app-server-\$port.log"
+
+nohup codex app-server --listen "ws://127.0.0.1:\$port" >"\$log_file" 2>&1 &
+server_pid=\$!
+
+for _ in {1..100}; do
+  if port_is_open; then
+    exit 0
+  fi
+
+  if ! kill -0 "\$server_pid" 2>/dev/null; then
+    echo "codex-remote: remote Codex app-server exited during startup" >&2
+    echo "codex-remote: log: \$log_file" >&2
+    exit 1
+  fi
+
+  sleep 0.2
+done
+
+echo "codex-remote: timed out starting remote Codex app-server" >&2
+echo "codex-remote: log: \$log_file" >&2
+exit 1
+EOF
+}
+
 host=
 codex_args=()
 
@@ -121,25 +138,6 @@ while [[ $# -gt 0 ]]; do
     shift
     codex_args=("$@")
     break
-    ;;
-  --start)
-    start=true
-    ;;
-  -C | --cd)
-    [[ $# -ge 2 ]] || die "$1 requires a directory"
-    remote_cwd=$2
-    shift
-    ;;
-  --cd=*)
-    remote_cwd=${1#*=}
-    ;;
-  --remote-port)
-    [[ $# -ge 2 ]] || die "$1 requires a port"
-    remote_port=$2
-    shift
-    ;;
-  --remote-port=*)
-    remote_port=${1#*=}
     ;;
   -h | --help)
     usage
@@ -166,12 +164,16 @@ done
   die "host is required"
 }
 
-valid_port "$remote_port" || die "invalid remote port: $remote_port"
 local_port=$(choose_local_port)
 
 if ! command -v codex >/dev/null 2>&1; then
   die "local codex binary not found"
 fi
+
+echo "codex-remote: ensuring Codex is running on $host:$remote_port" >&2
+script=$(remote_ensure_script)
+# shellcheck disable=SC2029
+ssh "$host" "bash -lc $(shell_quote "$script")"
 
 ssh_cmd=(
   ssh
@@ -180,14 +182,8 @@ ssh_cmd=(
   "$host"
 )
 
-if $start; then
-  script=$(remote_start_script)
-  ssh_cmd+=("sh -lc $(shell_quote "$script")")
-  echo "codex-remote: starting Codex on $host:$remote_port via local port $local_port" >&2
-else
-  ssh_cmd+=(-N)
-  echo "codex-remote: connecting to Codex on $host:$remote_port via local port $local_port" >&2
-fi
+ssh_cmd+=(-N)
+echo "codex-remote: connecting to Codex on $host:$remote_port via local port $local_port" >&2
 
 "${ssh_cmd[@]}" &
 ssh_pid=$!
@@ -206,13 +202,7 @@ trap 'trap - EXIT; cleanup; exit 143' TERM
 
 wait_for_tunnel "$local_port" || exit 1
 
-client_cmd=(codex --remote "ws://127.0.0.1:$local_port")
-
-if [[ -n $remote_cwd ]]; then
-  client_cmd+=(-C "$remote_cwd")
-fi
-
-client_cmd+=("${codex_args[@]}")
+client_cmd=(codex --remote "ws://127.0.0.1:$local_port" "${codex_args[@]}")
 
 set +e
 "${client_cmd[@]}"
