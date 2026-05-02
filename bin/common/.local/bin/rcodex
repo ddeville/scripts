@@ -84,7 +84,6 @@ if ! command -v codex >/dev/null 2>&1; then
 fi
 
 cd "\$HOME"
-mkdir -p "\$state_dir"
 
 if port_is_open; then
   exit 0

@@ -9,7 +9,10 @@ set -eu
 PATH="\$HOME/.local/bin:\$HOME/bin:\$PATH"
 
 port=$RCODEX_REMOTE_PORT
+
 state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/rcodex"
+mkdir -p "\$state_dir"
+
 pid_file="\$state_dir/app-server-\$port.pid"
 log_file="\$state_dir/app-server-\$port.log"
 EOF
