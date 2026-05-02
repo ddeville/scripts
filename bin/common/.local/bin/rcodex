@@ -109,7 +109,7 @@ log_file="\$log_dir/app-server-\$port.log"
 nohup codex app-server --listen "ws://127.0.0.1:\$port" >"\$log_file" 2>&1 &
 server_pid=\$!
 
-for _ in {1..100}; do
+for attempt in {1..100}; do
   if port_is_open; then
     exit 0
   fi
@@ -161,12 +161,12 @@ ssh "$host" "bash -lc $(shell_quote "$script")"
 
 ssh_cmd=(
   ssh
+  -N
   -o ExitOnForwardFailure=yes
   -L "127.0.0.1:$local_port:127.0.0.1:$remote_port"
   "$host"
 )
 
-ssh_cmd+=(-N)
 echo "rcodex: connecting to Codex on $host:$remote_port via local port $local_port" >&2
 
 "${ssh_cmd[@]}" &
