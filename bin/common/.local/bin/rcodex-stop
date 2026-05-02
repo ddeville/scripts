@@ -27,8 +27,6 @@ die() {
 
 remote_stop_script() {
   cat <<EOF
-$(rcodex_remote_common_script)
-
 if [[ ! -f "\$pid_file" ]]; then
   echo "rcodex-stop: no pid file at \$pid_file" >&2
   exit 0

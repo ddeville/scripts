@@ -74,8 +74,6 @@ remote_ensure_script() {
   login_hint="rcodex: run: ssh $(rcodex_shell_quote "$host") codex login"
 
   cat <<EOF
-$(rcodex_remote_common_script)
-
 port_is_open() {
   (exec 3<>"/dev/tcp/127.0.0.1/\$port") >/dev/null 2>&1
 }
