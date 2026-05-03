@@ -26,59 +26,53 @@ die() {
   exit 1
 }
 
-port_is_open() {
-  local port=$1
-  (exec 3<>"/dev/tcp/127.0.0.1/$port") >/dev/null 2>&1
-}
-
-choose_local_port() {
+parse_allocated_port() {
+  local output=$1
   local port
 
-  for ((port = RCODEX_REMOTE_PORT; port < RCODEX_REMOTE_PORT + 200; port++)); do
-    if ! port_is_open "$port"; then
-      printf '%s\n' "$port"
-      return 0
-    fi
-  done
+  if [[ $output =~ Allocated\ port\ ([0-9]+) ]]; then
+    port=${BASH_REMATCH[1]}
+    printf '%s\n' "$port"
+    return 0
+  fi
 
-  die "could not find a free local port"
-}
-
-wait_for_tunnel() {
-  local local_port wait_seconds attempts i ssh_status
-  local_port=$1
-  wait_seconds=20
-  attempts=$((wait_seconds * 5))
-
-  for ((i = 0; i < attempts; i++)); do
-    if port_is_open "$local_port"; then
-      return 0
-    fi
-
-    if ! ssh_is_running; then
-      ssh_status=0
-      wait "$ssh_pid" || ssh_status=$?
-      echo "rcodex: ssh tunnel exited with status $ssh_status before codex was reachable" >&2
-      return 1
-    fi
-
-    sleep 0.2
-  done
-
-  echo "rcodex: timed out waiting for ws://127.0.0.1:$local_port" >&2
   return 1
 }
 
-ssh_is_running() {
-  local pid
+start_tunnel() {
+  local output status
 
-  for pid in $(jobs -pr); do
-    if [[ $pid == "$ssh_pid" ]]; then
-      return 0
-    fi
-  done
+  control_path=$(mktemp -u "${TMPDIR:-/tmp}/rcodex-ssh-%XXXXXXXX")
 
-  return 1
+  ssh -MNf \
+    -S "$control_path" \
+    -o ExitOnForwardFailure=yes \
+    "$host"
+
+  set +e
+  output=$(ssh \
+    -S "$control_path" \
+    -O forward \
+    -L "127.0.0.1:0:127.0.0.1:$RCODEX_REMOTE_PORT" \
+    "$host" 2>&1)
+  status=$?
+  set -e
+
+  if ((status != 0)); then
+    output=${output//$'\n'/ }
+    echo "rcodex: failed to request dynamic local forward via control socket (ssh status $status)" >&2
+    echo "rcodex: output: ${output:-<empty>}" >&2
+    return 1
+  fi
+
+  if ! local_port=$(parse_allocated_port "$output"); then
+    output=${output//$'\n'/ }
+    echo "rcodex: could not parse allocated local port from ssh output" >&2
+    echo "rcodex: output: ${output:-<empty>}" >&2
+    return 1
+  fi
+
+  echo "rcodex: connecting to codex on $host:$RCODEX_REMOTE_PORT via local port $local_port" >&2
 }
 
 print_resume_command() {
@@ -192,26 +186,10 @@ echo "rcodex: ensuring codex is running on $host:$RCODEX_REMOTE_PORT" >&2
 script=$(remote_ensure_script)
 rcodex_run_remote "rcodex" "ensure remote codex app-server" "$host" "$script" || exit 1
 
-local_port=$(choose_local_port)
-
-ssh_cmd=(
-  ssh
-  -N
-  -o ExitOnForwardFailure=yes
-  -L "127.0.0.1:$local_port:127.0.0.1:$RCODEX_REMOTE_PORT"
-  "$host"
-)
-
-echo "rcodex: connecting to codex on $host:$RCODEX_REMOTE_PORT via local port $local_port" >&2
-
-"${ssh_cmd[@]}" &
-ssh_pid=$!
-
 # shellcheck disable=SC2317,SC2329
 cleanup() {
-  if kill -0 "$ssh_pid" 2>/dev/null; then
-    kill "$ssh_pid" 2>/dev/null || true
-    wait "$ssh_pid" 2>/dev/null || true
+  if [[ ${control_path-} != "" ]]; then
+    ssh -S "$control_path" -O exit "$host" >/dev/null 2>&1 || true
   fi
 }
 
@@ -219,7 +197,7 @@ trap cleanup EXIT
 trap 'trap - EXIT; cleanup; exit 130' INT
 trap 'trap - EXIT; cleanup; exit 143' TERM
 
-wait_for_tunnel "$local_port" || exit 1
+start_tunnel || exit 1
 
 set +e
 codex --remote "ws://127.0.0.1:$local_port" "$@"
