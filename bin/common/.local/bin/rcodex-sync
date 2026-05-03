@@ -34,10 +34,6 @@ stage_codex_config() {
     "$stage_home/.codex/skills"
 
   stow --restow --no-folding "${config_dirs[@]}" --dir "$repo_dir/config" --target "$stage_home"
-
-  if [[ ! -x $stage_home/.codex/bin/render-config ]]; then
-    die "staged render-config is missing or not executable: $stage_home/.codex/bin/render-config"
-  fi
 }
 
 remote_prepare_script() {
