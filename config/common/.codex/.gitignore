@@ -3,7 +3,9 @@
 !AGENTS.md
 !config.shared.toml
 !config.shared.override.toml
+!bin/
 !bin/render-config
+!skills/
 !skills/personal/
 !skills/personal/**
 !skills/openai
