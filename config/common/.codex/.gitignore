@@ -4,9 +4,9 @@
 !config.shared.toml
 !config.shared.override.toml
 !bin/
-!bin/render-config
+!bin/**
 !skills/
 !skills/personal/
 !skills/personal/**
-!skills/openai
+!skills/openai/
 !skills/openai/**
