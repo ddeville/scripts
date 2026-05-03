@@ -47,4 +47,4 @@ if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" clean --force -d -- config bin
 fi
 
-"$lib_dir/render-codex-config"
+python3 "$lib_dir/render_codex_config.py"
