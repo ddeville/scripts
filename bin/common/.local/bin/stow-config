@@ -13,7 +13,7 @@ elif [ "$plat" = "Darwin" ]; then
 fi
 
 # OpenAI stuff
-if [ -d "$HOME/scripts-openai" ]; then
+if [ -d "$HOME/scripts/config/openai" ]; then
   dirs+=(openai)
 fi
 
