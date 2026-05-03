@@ -10,7 +10,13 @@ from typing import cast
 
 import tomllib
 
-PRESERVED_TABLES = {"notice", "marketplaces", "plugins", "projects"}
+PRESERVED_TABLES = {
+    ("notice",),
+    ("marketplaces",),
+    ("plugins",),
+    ("projects",),
+    ("tui", "model_availability_nux"),
+}
 BARE_KEY_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
@@ -38,14 +44,37 @@ def iter_leaf_paths(val: object, prefix: tuple[str, ...] = ()) -> list[tuple[str
     return [prefix]
 
 
+def is_preserved_path(path: tuple[str, ...]) -> bool:
+    return any(path[: len(preserved)] == preserved for preserved in PRESERVED_TABLES)
+
+
 def collect_non_preserved_paths(config: dict) -> list[str]:
     paths: list[str] = []
     for key, val in config.items():
-        if key in PRESERVED_TABLES:
-            continue
         for path in iter_leaf_paths(val, (key,)):
-            paths.append(".".join(path))
+            if not is_preserved_path(path):
+                paths.append(".".join(path))
     return paths
+
+
+def get_path(config: dict, path: tuple[str, ...]) -> object:
+    val: object = config
+    for key in path:
+        if not isinstance(val, dict) or key not in val:
+            raise KeyError(path)
+        val = cast(dict[str, object], val)[key]
+    return val
+
+
+def set_path(config: dict, path: tuple[str, ...], val: object) -> None:
+    table = config
+    for key in path[:-1]:
+        existing = table.get(key)
+        if not isinstance(existing, dict):
+            existing = {}
+            table[key] = existing
+        table = cast(dict[str, object], existing)
+    table[path[-1]] = val
 
 
 def format_key(key: str) -> str:
@@ -129,9 +158,12 @@ def main() -> int:
             file=sys.stderr,
         )
 
-    for table_name in sorted(PRESERVED_TABLES):
-        if table_name in existing:
-            rendered[table_name] = existing[table_name]
+    for path in sorted(PRESERVED_TABLES):
+        try:
+            preserved = get_path(existing, path)
+        except KeyError:
+            continue
+        set_path(rendered, path, preserved)
 
     if existing == rendered:
         return 0
