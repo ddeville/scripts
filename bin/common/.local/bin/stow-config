@@ -3,6 +3,7 @@
 set -eu -o pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+lib_dir="$script_dir/../lib/stow-config"
 
 dirs=(common)
 
@@ -46,4 +47,4 @@ if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" clean --force -d -- config bin
 fi
 
-"$script_dir/codex-render-config"
+"$lib_dir/render-codex-config"

@@ -134,7 +134,7 @@ def main() -> int:
 
     if not shared_path.exists():
         print(
-            f"codex-render-config: no shared config found at {shared_path}; skipping",
+            f"render-codex-config: no shared config found at {shared_path}; skipping",
             file=sys.stderr,
         )
         return 0
@@ -152,7 +152,7 @@ def main() -> int:
     )
     if removed_paths:
         print(
-            "codex-render-config: removing entries from config.toml:",
+            "render-codex-config: removing entries from config.toml:",
             *removed_paths,
             sep="\n  - ",
             file=sys.stderr,
@@ -174,14 +174,14 @@ def main() -> int:
         backup_path = config_path.with_name(config_path.name + ".bak")
         shutil.copy2(config_path, backup_path)
         print(
-            f"codex-render-config: backed up {config_path} to {backup_path}",
+            f"render-codex-config: backed up {config_path} to {backup_path}",
             file=sys.stderr,
         )
 
     rendered_text = dump_toml(rendered)
     config_path.write_text(rendered_text, encoding="utf-8")
 
-    print(f"codex-render-config: wrote {config_path}", file=sys.stderr)
+    print(f"render-codex-config: wrote {config_path}", file=sys.stderr)
 
     return 0
 
