@@ -85,11 +85,13 @@ print_resume_command() {
   local resume_args=()
   local arg
 
-  if [[ ${1-} == "resume" ]]; then
-    resume_args=("$@")
-  else
-    resume_args=(resume --last "$@")
-  fi
+  resume_args=(resume --last "$@")
+  for arg in "$@"; do
+    if [[ $arg == "resume" ]]; then
+      resume_args=("$@")
+      break
+    fi
+  done
 
   echo "rcodex: disconnected" >&2
   echo "rcodex: to resume with the same launch args, run:" >&2
@@ -218,9 +220,6 @@ codex --remote "ws://127.0.0.1:$local_port" "$@"
 client_status=$?
 set -e
 
-if ! ssh_is_running; then
-  wait "$ssh_pid" 2>/dev/null || true
-  print_resume_command "$@"
-fi
+print_resume_command "$@"
 
 exit "$client_status"
