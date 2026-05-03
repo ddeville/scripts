@@ -2,4 +2,5 @@
 .gitkeep
 .gitignore
 .vim-bookmarks
+\.ssh/ssh_auth_sock$
 __pycache__
