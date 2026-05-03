@@ -25,6 +25,20 @@ rcodex_shell_quote() {
   printf "'%s'" "$quoted"
 }
 
+rcodex_format_shell_arg() {
+  local arg=$1
+
+  if [[ $arg =~ ^[A-Za-z0-9_./:=,+@%+-]+$ ]]; then
+    printf '%s' "$arg"
+  else
+    rcodex_shell_quote "$arg"
+  fi
+}
+
+rcodex_print_command_arg() {
+  printf ' %s' "$(rcodex_format_shell_arg "$1")"
+}
+
 rcodex_run_remote() {
   local command_name action host script print_success_output output status
   local script_parts
