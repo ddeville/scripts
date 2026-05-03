@@ -14,10 +14,12 @@ Sync this repo's Codex config, helpers, and owned skills to a remote host.
 
 Environment:
   REMOTE_PORT  Remote app-server port used for restart hints; default: 17338
+  REMOTE_CODEX_HOME  Remote Codex home; default: .codex under the remote home
 
 Examples:
   rcodex-sync host
   REMOTE_PORT=17339 rcodex-sync host
+  REMOTE_CODEX_HOME=/tmp/rcodex-sync-test rcodex-sync host
 EOF
 }
 
@@ -31,14 +33,26 @@ stage_codex_config() {
   stow --restow --no-folding "${config_dirs[@]}" --dir "$repo_dir/config" --target "$stage_home"
 }
 
+remote_codex_home_script() {
+  cat <<EOF
+codex_home=$(rcodex_shell_quote "$remote_codex_home")
+case "\$codex_home" in
+  /*) ;;
+  *) codex_home="\$HOME/\$codex_home" ;;
+esac
+EOF
+}
+
 remote_prepare_script() {
-  cat <<'EOF'
+  cat <<EOF
 if ! command -v rsync >/dev/null 2>&1; then
   echo "rcodex-sync: remote rsync binary not found" >&2
   exit 127
 fi
 
-mkdir -p "$HOME/.codex"
+$(remote_codex_home_script)
+
+mkdir -p "\$codex_home"
 EOF
 }
 
@@ -51,16 +65,18 @@ remote_render_script() {
   fi
 
   cat <<EOF
+$(remote_codex_home_script)
+
 port_is_open() {
   (exec 3<>"/dev/tcp/127.0.0.1/\$port") >/dev/null 2>&1
 }
 
-if [[ ! -x "\$HOME/.codex/bin/render-config" ]]; then
+if [[ ! -x "\$codex_home/bin/render-config" ]]; then
   echo "rcodex-sync: remote render-config is missing or not executable" >&2
   exit 1
 fi
 
-"\$HOME/.codex/bin/render-config"
+CODEX_HOME="\$codex_home" "\$codex_home/bin/render-config"
 
 if port_is_open; then
   echo $(rcodex_shell_quote "rcodex-sync: remote codex app-server is running; restart it with: $restart_command") >&2
@@ -69,22 +85,24 @@ EOF
 }
 
 sync_codex() {
-  local script status
+  local rsync_dest script status
 
   stage_codex_config
 
   script=$(remote_prepare_script)
   rcodex_run_remote "rcodex-sync" "prepare remote codex directory" "$host" "$script" || exit 1
 
-  echo "rcodex-sync: syncing staged .codex to $host:~/.codex" >&2
+  rsync_dest="$host:$(rcodex_format_shell_arg "$remote_codex_home")/"
+
+  echo "rcodex-sync: syncing staged .codex to $host:$remote_codex_home" >&2
 
   set +e
-  rsync -azL --rsync-path="PATH=\"\$HOME/.local/bin:\$HOME/bin:\$PATH\" rsync" "$stage_home/.codex/" "$host:.codex/"
+  rsync -azL --rsync-path="PATH=\"\$HOME/.local/bin:\$HOME/bin:\$PATH\" rsync" "$stage_home/.codex/" "$rsync_dest"
   status=$?
   set -e
 
   if ((status != 0)); then
-    die "failed to rsync staged .codex to $host:~/.codex (rsync status $status)"
+    die "failed to rsync staged .codex to $host:$remote_codex_home (rsync status $status)"
   fi
 
   script=$(remote_render_script)
@@ -111,6 +129,7 @@ fi
 host=$1
 repo_dir="$(cd -- "$script_dir/../../../.." && pwd)"
 config_dirs=(common)
+remote_codex_home=${REMOTE_CODEX_HOME:-.codex}
 stage_home=
 
 cleanup() {
