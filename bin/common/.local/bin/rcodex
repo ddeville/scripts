@@ -55,7 +55,7 @@ wait_for_tunnel() {
       return 0
     fi
 
-    if ! kill -0 "$ssh_pid" 2>/dev/null; then
+    if ! ssh_is_running; then
       ssh_status=0
       wait "$ssh_pid" || ssh_status=$?
       echo "rcodex: ssh tunnel exited with status $ssh_status before codex was reachable" >&2
@@ -67,6 +67,44 @@ wait_for_tunnel() {
 
   echo "rcodex: timed out waiting for ws://127.0.0.1:$local_port" >&2
   return 1
+}
+
+ssh_is_running() {
+  local pid
+
+  for pid in $(jobs -pr); do
+    if [[ $pid == "$ssh_pid" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+print_resume_command() {
+  local resume_args=()
+  local arg
+
+  if [[ ${1-} == "resume" ]]; then
+    resume_args=("$@")
+  else
+    resume_args=(resume --last "$@")
+  fi
+
+  echo "rcodex: disconnected" >&2
+  echo "rcodex: to resume with the same launch args, run:" >&2
+
+  printf '  ' >&2
+  if [[ ${REMOTE_PORT-} != "" ]]; then
+    printf 'REMOTE_PORT=%s ' "$(rcodex_format_shell_arg "$REMOTE_PORT")" >&2
+  fi
+
+  printf 'rcodex' >&2
+  rcodex_print_command_arg "$host" >&2
+  for arg in "${resume_args[@]}"; do
+    rcodex_print_command_arg "$arg" >&2
+  done
+  printf '\n' >&2
 }
 
 remote_ensure_script() {
@@ -179,5 +217,10 @@ set +e
 codex --remote "ws://127.0.0.1:$local_port" "$@"
 client_status=$?
 set -e
+
+if ! ssh_is_running; then
+  wait "$ssh_pid" 2>/dev/null || true
+  print_resume_command "$@"
+fi
 
 exit "$client_status"
