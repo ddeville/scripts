@@ -44,4 +44,5 @@ if [ -d "$HOME/scripts/.git" ]; then
   git -C "$HOME/scripts" clean --force -d -- config bin
 fi
 
+# Post-processing for a few things...
 "$HOME/.codex/bin/render-config"
