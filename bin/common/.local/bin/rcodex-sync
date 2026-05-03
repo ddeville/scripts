@@ -27,12 +27,6 @@ die() {
 
 stage_codex_config() {
   stage_home=$(mktemp -d "${TMPDIR:-/tmp}/rcodex-sync.XXXXXX")
-
-  mkdir -p \
-    "$stage_home/.codex" \
-    "$stage_home/.codex/bin" \
-    "$stage_home/.codex/skills"
-
   stow --restow --no-folding "${config_dirs[@]}" --dir "$repo_dir/config" --target "$stage_home"
 }
 
