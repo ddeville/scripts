@@ -23,7 +23,7 @@ EOF
 }
 
 die() {
-  echo "rcodex-sync: $*" >&2
+  echo "rcodex: $*" >&2
   exit 1
 }
 
@@ -45,7 +45,7 @@ EOF
 remote_prepare_script() {
   cat <<EOF
 if ! command -v rsync >/dev/null 2>&1; then
-  echo "rcodex-sync: remote rsync binary not found" >&2
+  echo "rcodex: remote rsync binary not found" >&2
   exit 127
 fi
 
@@ -71,32 +71,35 @@ port_is_open() {
 }
 
 if [[ ! -x "\$codex_home/bin/render-config" ]]; then
-  echo "rcodex-sync: remote render-config is missing or not executable" >&2
+  echo "rcodex: remote render-config is missing or not executable" >&2
   exit 1
 fi
 
 CODEX_HOME="\$codex_home" "\$codex_home/bin/render-config"
 
 if port_is_open; then
-  echo $(rcodex_shell_quote "rcodex-sync: remote codex app-server is running; restart it with: $restart_command") >&2
+  echo $(rcodex_shell_quote "rcodex: remote codex app-server is running; restart it with: $restart_command") >&2
 fi
 EOF
 }
 
 sync_codex() {
-  local rsync_dest script status
+  local rsync_dest rsync_ssh script status
 
   stage_codex_config
+  control_path=$(rcodex_make_control_path)
+  rcodex_start_control_master "$host" "$control_path" || exit 1
 
   script=$(remote_prepare_script)
-  rcodex_run_remote "rcodex-sync" "prepare remote codex directory" "$host" "$script" || exit 1
+  rcodex_run_remote "prepare remote codex directory" "$host" "$script" "$control_path" || exit 1
 
   rsync_dest="$host:$remote_codex_home/"
+  rsync_ssh="ssh -F none -S $(rcodex_format_shell_arg "$control_path")"
 
-  echo "rcodex-sync: syncing staged .codex to $host:$remote_codex_home" >&2
+  echo "rcodex: syncing staged .codex to $host:$remote_codex_home" >&2
 
   set +e
-  rsync -azL --rsync-path="PATH=\"\$HOME/.local/bin:\$HOME/bin:\$PATH\" rsync" "$stage_home/.codex/" "$rsync_dest"
+  rsync -azL -e "$rsync_ssh" --rsync-path="PATH=\"\$HOME/.local/bin:\$HOME/bin:\$PATH\" rsync" "$stage_home/.codex/" "$rsync_dest"
   status=$?
   set -e
 
@@ -105,9 +108,9 @@ sync_codex() {
   fi
 
   script=$(remote_render_script)
-  rcodex_run_remote "rcodex-sync" "render remote codex config" "$host" "$script" print || exit 1
+  RCODEX_PRINT_REMOTE_OUTPUT=1 rcodex_run_remote "render remote codex config" "$host" "$script" "$control_path" || exit 1
 
-  echo "rcodex-sync: synced $host" >&2
+  echo "rcodex: synced $host" >&2
 }
 
 if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
@@ -129,15 +132,22 @@ host=$1
 repo_dir="$(cd -- "$script_dir/../../../.." && pwd)"
 config_dirs=(common)
 remote_codex_home=${REMOTE_CODEX_HOME:-.codex}
+control_path=
 stage_home=
 
 cleanup() {
+  if [[ $control_path != "" ]]; then
+    rcodex_stop_control_master "$host" "$control_path"
+    rm -f "$control_path"
+  fi
   if [[ $stage_home != "" ]]; then
     rm -rf "$stage_home"
   fi
 }
 
 trap cleanup EXIT
+trap 'trap - EXIT; cleanup; exit 130' INT
+trap 'trap - EXIT; cleanup; exit 143' TERM
 
 plat="$(uname)"
 if [[ $plat == "Linux" ]]; then
