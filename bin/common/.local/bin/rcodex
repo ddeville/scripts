@@ -84,6 +84,8 @@ ssh_is_running() {
 print_resume_command() {
   local resume_args=()
   local arg
+  local command_color=""
+  local reset_color=""
 
   resume_args=(resume --last "$@")
   for arg in "$@"; do
@@ -93,10 +95,14 @@ print_resume_command() {
     fi
   done
 
-  echo "rcodex: disconnected" >&2
-  echo "rcodex: to resume with the same launch args, run:" >&2
+  if [[ -t 2 && ${NO_COLOR-} == "" ]]; then
+    command_color=$'\033[36m'
+    reset_color=$'\033[0m'
+  fi
 
-  printf '  ' >&2
+  echo "rcodex: disconnected" >&2
+  printf 'rcodex: to resume with the same launch args, run: %s' "$command_color" >&2
+
   if [[ ${REMOTE_PORT-} != "" ]]; then
     printf 'REMOTE_PORT=%s ' "$(rcodex_format_shell_arg "$REMOTE_PORT")" >&2
   fi
@@ -106,7 +112,7 @@ print_resume_command() {
   for arg in "${resume_args[@]}"; do
     rcodex_print_command_arg "$arg" >&2
   done
-  printf '\n' >&2
+  printf '%s\n' "$reset_color" >&2
 }
 
 remote_ensure_script() {
