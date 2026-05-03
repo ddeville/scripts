@@ -91,7 +91,7 @@ sync_codex() {
   script=$(remote_prepare_script)
   rcodex_run_remote "rcodex-sync" "prepare remote codex directory" "$host" "$script" || exit 1
 
-  rsync_dest="$host:$(rcodex_format_shell_arg "$remote_codex_home")/"
+  rsync_dest="$host:$remote_codex_home/"
 
   echo "rcodex-sync: syncing staged .codex to $host:$remote_codex_home" >&2
 
