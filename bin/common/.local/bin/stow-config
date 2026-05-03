@@ -27,6 +27,7 @@ fi
 # individually instead of folding the whole directory into one symlink.
 unfolded_paths=(
   "$HOME/.codex"
+  "$HOME/.codex/skills"
   "$HOME/.local/bin"
   "$HOME/.ssh"
 )
