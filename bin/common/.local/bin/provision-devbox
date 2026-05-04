@@ -113,6 +113,8 @@ trap 'trap - EXIT; cleanup; exit 143' TERM
 start_control_master
 
 install_repo_snapshot scripts https://github.com/ddeville/scripts.git
-install_repo_snapshot scripts-openai https://github.com/ddeville/scripts-openai.git
+if [ -d "$HOME/scripts/config/openai" ]; then
+  install_repo_snapshot scripts-openai https://github.com/ddeville/scripts-openai.git
+fi
 
 run_devbox_installer
