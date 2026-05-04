@@ -48,12 +48,16 @@ ssh_remote_tty() {
 }
 
 install_repo_snapshot() {
-  local remote_script repo_name repo_url pack_tmp
+  local remote_script repo_name repo_path pack_tmp staged_repo
 
   repo_name=$1
-  repo_url=$2
+  repo_path=$2
 
-  echo "provision-devbox: installing remote ~/$repo_name" >&2
+  if ! git -C "$repo_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    die "local repo is not a git worktree: $repo_path"
+  fi
+
+  echo "provision-devbox: installing remote ~/$repo_name from $repo_path" >&2
   remote_script=$(
     printf '%s\n\n' 'set -eu'
     printf "repo_name='%s'\n\n" "$repo_name"
@@ -74,9 +78,11 @@ EOF
   )
 
   pack_tmp=$(mktemp -d)
-  git clone --depth 1 "$repo_url" "$pack_tmp/$repo_name"
-  rm -rf "$pack_tmp/$repo_name/.git"
-  rm -rf "$pack_tmp/$repo_name/.github"
+  staged_repo="$pack_tmp/$repo_name"
+  COPYFILE_DISABLE=1 cp -Rp "$repo_path" "$staged_repo"
+  git -C "$staged_repo" clean -ffdx
+  rm -rf "$staged_repo/.git"
+  rm -rf "$staged_repo/.github"
 
   COPYFILE_DISABLE=1 tar -cz --no-xattrs --exclude .DS_Store -f - -C "$pack_tmp" "$repo_name" |
     ssh_remote "$remote_script"
@@ -116,9 +122,9 @@ trap 'trap - EXIT; cleanup; exit 143' TERM
 
 start_control_master
 
-install_repo_snapshot scripts https://github.com/ddeville/scripts.git
+install_repo_snapshot scripts "$HOME/scripts"
 if [ -d "$HOME/scripts/config/openai" ]; then
-  install_repo_snapshot scripts-openai https://github.com/ddeville/scripts-openai.git
+  install_repo_snapshot scripts-openai "$HOME/scripts-openai"
 fi
 
 run_devbox_installer
