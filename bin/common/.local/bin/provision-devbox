@@ -1,0 +1,165 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: provision-devbox <host>
+
+Provision a devbox over SSH.
+
+The script clones ~/scripts on the remote host if missing, optionally installs
+~/scripts-openai from the local machine if present and missing remotely, then
+runs ~/scripts/install/devbox/install.sh on the remote host.
+EOF
+}
+
+die() {
+  echo "provision-devbox: $*" >&2
+  exit 1
+}
+
+start_control_master() {
+  local output status
+
+  control_path=${TMPDIR:-/tmp}/provision-devbox-ssh-control.$$
+
+  set +e
+  output=$(ssh \
+    -MNf \
+    -S "$control_path" \
+    -o ClearAllForwardings=yes \
+    "$host" 2>&1)
+  status=$?
+  set -e
+
+  if ((status != 0)); then
+    output=${output//$'\n'/ }
+    die "failed to start ssh control master (ssh status $status): ${output:-<empty>}"
+  fi
+}
+
+ssh_remote() {
+  ssh -F none -S "$control_path" "$host" "$@"
+}
+
+install_scripts_repo() {
+  echo "provision-devbox: ensuring remote ~/scripts" >&2
+
+  ssh_remote 'bash -s' <<'EOF'
+set -eu
+
+if [ ! -e "$HOME/scripts" ]; then
+  git clone https://github.com/ddeville/scripts.git "$HOME/scripts"
+elif [ ! -d "$HOME/scripts" ]; then
+  echo "provision-devbox: $HOME/scripts exists but is not a directory" >&2
+  exit 1
+elif [ ! -d "$HOME/scripts/.git" ]; then
+  echo "provision-devbox: $HOME/scripts exists but is not a git repository" >&2
+  exit 1
+else
+  git -C "$HOME/scripts" fetch origin
+  git -C "$HOME/scripts" reset --hard origin/main
+  git -C "$HOME/scripts" clean -ffxd
+fi
+EOF
+}
+
+maybe_install_scripts_openai() {
+  local remote_script status
+
+  if [ ! -d "$HOME/scripts-openai" ]; then
+    echo "provision-devbox: local ~/scripts-openai not found; skipping" >&2
+    return 0
+  fi
+
+  set +e
+  ssh_remote 'test -e ~/scripts-openai'
+  status=$?
+  set -e
+
+  if ((status == 0)); then
+    echo "provision-devbox: remote ~/scripts-openai already exists; skipping" >&2
+    return 0
+  fi
+
+  if ((status != 1)); then
+    die "failed to check remote ~/scripts-openai (ssh status $status)"
+  fi
+
+  echo "provision-devbox: installing remote ~/scripts-openai" >&2
+
+  remote_script=$(
+    cat <<'EOF'
+set -eu
+
+if [ -e "$HOME/scripts-openai" ]; then
+  rm -rf "$HOME/scripts-openai"
+fi
+
+tmp_tar=$(mktemp "${TMPDIR:-/tmp}/scripts-openai.XXXXXX.tar.gz")
+cleanup() {
+  rm -f "$tmp_tar"
+}
+trap cleanup EXIT
+
+cat >"$tmp_tar"
+tar -xzf "$tmp_tar" -C "$HOME"
+EOF
+  )
+
+  pack_tmp=$(mktemp -d)
+  cp -R "$HOME/scripts-openai" "$pack_tmp/scripts-openai" 2>/dev/null
+
+  if [ -d "$pack_tmp/scripts-openai/.git" ]; then
+    git -C "$pack_tmp/scripts-openai" clean -ffxdq
+    rm -rf "$pack_tmp/scripts-openai/.git"
+    rm -rf "$pack_tmp/scripts-openai/.github"
+  fi
+
+  COPYFILE_DISABLE=1 tar -cz --no-xattrs --exclude .DS_Store -f - -C "$pack_tmp" scripts-openai |
+    ssh_remote "$remote_script"
+}
+
+run_devbox_installer() {
+  echo "provision-devbox: running remote devbox installer" >&2
+
+  if [ -t 0 ]; then
+    ssh -t -F none -S "$control_path" "$host" 'exec ~/scripts/install/devbox/install.sh'
+  else
+    ssh_remote 'exec ~/scripts/install/devbox/install.sh'
+  fi
+}
+
+cleanup() {
+  if [ -n "$control_path" ]; then
+    ssh -F none -S "$control_path" -O exit "$host" >/dev/null 2>&1 || true
+    rm -f "$control_path"
+  fi
+  if [ -n "$pack_tmp" ]; then
+    rm -rf "$pack_tmp"
+  fi
+}
+
+if [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+[ $# -eq 1 ] || {
+  usage >&2
+  die "host is required"
+}
+
+host=$1
+control_path=
+pack_tmp=
+
+trap cleanup EXIT
+trap 'trap - EXIT; cleanup; exit 130' INT
+trap 'trap - EXIT; cleanup; exit 143' TERM
+
+start_control_master
+install_scripts_repo
+maybe_install_scripts_openai
+run_devbox_installer
