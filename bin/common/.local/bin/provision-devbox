@@ -79,11 +79,7 @@ EOF
 run_devbox_installer() {
   echo "provision-devbox: running remote devbox installer" >&2
 
-  if [ -t 0 ]; then
-    ssh -t -F none -S "$control_path" "$host" 'exec ~/scripts/install/devbox/install.sh'
-  else
-    ssh_remote 'exec ~/scripts/install/devbox/install.sh'
-  fi
+  ssh_remote 'exec ~/scripts/install/devbox/install.sh'
 }
 
 cleanup() {
