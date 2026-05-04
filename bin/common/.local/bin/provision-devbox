@@ -39,6 +39,14 @@ ssh_remote() {
   ssh -F none -S "$control_path" "$host" "$@"
 }
 
+ssh_remote_tty() {
+  if [ -t 0 ]; then
+    ssh -t -F none -S "$control_path" "$host" "$@"
+  else
+    ssh_remote "$@"
+  fi
+}
+
 install_repo_snapshot() {
   local remote_script repo_name repo_url pack_tmp
 
@@ -79,7 +87,7 @@ EOF
 run_devbox_installer() {
   echo "provision-devbox: running remote devbox installer" >&2
 
-  ssh_remote 'exec ~/scripts/install/devbox/install.sh'
+  ssh_remote_tty 'exec ~/scripts/install/devbox/install.sh'
 }
 
 cleanup() {
