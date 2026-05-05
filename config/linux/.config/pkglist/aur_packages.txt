@@ -24,10 +24,6 @@ google-chrome
 nautilus-dropbox
 nitrogen
 
-# ========== Virtualization =========
-
-bridge-utils
-
 # ============== Fonts ==============
 
 apple-fonts
