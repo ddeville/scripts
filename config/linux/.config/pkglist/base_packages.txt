@@ -78,7 +78,6 @@ acpid
 
 bat
 curl
-dust
 eza
 dialog
 difftastic
