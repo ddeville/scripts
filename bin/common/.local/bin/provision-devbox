@@ -96,9 +96,21 @@ EOF
 }
 
 run_devbox_installer() {
+  local command
+
   echo "provision-devbox: running remote devbox installer" >&2
 
-  ssh_remote_tty 'exec ~/scripts/install/devbox/install.sh'
+  command=$(
+    cat <<'EOF'
+exec env \
+  DEVBOX_INSTALL_RUN_AS_ROOT=1 \
+  DEVBOX_INSTALL_MINIMAL_PACKAGES=1 \
+  DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 \
+  ~/scripts/install/devbox/install.sh
+EOF
+  )
+
+  ssh_remote_tty "$command"
 }
 
 cleanup() {
