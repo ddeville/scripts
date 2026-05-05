@@ -11,6 +11,7 @@ set -eu -o pipefail
 #   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
 export DEBIAN_FRONTEND=noninteractive
+export NONINTERACTIVE=1
 
 devbox_install_flag() {
   local default name value
