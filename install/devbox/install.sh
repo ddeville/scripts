@@ -10,6 +10,8 @@ set -eu -o pipefail
 #   DEVBOX_INSTALL_MINIMAL_PACKAGES=1 installs Brewfile.min-devbox and skips language toolchains.
 #   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
+export DEBIAN_FRONTEND=noninteractive
+
 devbox_install_flag() {
   local default name value
 
