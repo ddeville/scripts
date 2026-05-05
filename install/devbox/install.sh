@@ -6,7 +6,7 @@ set -eu -o pipefail
 # toolchains or programs to the latest version.
 #
 # Environment:
-#   DEVBOX_INSTALL_RUN_AS_ROOT=1 expects the script to run as root and skips sudo setup.
+#   DEVBOX_INSTALL_RUN_AS_ROOT=1 expects the script to run as root and skips user sudo setup.
 #   DEVBOX_INSTALL_MINIMAL_PACKAGES=1 installs Brewfile.min-devbox and skips language toolchains.
 #   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
@@ -48,19 +48,15 @@ if devbox_install_flag DEVBOX_INSTALL_RUN_AS_ROOT false; then
     echo "DEVBOX_INSTALL_RUN_AS_ROOT is set, but the script is not running as root."
     exit 1
   fi
-
-  sudo_cmd=()
 else
   if [ "$(id -u)" -eq 0 ]; then
     echo "The script is running as root, please run as the user or set DEVBOX_INSTALL_RUN_AS_ROOT=1."
     exit 1
   fi
 
-  sudo_cmd=(sudo)
-
-  "${sudo_cmd[@]}" adduser "$USER" sudo
-  echo "${USER} ALL=(ALL) NOPASSWD:ALL" | "${sudo_cmd[@]}" tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
-  "${sudo_cmd[@]}" chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
+  sudo adduser "$USER" sudo
+  echo "${USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
+  sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
 fi
 
 export PATH="$HOME/.local/bin:$PATH"
@@ -82,9 +78,9 @@ trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
 # system and for which we don't really need the very latest version and can live
 # with whatever version the current distro happens to package.
 
-"${sudo_cmd[@]}" apt-get update
+sudo apt-get update
 
-"${sudo_cmd[@]}" apt-get -y install \
+sudo apt-get -y install \
   bubblewrap \
   build-essential \
   clang-format \
@@ -116,18 +112,42 @@ trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
 ############ Homebrew #############
 ###################################
 
-LINUXBREW_PATH="/home/linuxbrew/.linuxbrew"
+LINUXBREW_USER="linuxbrew"
+LINUXBREW_HOME="/home/${LINUXBREW_USER}"
+LINUXBREW_PATH="${LINUXBREW_HOME}/.linuxbrew"
 BREW_BIN="$LINUXBREW_PATH/bin/brew"
+
 if devbox_install_flag DEVBOX_INSTALL_MINIMAL_PACKAGES false; then
   BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox-minimal"
 else
   BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox"
 fi
 
-[ -x "$BREW_BIN" ] || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ensure_linuxbrew_user() {
+  if ! id -u "$LINUXBREW_USER" >/dev/null 2>&1; then
+    sudo useradd --create-home --home-dir "$LINUXBREW_HOME" --shell /bin/bash "$LINUXBREW_USER"
+  fi
 
-"$BREW_BIN" update
-"$BREW_BIN" bundle install --file="$BREWFILE" --upgrade --cleanup
+  sudo mkdir -p /etc/sudoers.d "$LINUXBREW_HOME"
+  sudo chown -R "$LINUXBREW_USER:$LINUXBREW_USER" "$LINUXBREW_HOME"
+  echo "${LINUXBREW_USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${LINUXBREW_USER}" >/dev/null
+  sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${LINUXBREW_USER}"
+}
+
+linuxbrew() {
+  sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" USER="$LINUXBREW_USER" LOGNAME="$LINUXBREW_USER" NONINTERACTIVE=1 "$@"
+}
+
+ensure_linuxbrew_user
+
+[ -x "$BREW_BIN" ] || linuxbrew /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+BREWFILE_TMP=$(mktemp /tmp/devbox-brewfile.XXXXXX)
+cp "$BREWFILE" "$BREWFILE_TMP"
+chmod 0644 "$BREWFILE_TMP"
+
+linuxbrew "$BREW_BIN" update
+linuxbrew "$BREW_BIN" bundle install --file="$BREWFILE_TMP" --upgrade --cleanup
 
 export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
@@ -186,9 +206,9 @@ FISH_BIN="$LINUXBREW_PATH/bin/fish"
 
 # Change shell to fish
 if ! grep -q "$FISH_BIN" /etc/shells; then
-  printf '%s\n' "$FISH_BIN" | "${sudo_cmd[@]}" tee -a /etc/shells >/dev/null
+  printf '%s\n' "$FISH_BIN" | sudo tee -a /etc/shells >/dev/null
 fi
-[ "$SHELL" == "$FISH_BIN" ] || "${sudo_cmd[@]}" chsh "$USER" --shell "$FISH_BIN"
+[ "$SHELL" == "$FISH_BIN" ] || sudo chsh "$USER" --shell "$FISH_BIN"
 
 # Run stow to put all the configs and bins in the right place.
 "$HOME/scripts/bin/common/.local/bin/stow-config"
@@ -202,8 +222,8 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 ###################################
 
 # Needed by bubblewrap in codex to create users.
-echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | "${sudo_cmd[@]}" tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
-"${sudo_cmd[@]}" sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
 ###################################
 ############ Automation ###########
