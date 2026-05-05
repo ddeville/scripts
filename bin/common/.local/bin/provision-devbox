@@ -54,7 +54,7 @@ install_repo_snapshot() {
   repo_path=$2
 
   if ! git -C "$repo_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    die "local repo is not a git worktree: $repo_path"
+    die "local path is not inside a git repository: $repo_path"
   fi
 
   echo "provision-devbox: installing remote ~/$repo_name from $repo_path" >&2
@@ -79,12 +79,17 @@ EOF
 
   pack_tmp=$(mktemp -d)
   staged_repo="$pack_tmp/$repo_name"
-  COPYFILE_DISABLE=1 cp -Rp "$repo_path" "$staged_repo"
-  git -C "$staged_repo" clean -ffdx
-  rm -rf "$staged_repo/.git"
+  mkdir "$staged_repo"
+  git -C "$repo_path" ls-files -z |
+    while IFS= read -r -d '' path; do
+      if [ -e "$repo_path/$path" ] || [ -L "$repo_path/$path" ]; then
+        printf '%s\0' "$path"
+      fi
+    done |
+    rsync -a --from0 --files-from=- "$repo_path"/ "$staged_repo"/
   rm -rf "$staged_repo/.github"
 
-  COPYFILE_DISABLE=1 tar -cz --no-xattrs --exclude .DS_Store -f - -C "$pack_tmp" "$repo_name" |
+  COPYFILE_DISABLE=1 tar -cz --no-xattrs -f - -C "$pack_tmp" "$repo_name" |
     ssh_remote "$remote_script"
 
   rm -rf "$pack_tmp"
