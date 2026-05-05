@@ -41,17 +41,26 @@ elif [ "$(uname)" = "Linux" ]; then
     sudo apt full-upgrade --option APT::Get::Always-Include-Phased-Updates=true --yes
     sudo apt autoremove
 
-    if [ -d /home/linuxbrew ] && command -v brew >/dev/null 2>&1; then
-      brew update
+    if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+      linuxbrew() {
+        sudo runuser -u linuxbrew -- env HOME=/home/linuxbrew /home/linuxbrew/.linuxbrew/bin/brew "$@"
+      }
+
+      brewfile="$(mktemp /tmp/bus-brewfile.XXXXXX)"
+      cp "$HOME/.config/homebrew/Brewfile.devbox" "$brewfile"
+      chmod 0644 "$brewfile"
+      trap 'rm -f "$brewfile"' EXIT
+
+      linuxbrew update
 
       echo -e "\033[34m==>\033[0m Installing from bundle..."
-      brew bundle install --file="$HOME/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
+      linuxbrew bundle install --file="$brewfile" --upgrade --cleanup
 
       echo -e "\033[34m==>\033[0m Running brew upgrade..."
-      brew upgrade
+      linuxbrew upgrade
 
       echo -e "\033[34m==>\033[0m Running brew cleanup..."
-      brew cleanup --prune=3
+      linuxbrew cleanup --prune=3
     fi
   else
     echo "No known package manager"
