@@ -41,7 +41,6 @@ brew "tmux"
 brew "vim"
 brew "wget"
 brew "yq"
-brew "zoxide"
 
 # =========== Development ===========
 
