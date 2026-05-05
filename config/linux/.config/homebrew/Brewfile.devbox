@@ -6,7 +6,6 @@ tap "warrensbox/tap"
 
 brew "bash"
 brew "direnv"
-brew "dust"
 brew "eza"
 brew "fd"
 brew "fish"
