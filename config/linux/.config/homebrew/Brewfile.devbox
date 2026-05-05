@@ -23,7 +23,6 @@ brew "neovim"
 brew "ripgrep"
 brew "tmux"
 brew "yq"
-brew "zoxide"
 
 # =========== Development ===========
 

@@ -112,7 +112,6 @@ vim
 wget
 yq
 zip
-zoxide
 
 # =========== Development ===========
 
