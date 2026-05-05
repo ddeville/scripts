@@ -39,14 +39,6 @@ ssh_remote() {
   ssh -F none -S "$control_path" "$host" "$@"
 }
 
-ssh_remote_tty() {
-  if [ -t 0 ]; then
-    ssh -t -F none -S "$control_path" "$host" "$@"
-  else
-    ssh_remote "$@"
-  fi
-}
-
 install_repo_snapshot() {
   local remote_script repo_name repo_path pack_tmp staged_repo
 
@@ -110,7 +102,7 @@ exec env \
 EOF
   )
 
-  ssh_remote_tty "$command"
+  ssh_remote "$command"
 }
 
 cleanup() {
