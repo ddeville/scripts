@@ -7,7 +7,7 @@ set -eu -o pipefail
 #
 # Environment:
 #   DEVBOX_INSTALL_RUN_AS_ROOT=1 expects the script to run as root and skips sudo setup.
-#   DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=1 skips language toolchain installation.
+#   DEVBOX_INSTALL_MINIMAL_PACKAGES=1 installs Brewfile.min-devbox and skips language toolchains.
 #   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
 devbox_install_flag() {
@@ -33,7 +33,7 @@ devbox_install_flag() {
 }
 
 DEVBOX_INSTALL_RUN_AS_ROOT=${DEVBOX_INSTALL_RUN_AS_ROOT:-0}
-DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=${DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS:-0}
+DEVBOX_INSTALL_MINIMAL_PACKAGES=${DEVBOX_INSTALL_MINIMAL_PACKAGES:-0}
 DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=${DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE:-0}
 
 ###################################
@@ -115,11 +115,16 @@ trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
 
 LINUXBREW_PATH="/home/linuxbrew/.linuxbrew"
 BREW_BIN="$LINUXBREW_PATH/bin/brew"
+if devbox_install_flag DEVBOX_INSTALL_MINIMAL_PACKAGES false; then
+  BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox-minimal"
+else
+  BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox"
+fi
 
 [ -x "$BREW_BIN" ] || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 "$BREW_BIN" update
-"$BREW_BIN" bundle install --file="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox" --upgrade --cleanup
+"$BREW_BIN" bundle install --file="$BREWFILE" --upgrade --cleanup
 
 export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
@@ -127,7 +132,7 @@ export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 ########### Toolchains ############
 ###################################
 
-if ! devbox_install_flag DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS false; then
+if ! devbox_install_flag DEVBOX_INSTALL_MINIMAL_PACKAGES false; then
   # Install language build toolchains.
   #
   # For each toolchain, the idea is to install a toolchain manager (uv, rustup,
@@ -219,7 +224,7 @@ Description=Set up devbox
 [Service]
 Type=simple
 Environment=DEVBOX_INSTALL_RUN_AS_ROOT=$DEVBOX_INSTALL_RUN_AS_ROOT
-Environment=DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=$DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS
+Environment=DEVBOX_INSTALL_MINIMAL_PACKAGES=$DEVBOX_INSTALL_MINIMAL_PACKAGES
 Environment=DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=$DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE
 ExecStart=%h/scripts/install/devbox/install.sh
 Restart=no
