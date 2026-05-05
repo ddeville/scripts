@@ -7,8 +7,8 @@ set -eu -o pipefail
 #
 # Environment:
 #   DEVBOX_INSTALL_RUN_AS_ROOT=1 expects the script to run as root and skips sudo setup.
-#   DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS=0 skips language toolchain installation.
-#   DEVBOX_INSTALL_SYSTEMD_SERVICE=0 skips installing the user systemd service.
+#   DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=1 skips language toolchain installation.
+#   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
 devbox_install_flag() {
   local default name value
@@ -33,8 +33,8 @@ devbox_install_flag() {
 }
 
 DEVBOX_INSTALL_RUN_AS_ROOT=${DEVBOX_INSTALL_RUN_AS_ROOT:-0}
-DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS=${DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS:-1}
-DEVBOX_INSTALL_SYSTEMD_SERVICE=${DEVBOX_INSTALL_SYSTEMD_SERVICE:-1}
+DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=${DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS:-0}
+DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=${DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE:-0}
 
 ###################################
 ############## User ###############
@@ -127,7 +127,7 @@ export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 ########### Toolchains ############
 ###################################
 
-if devbox_install_flag DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS true; then
+if ! devbox_install_flag DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS false; then
   # Install language build toolchains.
   #
   # For each toolchain, the idea is to install a toolchain manager (uv, rustup,
@@ -201,7 +201,7 @@ echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | "${sudo_cmd[@]}" tee /
 ############ Automation ###########
 ###################################
 
-if devbox_install_flag DEVBOX_INSTALL_SYSTEMD_SERVICE true; then
+if ! devbox_install_flag DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE false; then
 
   # Run the script on boot so that it can set up a few global things (like the
   # default shell) in scenarios where a devbox is recreated and only its home
@@ -219,8 +219,8 @@ Description=Set up devbox
 [Service]
 Type=simple
 Environment=DEVBOX_INSTALL_RUN_AS_ROOT=$DEVBOX_INSTALL_RUN_AS_ROOT
-Environment=DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS=$DEVBOX_INSTALL_LANGUAGE_TOOLCHAINS
-Environment=DEVBOX_INSTALL_SYSTEMD_SERVICE=$DEVBOX_INSTALL_SYSTEMD_SERVICE
+Environment=DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS=$DEVBOX_INSTALL_SKIP_LANGUAGE_TOOLCHAINS
+Environment=DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=$DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE
 ExecStart=%h/scripts/install/devbox/install.sh
 Restart=no
 
