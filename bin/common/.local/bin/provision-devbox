@@ -7,6 +7,9 @@ usage() {
 Usage: provision-devbox <host>
 
 Provision a devbox over SSH.
+
+Environment:
+  PROVISION_DEVBOX_FULL_INSTALL=1  Run install/devbox/install.sh instead of install_minimal.sh.
 EOF
 }
 
@@ -88,21 +91,9 @@ EOF
 }
 
 run_devbox_installer() {
-  local command
+  echo "provision-devbox: running remote devbox installer ($devbox_installer)" >&2
 
-  echo "provision-devbox: running remote devbox installer" >&2
-
-  command=$(
-    cat <<'EOF'
-exec env \
-  DEVBOX_INSTALL_RUN_AS_ROOT=1 \
-  DEVBOX_INSTALL_MINIMAL_PACKAGES=1 \
-  DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 \
-  ~/scripts/install/devbox/install.sh
-EOF
-  )
-
-  ssh_remote "$command"
+  ssh_remote "exec ~/scripts/install/devbox/$devbox_installer"
 }
 
 cleanup() {
@@ -124,6 +115,7 @@ fi
 
 host=$1
 control_path=
+[ -n "${PROVISION_DEVBOX_FULL_INSTALL:-}" ] && devbox_installer=install.sh || devbox_installer=install_minimal.sh
 
 trap cleanup EXIT
 trap 'trap - EXIT; cleanup; exit 130' INT
