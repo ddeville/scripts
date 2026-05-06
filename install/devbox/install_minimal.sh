@@ -33,7 +33,7 @@ fi
 
 sudo apt update
 
-sudo apt --yes install \
+sudo apt install --yes \
   curl \
   file \
   git \
