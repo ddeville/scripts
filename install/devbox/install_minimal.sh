@@ -114,7 +114,7 @@ export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 ############## Codex ##############
 ###################################
 
-sudo apt --yes install bubblewrap
+sudo apt install --yes bubblewrap
 
 # Needed by bubblewrap in codex to create users.
 echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
