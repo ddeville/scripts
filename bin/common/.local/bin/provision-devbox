@@ -10,6 +10,7 @@ Provision a devbox over SSH.
 
 Environment:
   PROVISION_DEVBOX_FULL_INSTALL=1  Run install/devbox/install.sh instead of install_minimal.sh.
+  PROVISION_DEVBOX_SKIP_INSTALL=1  Skip running the remote devbox installer.
 EOF
 }
 
@@ -128,4 +129,8 @@ if [ -d "$HOME/scripts/config/openai" ]; then
   install_repo_snapshot scripts-openai "$HOME/scripts-openai"
 fi
 
-run_devbox_installer
+if [ -n "${PROVISION_DEVBOX_SKIP_INSTALL:-}" ]; then
+  echo "provision-devbox: skipping remote devbox installer" >&2
+else
+  run_devbox_installer
+fi
