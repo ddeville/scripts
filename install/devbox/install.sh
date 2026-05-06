@@ -58,6 +58,7 @@ sudo apt-get -y install \
   ninja-build \
   pkg-config \
   procps \
+  rsync \
   stow \
   tk-dev \
   unzip \
