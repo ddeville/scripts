@@ -66,6 +66,10 @@ sudo apt-get -y install \
   xz-utils \
   zlib1g-dev
 
+# Needed by bubblewrap in codex to create users.
+echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
 ###################################
 ############ Homebrew #############
 ###################################
@@ -171,14 +175,6 @@ fi
 # Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins" --no-update
-
-###################################
-############## Codex ##############
-###################################
-
-# Needed by bubblewrap in codex to create users.
-echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
-sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
 ###################################
 ############ Automation ###########
