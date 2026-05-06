@@ -39,6 +39,7 @@ sudo apt install --yes \
   file \
   git \
   jq \
+  rsync \
   stow \
   unzip \
   xz-utils
