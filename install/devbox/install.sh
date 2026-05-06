@@ -4,60 +4,8 @@ set -eu -o pipefail
 
 # NOTE: This script is idempotent and can be run multiple times to update
 # toolchains or programs to the latest version.
-#
-# Environment:
-#   DEVBOX_INSTALL_RUN_AS_ROOT=1 expects the script to run as root and skips user sudo setup.
-#   DEVBOX_INSTALL_MINIMAL_PACKAGES=1 installs Brewfile.min-devbox and skips language toolchains.
-#   DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=1 skips installing the user systemd service.
 
 export DEBIAN_FRONTEND=noninteractive
-export NONINTERACTIVE=1
-
-devbox_install_flag() {
-  local default name value
-
-  name=$1
-  default=$2
-  value=${!name:-$default}
-
-  case "$value" in
-  1 | true | yes | on)
-    return 0
-    ;;
-  0 | false | no | off)
-    return 1
-    ;;
-  *)
-    echo "Invalid $name: $value" >&2
-    echo "Expected one of: 1, 0, true, false, yes, no, on, off." >&2
-    exit 1
-    ;;
-  esac
-}
-
-DEVBOX_INSTALL_RUN_AS_ROOT=${DEVBOX_INSTALL_RUN_AS_ROOT:-0}
-DEVBOX_INSTALL_MINIMAL_PACKAGES=${DEVBOX_INSTALL_MINIMAL_PACKAGES:-0}
-DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=${DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE:-0}
-
-###################################
-############## User ###############
-###################################
-
-if devbox_install_flag DEVBOX_INSTALL_RUN_AS_ROOT false; then
-  if [ "$(id -u)" -ne 0 ]; then
-    echo "DEVBOX_INSTALL_RUN_AS_ROOT is set, but the script is not running as root."
-    exit 1
-  fi
-else
-  if [ "$(id -u)" -eq 0 ]; then
-    echo "The script is running as root, please run as the user or set DEVBOX_INSTALL_RUN_AS_ROOT=1."
-    exit 1
-  fi
-
-  sudo adduser "$USER" sudo
-  echo "${USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
-  sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
-fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -69,6 +17,16 @@ export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains" && mkdir -p "$XDG_TOOLCHAIN
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR"
 trap 'rm -rf "$INSTALL_TMPDIR"' EXIT
+
+###################################
+############## User ###############
+###################################
+
+if [ "$(id -u)" -ne 0 ]; then
+  sudo adduser "$USER" sudo
+  echo "${USER} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/90-nopasswd-${USER}" >/dev/null
+  sudo chmod 0440 "/etc/sudoers.d/90-nopasswd-${USER}"
+fi
 
 ###################################
 ########## Base Packages ##########
@@ -116,12 +74,7 @@ LINUXBREW_USER="linuxbrew"
 LINUXBREW_HOME="/home/${LINUXBREW_USER}"
 LINUXBREW_PATH="${LINUXBREW_HOME}/.linuxbrew"
 BREW_BIN="$LINUXBREW_PATH/bin/brew"
-
-if devbox_install_flag DEVBOX_INSTALL_MINIMAL_PACKAGES false; then
-  BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox-minimal"
-else
-  BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox"
-fi
+BREWFILE="$HOME/scripts/config/linux/.config/homebrew/Brewfile.devbox"
 
 ensure_linuxbrew_user() {
   if ! id -u "$LINUXBREW_USER" >/dev/null 2>&1; then
@@ -159,48 +112,46 @@ popd
 ########### Toolchains ############
 ###################################
 
-if ! devbox_install_flag DEVBOX_INSTALL_MINIMAL_PACKAGES false; then
-  # Install language build toolchains.
-  #
-  # For each toolchain, the idea is to install a toolchain manager (uv, rustup,
-  # tfswitch, etc...) that can then be used to install a given version of the
-  # actual toolchain and point the PATH to it.
-  # Toolchains get installed in the `~/.local/toolchains` directory and things
-  # get added to the PATH in the usual fish path handling function.
+# Install language build toolchains.
+#
+# For each toolchain, the idea is to install a toolchain manager (uv, rustup,
+# tfswitch, etc...) that can then be used to install a given version of the
+# actual toolchain and point the PATH to it.
+# Toolchains get installed in the `~/.local/toolchains` directory and things
+# get added to the PATH in the usual fish path handling function.
 
-  # python
-  mkdir -p "$XDG_TOOLCHAINS_HOME/python"
-  export PY_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/python/uv/bin"
-  export VENV_INSTALL_DIR="$XDG_TOOLCHAINS_HOME/python/venv" && mkdir -p "$VENV_INSTALL_DIR"
-  "$HOME/scripts/bin/common/.local/bin/pyswitch" latest
+# python
+mkdir -p "$XDG_TOOLCHAINS_HOME/python"
+export PY_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/python/uv/bin"
+export VENV_INSTALL_DIR="$XDG_TOOLCHAINS_HOME/python/venv" && mkdir -p "$VENV_INSTALL_DIR"
+"$HOME/scripts/bin/common/.local/bin/pyswitch" latest
 
-  # rust
-  mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
-  export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
-  export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
-  [ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=none -y --no-modify-path --no-update-default-toolchain
-  "$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
-  "$HOME/scripts/bin/common/.local/bin/rustswitch" latest
+# rust
+mkdir -p "$XDG_TOOLCHAINS_HOME/rust"
+export CARGO_HOME="$XDG_TOOLCHAINS_HOME/rust/cargo"
+export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
+[ -d "$RUSTUP_HOME" ] || curl --proto '=https' --tlsv1.2 -sSLf https://sh.rustup.rs | /bin/sh -s -- --default-toolchain=none -y --no-modify-path --no-update-default-toolchain
+"$CARGO_HOME/bin/rustup" component add rust-src rustfmt clippy
+"$HOME/scripts/bin/common/.local/bin/rustswitch" latest
 
-  # golang
-  mkdir -p "$XDG_TOOLCHAINS_HOME/go"
-  export GO_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/go/current/bin"
-  export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
-  "$HOME/scripts/bin/common/.local/bin/goswitch" latest
+# golang
+mkdir -p "$XDG_TOOLCHAINS_HOME/go"
+export GO_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/go/current/bin"
+export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
+"$HOME/scripts/bin/common/.local/bin/goswitch" latest
 
-  # nodejs
-  mkdir -p "$XDG_TOOLCHAINS_HOME/node"
-  export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
-  "$HOME/scripts/bin/common/.local/bin/nodeswitch" latest
+# nodejs
+mkdir -p "$XDG_TOOLCHAINS_HOME/node"
+export NODE_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/node/current/bin"
+"$HOME/scripts/bin/common/.local/bin/nodeswitch" latest
 
-  # terraform
-  mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
-  export TF_INSTALL_PATH="$XDG_TOOLCHAINS_HOME/terraform"
-  export TF_BINARY_PATH="$HOME/.local/bin/terraform"
-  tfswitch --latest
+# terraform
+mkdir -p "$XDG_TOOLCHAINS_HOME/terraform"
+export TF_INSTALL_PATH="$XDG_TOOLCHAINS_HOME/terraform"
+export TF_BINARY_PATH="$HOME/.local/bin/terraform"
+tfswitch --latest
 
-  export PATH="$CARGO_HOME/bin:$PY_TOOLCHAIN_BIN:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
-fi
+export PATH="$CARGO_HOME/bin:$PY_TOOLCHAIN_BIN:$GO_TOOLCHAIN_BIN:$GOBIN:$NODE_TOOLCHAIN_BIN:$PATH"
 
 ###################################
 ############## Shell ##############
@@ -233,26 +184,21 @@ sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 ############ Automation ###########
 ###################################
 
-if ! devbox_install_flag DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE false; then
+# Run the script on boot so that it can set up a few global things (like the
+# default shell) in scenarios where a devbox is recreated and only its home
+# volume is preserved.
 
-  # Run the script on boot so that it can set up a few global things (like the
-  # default shell) in scenarios where a devbox is recreated and only its home
-  # volume is preserved.
+SYSTEMD_HOME="$XDG_CONFIG_HOME/systemd/user"
+mkdir -p "$SYSTEMD_HOME"
 
-  SYSTEMD_HOME="$XDG_CONFIG_HOME/systemd/user"
-  mkdir -p "$SYSTEMD_HOME"
+DEVBOX_SERVICE="$SYSTEMD_HOME/setup-devbox.service"
 
-  DEVBOX_SERVICE="$SYSTEMD_HOME/setup-devbox.service"
-
-  cat <<EOF >"$DEVBOX_SERVICE"
+cat <<EOF >"$DEVBOX_SERVICE"
 [Unit]
 Description=Set up devbox
 
 [Service]
 Type=simple
-Environment=DEVBOX_INSTALL_RUN_AS_ROOT=$DEVBOX_INSTALL_RUN_AS_ROOT
-Environment=DEVBOX_INSTALL_MINIMAL_PACKAGES=$DEVBOX_INSTALL_MINIMAL_PACKAGES
-Environment=DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE=$DEVBOX_INSTALL_SKIP_SYSTEMD_SERVICE
 ExecStart=%h/scripts/install/devbox/install.sh
 Restart=no
 
@@ -260,7 +206,6 @@ Restart=no
 WantedBy=default.target
 EOF
 
-  # Enabling the service simply creates a symlink in $SYSTEMD_HOME so it will persist
-  # across reboots when only the home volume is preserved.
-  systemctl --user enable "$DEVBOX_SERVICE"
-fi
+# Enabling the service simply creates a symlink in $SYSTEMD_HOME so it will persist
+# across reboots when only the home volume is preserved.
+systemctl --user enable "$DEVBOX_SERVICE"
