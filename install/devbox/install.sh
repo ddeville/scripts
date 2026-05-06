@@ -146,10 +146,14 @@ BREWFILE_TMP=$(mktemp /tmp/devbox-brewfile.XXXXXX)
 cp "$BREWFILE" "$BREWFILE_TMP"
 chmod 0644 "$BREWFILE_TMP"
 
+export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
+
+pushd /home/linuxbrew
+
 linuxbrew "$BREW_BIN" update
 linuxbrew "$BREW_BIN" bundle install --file="$BREWFILE_TMP" --upgrade --cleanup
 
-export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
+popd
 
 ###################################
 ########### Toolchains ############
