@@ -75,6 +75,7 @@ EOF
   pack_tmp=$(mktemp -d)
   staged_repo="$pack_tmp/$repo_name"
   mkdir "$staged_repo"
+
   git -C "$repo_path" ls-files -z |
     while IFS= read -r -d '' path; do
       if [ -e "$repo_path/$path" ] || [ -L "$repo_path/$path" ]; then
@@ -82,7 +83,6 @@ EOF
       fi
     done |
     rsync -a --from0 --files-from=- "$repo_path"/ "$staged_repo"/
-  rm -rf "$staged_repo/.github"
 
   COPYFILE_DISABLE=1 tar -cz --no-xattrs -f - -C "$pack_tmp" "$repo_name" |
     ssh_remote "$remote_script"
