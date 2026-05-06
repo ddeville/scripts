@@ -23,10 +23,18 @@ if [[ $version == "system" ]]; then
 fi
 
 if [[ $version == "latest" ]]; then
-  version="$(uv python list --only-downloads --output-format text |
-    awk '/^cpython-[0-9]+\.[0-9]+\.[0-9]+-/{sub(/^cpython-/, "", $1); sub(/-.*/, "", $1); print $1}' |
-    sort -V |
-    tail -n 1)"
+  version="$(uv python list --only-downloads --output-format json |
+    jq -er '
+      [
+        .[]
+        | select(
+          .implementation == "cpython"
+          and .variant == "default"
+          and (.version | test("^[0-9]+[.][0-9]+[.][0-9]+(rc[0-9]+)?$"))
+        )
+      ]
+      | first.version
+    ')"
   if [ -z "$version" ]; then
     echo "Could not resolve latest CPython version from uv." >&2
     exit 1
