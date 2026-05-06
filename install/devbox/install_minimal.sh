@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 # NOTE: This script is idempotent and can be run multiple times to update
-# toolchains or programs to the latest version.
+# programs to the latest version.
 
 export DEBIAN_FRONTEND=noninteractive
 
