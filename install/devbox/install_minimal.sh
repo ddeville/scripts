@@ -37,6 +37,7 @@ sudo apt install --yes \
   curl \
   file \
   git \
+  jq \
   stow \
   unzip \
   xz-utils
@@ -45,54 +46,84 @@ sudo apt install --yes \
 ############# Tools ###############
 ###################################
 
+download_latest_github_asset() {
+  local asset asset_template release repo tag url version
+
+  repo=$1
+  asset_template=$2
+
+  release=$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest")
+  tag=$(jq -er '.tag_name' <<<"$release")
+  version=${tag#v}
+  asset=${asset_template//\{version\}/$version}
+
+  if ! url=$(jq -er --arg asset "$asset" 'first(.assets[] | select(.name == $asset) | .browser_download_url)' <<<"$release"); then
+    echo "no latest release asset found for $repo named $asset" >&2
+    exit 1
+  fi
+
+  echo "downloading $asset" >&2
+  curl -fsSL -o "$asset" "$url"
+
+  printf '%s\n' "$asset"
+}
+
 ARCH=$(uname -m)
 
-NEOVIM_VERSION=0.12.2
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
-curl -fsSLO "https://github.com/neovim/neovim/releases/download/v${NEOVIM_VERSION}/nvim-linux-${arch}.tar.gz"
-sudo tar -xzf "nvim-linux-${arch}.tar.gz" --strip-components=1 -C /usr/local
+# tmux
 
-FISH_VERSION=4.6.0
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
-curl -fsSLO "https://github.com/fish-shell/fish-shell/releases/download/${FISH_VERSION}/fish-${FISH_VERSION}-linux-${arch}.tar.xz"
-tar -xJf "fish-${FISH_VERSION}-linux-${arch}.tar.xz"
-sudo install -m 0755 fish /usr/local/bin/fish
-
-TMUX_VERSION=3.6a
 arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
-curl -fsSLO "https://github.com/tmux/tmux-builds/releases/download/v${TMUX_VERSION}/tmux-${TMUX_VERSION}-linux-${arch}.tar.gz"
-tar -xzf "tmux-${TMUX_VERSION}-linux-${arch}.tar.gz"
+archive=$(download_latest_github_asset tmux/tmux-builds "tmux-{version}-linux-${arch}.tar.gz")
+tar -xzf "$archive"
 sudo install -m 0755 tmux /usr/local/bin/tmux
 
-RIPGREP_VERSION=15.1.0
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
-curl -fsSLO "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep-${RIPGREP_VERSION}-${arch}-unknown-linux-musl.tar.gz"
-tar -xzf "ripgrep-${RIPGREP_VERSION}-${arch}-unknown-linux-musl.tar.gz"
-sudo install -m 0755 "ripgrep-${RIPGREP_VERSION}-${arch}-unknown-linux-musl/rg" /usr/local/bin/rg
+# fish
 
-FZF_VERSION=0.72.0
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+archive=$(download_latest_github_asset fish-shell/fish-shell "fish-{version}-linux-${arch}.tar.xz")
+tar -xJf "$archive"
+sudo install -m 0755 fish /usr/local/bin/fish
+
+# neovim
+
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
+archive=$(download_latest_github_asset neovim/neovim "nvim-linux-${arch}.tar.gz")
+sudo tar -xzf "$archive" --strip-components=1 -C /usr/local
+
+# tree-sitter
+
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x64)
+archive=$(download_latest_github_asset tree-sitter/tree-sitter "tree-sitter-cli-linux-${arch}.zip")
+unzip -q "$archive"
+sudo install -m 0755 tree-sitter /usr/local/bin/tree-sitter
+
+# fzf
+
 arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo amd64)
-curl -fsSLO "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_${arch}.tar.gz"
-tar -xzf "fzf-${FZF_VERSION}-linux_${arch}.tar.gz"
+archive=$(download_latest_github_asset junegunn/fzf "fzf-{version}-linux_${arch}.tar.gz")
+tar -xzf "$archive"
 sudo install -m 0755 fzf /usr/local/bin/fzf
 
-FD_VERSION=10.4.2
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
-curl -fsSLO "https://github.com/sharkdp/fd/releases/download/v${FD_VERSION}/fd-v${FD_VERSION}-${arch}-unknown-linux-musl.tar.gz"
-tar -xzf "fd-v${FD_VERSION}-${arch}-unknown-linux-musl.tar.gz"
-sudo install -m 0755 "fd-v${FD_VERSION}-${arch}-unknown-linux-musl/fd" /usr/local/bin/fd
+# ripgrep
 
-EZA_VERSION=0.23.4
 arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
-curl -fsSLO "https://github.com/eza-community/eza/releases/download/v${EZA_VERSION}/eza_${arch}-unknown-linux-musl.tar.gz"
-tar -xzf "eza_${arch}-unknown-linux-musl.tar.gz"
+archive=$(download_latest_github_asset BurntSushi/ripgrep "ripgrep-{version}-${arch}-unknown-linux-musl.tar.gz")
+tar -xzf "$archive"
+sudo install -m 0755 ripgrep-*/rg /usr/local/bin/rg
+
+# fd
+
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+archive=$(download_latest_github_asset sharkdp/fd "fd-v{version}-${arch}-unknown-linux-musl.tar.gz")
+tar -xzf "$archive"
+sudo install -m 0755 fd-*/fd /usr/local/bin/fd
+
+# eza
+
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+archive=$(download_latest_github_asset eza-community/eza "eza_${arch}-unknown-linux-musl.tar.gz")
+tar -xzf "$archive"
 sudo install -m 0755 eza /usr/local/bin/eza
-
-TREE_SITTER_VERSION=0.26.8
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x64)
-curl -fsSLO "https://github.com/tree-sitter/tree-sitter/releases/download/v${TREE_SITTER_VERSION}/tree-sitter-cli-linux-${arch}.zip"
-unzip -q "tree-sitter-cli-linux-${arch}.zip"
-sudo install -m 0755 tree-sitter /usr/local/bin/tree-sitter
 
 ###################################
 ############## Shell ##############
