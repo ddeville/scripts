@@ -34,6 +34,7 @@ fi
 sudo apt update
 
 sudo apt install --yes \
+  bubblewrap \
   curl \
   file \
   git \
@@ -41,6 +42,10 @@ sudo apt install --yes \
   stow \
   unzip \
   xz-utils
+
+# Needed by bubblewrap in codex to create users.
+echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
 ###################################
 ############# Tools ###############
@@ -125,6 +130,13 @@ archive=$(download_latest_github_asset eza-community/eza "eza_${arch}-unknown-li
 tar -xzf "$archive"
 sudo install -m 0755 eza /usr/local/bin/eza
 
+# codex
+
+arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+archive=$(download_latest_github_asset openai/codex "codex-${arch}-unknown-linux-musl.tar.gz")
+tar -xzf "$archive"
+sudo install -m 0755 "codex-${arch}-unknown-linux-musl" /usr/local/bin/codex
+
 ###################################
 ############## Shell ##############
 ###################################
@@ -140,13 +152,3 @@ fi
 
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins" --no-update
-
-###################################
-############## Codex ##############
-###################################
-
-sudo apt install --yes bubblewrap
-
-# Needed by bubblewrap in codex to create users.
-echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee /etc/sysctl.d/20-apparmor-donotrestrict.conf
-sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
