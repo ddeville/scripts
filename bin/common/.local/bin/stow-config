@@ -7,6 +7,12 @@ if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree >/dev/null 2>&1; the
   exit 1
 fi
 
+# Don't support running stow if the git repo is dirty (since we're using `--adopt`)
+if [ -n "$(git -C "$HOME/scripts" status --porcelain)" ]; then
+  echo "ERROR: $HOME/scripts is dirty, please commit changes before running stow-config"
+  exit 1
+fi
+
 dirs=(common)
 
 # Platform-specific stuff
@@ -20,12 +26,6 @@ fi
 # OpenAI stuff
 if [ -d "$HOME/scripts/config/openai" ]; then
   dirs+=(openai)
-fi
-
-# Don't support running stow if the git repo is dirty (since we're using `--adopt`)
-if [ -n "$(git -C "$HOME/scripts" status --porcelain)" ]; then
-  echo "ERROR: $HOME/scripts is dirty, please commit changes before running stow-config"
-  exit 1
 fi
 
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
