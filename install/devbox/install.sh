@@ -135,7 +135,7 @@ ensure_linuxbrew_user() {
 }
 
 linuxbrew() {
-  sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" USER="$LINUXBREW_USER" LOGNAME="$LINUXBREW_USER" NONINTERACTIVE=1 "$@"
+  sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" NONINTERACTIVE=1 "$@"
 }
 
 ensure_linuxbrew_user
