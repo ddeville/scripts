@@ -51,7 +51,7 @@ elif [ "$(uname)" = "Linux" ]; then
       chmod 0644 "$brewfile"
       trap 'rm -f "$brewfile"' EXIT
 
-      pushd /home/linuxbrew
+      pushd /home/linuxbrew >/dev/null
 
       linuxbrew update
 
@@ -64,7 +64,7 @@ elif [ "$(uname)" = "Linux" ]; then
       echo -e "\033[34m==>\033[0m Running brew cleanup..."
       linuxbrew cleanup --prune=3
 
-      popd
+      popd >/dev/null
     fi
   else
     echo "No known package manager"
