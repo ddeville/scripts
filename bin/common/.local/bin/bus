@@ -51,6 +51,8 @@ elif [ "$(uname)" = "Linux" ]; then
       chmod 0644 "$brewfile"
       trap 'rm -f "$brewfile"' EXIT
 
+      pushd /home/linuxbrew
+
       linuxbrew update
 
       echo -e "\033[34m==>\033[0m Installing from bundle..."
@@ -61,6 +63,8 @@ elif [ "$(uname)" = "Linux" ]; then
 
       echo -e "\033[34m==>\033[0m Running brew cleanup..."
       linuxbrew cleanup --prune=3
+
+      popd
     fi
   else
     echo "No known package manager"
