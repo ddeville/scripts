@@ -85,6 +85,14 @@ EOF
     done |
     rsync -a --from0 --files-from=- "$repo_path"/ "$staged_repo"/
 
+  git -C "$staged_repo" init -q
+  git -C "$staged_repo" add -A
+  git -C "$staged_repo" \
+    -c user.name=provision-devbox \
+    -c user.email=provision-devbox@localhost \
+    -c commit.gpgsign=false \
+    commit -qm "Provision snapshot"
+
   COPYFILE_DISABLE=1 tar -cz --no-xattrs -f - -C "$pack_tmp" "$repo_name" |
     ssh_remote "$remote_script"
 
