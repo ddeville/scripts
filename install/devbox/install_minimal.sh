@@ -77,62 +77,62 @@ ARCH=$(uname -m)
 
 # tmux
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
 archive=$(download_latest_github_asset tmux/tmux-builds "tmux-{version}-linux-${arch}.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 tmux /usr/local/bin/tmux
 
 # fish
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
 archive=$(download_latest_github_asset fish-shell/fish-shell "fish-{version}-linux-${arch}.tar.xz")
 tar -xJf "$archive"
 sudo install -m 0755 fish /usr/local/bin/fish
 
 # neovim
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo arm64 || echo x86_64)
 archive=$(download_latest_github_asset neovim/neovim "nvim-linux-${arch}.tar.gz")
 sudo tar -xzf "$archive" --strip-components=1 -C /usr/local
 
 # tree-sitter
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo x64)
+arch=$([[ $ARCH == aarch64 ]] && echo arm64 || echo x64)
 archive=$(download_latest_github_asset tree-sitter/tree-sitter "tree-sitter-cli-linux-${arch}.zip")
 unzip -q "$archive"
 sudo install -m 0755 tree-sitter /usr/local/bin/tree-sitter
 
 # fzf
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo arm64 || echo amd64)
+arch=$([[ $ARCH == aarch64 ]] && echo arm64 || echo amd64)
 archive=$(download_latest_github_asset junegunn/fzf "fzf-{version}-linux_${arch}.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 fzf /usr/local/bin/fzf
 
 # ripgrep
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
 archive=$(download_latest_github_asset BurntSushi/ripgrep "ripgrep-{version}-${arch}-unknown-linux-musl.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 ripgrep-*/rg /usr/local/bin/rg
 
 # fd
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
 archive=$(download_latest_github_asset sharkdp/fd "fd-v{version}-${arch}-unknown-linux-musl.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 fd-*/fd /usr/local/bin/fd
 
 # eza
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
 archive=$(download_latest_github_asset eza-community/eza "eza_${arch}-unknown-linux-musl.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 eza /usr/local/bin/eza
 
 # codex
 
-arch=$([[ $ARCH == arm64 || $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
+arch=$([[ $ARCH == aarch64 ]] && echo aarch64 || echo x86_64)
 archive=$(download_latest_github_asset openai/codex "codex-${arch}-unknown-linux-musl.tar.gz")
 tar -xzf "$archive"
 sudo install -m 0755 "codex-${arch}-unknown-linux-musl" /usr/local/bin/codex
