@@ -28,12 +28,15 @@ if [ -d "$HOME/scripts/config/openai" ]; then
   dirs+=(openai)
 fi
 
-stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
-stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
+stow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --adopt --verbose
+stow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --adopt --verbose
 
 # Restore the content of the repo since we run with `--adopt`...
 git -C "$HOME/scripts" restore .
 git -C "$HOME/scripts" clean --force -d -- config bin
+
+stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
+stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
 
 # Post-processing for a few things...
 "$HOME/.codex/bin/render-config"
