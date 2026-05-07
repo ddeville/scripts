@@ -69,7 +69,7 @@ cleanup() {
 trap cleanup EXIT
 
 cat >"$tmp_tar"
-tar -xzf "$tmp_tar" -C "$HOME"
+tar --no-same-owner -xzf "$tmp_tar" -C "$HOME"
 EOF
   )
 
@@ -92,6 +92,8 @@ EOF
     -c user.email=provision-devbox@localhost \
     -c commit.gpgsign=false \
     commit -qm "Provision snapshot"
+
+  find "$staged_repo" -type s -exec rm -f {} +
 
   COPYFILE_DISABLE=1 tar -cz --no-xattrs -f - -C "$pack_tmp" "$repo_name" |
     ssh_remote "$remote_script"
