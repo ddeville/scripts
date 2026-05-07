@@ -31,9 +31,9 @@ fi
 ########## Base Packages ##########
 ###################################
 
-sudo apt update
+sudo apt-get update
 
-sudo apt install --yes \
+sudo apt-get install --yes \
   bubblewrap \
   curl \
   file \
