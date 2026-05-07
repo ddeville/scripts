@@ -19,6 +19,14 @@ die() {
   exit 1
 }
 
+shell_quote() {
+  local value quoted
+
+  value=$1
+  quoted=${value//\'/\'\\\'\'}
+  printf "'%s'" "$quoted"
+}
+
 start_control_master() {
   local output status
 
@@ -44,7 +52,7 @@ ssh_remote() {
 }
 
 install_repo_snapshot() {
-  local remote_script repo_name repo_path pack_tmp staged_repo
+  local remote_command remote_script repo_name repo_path pack_tmp staged_repo
 
   repo_name=$1
   repo_path=$2
@@ -56,8 +64,9 @@ install_repo_snapshot() {
   echo "provision-devbox: installing remote ~/$repo_name from $repo_path" >&2
   remote_script=$(
     printf '%s\n\n' 'set -eu'
-    printf "repo_name='%s'\n\n" "$repo_name"
     cat <<'EOF'
+repo_name=$1
+
 if [ -e "$HOME/$repo_name" ]; then
   rm -rf "$HOME/$repo_name"
 fi
@@ -72,6 +81,7 @@ cat >"$tmp_tar"
 tar --no-same-owner -xzf "$tmp_tar" -C "$HOME"
 EOF
   )
+  remote_command="bash -c $(shell_quote "$remote_script") bash $(shell_quote "$repo_name")"
 
   pack_tmp=$(mktemp -d)
   staged_repo="$pack_tmp/$repo_name"
@@ -96,7 +106,7 @@ EOF
   find "$staged_repo" -type s -exec rm -f {} +
 
   COPYFILE_DISABLE=1 tar -cz --no-xattrs -f - -C "$pack_tmp" "$repo_name" |
-    ssh_remote "$remote_script"
+    ssh_remote "$remote_command"
 
   rm -rf "$pack_tmp"
 }
