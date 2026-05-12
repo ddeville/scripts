@@ -38,3 +38,4 @@ guardian_approval = true
 remote_connections = true
 remote_control = true
 memories = true
+hooks = true
