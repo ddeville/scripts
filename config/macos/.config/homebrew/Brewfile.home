@@ -1,7 +1,15 @@
-brew "ansible"
+# ============== Media ==============
+
 brew "ffmpeg"
 brew "mp4box"
 brew "yt-dlp"
+
+# ============= Homelab =============
+
+brew "ansible"
+brew "awscli"
+
+# ============== Apps ===============
 
 cask "arq"
 cask "dropbox"
