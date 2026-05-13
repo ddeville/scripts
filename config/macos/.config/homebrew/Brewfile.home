@@ -7,6 +7,8 @@ brew "yt-dlp"
 # ============= Homelab =============
 
 brew "ansible"
+brew "restic"
+brew "talosctl"
 
 # ============== Apps ===============
 
