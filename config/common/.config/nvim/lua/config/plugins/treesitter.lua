@@ -16,8 +16,10 @@ local ensure_installed = {
   'go',
   'gomod',
   'gosum',
+  'gotmpl',
   'gowork',
   'hcl',
+  'helm',
   'html',
   'java',
   'javascript',
@@ -60,7 +62,7 @@ local function setup_treesitter()
   vim.treesitter.language.register('starlark', { 'tiltfile' })
   vim.treesitter.language.register('ruby', { 'brewfile' })
   vim.treesitter.language.register('terraform', { 'terraform-vars' })
-  vim.treesitter.language.register('go', { 'gowork', 'gotmpl' })
+  vim.treesitter.language.register('go', { 'gowork' })
 
   vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('TreesitterHighlight', { clear = true }),
