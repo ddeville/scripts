@@ -7,7 +7,6 @@ brew "yt-dlp"
 # ============= Homelab =============
 
 brew "ansible"
-brew "awscli"
 
 # ============== Apps ===============
 
