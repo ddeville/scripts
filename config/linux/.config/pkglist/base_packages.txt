@@ -116,6 +116,8 @@ zip
 
 # =========== Development ===========
 
+age
+aws-cli
 bazelisk
 buf
 checkbashisms
@@ -137,6 +139,7 @@ ruff
 rustup
 shellcheck
 shfmt
+sops
 staticcheck
 stylua
 terraform
