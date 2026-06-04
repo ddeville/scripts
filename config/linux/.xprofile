@@ -28,7 +28,7 @@ xrdb -merge <(echo "Xft.dpi: $DPI")
 xrdb -merge <(echo "*dpi: $DPI")
 
 # Update the keyboard settings
-"$SCRIPT_DIR"/../../bin/linux/.local/bin/update-kb-settings
+"$SCRIPT_DIR"/../../bin/common/.local/bin/update-kb-settings
 
 # Sleep and screen saver
 xset s 600 600
