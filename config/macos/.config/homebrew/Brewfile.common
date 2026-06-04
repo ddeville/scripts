@@ -1,4 +1,3 @@
-tap "github/gh"
 tap "koenbollen/public"
 tap "teamookla/speedtest"
 tap "warrensbox/tap"
