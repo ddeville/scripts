@@ -1,5 +1,3 @@
-tap "github/gh"
-tap "koenbollen/public"
 tap "warrensbox/tap"
 
 # ============== Shell ==============
