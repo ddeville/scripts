@@ -1,5 +1,4 @@
 tap "koenbollen/public"
-tap "teamookla/speedtest"
 tap "warrensbox/tap"
 
 cask_args appdir: "/Applications", require_sha: true
@@ -36,7 +35,6 @@ brew "readline"
 brew "ripgrep"
 brew "rsync"
 brew "stow"
-brew "teamookla/speedtest/speedtest"
 brew "tmux"
 brew "vim"
 brew "wget"
