@@ -117,7 +117,7 @@ zip
 # =========== Development ===========
 
 age
-aws-cli
+aws-cli-v2
 bazelisk
 buf
 checkbashisms
