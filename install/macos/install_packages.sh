@@ -25,4 +25,4 @@ if [[ -f "$homebrew_dir/Brewfile.openai" ]]; then
 fi
 
 $brew update
-$brew bundle install --file="$brewfile" --upgrade --cleanup
+$brew bundle install --file="$brewfile" --upgrade --force-cleanup

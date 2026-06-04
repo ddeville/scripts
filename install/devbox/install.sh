@@ -136,7 +136,7 @@ pushd /home/linuxbrew
 trust_linuxbrew_brewfile "$BREWFILE_TMP"
 
 linuxbrew "$BREW_BIN" update
-linuxbrew "$BREW_BIN" bundle install --file="$BREWFILE_TMP" --upgrade --cleanup
+linuxbrew "$BREW_BIN" bundle install --file="$BREWFILE_TMP" --upgrade --force-cleanup
 
 popd
 

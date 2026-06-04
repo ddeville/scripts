@@ -45,7 +45,7 @@ if [ "$(uname)" = "Darwin" ]; then
   brew update
 
   echo -e "\033[34m==>\033[0m Installing from bundle..."
-  brew bundle install --file="$brewfile" --upgrade --cleanup
+  brew bundle install --file="$brewfile" --upgrade --force-cleanup
 
   echo -e "\033[34m==>\033[0m Running brew upgrade..."
   brew upgrade
@@ -86,7 +86,7 @@ elif [ "$(uname)" = "Linux" ]; then
       linuxbrew update
 
       echo -e "\033[34m==>\033[0m Installing from bundle..."
-      linuxbrew bundle install --file="$brewfile" --upgrade --cleanup
+      linuxbrew bundle install --file="$brewfile" --upgrade --force-cleanup
 
       echo -e "\033[34m==>\033[0m Running brew upgrade..."
       linuxbrew upgrade
