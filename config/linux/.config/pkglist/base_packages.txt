@@ -90,6 +90,7 @@ fzf
 git
 github-cli
 glances
+go-yq
 fish
 htop
 hyperfine
@@ -111,7 +112,6 @@ tree-sitter-cli
 unzip
 vim
 wget
-yq
 zip
 
 # =========== Development ===========
