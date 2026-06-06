@@ -30,7 +30,8 @@ if [[ $version == "latest" ]]; then
   fi
 fi
 
-install_dir="$toolchain_dir/versions/$version"
+versions_dir="$toolchain_dir/versions"
+install_dir="$versions_dir/$version"
 
 plat="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
@@ -41,17 +42,29 @@ case "$arch" in
   ;;
 esac
 
+if [[ -d $install_dir && ! -x $install_dir/bin/go ]]; then
+  echo "Existing Go install is incomplete: $install_dir" >&2
+  echo "Remove it and rerun goswitch." >&2
+  exit 1
+fi
+
 if [[ ! -d $install_dir ]]; then
-  tmpdir="$(mktemp -d)"
+  mkdir -p "$versions_dir"
+  tmpdir="$(mktemp -d "$versions_dir/.${version}.XXXXXX")"
+  staging_dir="$tmpdir/stage"
   trap 'rm -rf "$tmpdir"' EXIT
 
-  pushd "$tmpdir" >/dev/null
+  mkdir "$staging_dir"
 
-  curl -L "https://go.dev/dl/go${version}.${plat}-${arch}.tar.gz" -o go.tar.gz
-  mkdir -p "$install_dir"
-  tar -xzf go.tar.gz -C "$install_dir" --strip-components 1
+  curl -fL "https://go.dev/dl/go${version}.${plat}-${arch}.tar.gz" -o "$tmpdir/go.tar.gz"
+  tar -xzf "$tmpdir/go.tar.gz" -C "$staging_dir" --strip-components 1
 
-  popd >/dev/null
+  if [[ ! -x $staging_dir/bin/go ]]; then
+    echo "Downloaded Go archive did not contain bin/go." >&2
+    exit 1
+  fi
+
+  mv "$staging_dir" "$install_dir"
 fi
 
 rm -f "$current_dir"
