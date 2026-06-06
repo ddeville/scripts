@@ -4,17 +4,101 @@ set -eu -o pipefail
 
 NVIM_INSTALL_PATH="/opt/nvim"
 
+function _copy_dir_contents {
+  local source_dir="$1"
+  local target_dir="$2"
+
+  tar -C "$source_dir" -cf - . | tar -C "$target_dir" -xf -
+}
+
+function _move_dir_contents {
+  local entry
+  local source_dir="$1"
+  local target_dir="$2"
+  local status=0
+
+  shopt -s dotglob nullglob
+  for entry in "$source_dir"/*; do
+    if ! mv "$entry" "$target_dir"/; then
+      status=1
+      break
+    fi
+  done
+  shopt -u dotglob nullglob
+
+  return "$status"
+}
+
+function _replace_nvim_install {
+  local backup_dir entry source_dir stage_dir
+
+  source_dir="$1"
+  stage_dir="$(mktemp -d "$NVIM_INSTALL_PATH/.stage.XXXXXX")"
+  backup_dir="$(mktemp -d "$NVIM_INSTALL_PATH/.backup.XXXXXX")"
+
+  if ! _copy_dir_contents "$source_dir" "$stage_dir"; then
+    rm -rf "$stage_dir" "$backup_dir"
+    echo "Failed to stage Neovim install." >&2
+    return 1
+  fi
+
+  if [ ! -x "$stage_dir/bin/nvim" ]; then
+    rm -rf "$stage_dir" "$backup_dir"
+    echo "Staged Neovim install does not contain bin/nvim." >&2
+    return 1
+  fi
+
+  shopt -s dotglob nullglob
+  for entry in "$NVIM_INSTALL_PATH"/*; do
+    case "$entry" in
+    "$stage_dir" | "$backup_dir")
+      continue
+      ;;
+    esac
+
+    if ! mv "$entry" "$backup_dir"/; then
+      shopt -u dotglob nullglob
+      _move_dir_contents "$backup_dir" "$NVIM_INSTALL_PATH"
+      rm -rf "$stage_dir"
+      echo "Failed to back up existing Neovim install. Restored any moved files." >&2
+      return 1
+    fi
+  done
+  shopt -u dotglob nullglob
+
+  if ! _move_dir_contents "$stage_dir" "$NVIM_INSTALL_PATH"; then
+    echo "Failed to move staged Neovim install into place. Restoring previous install." >&2
+    shopt -s dotglob nullglob
+    for entry in "$NVIM_INSTALL_PATH"/*; do
+      case "$entry" in
+      "$stage_dir" | "$backup_dir")
+        continue
+        ;;
+      esac
+
+      rm -rf "$entry"
+    done
+    shopt -u dotglob nullglob
+
+    _move_dir_contents "$backup_dir" "$NVIM_INSTALL_PATH"
+    rm -rf "$stage_dir" "$backup_dir"
+    return 1
+  fi
+
+  rm -rf "$stage_dir" "$backup_dir"
+}
+
 function _setup {
   # Create install path if needed
-  if [ ! -d $NVIM_INSTALL_PATH ]; then
+  if [ ! -d "$NVIM_INSTALL_PATH" ]; then
     echo "Creating install folder"
-    sudo mkdir -p $NVIM_INSTALL_PATH
-    sudo chown "$USER" $NVIM_INSTALL_PATH
+    sudo mkdir -p "$NVIM_INSTALL_PATH"
+    sudo chown "$USER" "$NVIM_INSTALL_PATH"
   fi
 
   # Make sure it's a folder with the right permissions
-  if [ ! -d $NVIM_INSTALL_PATH ] || [ -f $NVIM_INSTALL_PATH ] || [ ! -O $NVIM_INSTALL_PATH ]; then
-    echo "Make sure that" $NVIM_INSTALL_PATH "is a directory and is owned by" "$USER"
+  if [ ! -d "$NVIM_INSTALL_PATH" ] || [ -f "$NVIM_INSTALL_PATH" ] || [ ! -O "$NVIM_INSTALL_PATH" ]; then
+    echo "Make sure that $NVIM_INSTALL_PATH is a directory and is owned by $USER"
     exit 1
   fi
 }
@@ -56,13 +140,14 @@ function _nvim_nightly_prebuilt {
 
   # Download the archive to a temp directory
   tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
   tmp_path="$tmp_dir/$filename"
   echo "Downloading $url to $tmp_path"
-  curl -L --url "$url" --output "$tmp_path"
+  curl -fL --url "$url" --output "$tmp_path"
 
   # Extract the archive
   tar xzvf "$tmp_path" -C "$tmp_dir"
-  rm "$tmp_path"
+  rm -f "$tmp_path"
 
   # Check whether it is a new version
   new_version="$("$tmp_dir/$foldername/bin/nvim" --version | head -n 1)"
@@ -71,20 +156,12 @@ function _nvim_nightly_prebuilt {
 
     if [[ $cur_version == "$new_version" ]]; then
       echo "Version $cur_version is already installed"
-      # Cleanup
-      rm -rf "${tmp_dir:?}/$foldername"
       exit 0
     fi
   fi
 
-  # Delete the existing install and move the new one over
   echo "Installing $new_version"
-  touch "$NVIM_INSTALL_PATH/sentinel"
-  rm -rf "${NVIM_INSTALL_PATH:?}/"*
-  mv "$tmp_dir/$foldername/"* $NVIM_INSTALL_PATH
-
-  # Cleanup
-  rm -r "${tmp_dir:?}/$foldername"
+  _replace_nvim_install "$tmp_dir/$foldername"
 }
 
 # Prerequisites:
@@ -98,23 +175,23 @@ function _nvim_nightly_compile {
   # Download the archive to a temp directory
   url="https://github.com/neovim/neovim/archive/nightly.tar.gz"
   tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
   tmp_path="$tmp_dir/neovim-nightly.tar.gz"
   echo "Downloading $url to $tmp_path"
-  curl -L --url "$url" --output "$tmp_path"
+  curl -fL --url "$url" --output "$tmp_path"
 
   # Extract the archive
   tar xzvf "$tmp_path" -C "$tmp_dir"
-  rm "$tmp_path"
+  rm -f "$tmp_path"
 
   # Build
   pushd "$tmp_dir/neovim-nightly" >/dev/null
   echo "Building in $(pwd)"
-  make CMAKE_BUILD_TYPE=Release CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$NVIM_INSTALL_PATH"
+  make CMAKE_BUILD_TYPE=Release CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$tmp_dir/install"
   make install
   popd >/dev/null
 
-  # Cleanup
-  rm -rf "$tmp_dir"
+  _replace_nvim_install "$tmp_dir/install"
 }
 
 function _nvim_nightly_uninstall {
