@@ -117,6 +117,7 @@ zip
 # =========== Development ===========
 
 age
+ansible-core
 aws-cli-v2
 bazelisk
 buf
@@ -133,8 +134,10 @@ nodejs
 npm
 openai-codex
 perf
+pre-commit
 python
 python-pip
+restic
 ruff
 rustup
 shellcheck
