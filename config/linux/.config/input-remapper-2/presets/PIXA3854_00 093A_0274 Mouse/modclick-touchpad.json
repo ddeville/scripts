@@ -1,0 +1,35 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 272
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "if_eq($modclick, 1, hold_keys(BTN_RIGHT), hold_keys(BTN_LEFT))",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 273
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "if_eq($modclick, 1, hold_keys(BTN_RIGHT), hold_keys(BTN_LEFT))",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 274
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "if_eq($modclick, 1, hold_keys(BTN_RIGHT), hold_keys(BTN_LEFT))",
+        "mapping_type": "key_macro"
+    }
+]
