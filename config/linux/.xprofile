@@ -30,6 +30,12 @@ xrdb -merge <(echo "*dpi: $DPI")
 # Update the keyboard settings
 "$SCRIPT_DIR"/../../bin/common/.local/bin/update-kb-settings
 
+# Apply input-remapper presets for this user session.
+if [[ $(hostname) == "framework" ]] && [ -x /usr/bin/python3 ] && [ -x /usr/bin/input-remapper-control ]; then
+  /usr/bin/python3 /usr/bin/input-remapper-control --command stop-all
+  /usr/bin/python3 /usr/bin/input-remapper-control --command autoload
+fi
+
 # Sleep and screen saver
 xset s 600 600
 xset dpms 600 600 600
