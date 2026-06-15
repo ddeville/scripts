@@ -1,5 +1,5 @@
 {
-    "version": "2.2.0",
+    "version": "2.2.1",
     "autoload": {
         "AT Translated Set 2 keyboard": "modclick-key",
         "PIXA3854:00 093A:0274 Mouse": "modclick-touchpad"
