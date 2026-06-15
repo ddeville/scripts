@@ -14,11 +14,9 @@ set_xkb_repeat_rate() {
 import ctypes, re, subprocess, sys
 
 def keyboard_device_ids():
-    output = subprocess.check_output(["xinput", "list", "--short"], text=True)
-    for line in output.splitlines():
+    for line in subprocess.check_output(["xinput", "list", "--short"], text=True).splitlines():
         if "keyboard" in line.lower():
-          match = re.search(r"\bid=(\d+)\b", line)
-          if match:
+          if match := re.search(r"\bid=(\d+)\b", line):
               yield int(match.group(1))
 
 delay_ms = int(sys.argv[1])
