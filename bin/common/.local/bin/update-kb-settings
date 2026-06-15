@@ -2,9 +2,55 @@
 
 set -eu -o pipefail
 
+set_xkb_repeat_rate() {
+  local DELAY_MS=$1
+  local RATE_PER_SECOND=$2
+
+  xset r rate "$DELAY_MS" "$RATE_PER_SECOND"
+
+  # xset only updates the core keyboard; input-remapper's forwarded keyboard
+  # can keep its own stale XKB repeat rate.
+  /usr/bin/python3 - "$DELAY_MS" "$RATE_PER_SECOND" <<'PY' || true
+import ctypes, re, subprocess, sys
+
+def keyboard_device_ids():
+    output = subprocess.check_output(["xinput", "list", "--short"], text=True)
+    for line in output.splitlines():
+        if "keyboard" in line.lower():
+          match = re.search(r"\bid=(\d+)\b", line)
+          if match:
+              yield int(match.group(1))
+
+delay_ms = int(sys.argv[1])
+interval_ms = max(1, round(1000 / int(sys.argv[2])))
+
+x11 = ctypes.CDLL("libX11.so.6")
+x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+x11.XOpenDisplay.restype = ctypes.c_void_p
+x11.XCloseDisplay.argtypes = [ctypes.c_void_p]
+x11.XFlush.argtypes = [ctypes.c_void_p]
+x11.XkbSetAutoRepeatRate.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint]
+
+display = x11.XOpenDisplay(None)
+if not display:
+    sys.exit(1)
+
+try:
+    for device_id in sorted(set(keyboard_device_ids())):
+        x11.XkbSetAutoRepeatRate(display, device_id, delay_ms, interval_ms)
+    x11.XFlush(display)
+finally:
+    x11.XCloseDisplay(display)
+PY
+}
+
 if [[ $(uname) == Linux ]]; then
-  xset r rate 180 50
-  xsetroot -cursor_name left_ptr
+  if [ -x /usr/bin/python3 ] && [ -x /usr/bin/input-remapper-control ]; then
+    # Refresh input-remapper before applying settings to the forwarded touchpad device.
+    /usr/bin/python3 /usr/bin/input-remapper-control --command stop-all || true
+    /usr/bin/python3 /usr/bin/input-remapper-control --command autoload || true
+    sleep 1.5
+  fi
 
   if [ -f /etc/X11/xinit/.Xmodmap ]; then
     xmodmap /etc/X11/xinit/.Xmodmap
@@ -14,12 +60,6 @@ if [[ $(uname) == Linux ]]; then
   fi
 
   if [[ $(hostname) == "framework" ]]; then
-    # Refresh input-remapper before applying settings to the forwarded touchpad device.
-    if [ -x /usr/bin/python3 ] && [ -x /usr/bin/input-remapper-control ]; then
-      /usr/bin/python3 /usr/bin/input-remapper-control --command stop-all || true
-      /usr/bin/python3 /usr/bin/input-remapper-control --command autoload || true
-    fi
-
     TOUCHPAD_DEVICES=(
       "PIXA3854:00 093A:0274 Mouse"
       "PIXA3854:00 093A:0274 Touchpad"
@@ -40,6 +80,13 @@ if [[ $(uname) == Linux ]]; then
       xinput set-button-map "$TOUCHPAD" 1 1 1 4 5 6 7
     done
   fi
+
+  if command -v xdotool >/dev/null && xset q | grep -q "Caps Lock: *on"; then
+    xdotool key Caps_Lock || true
+  fi
+  xsetroot -cursor_name left_ptr
+  set_xkb_repeat_rate 180 50
+
 elif [[ $(uname) == Darwin ]]; then
   # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
   modifiermapping="$(
