@@ -43,8 +43,8 @@ if [[ $(uname) == Linux ]]; then
     # Natural scrolling
     xinput set-prop "$TOUCHPAD" "libinput Natural Scrolling Enabled" 1
 
-    # Disable middle click on trackpad (or rather make it the same as left click)
-    xinput set-button-map "$TOUCHPAD" 1 1 3 4 5 6 7
+    # Make any physical touchpad click emit a left click.
+    xinput set-button-map "$TOUCHPAD" 1 1 1 4 5 6 7
   fi
 elif [[ $(uname) == Darwin ]]; then
   # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
