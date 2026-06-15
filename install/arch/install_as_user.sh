@@ -44,6 +44,10 @@ readarray -t aur_packages < <(grep -Ev "^#|^$" "scripts/config/linux/.config/pkg
 paru -Syy
 paru -S --needed "${aur_packages[@]}" || true # we don't want to fail the whole install if a package is broken
 
+if [ -f /usr/lib/systemd/system/input-remapper.service ]; then
+  sudo systemctl enable input-remapper.service
+fi
+
 # Run stow to put all the configs and bins in the right place (making sure to first delete a couple of
 # configs that might have been created and that would prevent stow from completing successfully)
 rm -f .bashrc .profile
