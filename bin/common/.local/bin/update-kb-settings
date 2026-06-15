@@ -31,16 +31,15 @@ x11.XCloseDisplay.argtypes = [ctypes.c_void_p]
 x11.XFlush.argtypes = [ctypes.c_void_p]
 x11.XkbSetAutoRepeatRate.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint]
 
-display = x11.XOpenDisplay(None)
-if not display:
+if display := x11.XOpenDisplay(None):
+  try:
+      for device_id in sorted(set(keyboard_device_ids())):
+          x11.XkbSetAutoRepeatRate(display, device_id, delay_ms, interval_ms)
+      x11.XFlush(display)
+  finally:
+      x11.XCloseDisplay(display)
+else:
     sys.exit(1)
-
-try:
-    for device_id in sorted(set(keyboard_device_ids())):
-        x11.XkbSetAutoRepeatRate(display, device_id, delay_ms, interval_ms)
-    x11.XFlush(display)
-finally:
-    x11.XCloseDisplay(display)
 PY
 }
 
