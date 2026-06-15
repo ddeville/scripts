@@ -178,6 +178,7 @@ slock
 sxhkd
 tk
 xclip
+xdotool
 xf86-video-amdgpu
 xorg
 xorg-xinit
