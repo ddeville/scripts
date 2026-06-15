@@ -14,6 +14,12 @@ if [[ $(uname) == Linux ]]; then
   fi
 
   if [[ $(hostname) == "framework" ]]; then
+    # Refresh input-remapper before applying settings to the forwarded touchpad device.
+    if [ -x /usr/bin/python3 ] && [ -x /usr/bin/input-remapper-control ]; then
+      /usr/bin/python3 /usr/bin/input-remapper-control --command stop-all || true
+      /usr/bin/python3 /usr/bin/input-remapper-control --command autoload || true
+    fi
+
     TOUCHPAD_DEVICES=(
       "PIXA3854:00 093A:0274 Mouse"
       "PIXA3854:00 093A:0274 Touchpad"
