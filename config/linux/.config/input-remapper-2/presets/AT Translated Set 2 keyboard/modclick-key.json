@@ -3,11 +3,55 @@
         "input_combination": [
             {
                 "type": 1,
+                "code": 58
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTCTRL",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 56
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTCTRL",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 100
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTMETA",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 29
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTMETA",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
                 "code": 125
             }
         ],
         "target_uinput": "keyboard",
-        "output_symbol": "set(modclick, 1).hold().set(modclick, 0)",
+        "output_symbol": "set(modclick, 1).hold_keys(KEY_LEFTALT).set(modclick, 0)",
         "mapping_type": "key_macro"
     }
 ]
