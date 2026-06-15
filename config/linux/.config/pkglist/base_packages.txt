@@ -136,6 +136,7 @@ openai-codex
 perf
 pre-commit
 python
+python-dasbus
 python-pip
 restic
 ruff
