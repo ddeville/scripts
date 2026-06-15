@@ -60,25 +60,29 @@ if [[ $(uname) == Linux ]]; then
   fi
 
   if [[ $(hostname) == "framework" ]]; then
-    TOUCHPAD_DEVICES=(
-      "PIXA3854:00 093A:0274 Mouse"
-      "PIXA3854:00 093A:0274 Touchpad"
-      "input-remapper PIXA3854:00 093A:0274 Touchpad forwarded"
+    # Decimal vendor/product IDs from xinput's "Device Product ID" property: PIXA3854:00 093A:0274
+    FRAMEWORK_TOUCHPAD_PRODUCT_ID="2362, 628"
+
+    while read -r TOUCHPAD_ID; do
+      if [ -n "$TOUCHPAD_ID" ]; then
+        # Natural scrolling
+        if xinput list-props "$TOUCHPAD_ID" | grep -q "libinput Natural Scrolling Enabled"; then
+          xinput set-prop "$TOUCHPAD_ID" "libinput Natural Scrolling Enabled" 1
+        fi
+        # Make any physical touchpad click emit a left click.
+        xinput set-button-map "$TOUCHPAD_ID" 1 1 1 4 5 6 7
+      fi
+    done < <(
+      xinput list --short |
+        awk '/slave[[:space:]]+pointer/ && match($0, /id=[0-9]+/) {
+              print substr($0, RSTART + 3, RLENGTH - 3)
+            }' |
+        while read -r DEVICE_ID; do
+          if xinput list-props "$DEVICE_ID" | grep -q "Device Product ID.*$FRAMEWORK_TOUCHPAD_PRODUCT_ID"; then
+            echo "$DEVICE_ID"
+          fi
+        done
     )
-
-    for TOUCHPAD in "${TOUCHPAD_DEVICES[@]}"; do
-      if ! xinput list --id-only "$TOUCHPAD" >/dev/null 2>&1; then
-        continue
-      fi
-
-      # Natural scrolling
-      if xinput list-props "$TOUCHPAD" | grep -q "libinput Natural Scrolling Enabled"; then
-        xinput set-prop "$TOUCHPAD" "libinput Natural Scrolling Enabled" 1
-      fi
-
-      # Make any physical touchpad click emit a left click.
-      xinput set-button-map "$TOUCHPAD" 1 1 1 4 5 6 7
-    done
   fi
 
   if command -v xdotool >/dev/null && xset q | grep -q "Caps Lock: *on"; then
