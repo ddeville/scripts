@@ -53,7 +53,7 @@ if [ "$(uname)" = "Darwin" ]; then
   echo -e "\033[34m==>\033[0m Running brew cleanup..."
   brew cleanup --prune=3
 elif [ "$(uname)" = "Linux" ]; then
-  if command -v paru >/dev/null 2>&1; then
+  if [ -x /usr/bin/paru ]; then
     pkglist_dir="$HOME/.config/pkglist"
 
     mapfile -t pkgs < <(
@@ -63,7 +63,7 @@ elif [ "$(uname)" = "Linux" ]; then
         sort -u
     )
 
-    paru -Syyu --needed -- "${pkgs[@]}"
+    env PATH="$(getconf PATH)" /usr/bin/paru -Syyu --needed -- "${pkgs[@]}"
   elif command -v apt >/dev/null 2>&1; then
     sudo apt update
     sudo apt full-upgrade --option APT::Get::Always-Include-Phased-Updates=true --yes
