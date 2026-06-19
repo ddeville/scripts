@@ -40,7 +40,7 @@
             }
         ],
         "target_uinput": "keyboard",
-        "output_symbol": "KEY_LEFTMETA",
+        "output_symbol": "set(windowdrag, 1).hold_keys(KEY_LEFTMETA).set(windowdrag, 0)",
         "mapping_type": "key_macro"
     },
     {
