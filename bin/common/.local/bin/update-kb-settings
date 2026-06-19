@@ -15,9 +15,9 @@ import ctypes, re, subprocess, sys
 
 def keyboard_device_ids():
     for line in subprocess.check_output(["xinput", "list", "--short"], text=True).splitlines():
-        if "keyboard" in line.lower():
-          if match := re.search(r"\bid=(\d+)\b", line):
-              yield int(match.group(1))
+        if "[slave  keyboard" in line or "[master keyboard" in line:
+            if match := re.search(r"\bid=(\d+)\b", line):
+                yield int(match.group(1))
 
 delay_ms = int(sys.argv[1])
 interval_ms = max(1, round(1000 / int(sys.argv[2])))
