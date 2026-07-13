@@ -2,32 +2,6 @@
 
 set -eu -o pipefail
 
-trust_homebrew_brewfile() {
-  local brew_command=$1
-  local brewfile=$2
-  local package package_type
-  local -a trusted_formulae=()
-  local -a trusted_casks=()
-
-  while read -r package_type package; do
-    if [[ $package_type == brew ]]; then
-      trusted_formulae+=("$package")
-    else
-      trusted_casks+=("$package")
-    fi
-  done < <(
-    sed -En 's/^[[:space:]]*(brew|cask) "([^"/]+\/[^"/]+\/[^"/]+)".*/\1 \2/p' "$brewfile" |
-      sort -u
-  )
-
-  if ((${#trusted_formulae[@]})); then
-    "$brew_command" trust --formula "${trusted_formulae[@]}"
-  fi
-  if ((${#trusted_casks[@]})); then
-    "$brew_command" trust --cask "${trusted_casks[@]}"
-  fi
-}
-
 if [ "$(uname)" = "Darwin" ]; then
   homebrew_dir="$HOME/.config/homebrew"
 
@@ -39,8 +13,6 @@ if [ "$(uname)" = "Darwin" ]; then
   elif [[ -f "$homebrew_dir/Brewfile.home" ]]; then
     cat "$homebrew_dir/Brewfile.home" >>"$brewfile"
   fi
-
-  trust_homebrew_brewfile brew "$brewfile"
 
   brew update
 
@@ -80,8 +52,6 @@ elif [ "$(uname)" = "Linux" ]; then
       trap 'rm -f "$brewfile"' EXIT
 
       pushd /home/linuxbrew >/dev/null
-
-      trust_homebrew_brewfile linuxbrew "$brewfile"
 
       linuxbrew update
 
