@@ -27,7 +27,7 @@ brew "jq"
 brew "jujutsu"
 brew "just"
 brew "jwt-cli"
-brew "koenbollen/public/jl"
+brew "koenbollen/public/jl", trusted: true
 brew "lazygit"
 brew "neovim"
 brew "openssh"
@@ -106,4 +106,4 @@ cask "mos"
 cask "spotify", args: { require_sha: false }
 cask "stay"
 cask "suspicious-package", args: { require_sha: false }
-cask "warrensbox/tap/tfswitch"
+cask "warrensbox/tap/tfswitch", trusted: true

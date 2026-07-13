@@ -96,31 +96,6 @@ linuxbrew() {
   sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" HOMEBREW_REQUIRE_TAP_TRUST=1 NONINTERACTIVE=1 "$@"
 }
 
-trust_linuxbrew_brewfile() {
-  local brewfile=$1
-  local package package_type
-  local -a trusted_formulae=()
-  local -a trusted_casks=()
-
-  while read -r package_type package; do
-    if [[ $package_type == brew ]]; then
-      trusted_formulae+=("$package")
-    else
-      trusted_casks+=("$package")
-    fi
-  done < <(
-    sed -En 's/^[[:space:]]*(brew|cask) "([^"/]+\/[^"/]+\/[^"/]+)".*/\1 \2/p' "$brewfile" |
-      sort -u
-  )
-
-  if ((${#trusted_formulae[@]})); then
-    linuxbrew "$BREW_BIN" trust --formula "${trusted_formulae[@]}"
-  fi
-  if ((${#trusted_casks[@]})); then
-    linuxbrew "$BREW_BIN" trust --cask "${trusted_casks[@]}"
-  fi
-}
-
 ensure_linuxbrew_user
 
 [ -x "$BREW_BIN" ] || linuxbrew /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -132,8 +107,6 @@ chmod 0644 "$BREWFILE_TMP"
 export PATH="$LINUXBREW_PATH/bin:$LINUXBREW_PATH/sbin:$PATH"
 
 pushd /home/linuxbrew
-
-trust_linuxbrew_brewfile "$BREWFILE_TMP"
 
 linuxbrew "$BREW_BIN" update
 linuxbrew "$BREW_BIN" bundle install --file="$BREWFILE_TMP" --upgrade --force-cleanup
