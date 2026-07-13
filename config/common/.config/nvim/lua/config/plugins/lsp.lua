@@ -107,7 +107,12 @@ local servers = {
     filetypes = { 'swift' },
   },
 
-  terraformls = {},
+  terraformls = {
+    on_attach = function(client, bufnr)
+      client.server_capabilities.codeLensProvider = nil
+      vim.lsp.codelens.enable(false, { bufnr = bufnr, client_id = client.id })
+    end,
+  },
 
   ts_ls = {},
 
