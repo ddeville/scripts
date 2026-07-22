@@ -96,9 +96,8 @@ cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alac
 cask "alfred"
 cask "apparency"
 cask "archaeology", args: { require_sha: false }
-cask "chatgpt" if Hardware::CPU.arm?
+cask "chatgpt"
 cask "codex"
-cask "codex-app" if Hardware::CPU.arm?
 cask "google-chrome", args: { require_sha: false }
 cask "hex-fiend"
 cask "istat-menus", args: { require_sha: false }
