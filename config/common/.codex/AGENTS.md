@@ -29,6 +29,12 @@
 - Avoid unnecessary comments that only describe chain-of-thought or add no useful context for humans maintaining the code.
 - Avoid overly defensive programming (e.g., exhaustive catch-all handling and branch coverage) unless explicitly requested.
 
+## Test Quality
+
+- Value tests that provide meaningful confidence in behavior and protect against regressions; test quality matters more than quantity.
+- Do not add tests merely for the sake of having tests or increasing coverage numbers.
+- Tests are code. Write and structure them with the same care as production logic, keeping them clear, focused, and maintainable.
+
 ## Validation
 
 - Run the smallest useful validation for the changed scope first.
