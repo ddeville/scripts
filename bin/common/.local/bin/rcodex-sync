@@ -9,7 +9,7 @@ usage() {
   cat <<'EOF'
 Usage: rcodex-sync <host>
 
-Sync this repo's Codex config, helpers, and owned skills to a remote host.
+Sync this repo's Codex instructions and owned skills to a remote host.
 
 Environment:
   REMOTE_PORT  Remote app-server port used for restart hints; default: 17338
@@ -55,7 +55,7 @@ mkdir -p "\$codex_home"
 EOF
 }
 
-remote_render_script() {
+remote_restart_hint_script() {
   local restart_command
 
   restart_command="rcodex-stop $(rcodex_format_shell_arg "$host")"
@@ -64,18 +64,9 @@ remote_render_script() {
   fi
 
   cat <<EOF
-$(remote_codex_home_script)
-
 port_is_open() {
   (exec 3<>"/dev/tcp/127.0.0.1/\$port") >/dev/null 2>&1
 }
-
-if [[ ! -x "\$codex_home/bin/render-config" ]]; then
-  echo "rcodex: remote render-config is missing or not executable" >&2
-  exit 1
-fi
-
-CODEX_HOME="\$codex_home" "\$codex_home/bin/render-config"
 
 if port_is_open; then
   echo $(rcodex_shell_quote "rcodex: remote codex app-server is running; restart it with: $restart_command") >&2
@@ -107,8 +98,8 @@ sync_codex() {
     die "failed to rsync staged .codex to $host:$remote_codex_home (rsync status $status)"
   fi
 
-  script=$(remote_render_script)
-  RCODEX_PRINT_REMOTE_OUTPUT=1 rcodex_run_remote "render remote codex config" "$host" "$script" "$control_path" || exit 1
+  script=$(remote_restart_hint_script)
+  RCODEX_PRINT_REMOTE_OUTPUT=1 rcodex_run_remote "check remote codex app-server" "$host" "$script" "$control_path" || exit 1
 
   echo "rcodex: synced $host" >&2
 }

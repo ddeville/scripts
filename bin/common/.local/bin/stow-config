@@ -37,6 +37,3 @@ git -C "$HOME/scripts" clean --force -d -- config bin
 
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
-
-# Post-processing for a few things...
-"$HOME/.codex/bin/render-config"
