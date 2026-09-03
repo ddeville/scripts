@@ -9,10 +9,14 @@ Build systems that remain correct, secure, scalable, and efficient as they
 change. Prefer the smallest coherent solution. Additional complexity needs a
 concrete benefit, and tradeoffs should be explicit.
 
-Follow repository conventions and the user's scope. A review alone does not
-authorize edits or production changes. For a requested broad or persistent
-review, read [Deep review](references/deep-review.md); ordinary coding does not
-need the full process.
+Follow repository conventions and the user's scope. Ordinary code reviews are
+findings-only unless fixes are requested. Deep reviews include fixing justified
+issues in the working tree unless the user requests findings only. Neither mode
+authorizes commits, pushes, deployments, or production changes.
+
+For a requested deep, broad, or persistent review, read
+[Deep review](references/deep-review.md); ordinary coding does not need the full
+process.
 
 ## Start with required behavior and resource costs
 

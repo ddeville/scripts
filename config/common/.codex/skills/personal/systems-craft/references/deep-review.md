@@ -15,7 +15,7 @@ and explain why its benefit warrants the change.
 
 ## Establish coverage before drawing conclusions
 
-Establish the checkout, existing changes, scope, and permission to edit. Identify
+Establish the checkout, existing changes, scope, and any restrictions on edits. Identify
 the major components and trace how users reach them. Map important operations,
 trust boundaries, state owners, and resource bottlenecks. Recent changes are one
 starting point, not a substitute for reviewing the system. Include mature,
@@ -130,9 +130,11 @@ steering them toward your verdict. Inspect and reproduce their findings; neither
 a delegated finding nor a clean verdict is proof on its own. Independent discovery
 is useful before edits, not only when reviewing a patch afterward.
 
-When fixes are authorized, edit the code in place in the working tree, preserving
-existing work. Do not commit or push unless requested. Group changes by a coherent
-problem or responsibility rather than accumulating an unreviewed rewrite.
+Unless the user requests findings only, fix justified issues in place in the
+working tree, preserving existing work. Group changes by a coherent problem or
+responsibility rather than accumulating an unreviewed rewrite. Follow the scope
+and external-action limits in SKILL.md; working-tree fixes do not authorize
+production changes.
 
 After each logically related set of changes:
 
