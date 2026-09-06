@@ -27,6 +27,7 @@
 [fetch]
     writeCommitGraph = true
     parallel = 8
+    prune = true
 [checkout]
     workers = 8
 [commit]
@@ -62,9 +63,6 @@
 
 [commitGraph]
     generationVersion = 2
-[remote "origin"]
-    prune = true
-
 [alias]
     st = status
     br = branch -vv
