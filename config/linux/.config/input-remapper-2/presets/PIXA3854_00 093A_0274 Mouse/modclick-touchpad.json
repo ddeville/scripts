@@ -7,7 +7,7 @@
             }
         ],
         "target_uinput": "keyboard + mouse",
-        "output_symbol": "if_eq($windowdrag, 1, if_eq($modclick, 1, key_up(KEY_LEFTALT).hold_keys(BTN_RIGHT).if_eq($modclick, 1, key_down(KEY_LEFTALT), None), hold_keys(BTN_LEFT)), if_eq($modclick, 1, hold_keys(BTN_RIGHT), hold_keys(BTN_LEFT)))",
+        "output_symbol": "if_eq($windowdrag, 1, if_eq($modclick, 1, key_up(KEY_LEFTALT).hold(BTN_RIGHT), hold(BTN_LEFT)), if_eq($modclick, 1, hold(BTN_RIGHT), hold(BTN_LEFT)))",
         "mapping_type": "key_macro"
     },
     {
@@ -18,7 +18,7 @@
             }
         ],
         "target_uinput": "keyboard + mouse",
-        "output_symbol": "if_eq($windowdrag, 1, if_eq($modclick, 1, key_up(KEY_LEFTALT).hold_keys(BTN_RIGHT).if_eq($modclick, 1, key_down(KEY_LEFTALT), None), hold_keys(BTN_RIGHT)), if_eq($modclick, 1, hold_keys(BTN_RIGHT), hold_keys(BTN_LEFT)))",
+        "output_symbol": "if_eq($windowdrag, 1, if_eq($modclick, 1, key_up(KEY_LEFTALT).hold(BTN_RIGHT), hold(BTN_RIGHT)), if_eq($modclick, 1, hold(BTN_RIGHT), hold(BTN_LEFT)))",
         "mapping_type": "key_macro"
     }
 ]
