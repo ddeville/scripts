@@ -97,10 +97,9 @@ export PATH="$brew_path":$PATH
 rm -f "$HOME/.bashrc" "$HOME/.profile"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
 
-# Install shell plugins and terminfos
+# Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"
 "$HOME/scripts/bin/common/.local/bin/update-shell-plugins"
-"$HOME/scripts/bin/macos/.local/bin/update-terminfo"
 
 echo "Setting up 1Password"
 mkdir -p "$HOME/.1password"
@@ -195,7 +194,7 @@ defaults write com.apple.siri VoiceTriggerUserEnabled -bool false
 
 defaults write com.apple.textedit RichText -int 0
 
-# Writing the following will not work unless Terminal/Alacritty is given Full Disk Access...
+# Writing the following will not work unless Terminal/Ghostty is given Full Disk Access...
 defaults write com.apple.universalaccess closeViewSmoothImages -int 0
 defaults write com.apple.universalaccess closeViewScrollWheelToggle -int 1
 defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 262144
@@ -242,7 +241,7 @@ duti -s com.apple.TextEdit public.yaml all
 duti -s com.apple.TextEdit public.json all
 duti -s com.apple.TextEdit .toml all
 duti -s com.apple.TextEdit .srt all
-duti -s org.alacritty public.unix-executable all
+duti -s com.mitchellh.ghostty public.unix-executable all
 
 defaultbrowser chrome
 
