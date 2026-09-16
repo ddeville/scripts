@@ -14,7 +14,7 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 
 ## Post-installation
 
-- On MacOS, codesign Alacritty by running `codesign-alacritty` and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools"
+- On MacOS, use Ghostty as the default terminal and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools". The installer associates Unix executables with Ghostty.
 - On Arch Linux, edit `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc` to tweak settings related to the display and overall machine type
 - Check health of a few Neovim plugins and make sure that the appropriate packages are installed:
     - `nvim +checkhealth lazy`
