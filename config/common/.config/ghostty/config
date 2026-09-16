@@ -1,0 +1,32 @@
+shell-integration = fish
+shell-integration-features = no-cursor
+clipboard-read = allow
+clipboard-write = allow
+
+font-family = AnonymicePro Nerd Font
+font-family-bold = AnonymicePro Nerd Font
+font-family-italic = AnonymicePro Nerd Font
+font-family-bold-italic = AnonymicePro Nerd Font
+font-style = Regular
+font-style-bold = Regular
+font-style-italic = Italic
+font-style-bold-italic = Italic
+bold-color = bright
+
+cursor-style = block
+cursor-style-blink = false
+selection-background = cell-foreground
+selection-foreground = cell-background
+bell-features = no-system,no-audio,no-attention,no-title,no-border
+
+scrollback-limit = 100000000
+
+title = Ghostty
+window-inherit-working-directory = false
+window-padding-balance = true
+window-padding-y = 2
+
+theme = light:Gruvbox Material Light,dark:Gruvbox Material Dark
+
+# Stow installs the matching file from config/macos or config/linux.
+config-file = ?platform.conf
