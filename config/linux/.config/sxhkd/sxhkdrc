@@ -1,6 +1,6 @@
 # terminal emulator
 super + Return
-	alacritty
+	ghostty
 
 # browser
 super + backslash
