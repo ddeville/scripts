@@ -186,7 +186,6 @@ xorg-xinit
 
 # =========== X11 Programs ==========
 
-alacritty
 firefox
 ghostty
 mupdf

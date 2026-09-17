@@ -92,7 +92,6 @@ cask "font-anonymice-nerd-font"
 
 cask "1password-cli"
 cask "1password"
-cask "alacritty", postinstall: "$HOME/scripts/bin/macos/.local/bin/codesign-alacritty"
 cask "alfred"
 cask "apparency"
 cask "archaeology", args: { require_sha: false }
