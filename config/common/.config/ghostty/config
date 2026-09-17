@@ -19,7 +19,7 @@ bell-features = no-system,no-audio,no-attention,no-title,no-border
 
 scrollback-limit = 100000000
 
-title = → Ghostty
+title = "   ~(•_•)~   Ghostty"
 window-inherit-working-directory = false
 window-padding-balance = true
 window-padding-y = 2
