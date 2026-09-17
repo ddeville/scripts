@@ -188,6 +188,7 @@ xorg-xinit
 
 alacritty
 firefox
+ghostty
 mupdf
 nautilus
 remmina
