@@ -3,9 +3,6 @@ if vim.o.shell:sub(-5) == '/fish' then
   vim.o.shell = [[/bin/bash]]
 end
 
--- dark background is better
-vim.opt.background = 'dark'
-
 -- allow switching between buffers without saving first
 vim.opt.hidden = true
 

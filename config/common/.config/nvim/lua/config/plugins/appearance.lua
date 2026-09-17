@@ -27,25 +27,21 @@ return {
       -- don't show `-- INSERT --` since we have a fancy status line
       vim.opt.showmode = false
 
-      -- By default the gruvbox theme uses cyan for insert and green for command but I'm so
-      -- used to it being the opposite...
-      local gruvbox = require('lualine.themes.gruvbox')
-      gruvbox.command.a.bg, gruvbox.insert.a.bg = gruvbox.insert.a.bg, gruvbox.command.a.bg
-      -- Also some components in the middle change color between modes which is annoying.
-      -- I only every want the mode component to change color when switching mode...
-      gruvbox.insert.c.bg = gruvbox.normal.c.bg
-      gruvbox.insert.c.fg = gruvbox.normal.c.fg
-      gruvbox.visual.c.bg = gruvbox.normal.c.bg
-      gruvbox.visual.c.fg = gruvbox.normal.c.fg
-      gruvbox.replace.c.bg = gruvbox.normal.c.bg
-      gruvbox.replace.c.fg = gruvbox.normal.c.fg
-      gruvbox.command.c.bg = gruvbox.normal.c.bg
-      gruvbox.command.c.fg = gruvbox.normal.c.fg
-
       require('lualine').setup({
         options = {
           icons_enabled = false,
-          theme = gruvbox,
+          theme = function()
+            -- Rebuild from the current background without modifying the cached theme.
+            local gruvbox = vim.deepcopy(require('lualine.themes.gruvbox_' .. vim.o.background))
+            -- Keep the familiar insert/command color swap.
+            gruvbox.command.a.bg, gruvbox.insert.a.bg = gruvbox.insert.a.bg, gruvbox.command.a.bg
+            -- Only the mode component changes color between modes.
+            for _, mode in ipairs({ 'insert', 'visual', 'replace', 'command' }) do
+              gruvbox[mode].c.bg = gruvbox.normal.c.bg
+              gruvbox[mode].c.fg = gruvbox.normal.c.fg
+            end
+            return gruvbox
+          end,
           component_separators = { left = '|', right = '|' },
           section_separators = { left = '', right = '' },
         },
