@@ -201,9 +201,6 @@ defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 2
 defaults write com.apple.universalaccess closeViewHotkeysEnabled -int 0
 defaults write com.apple.universalaccess closeViewTrackpadGestureZoomEnabled -bool false
 
-# Set thin glyphs/strokes in Alacritty
-defaults write org.alacritty AppleFontSmoothing -int 0
-
 # Nigthshift
 core_brightness_defaults_key="CBUser-$(dscl . -read ~ GeneratedUID | sed 's/GeneratedUID: //')"
 core_brightness_defaults_val='{
