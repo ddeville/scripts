@@ -15,44 +15,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-# First update base16
-base16_path="$XDG_DATA_HOME/base16"
-
-repos=(
-  "https://github.com/tinted-theming/base16-shell.git origin/main"
-  # Pinned to a commit before they changed gruvbox tab background to match base16-alacritty background...
-  "https://github.com/tinted-theming/base16-tmux.git f8ca8735cff140ba51239f18177e7f43f9733826"
-  "https://github.com/tinted-theming/base16-fzf.git origin/main"
-  "https://github.com/aarowill/base16-alacritty.git origin/master"
-)
-
-for repo_spec in "${repos[@]}"; do
-  read -r repo ref <<<"$repo_spec"
-  folder_name=$(echo "$repo" | cut -d/ -f5 | cut -d. -f1)
-  path="$base16_path/$folder_name"
-  # If the repo was never cloned, do so, otherwise just update it
-  if [ -d "$path" ]; then
-    # If the repo already exists, check if the remote has changed and update it if needed
-    pushd "$path"
-    current_remote_url=$(git remote get-url origin)
-    if [ "$current_remote_url" != "$repo" ]; then
-      git remote set-url origin "$repo"
-    fi
-    if $update || ! git rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
-      git fetch origin
-    fi
-    git checkout --detach "$ref"
-    popd
-
-  else
-    git clone "$repo" "$path"
-    pushd "$path"
-    git checkout --detach "$ref"
-    popd
-  fi
-done
-
-# Then neovim plugins
+# Neovim plugins
 lazy_path="$XDG_DATA_HOME/nvim/lazy/lazy.nvim"
 
 if [ ! -d "$lazy_path" ]; then

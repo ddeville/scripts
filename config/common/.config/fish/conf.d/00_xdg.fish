@@ -112,14 +112,6 @@ if not test -d "$XDG_STATE_HOME/bash"
     command mkdir -p "$XDG_STATE_HOME/bash"
 end
 
-# base16
-set -x BASE16_CONFIG_PATH "$XDG_STATE_HOME/base16"
-set -x BASE16_SHELL_PATH "$XDG_DATA_HOME/base16/base16-shell"
-set -x BASE16_SHELL_HOOKS_PATH "$XDG_CONFIG_HOME/base16/hooks"
-set -x BASE16_SHELL_COLORSCHEME_PATH "$BASE16_CONFIG_PATH/base16_shell_theme"
-set -x BASE16_SHELL_THEME_NAME_PATH "$BASE16_CONFIG_PATH/theme_name"
-set -x BASE16_SHELL_PREVIOUS_THEME_NAME_PATH "$BASE16_CONFIG_PATH/theme_name_previous"
-
 # ripgrep
 set -x RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 
