@@ -24,7 +24,7 @@ window-inherit-working-directory = false
 window-padding-balance = true
 window-padding-y = 2
 
-theme = light:Gruvbox Material Light,dark:Gruvbox Material Dark
+theme = light:Base16 Gruvbox Light Soft,dark:Base16 Gruvbox Dark Pale
 
 # Stow installs the matching file from config/macos or config/linux.
 config-file = ?platform.conf
