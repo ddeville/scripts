@@ -18,7 +18,7 @@ fi
 
 bspc rule -a zoom desktop="zoom" state=floating
 bspc rule -a "zoom " desktop="zoom" state=floating
-bspc rule -a 1Password state=floating
+bspc rule -a com.onepassword.OnePassword state=floating
 bspc rule -a QjackCtl state=floating
 bspc rule -a Nm-connection-editor state=floating
 bspc rule -a Pavucontrol state=floating
