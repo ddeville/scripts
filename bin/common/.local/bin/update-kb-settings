@@ -89,6 +89,9 @@ if [[ $(uname) == Linux ]]; then
   set_xkb_repeat_rate 180 50
 
 elif [[ $(uname) == Darwin ]]; then
+  defaults write NSGlobalDomain InitialKeyRepeat -int 10
+  defaults write NSGlobalDomain KeyRepeat -int 1
+
   # Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
   modifiermapping="$(
     hidutil list --ndjson | jq -r '
