@@ -107,10 +107,11 @@ elif [[ $(uname) == Darwin ]]; then
         "HIDKeyboardModifierMappingDst": 0x7000000E0,
       }]
     }'
-    defaults -currentHost write NSGlobalDomain "$modifiermapping" -array '{
-      HIDKeyboardModifierMappingSrc = 30064771129;
-      HIDKeyboardModifierMappingDst = 30064771296;
-    }'
+    # OpenStep dictionary literals store these numbers as strings; use typed integers.
+    defaults -currentHost write NSGlobalDomain "$modifiermapping" -array '<dict>
+      <key>HIDKeyboardModifierMappingSrc</key><integer>30064771129</integer>
+      <key>HIDKeyboardModifierMappingDst</key><integer>30064771296</integer>
+    </dict>'
   else
     echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
   fi
