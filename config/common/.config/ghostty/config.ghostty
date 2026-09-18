@@ -15,6 +15,7 @@ bold-color = bright
 
 cursor-style = block
 cursor-style-blink = false
+adjust-cursor-thickness = 2
 bell-features = no-system,no-audio,no-attention,no-title,no-border
 
 scrollback-limit = 100000000
