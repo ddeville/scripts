@@ -70,8 +70,12 @@ end
 # terraform
 set -x TF_INSTALL_PATH "$XDG_TOOLCHAINS_HOME/terraform"
 set -x TF_BINARY_PATH "$HOME/.local/bin/terraform"
+set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
 if not test -d "$TF_INSTALL_PATH"
     command mkdir -p "$TF_INSTALL_PATH"
+end
+if not test -d "$TF_PLUGIN_CACHE_DIR"
+    command mkdir -p "$TF_PLUGIN_CACHE_DIR"
 end
 
 ############################
