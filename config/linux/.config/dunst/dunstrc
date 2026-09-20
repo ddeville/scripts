@@ -20,14 +20,14 @@
     # constant width of 300
     width = 450
 
-    # The maximum height of a single notification, excluding the frame.
-    height = (0, 400)
+    # The minimum and maximum height of a single notification, excluding the frame.
+    height = (64, 400)
 
     # Position the notification in the top right corner
     origin = bottom-right
 
     # Offset from the origin
-    offset = 20x80
+    offset = (20, 80)
 
     # Scale factor. It is auto-detected if value is 0.
     scale = 0
@@ -62,11 +62,6 @@
     # This option will only work if a compositing window manager is
     # present (e.g. xcompmgr, compiz, etc.).
     transparency = 0
-
-    # The height of the entire notification.  If the height is smaller
-    # than the font height and padding combined, it will be raised
-    # to the font height and padding.
-    notification_height = 64
 
     # Draw a line of "separator_height" pixel height between two
     # notifications.
@@ -224,20 +219,6 @@
     # Define the class of the windows spawned by dunst
     class = Dunst
 
-    # Print a notification on startup.
-    # This is mainly for error detection, since dbus (re-)starts dunst
-    # automatically after a crash.
-    startup_notification = false
-
-    # Manage dunst's desire for talking
-    # Can be one of the following values:
-    #  crit: Critical features. Dunst aborts
-    #  warn: Only non-fatal warnings
-    #  mesg: Important Messages
-    #  info: all unimportant stuff
-    # debug: all less than unimportant stuff
-    verbosity = mesg
-
     # Define the corner radius of the notification window
     # in pixel size. If the radius is 0, you have no rounded
     # corners.
@@ -289,17 +270,14 @@
     mouse_right_click = close_all
 
 [urgency_low]
-    msg_urgency = low
     background = "#3c3836"
     foreground = "#a89d94"
 
 [urgency_normal]
-    msg_urgency = normal
     background = "#222222"
     foreground = "#d5c4a1"
 
 [urgency_critical]
-    msg_urgency = critical
     background = "#fb4934"
     foreground = "#ebdbb2"
 
