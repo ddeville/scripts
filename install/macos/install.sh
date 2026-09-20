@@ -38,7 +38,7 @@ install_command_line_tools() {
   sudo touch "$clt_placeholder"
   clt_label="$(
     /usr/sbin/softwareupdate -l 2>/dev/null |
-      sed -n 's/^ *\\* Label: *//p' |
+      sed -n 's/^[[:space:]]*[*][[:space:]]*Label:[[:space:]]*//p' |
       grep 'Command Line Tools' |
       sort -V |
       tail -n1 || true
@@ -61,6 +61,15 @@ if [ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]; then
 fi
 
 export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+
+# If `scripts` was downloaded as an archive, clone the git repo instead
+if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
+  tmp_dir=$(mktemp -d)
+  git clone "https://github.com/ddeville/scripts.git" "$tmp_dir/scripts"
+  mv "$HOME/scripts" "$tmp_dir/scripts.bak"
+  mv "$tmp_dir/scripts" "$HOME/scripts"
+  rm -rf "$tmp_dir"
+fi
 
 # We can now install all the packages
 export SKIP_ALACRITTY_CODESIGN=1
@@ -253,15 +262,6 @@ if ! grep -q "app.autostart-mode" "$spotify_prefs_file"; then
     echo 'app.autostart-banner-seen=true'
     echo 'app.autostart-configured=true'
   } >>"$spotify_prefs_file"
-fi
-
-# If `scripts` was downloaded as an archive, clone the git repo instead
-if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
-  tmp_dir=$(mktemp -d)
-  git clone "https://github.com/ddeville/scripts.git" "$tmp_dir/scripts"
-  mv "$HOME/scripts" "$tmp_dir/scripts.bak"
-  mv "$tmp_dir/scripts" "$HOME/scripts"
-  rm -rf "$tmp_dir"
 fi
 
 # Make sure that the origin remote is set to use ssh
