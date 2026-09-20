@@ -165,6 +165,7 @@ brightnessctl
 bspwm
 dunst
 gnome-themes-extra
+i3lock
 libnotify
 lightdm
 lightdm-gtk-greeter
@@ -175,7 +176,6 @@ picom
 polybar
 redshift
 rofi
-slock
 sxhkd
 tk
 xclip
@@ -183,6 +183,7 @@ xdotool
 xf86-video-amdgpu
 xorg
 xorg-xinit
+xss-lock
 
 # =========== X11 Programs ==========
 

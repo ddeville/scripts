@@ -30,9 +30,11 @@ xrdb -merge <(echo "*dpi: $DPI")
 # Update the keyboard and touchpad settings.
 "$SCRIPT_DIR"/../../bin/common/.local/bin/update-kb-settings
 
-# Sleep and screen saver
+# Lock after 10 minutes of inactivity and before suspend.
 xset s 600 600
 xset dpms 600 600 600
+xss-lock --transfer-sleep-lock -- i3lock --nofork --color=282828 &
+disown
 
 # Tweak screen color to be easier on the eyes
 redshift -P -O 4500
