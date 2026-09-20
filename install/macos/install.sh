@@ -72,7 +72,6 @@ if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree &>/dev/null; then
 fi
 
 # We can now install all the packages
-export SKIP_ALACRITTY_CODESIGN=1
 "$HOME/scripts/install/macos/install_packages.sh"
 
 if [ "${arch_name}" = "arm64" ]; then
