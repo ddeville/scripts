@@ -17,11 +17,16 @@ if [ ! -x $brew ]; then
 fi
 
 homebrew_dir="$script_dir/../../config/macos/.config/homebrew"
+work_brewfile="$script_dir/../../config/openai/.config/homebrew/Brewfile.openai"
 brewfile="$(mktemp -d)/Brewfile"
 trap 'rm -rf "$(dirname "$brewfile")"' EXIT
 cat "$homebrew_dir/Brewfile.common" >"$brewfile"
-if [[ -f "$homebrew_dir/Brewfile.openai" ]]; then
+if [[ -f $work_brewfile ]]; then
+  cat "$work_brewfile" >>"$brewfile"
+elif [[ -f "$homebrew_dir/Brewfile.openai" ]]; then
   cat "$homebrew_dir/Brewfile.openai" >>"$brewfile"
+elif [[ -f "$homebrew_dir/Brewfile.home" ]]; then
+  cat "$homebrew_dir/Brewfile.home" >>"$brewfile"
 fi
 
 $brew update

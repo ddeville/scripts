@@ -39,15 +39,13 @@ Server = https://mirrors.mit.edu/archlinux/\$repo/os/\$arch
 EOT
 
 # Install grub
-pacman -Syy
-pacman -S --needed grub efibootmgr os-prober
+pacman -Syu --needed grub efibootmgr os-prober
 
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Install all the base packages
 readarray -t base_packages < <(grep -Ev "^#|^$" "/scripts/config/linux/.config/pkglist/base_packages.txt")
-pacman -Syy
 pacman -S --needed "${base_packages[@]}"
 
 # Setup the systemd services
