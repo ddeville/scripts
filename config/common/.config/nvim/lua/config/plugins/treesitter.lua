@@ -77,7 +77,8 @@ local function update_treesitter()
   treesitter.setup({
     install_dir = install_dir,
   })
-  treesitter.install(ensure_installed):wait(300000)
+  assert(treesitter.install(ensure_installed):wait(300000), 'Tree-sitter parser installation failed')
+  assert(treesitter.update():wait(300000), 'Tree-sitter parser update failed')
 end
 
 return {
