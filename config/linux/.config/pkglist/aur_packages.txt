@@ -2,7 +2,6 @@
 
 1password-cli
 buildifier-bin
-dropbox-cli
 flamegraph
 jl
 sysz
@@ -19,10 +18,8 @@ terraform-ls
 # =========== X11 Programs ==========
 
 1password
-dropbox
 google-chrome
 input-remapper-bin
-nautilus-dropbox
 nitrogen
 
 # ============== Fonts ==============
