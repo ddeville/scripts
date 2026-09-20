@@ -125,7 +125,7 @@ ctrl + alt + period
 
 # maim
 ctrl + shift + 3
-	maim -s ~/data/Pictures/screenshots/screenshot-(date +%Y_%m_%d-%H_%M_%S).png
+	maim -s "$HOME/data/Pictures/screenshots/screenshot-$(date +%Y_%m_%d-%H_%M_%S).png"
 
 ctrl + shift + 4
 	maim -s | xclip -selection clipboard -t image/png
