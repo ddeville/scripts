@@ -175,7 +175,7 @@ return {
           end
           require('mason-lspconfig').setup({
             ensure_installed = server_names,
-            automatic_installation = true,
+            automatic_enable = false, -- Servers are enabled by the LSP configuration above.
           })
         end,
       },
