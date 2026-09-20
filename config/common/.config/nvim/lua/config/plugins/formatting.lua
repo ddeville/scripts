@@ -11,7 +11,7 @@ return {
 
     conform.setup({
       format_after_save = {
-        lsp_fallback = true,
+        lsp_format = 'fallback',
       },
       -- Don't show formatter errors since this gets super annoying and takes
       -- focus when saving with a syntax error.
