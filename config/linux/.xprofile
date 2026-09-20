@@ -33,7 +33,7 @@ xrdb -merge <(echo "*dpi: $DPI")
 # Lock after 10 minutes of inactivity and before suspend.
 xset s 600 600
 xset dpms 600 600 600
-xss-lock --transfer-sleep-lock -- i3lock --nofork --color=282828 &
+xss-lock --transfer-sleep-lock -- i3lock --nofork --color=405b73 &
 disown
 
 # Tweak screen color to be easier on the eyes
