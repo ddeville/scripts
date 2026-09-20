@@ -38,7 +38,6 @@
 [diff]
     tool = difftastic
     algorithm = patience
-    compactionHeuristic = true
 [difftool]
     prompt = false
 [difftool "difftastic"]
