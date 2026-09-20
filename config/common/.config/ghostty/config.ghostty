@@ -1,6 +1,6 @@
 shell-integration = fish
 shell-integration-features = no-cursor
-clipboard-read = allow
+clipboard-read = ask
 clipboard-write = allow
 
 font-family = AnonymicePro Nerd Font
