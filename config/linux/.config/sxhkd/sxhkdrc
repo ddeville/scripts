@@ -15,7 +15,7 @@ ctrl + @space
 	rofi -show drun -m -1 -dpi $DPI
 
 super + shift + d
-	xset s activate && xset dpms force off
+	loginctl lock-session "$XDG_SESSION_ID" && timeout 5s xdotool search --sync --onlyvisible --class '^i3lock$' >/dev/null && xset dpms force off
 
 # sleep
 super + shift + s
