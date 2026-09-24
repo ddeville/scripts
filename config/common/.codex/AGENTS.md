@@ -13,10 +13,7 @@
 
 ## Git Behavior
 
-- When executing Git commands during agent work, disable fsmonitor for each command to avoid spawning persistent fsmonitor daemons.
-- Use: `git -c core.fsmonitor=false <subcommand> ...`
-- Git commands written for the user in scripts, source code, or documentation must not include fsmonitor overrides.
-- Do not change the user's global or repository fsmonitor configuration unless explicitly asked.
+- Do not create new branches or worktrees unless explicitly requested.
 - Do not commit or push unless explicitly requested.
 - Do not amend existing commits unless explicitly requested.
 - Do not merge PRs or use administrative overrides (such as `gh pr merge --admin`) unless explicitly requested. This applies to all CLIs, connectors, APIs, and UIs.
@@ -49,6 +46,11 @@
 - Ask for clarification when ambiguity materially affects correctness, scope, or risk; otherwise state a reasonable assumption and continue.
 - Reuse authorization already given in the conversation; do not ask for it again unless the scope or risk materially changes.
 - If task scope expands materially beyond the original request, call it out and confirm before proceeding.
+
+## Slack
+
+- It's ok for you to use the Slack connector to find information, either when directly provided a link to a thread or proactively.
+- Never under any circumstances post anything to Slack, either using the connector or CUA.
 
 ## Solution Bias
 
