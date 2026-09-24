@@ -43,7 +43,7 @@ elif [ "$(uname)" = "Linux" ]; then
 
     if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
       linuxbrew() {
-        sudo runuser -u linuxbrew -- env HOME=/home/linuxbrew HOMEBREW_REQUIRE_TAP_TRUST=1 /home/linuxbrew/.linuxbrew/bin/brew "$@"
+        sudo runuser -u linuxbrew -- env HOME=/home/linuxbrew /home/linuxbrew/.linuxbrew/bin/brew "$@"
       }
 
       brewfile="$(mktemp /tmp/bus-brewfile.XXXXXX)"
