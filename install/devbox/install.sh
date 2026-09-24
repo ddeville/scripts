@@ -93,7 +93,7 @@ ensure_linuxbrew_user() {
 }
 
 linuxbrew() {
-  sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" HOMEBREW_REQUIRE_TAP_TRUST=1 NONINTERACTIVE=1 "$@"
+  sudo runuser -u "$LINUXBREW_USER" -- env HOME="$LINUXBREW_HOME" NONINTERACTIVE=1 "$@"
 }
 
 ensure_linuxbrew_user
