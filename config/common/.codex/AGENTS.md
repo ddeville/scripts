@@ -61,3 +61,4 @@
 - Prefer `rg` / `rg --files` for searching.
 - Prefer `apply_patch` for focused file edits.
 - Avoid scripting (e.g., Python) for simple read/write changes when shell tools suffice.
+- If you need to provide shell commands to run make sure that they're compatible with the Fish shell.
