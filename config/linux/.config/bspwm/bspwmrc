@@ -8,8 +8,8 @@ bspc config borderless_monocle false
 bspc config gapless_monocle false
 
 if [[ $(hostname) == "arch" ]]; then
-  bspc monitor DisplayPort-0 -d web media flt a b c
-  bspc monitor DisplayPort-1 -d code a b c
+  bspc monitor DP-1 -d web media flt a b c
+  bspc monitor DP-2 -d code a b c
 elif [[ $(hostname) == "framework" ]]; then
   bspc monitor -d web code media flt a b c
 else
@@ -51,8 +51,8 @@ polybar-msg cmd quit >/dev/null
 mkdir -p "$HOME/.cache/logs"
 
 if [[ $(hostname) == "arch" ]]; then
-  MONITOR=DisplayPort-0 HOME_MOUNT=/home/damien/data polybar main 2>"$HOME/.cache/logs/polybar-main.err" &
-  MONITOR=DisplayPort-1 polybar term 2>"$HOME/.cache/logs/polybar-term.err" &
+  MONITOR=DP-1 HOME_MOUNT=/home/damien/data polybar main 2>"$HOME/.cache/logs/polybar-main.err" &
+  MONITOR=DP-2 polybar term 2>"$HOME/.cache/logs/polybar-term.err" &
 elif [[ $(hostname) == "framework" ]]; then
   BATTERY=BAT1 POWER_ADAPTER=ACAD polybar laptop 2>"$HOME/.cache/logs/polybar-laptop.err" &
 else
