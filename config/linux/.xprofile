@@ -5,8 +5,8 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" &>/dev/n
 if [[ $(hostname) == "arch" ]]; then
   # This is my home machine with two monitors
   DPI=140
-  xrandr --output DisplayPort-0 --mode 3840x2160 --pos 0x1280 --primary
-  xrandr --output DisplayPort-1 --mode 3840x2160 --pos 3840x0 --rotate right
+  xrandr --output DP-1 --mode 3840x2160 --pos 0x1280 --primary
+  xrandr --output DP-2 --mode 3840x2160 --pos 3840x0 --rotate right
 elif [[ $(hostname) == "archvm"* ]]; then
   # Random Arch VMs in libvirt
   DPI=140
