@@ -136,7 +136,7 @@ defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true
 defaults write NSGlobalDomain AppleShowAllExtensions -int 1
 defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 defaults write NSGlobalDomain ContextMenuGesture -int 0
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
