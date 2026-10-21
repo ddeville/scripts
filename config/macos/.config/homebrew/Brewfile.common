@@ -59,7 +59,6 @@ brew "docker-compose", postinstall: 'mkdir -p "$HOME/.docker/cli-plugins" && ln 
 brew "golang"
 brew "gopls"
 brew "helm"
-brew "kubelogin"
 brew "kubernetes-cli"
 brew "kind"
 brew "luarocks"
