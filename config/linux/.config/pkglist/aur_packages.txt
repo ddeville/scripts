@@ -24,7 +24,6 @@ nitrogen
 
 # ============== Fonts ==============
 
-apple-fonts
 faenza-icon-theme
 otf-public-sans
 ttf-mac-fonts
