@@ -102,7 +102,7 @@
 [url "git@github.openai:openai/"]
     insteadOf = git@github.com:openai/
 
-[includeIf "hasconfig:remote.*.url:*@github.openai:openai/**"]
-    path = ~/.config/git/config_openai
 [includeIf "hasconfig:remote.*.url:*@github.com:openai/**"]
+    path = ~/.config/git/config_openai
+[includeIf "hasconfig:remote.*.url:*://*.openai.internal/**"]
     path = ~/.config/git/config_openai
