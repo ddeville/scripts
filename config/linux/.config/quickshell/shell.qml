@@ -131,7 +131,9 @@ ShellRoot {
             screen: modelData
             implicitHeight: Theme.height
             color: Theme.background
-            exclusionMode: root.preview ? ExclusionMode.Ignore : ExclusionMode.Auto
+            // X11 reserves physical pixels; Wayland reserves logical pixels.
+            exclusiveZone: Math.round(implicitHeight * (Quickshell.env("XDG_SESSION_TYPE") === "x11" ? devicePixelRatio : 1))
+            exclusionMode: root.preview ? ExclusionMode.Ignore : ExclusionMode.Normal
 
             anchors {
                 left: true
@@ -143,7 +145,7 @@ ShellRoot {
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: parent.bottom
+                y: root.preview ? parent.height - height : 0
                 height: 1
                 color: Theme.border
             }
@@ -157,22 +159,9 @@ ShellRoot {
                     rightMargin: 10
                 }
 
-                StatusGroup {
-                    Layout.minimumWidth: implicitWidth
-                    visible: workspaces.width > 0
-
-                    WorkspaceStrip {
-                        id: workspaces
-
-                        backend: bspwm
-                        monitor: panel.screen.name
-                    }
-
-                }
-
                 Item {
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 110
+                    Layout.preferredWidth: 90
+                    Layout.minimumWidth: 90
                     Layout.fillHeight: true
 
                     Column {
@@ -199,6 +188,23 @@ ShellRoot {
 
                     }
 
+                }
+
+                StatusGroup {
+                    Layout.minimumWidth: implicitWidth
+                    visible: workspaces.width > 0
+
+                    WorkspaceStrip {
+                        id: workspaces
+
+                        backend: bspwm
+                        monitor: panel.screen.name
+                    }
+
+                }
+
+                Item {
+                    Layout.fillWidth: true
                 }
 
                 Item {
@@ -255,7 +261,7 @@ ShellRoot {
 
                             Metric {
                                 label: "CPU"
-                                value: String(root.cpu).padStart(2, "0") + "%"
+                                value: root.cpu + "%"
                             }
 
                             Metric {
