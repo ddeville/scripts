@@ -77,7 +77,7 @@ Row {
                 width: 4
                 height: 4
                 radius: 2
-                color: urgent ? Theme.alert : focused ? Theme.selected : occupied ? Theme.muted : "transparent"
+                color: !occupied ? "transparent" : urgent ? Theme.alert : focused ? Theme.selected : Theme.muted
             }
 
         }
