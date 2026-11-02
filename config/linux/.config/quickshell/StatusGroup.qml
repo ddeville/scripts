@@ -3,7 +3,7 @@ import QtQuick
 Rectangle {
     default property alias content: contentRow.data
 
-    implicitWidth: contentRow.implicitWidth + 6
+    implicitWidth: contentRow.implicitWidth + 4
     implicitHeight: Theme.height - 6
     color: Theme.surface
     radius: 7

@@ -16,8 +16,8 @@ QtObject {
     readonly property color tertiary: "#8ec07c"
     readonly property color alert: "#fb4934"
     readonly property string font: "Noto Sans Mono"
-    readonly property string iconFont: "Font Awesome 7 Free Solid"
     readonly property int fontSize: 12
+    readonly property int captionSize: 8
     readonly property int iconSize: 16
     readonly property int height: 34
 }
