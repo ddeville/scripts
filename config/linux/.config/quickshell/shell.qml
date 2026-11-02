@@ -352,8 +352,7 @@ ShellRoot {
                         StatusGroup {
                             BarButton {
                                 symbol: root.notificationsPaused ? "bell-off" : "bell"
-                                active: root.notificationsPaused
-                                foreground: root.notificationsPaused ? Theme.selected : Theme.muted
+                                foreground: root.notificationsPaused ? Theme.muted : Theme.selected
                                 interactive: true
                                 onClicked: (button) => {
                                     if (button === Qt.LeftButton)
