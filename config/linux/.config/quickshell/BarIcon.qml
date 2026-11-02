@@ -9,6 +9,9 @@ Item {
     property real level: 1
     property bool muted: false
     readonly property var paths: ({
+        "cpu": "M6 6 H18 V18 H6 Z M9 9 H15 V15 H9 Z M9 3 V6 M15 3 V6 M9 18 V21 M15 18 V21 M3 9 H6 M3 15 H6 M18 9 H21 M18 15 H21",
+        "memory": "M3 6 H21 V17 H3 Z M6 9 H9 V13 H6 Z M12 9 H15 V13 H12 Z M18 9 V13 M6 17 V20 M10 17 V20 M14 17 V20 M18 17 V20",
+        "temperature": "M10 14 V5 A2 2 0 0 1 14 5 V14 A4 4 0 1 1 10 14 M12 8 V17 M17 6 H20 M17 10 H19",
         "mail": "M4 5 H20 V19 H4 Z M4 6 L12 12 L20 6",
         "updates": "M4 8 L12 4 L20 8 V17 L12 21 L4 17 Z M4 8 L12 12 L20 8 M12 12 V21 M8 6 L16 10",
         "sun": "M16 12 A4 4 0 1 1 8 12 A4 4 0 1 1 16 12 M12 2 V4 M12 20 V22 M2 12 H4 M20 12 H22 M5 5 L6.5 6.5 M17.5 17.5 L19 19 M5 19 L6.5 17.5 M17.5 6.5 L19 5",

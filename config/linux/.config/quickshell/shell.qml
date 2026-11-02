@@ -151,7 +151,7 @@ ShellRoot {
             }
 
             RowLayout {
-                spacing: 12
+                spacing: 8
 
                 anchors {
                     fill: parent
@@ -159,33 +159,13 @@ ShellRoot {
                     rightMargin: 10
                 }
 
-                Item {
-                    Layout.preferredWidth: 90
-                    Layout.minimumWidth: 90
-                    Layout.fillHeight: true
+                StatusGroup {
+                    Layout.minimumWidth: implicitWidth
 
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 0
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: Qt.formatDateTime(clock.date, "h:mm AP")
-                            color: Theme.foreground
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSize
-                            renderType: Text.QtRendering
-                        }
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: Qt.formatDateTime(clock.date, "ddd · d MMM")
-                            color: Theme.muted
-                            font.family: Theme.font
-                            font.pixelSize: 9
-                            renderType: Text.QtRendering
-                        }
-
+                    BarButton {
+                        caption: Qt.formatDateTime(clock.date, "ddd d MMM").toUpperCase()
+                        text: Qt.formatDateTime(clock.date, "h:mm AP")
+                        textWidth: 60
                     }
 
                 }
@@ -215,7 +195,7 @@ ShellRoot {
                     Row {
                         id: rightGroup
 
-                        spacing: 12
+                        spacing: 8
 
                         anchors {
                             right: parent.right
@@ -224,12 +204,10 @@ ShellRoot {
 
                         StatusGroup {
                             visible: !root.offline && panel.width >= 1000
-                            color: "transparent"
 
                             BarButton {
                                 visible: github.output !== ""
-                                icon: "\uf09b"
-                                iconFont: "Font Awesome 7 Brands"
+                                glyph: "\uf09b"
                                 text: github.output === "offline" ? "ERR" : github.output
                                 foreground: github.output === "offline" ? Theme.alert : Number.parseInt(github.output) > 0 ? Theme.selected : Theme.muted
                                 interactive: true
@@ -257,23 +235,28 @@ ShellRoot {
 
                         StatusGroup {
                             visible: !panel.powerOpen && panel.width >= 1150
-                            color: "transparent"
 
-                            Metric {
-                                label: "CPU"
-                                value: root.cpu + "%"
+                            BarButton {
+                                caption: "CPU"
+                                stacked: true
+                                text: root.cpu + "%"
+                                textWidth: 30
                             }
 
-                            Metric {
-                                label: "MEM"
-                                value: (root.stats.memory ?? 0) + "%"
+                            BarButton {
+                                caption: "MEM"
+                                stacked: true
+                                text: (root.stats.memory ?? 0) + "%"
+                                textWidth: 30
                             }
 
-                            Metric {
+                            BarButton {
                                 visible: typeof root.stats.temperature === "number"
-                                label: "TEMP"
-                                value: root.stats.temperature + "°F"
-                                alert: root.stats.temperature >= 140
+                                caption: "TEMP"
+                                stacked: true
+                                text: root.stats.temperature + "°F"
+                                textWidth: 38
+                                foreground: root.stats.temperature >= 140 ? Theme.alert : Theme.foreground
                             }
 
                         }
@@ -307,8 +290,8 @@ ShellRoot {
                                 symbol: "volume"
                                 level: root.audio ? root.audio.volume : 0
                                 muted: !root.audio || root.audio.muted
-                                text: !root.audio ? "—" : root.audio.muted ? "Muted" : Math.round(root.audio.volume * 100) + "%"
-                                textWidth: 38
+                                text: !root.audio ? "—" : root.audio.muted ? "MUTE" : Math.round(root.audio.volume * 100) + "%"
+                                textWidth: 30
                                 foreground: root.audio && root.audio.muted ? Theme.muted : root.audio && root.audio.volume > 1 ? Theme.alert : Theme.foreground
                                 interactive: true
                                 onClicked: (button) => {
@@ -335,7 +318,8 @@ ShellRoot {
                                 delegate: BarButton {
                                     required property string modelData
 
-                                    text: (panel.pendingPowerAction === modelData ? "Confirm " : "") + modelData
+                                    caption: panel.pendingPowerAction === modelData ? "CONFIRM" : "SESSION"
+                                    text: modelData
                                     foreground: Theme.alert
                                     interactive: true
                                     onClicked: (button) => {
@@ -375,59 +359,65 @@ ShellRoot {
 
                         }
 
-                        Row {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 4
+                        StatusGroup {
+                            visible: trayRow.implicitWidth > 0
 
-                            Repeater {
-                                model: SystemTray.items
+                            Row {
+                                id: trayRow
 
-                                delegate: Item {
-                                    id: trayItem
+                                spacing: 4
 
-                                    required property var modelData
+                                Repeater {
+                                    model: SystemTray.items
 
-                                    width: visible ? 24 : 0
-                                    height: Theme.height - 10
-                                    visible: modelData.status !== Status.Passive
+                                    delegate: Item {
+                                        id: trayItem
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: 5
-                                        color: trayMouse.containsMouse ? Theme.hover : "transparent"
-                                    }
+                                        required property var modelData
 
-                                    Image {
-                                        anchors.centerIn: parent
-                                        width: Theme.iconSize
-                                        height: Theme.iconSize
-                                        sourceSize.width: width * panel.devicePixelRatio
-                                        sourceSize.height: height * panel.devicePixelRatio
-                                        source: trayItem.modelData.icon
-                                        fillMode: Image.PreserveAspectFit
-                                    }
+                                        width: visible ? 24 : 0
+                                        height: Theme.height - 10
+                                        visible: modelData.status !== Status.Passive
 
-                                    MouseArea {
-                                        id: trayMouse
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: 5
+                                            color: trayMouse.containsMouse ? Theme.hover : "transparent"
+                                        }
 
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                                        onClicked: (event) => {
-                                            const item = trayItem.modelData;
-                                            if (event.button === Qt.RightButton || item.onlyMenu) {
-                                                const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
-                                                item.display(panel, pos.x, pos.y);
-                                            } else if (event.button === Qt.MiddleButton) {
-                                                item.secondaryActivate();
-                                            } else {
-                                                item.activate();
+                                        Image {
+                                            anchors.centerIn: parent
+                                            width: Theme.iconSize
+                                            height: Theme.iconSize
+                                            sourceSize.width: width * panel.devicePixelRatio
+                                            sourceSize.height: height * panel.devicePixelRatio
+                                            source: trayItem.modelData.icon
+                                            fillMode: Image.PreserveAspectFit
+                                        }
+
+                                        MouseArea {
+                                            id: trayMouse
+
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                                            onClicked: (event) => {
+                                                const item = trayItem.modelData;
+                                                if (event.button === Qt.RightButton || item.onlyMenu) {
+                                                    const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
+                                                    item.display(panel, pos.x, pos.y);
+                                                } else if (event.button === Qt.MiddleButton) {
+                                                    item.secondaryActivate();
+                                                } else {
+                                                    item.activate();
+                                                }
+                                            }
+                                            onWheel: (event) => {
+                                                return trayItem.modelData.scroll(event.angleDelta.y, false);
                                             }
                                         }
-                                        onWheel: (event) => {
-                                            return trayItem.modelData.scroll(event.angleDelta.y, false);
-                                        }
+
                                     }
 
                                 }

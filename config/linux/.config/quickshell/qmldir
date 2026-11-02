@@ -5,4 +5,3 @@ CommandPoll 1.0 CommandPoll.qml
 WorkspaceStrip 1.0 WorkspaceStrip.qml
 StatusGroup 1.0 StatusGroup.qml
 BarIcon 1.0 BarIcon.qml
-Metric 1.0 Metric.qml
