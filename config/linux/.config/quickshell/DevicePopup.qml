@@ -12,9 +12,24 @@ Controls.Popup {
     property real battery: -1
     property bool plugged: false
     property string batteryStatus: ""
+    property string activeSection: ""
+    property string emphasizedSection: ""
 
     signal brightnessRequested(int percent)
     signal mixerRequested()
+
+    function toggleSection(section) {
+        if (visible && activeSection === section) {
+            close();
+            return ;
+        }
+        activeSection = section;
+        emphasizedSection = section;
+        if (!visible)
+            open();
+
+        emphasisTimer.restart();
+    }
 
     implicitWidth: 280
     implicitHeight: body.implicitHeight + 24
@@ -27,6 +42,18 @@ Controls.Popup {
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: closeButton.forceActiveFocus(Qt.TabFocusReason)
+    onClosed: {
+        activeSection = "";
+        emphasizedSection = "";
+        emphasisTimer.stop();
+    }
+
+    Timer {
+        id: emphasisTimer
+
+        interval: 1200
+        onTriggered: root.emphasizedSection = ""
+    }
 
     Column {
         id: body
@@ -81,10 +108,18 @@ Controls.Popup {
 
                 Text {
                     text: root.battery + "% · " + (root.plugged ? "Plugged in" : "On battery")
-                    color: Theme.foreground
+                    color: root.emphasizedSection === "battery" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 160
+                        }
+
+                    }
+
                 }
 
                 Text {
@@ -120,10 +155,18 @@ Controls.Popup {
                     width: parent.width - 28 - brightnessValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Brightness"
-                    color: Theme.foreground
+                    color: root.emphasizedSection === "brightness" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 160
+                        }
+
+                    }
+
                 }
 
                 Text {
@@ -173,10 +216,18 @@ Controls.Popup {
                     width: parent.width - 28 - volumeValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.audio && root.audio.muted ? "Volume · muted" : "Volume"
-                    color: Theme.foreground
+                    color: root.emphasizedSection === "volume" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 160
+                        }
+
+                    }
+
                 }
 
                 Text {
