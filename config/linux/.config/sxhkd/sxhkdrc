@@ -8,11 +8,11 @@ super + backslash
 
 # program launcher
 super + @space
-	rofi -show drun -m -1 -dpi $DPI
+	qs ipc call launcher toggle
 super + d
-	rofi -show drun -m -1 -dpi $DPI
+	qs ipc call launcher toggle
 ctrl + @space
-	rofi -show drun -m -1 -dpi $DPI
+	qs ipc call launcher toggle
 
 super + shift + d
 	loginctl lock-session "$XDG_SESSION_ID" && timeout 5s xdotool search --sync --onlyvisible --class '^i3lock$' >/dev/null && xset dpms force off
