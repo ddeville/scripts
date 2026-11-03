@@ -48,6 +48,11 @@ ShellRoot {
         objects: root.sink ? [root.sink] : []
     }
 
+    AudioOutputs {
+        id: audioOutputs
+        enabled: true
+    }
+
     Process {
         id: brightnessAction
     }
@@ -173,6 +178,7 @@ ShellRoot {
                 below: root.preview
                 onAboutToShow: panel.closeOtherPopups(devicePopup)
                 audio: root.audio
+                outputs: audioOutputs
                 brightness: root.stats.backlight ?? -1
                 battery: root.stats.battery ?? -1
                 plugged: root.stats.plugged ?? false
@@ -432,10 +438,10 @@ ShellRoot {
                             }
 
                             BarButton {
-                                symbol: "volume"
+                                symbol: audioOutputs.currentOutput && audioOutputs.currentOutput.symbol === "headphones" ? "headphones" : "volume"
                                 level: root.audio ? root.audio.volume : 0
                                 muted: !root.audio || root.audio.muted
-                                tooltip: !root.audio ? "No audio output" : "Volume: " + Math.round(root.audio.volume * 100) + "%" + (root.audio.muted ? " · Muted" : "")
+                                tooltip: !root.audio ? "No audio output" : (audioOutputs.currentOutput ? audioOutputs.currentOutput.label : "Volume") + ": " + Math.round(root.audio.volume * 100) + "%" + (root.audio.muted ? " · Muted" : "")
                                 tooltipEnabled: !devicePopup.visible
                                 foreground: root.audio && root.audio.muted ? Theme.muted : root.audio && root.audio.volume > 1 ? Theme.alert : Theme.foreground
                                 interactive: true

@@ -8,6 +8,7 @@ BarIcon 1.0 BarIcon.qml
 BarDivider 1.0 BarDivider.qml
 SessionPopup 1.0 SessionPopup.qml
 DevicePopup 1.0 DevicePopup.qml
+AudioOutputs 1.0 AudioOutputs.qml
 LevelSlider 1.0 LevelSlider.qml
 Network 1.0 Network.qml
 NetworkPopup 1.0 NetworkPopup.qml
