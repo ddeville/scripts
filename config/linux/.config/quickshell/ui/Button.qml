@@ -81,7 +81,7 @@ Controls.Control {
             renderType: Text.QtRendering
         }
 
-        BarIcon {
+        Icon {
             visible: root.stacked && root.symbol !== ""
             name: root.symbol
             color: root.foreground
@@ -101,7 +101,7 @@ Controls.Control {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            BarIcon {
+            Icon {
                 visible: !root.stacked && root.symbol !== ""
                 name: root.symbol
                 color: root.foreground

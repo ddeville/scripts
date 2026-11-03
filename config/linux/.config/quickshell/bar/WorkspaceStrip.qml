@@ -1,4 +1,6 @@
 import QtQuick
+import "../ui"
+import "../services"
 
 Row {
     id: root
@@ -53,7 +55,7 @@ Row {
     Repeater {
         model: desktops
 
-        delegate: BarButton {
+        delegate: Button {
             required property int desktopId
             required property string label
             required property bool focused

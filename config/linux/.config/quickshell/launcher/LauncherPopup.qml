@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import Quickshell
 import "LauncherSearch.js" as Search
+import "../ui"
 
 Controls.Popup {
     id: root

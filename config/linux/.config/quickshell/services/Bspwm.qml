@@ -36,7 +36,7 @@ Scope {
     Process {
         id: snapshot
 
-        command: ["bash", Quickshell.shellPath("scripts/status.sh"), "workspaces"]
+        command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "workspaces"]
         onExited: {
             if (root.refreshPending) {
                 root.refreshPending = false;

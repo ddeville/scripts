@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import "../../ui"
 
 Controls.Popup {
     id: root
@@ -80,7 +81,7 @@ Controls.Popup {
 
             }
 
-            BarButton {
+            Button {
                 symbol: "close"
                 tooltip: "Close Wi-Fi"
                 foreground: Theme.muted
@@ -117,7 +118,7 @@ Controls.Popup {
                 renderType: Text.QtRendering
             }
 
-            BarButton {
+            Button {
                 visible: !!root.state.current
                 text: "Disconnect"
                 foreground: Theme.muted
@@ -148,7 +149,7 @@ Controls.Popup {
                 renderType: Text.QtRendering
             }
 
-            BarButton {
+            Button {
                 symbol: "restart"
                 tooltip: "Scan for networks"
                 foreground: Theme.muted
@@ -199,7 +200,7 @@ Controls.Popup {
                         Keys.onEnterPressed: connectNetwork()
                         Keys.onSpacePressed: connectNetwork()
 
-                        BarIcon {
+                        Icon {
                             x: 6
                             anchors.verticalCenter: parent.verticalCenter
                             name: "wifi"
@@ -289,7 +290,7 @@ Controls.Popup {
             color: Theme.border
         }
 
-        BarButton {
+        Button {
             text: "Network settings…"
             foreground: Theme.muted
             interactive: true

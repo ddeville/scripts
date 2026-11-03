@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import "../../ui"
 
 Controls.Popup {
     id: root
@@ -211,7 +212,7 @@ Controls.Popup {
         contentItem: Row {
             spacing: 10
 
-            BarIcon {
+            Icon {
                 visible: control.symbol !== ""
                 name: control.symbol
                 color: control.foreground

@@ -1,0 +1,482 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Services.SystemTray
+import "../ui"
+import "../services"
+import "../launcher"
+import "popups"
+
+PanelWindow {
+    id: panel
+
+    required property SystemStatus status
+    required property Bspwm bspwm
+    required property Launcher launcher
+    required property Network network
+    required property Notifications notifications
+    required property AudioOutputs audioOutputs
+    required property date date
+    property var audio: null
+    property bool preview: false
+
+    function command(args) {
+        Quickshell.execDetached(args);
+    }
+
+    function networkRate(bytes) {
+        if (bytes >= 1048576)
+            return (bytes / 1048576).toFixed(bytes < 10485760 ? 1 : 0) + "M";
+        return Math.round(bytes / 1024) + "K";
+    }
+
+    function closeOtherPopups(openingPopup) {
+        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup]) {
+            if (popup !== openingPopup)
+                popup.close();
+        }
+    }
+
+    implicitHeight: Theme.height
+    color: Theme.background
+    // X11 reserves physical pixels; Wayland reserves logical pixels.
+    exclusiveZone: Math.round(implicitHeight * (Quickshell.env("XDG_SESSION_TYPE") === "x11" ? devicePixelRatio : 1))
+    exclusionMode: panel.preview ? ExclusionMode.Ignore : ExclusionMode.Normal
+
+    anchors {
+        left: true
+        right: true
+        top: panel.preview
+        bottom: !panel.preview
+    }
+
+    Connections {
+        target: panel.launcher
+
+        function onShowRequested(monitor) {
+            panel.closeOtherPopups(null);
+            if (panel.screen.name === monitor)
+                launcherPopup.open();
+        }
+
+        function onCloseRequested() {
+            launcherPopup.close();
+        }
+    }
+
+    LauncherPopup {
+        id: launcherPopup
+
+        anchorItem: panel.contentItem
+        backend: panel.launcher
+        screenHeight: panel.screen.height
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(launcherPopup)
+    }
+
+    SessionPopup {
+        id: sessionPopup
+
+        anchorItem: powerButton
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(sessionPopup)
+        onActionRequested: (action) => {
+            if (action === "lock")
+                panel.command(["loginctl", "lock-session", Quickshell.env("XDG_SESSION_ID")]);
+            else
+                panel.command(["systemctl", action]);
+        }
+    }
+
+    QuickControlsPopup {
+        id: devicePopup
+
+        anchorItem: deviceControls
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(devicePopup)
+        audio: panel.audio
+        outputs: panel.audioOutputs
+        brightness: panel.status.stats.backlight ?? -1
+        battery: panel.status.stats.battery ?? -1
+        plugged: panel.status.stats.plugged ?? false
+        batteryStatus: panel.status.stats.batteryStatus ?? ""
+        onBrightnessRequested: percent => panel.status.setBrightness(percent)
+        onMixerRequested: panel.command(["pavucontrol"])
+    }
+
+    NetworkPopup {
+        id: networkPopup
+        anchorItem: wifiButton
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(networkPopup)
+        backend: panel.network
+        onSettingsRequested: panel.command(["nm-connection-editor"])
+    }
+
+    CalendarPopup {
+        id: calendarPopup
+
+        anchorItem: clockButton
+        below: panel.preview
+        today: panel.date
+        onVisibleChanged: {
+            if (visible)
+                panel.closeOtherPopups(calendarPopup);
+        }
+    }
+
+    NotificationPopup {
+        id: notificationPopup
+        anchorItem: notificationButton
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(notificationPopup)
+        backend: panel.notifications
+    }
+
+    Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        y: panel.preview ? parent.height - height : 0
+        height: 1
+        color: Theme.border
+    }
+
+    RowLayout {
+        spacing: 8
+
+        anchors {
+            fill: parent
+            leftMargin: 10
+            rightMargin: 10
+        }
+
+        StatusGroup {
+            Layout.minimumWidth: implicitWidth
+
+            Button {
+                id: clockButton
+
+                caption: Qt.formatDateTime(panel.date, "ddd d MMM").toUpperCase()
+                text: Qt.formatDateTime(panel.date, "h:mm AP")
+                textWidth: 60
+                interactive: true
+                active: calendarPopup.visible
+                onClicked: calendarPopup.visible = !calendarPopup.visible
+            }
+
+        }
+
+        Divider {
+            Layout.alignment: Qt.AlignVCenter
+            visible: workspaces.width > 0
+        }
+
+        StatusGroup {
+            Layout.minimumWidth: implicitWidth
+            visible: workspaces.width > 0
+
+            WorkspaceStrip {
+                id: workspaces
+
+                backend: panel.bspwm
+                monitor: panel.screen.name
+            }
+
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Item {
+            Layout.preferredWidth: rightGroup.implicitWidth
+            Layout.minimumWidth: rightGroup.implicitWidth
+            Layout.fillHeight: true
+
+            Row {
+                id: rightGroup
+
+                spacing: 8
+
+                anchors {
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+
+                StatusGroup {
+                    id: machineStatus
+
+                    visible: panel.width >= 1150
+
+                    Button {
+                        id: networkStatus
+
+                        caption: "NET"
+                        stacked: true
+                        tooltip: "Download: " + (panel.status.downloadRate / 1024).toFixed(1) + " KiB/s\nUpload: " + (panel.status.uploadRate / 1024).toFixed(1) + " KiB/s\n" + (Object.keys(panel.status.stats.network ?? {}).join(", ") || "No active physical link")
+                        indicator: Row {
+                            spacing: 8
+
+                            Repeater {
+                                model: [{ arrow: "↓", rate: panel.status.downloadRate }, { arrow: "↑", rate: panel.status.uploadRate }]
+                                delegate: Row {
+                                    required property var modelData
+                                    spacing: 3
+                                    Text {
+                                        text: modelData.arrow
+                                        color: Theme.muted
+                                        font.family: Theme.font
+                                        font.pixelSize: Theme.fontSize
+                                    }
+                                    Text {
+                                        text: panel.networkRate(modelData.rate)
+                                        color: Theme.foreground
+                                        font.family: Theme.font
+                                        font.pixelSize: Theme.fontSize
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        caption: "CPU"
+                        stacked: true
+                        text: panel.status.cpu + "%"
+                        textWidth: 30
+                    }
+
+                    Button {
+                        caption: "MEM"
+                        stacked: true
+                        text: (panel.status.stats.memory ?? 0) + "%"
+                        textWidth: 30
+                    }
+
+                    Button {
+                        visible: typeof panel.status.stats.temperature === "number"
+                        caption: "TEMP"
+                        stacked: true
+                        text: panel.status.stats.temperature + "°F"
+                        textWidth: 38
+                        foreground: panel.status.stats.temperature >= 140 ? Theme.alert : Theme.foreground
+                    }
+
+                }
+
+                Divider {
+                    visible: machineStatus.visible && accountStatus.visible
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StatusGroup {
+                    id: accountStatus
+
+                    visible: !panel.status.offline && panel.width >= 1000
+
+                    Button {
+                        visible: panel.status.github !== ""
+                        glyph: "\uf09b"
+                        glyphSize: 14
+                        tooltip: panel.status.github === "offline" ? "GitHub check unavailable" : "GitHub: " + panel.status.github + " unread notifications"
+                        foreground: panel.status.github === "offline" ? Theme.alert : Number.parseInt(panel.status.github) > 0 ? Theme.selected : Theme.muted
+                        interactive: true
+                        onClicked: panel.command(["xdg-open", "https://github.com/notifications"])
+                    }
+
+                    Button {
+                        visible: panel.status.email !== ""
+                        symbol: "mail"
+                        tooltip: panel.status.email === "offline" ? "Email check unavailable" : "Mail: " + panel.status.email + " unread messages"
+                        foreground: panel.status.email === "offline" ? Theme.alert : Number.parseInt(panel.status.email) > 0 ? Theme.selected : Theme.muted
+                        interactive: true
+                        onClicked: panel.command(["xdg-open", "https://app.fastmail.com/"])
+                    }
+
+                    Button {
+                        symbol: "updates"
+                        tooltip: panel.status.updates === "unavailable" ? "Package check failed · click to retry" : panel.status.updates === "" ? "Checking for updates…" : panel.status.updates + " package updates · click to refresh"
+                        foreground: panel.status.updates === "unavailable" ? Theme.alert : Number.parseInt(panel.status.updates) > 0 ? Theme.selected : Theme.muted
+                        interactive: true
+                        onClicked: panel.status.refreshUpdates()
+                    }
+
+                }
+
+                Divider {
+                    visible: accountStatus.visible
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StatusGroup {
+                    id: deviceControls
+
+                    Button {
+                        id: wifiButton
+                        symbol: "wifi"
+                        level: panel.network.state.current ? panel.network.state.current.signal / 100 : 0
+                        muted: !panel.network.state.enabled
+                        foreground: panel.network.failed || !panel.network.state.available ? Theme.alert : panel.network.state.current ? Theme.foreground : Theme.muted
+                        tooltip: panel.network.message || (!panel.network.state.available ? "NetworkManager unavailable" : !panel.network.state.enabled ? "Wi-Fi off" : panel.network.state.current ? panel.network.state.current.ssid + " · " + panel.network.state.current.signal + "% signal" : "Wi-Fi · Not connected")
+                        tooltipEnabled: !networkPopup.visible
+                        interactive: true
+                        active: networkPopup.visible
+                        onClicked: networkPopup.visible = !networkPopup.visible
+                    }
+
+                    Button {
+                        visible: typeof panel.status.stats.battery === "number"
+                        symbol: "battery"
+                        level: (panel.status.stats.battery ?? 0) / 100
+                        plugged: panel.status.stats.plugged ?? false
+                        tooltip: "Battery: " + panel.status.stats.battery + "% · " + (panel.status.stats.plugged ? "Plugged in" : "On battery")
+                        tooltipEnabled: !devicePopup.visible
+                        foreground: panel.status.stats.battery <= 10 ? Theme.alert : Theme.foreground
+                        interactive: true
+                        active: devicePopup.visible && devicePopup.activeSection === "battery"
+                        onClicked: devicePopup.toggleSection("battery")
+                    }
+
+                    Button {
+                        visible: typeof panel.status.stats.backlight === "number" && panel.width >= 900
+                        symbol: "sun"
+                        tooltip: "Brightness: " + panel.status.stats.backlight + "%"
+                        tooltipEnabled: !devicePopup.visible
+                        interactive: true
+                        active: devicePopup.visible && devicePopup.activeSection === "brightness"
+                        onClicked: devicePopup.toggleSection("brightness")
+                        onScrolled: (delta) => {
+                            if (delta !== 0)
+                                panel.command(["brightnessctl", "set", delta > 0 ? "+5%" : "5%-"]);
+
+                        }
+                    }
+
+                    Button {
+                        symbol: panel.audioOutputs.currentOutput && panel.audioOutputs.currentOutput.symbol === "headphones" ? "headphones" : "volume"
+                        level: panel.audio ? panel.audio.volume : 0
+                        muted: !panel.audio || panel.audio.muted
+                        tooltip: !panel.audio ? "No audio output" : (panel.audioOutputs.currentOutput ? panel.audioOutputs.currentOutput.label : "Volume") + ": " + Math.round(panel.audio.volume * 100) + "%" + (panel.audio.muted ? " · Muted" : "")
+                        tooltipEnabled: !devicePopup.visible
+                        foreground: panel.audio && panel.audio.muted ? Theme.muted : panel.audio && panel.audio.volume > 1 ? Theme.alert : Theme.foreground
+                        interactive: true
+                        active: devicePopup.visible && devicePopup.activeSection === "volume"
+                        onClicked: (button) => {
+                            if (button === Qt.RightButton)
+                                panel.command(["pavucontrol"]);
+                            else if (button === Qt.MiddleButton && panel.audio)
+                                panel.audio.muted = !panel.audio.muted;
+                            else if (button === Qt.LeftButton)
+                                devicePopup.toggleSection("volume");
+                        }
+                        onScrolled: (delta) => {
+                            if (panel.audio && delta !== 0)
+                                panel.audio.volume = Math.max(0, Math.min(1.5, panel.audio.volume + (delta > 0 ? 0.01 : -0.01)));
+
+                        }
+                    }
+
+                }
+
+                Divider {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StatusGroup {
+                    Button {
+                        id: notificationButton
+                        symbol: panel.notifications.paused ? "bell-off" : "bell"
+                        foreground: !panel.notifications.available || panel.notifications.error !== "" ? Theme.alert : panel.notifications.paused ? Theme.muted : Theme.selected
+                        tooltip: panel.notifications.summary + " · Click to manage"
+                        tooltipEnabled: !notificationPopup.visible
+                        active: notificationPopup.visible
+                        interactive: true
+                        onClicked: (button) => {
+                            if (button === Qt.LeftButton)
+                                notificationPopup.visible = !notificationPopup.visible;
+
+                        }
+                    }
+
+                    Button {
+                        id: powerButton
+
+                        symbol: "power"
+                        tooltip: "Session controls"
+                        tooltipEnabled: !sessionPopup.visible
+                        active: sessionPopup.visible
+                        interactive: true
+                        onClicked: (button) => {
+                            if (button === Qt.LeftButton)
+                                sessionPopup.visible = !sessionPopup.visible;
+
+                        }
+                    }
+
+                }
+
+                StatusGroup {
+                    visible: trayRow.implicitWidth > 0
+
+                    Row {
+                        id: trayRow
+
+                        spacing: 4
+
+                        Repeater {
+                            model: SystemTray.items
+
+                            delegate: Button {
+                                id: trayItem
+
+                                                            visible: modelData.status !== Status.Passive
+                                interactive: true
+                                tooltip: [modelData.tooltipTitle || modelData.title, modelData.tooltipDescription].filter(part => part !== "").join("\n")
+                                Accessible.name: modelData.title || modelData.tooltipTitle || "Application tray icon"
+
+                                indicator: Image {
+                                    width: Theme.iconSize
+                                    height: Theme.iconSize
+                                    sourceSize.width: width * panel.devicePixelRatio
+                                    sourceSize.height: height * panel.devicePixelRatio
+                                    source: trayItem.modelData.icon
+                                    fillMode: Image.PreserveAspectFit
+                                }
+
+                                onClicked: (button) => {
+                                    const item = modelData;
+                                    if (button === Qt.RightButton || item.onlyMenu) {
+                                        const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
+                                        panel.closeOtherPopups(null);
+                                        item.display(panel, pos.x, pos.y);
+                                    } else if (button === Qt.MiddleButton) {
+                                        item.secondaryActivate();
+                                    } else {
+                                        item.activate();
+                                    }
+                                }
+                                onScrolled: delta => modelData.scroll(delta, false)
+                                Keys.onPressed: event => {
+                                    if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier))) {
+                                        clicked(Qt.RightButton);
+                                        event.accepted = true;
+                                    } else {
+                                        event.accepted = false;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
