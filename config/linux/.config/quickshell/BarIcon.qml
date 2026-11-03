@@ -24,6 +24,8 @@ Item {
         "moon": "M20 14 A8 8 0 1 1 10 4 A7 7 0 0 0 20 14 Z",
         "restart": "M20 10 A8 8 0 1 0 19 17 M20 4 V10 H14",
         "close": "M6 6 L18 18 M18 6 L6 18",
+        "chevron-left": "M15 6 L9 12 L15 18",
+        "chevron-right": "M9 6 L15 12 L9 18",
         "volume": "M3 9 H7 L12 5 V19 L7 15 H3 Z"
     })
     readonly property var wifiArcs: ["M8.46 15.46 A5 5 0 0 1 15.54 15.46", "M5.28 12.28 A9.5 9.5 0 0 1 18.72 12.28", "M2.1 9.1 A14 14 0 0 1 21.9 9.1"]
