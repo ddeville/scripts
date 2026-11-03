@@ -11,6 +11,11 @@ Controls.Popup {
     signal actionRequested(string action)
 
     function choose(action) {
+        if (action.action === "lock") {
+            close();
+            actionRequested("lock");
+            return ;
+        }
         pendingAction = action;
         cancelButton.forceActiveFocus();
     }
@@ -97,6 +102,11 @@ Controls.Popup {
                     id: actions
 
                     model: [{
+                        "action": "lock",
+                        "label": "Lock",
+                        "detail": "Lock this session",
+                        "symbol": "lock"
+                    }, {
                         "action": "suspend",
                         "label": "Suspend",
                         "detail": "Put this session to sleep",
@@ -120,7 +130,6 @@ Controls.Popup {
                         text: modelData.label
                         detail: modelData.detail
                         symbol: modelData.symbol
-                        foreground: modelData.action === "poweroff" ? Theme.alert : Theme.foreground
                         onClicked: root.choose(modelData)
                     }
 
@@ -162,7 +171,7 @@ Controls.Popup {
                     ActionButton {
                         width: (parent.width - parent.spacing) / 2
                         text: root.pendingAction ? root.pendingAction.label : ""
-                        foreground: Theme.alert
+                        foreground: root.pendingAction && root.pendingAction.action !== "suspend" ? Theme.alert : Theme.foreground
                         onClicked: root.confirm()
                     }
 
