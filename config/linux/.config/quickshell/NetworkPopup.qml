@@ -23,7 +23,7 @@ Controls.Popup {
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
         backend.refresh();
-        radio.forceActiveFocus(Qt.TabFocusReason);
+        radio.forceActiveFocus(Qt.PopupFocusReason);
     }
 
     Column {
@@ -175,7 +175,7 @@ Controls.Popup {
                 Repeater {
                     model: root.state.networks
 
-                    Rectangle {
+                    Controls.Control {
                         id: networkRow
 
                         required property var modelData
@@ -191,10 +191,6 @@ Controls.Popup {
 
                         width: networks.width
                         height: 40
-                        radius: 5
-                        color: networkMouse.containsMouse || activeFocus ? Theme.hover : modelData.active ? Theme.surface : "transparent"
-                        border.width: activeFocus ? 1 : 0
-                        border.color: Theme.selected
                         activeFocusOnTab: (!root.backend.busy && !modelData.active) || activeFocus
                         Accessible.role: Accessible.Button
                         Accessible.name: modelData.ssid + (modelData.active ? " · Connected" : " · Connect")
@@ -249,6 +245,13 @@ Controls.Popup {
                             enabled: !root.backend.busy && !networkRow.modelData.active
                             cursorShape: Qt.PointingHandCursor
                             onClicked: networkRow.connectNetwork()
+                        }
+
+                        background: Rectangle {
+                            radius: 5
+                            color: networkMouse.containsMouse || networkRow.visualFocus ? Theme.hover : networkRow.modelData.active ? Theme.surface : "transparent"
+                            border.width: networkRow.visualFocus ? 1 : 0
+                            border.color: Theme.selected
                         }
 
                     }

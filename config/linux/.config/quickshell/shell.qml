@@ -505,23 +505,17 @@ ShellRoot {
                                 Repeater {
                                     model: SystemTray.items
 
-                                    delegate: Item {
+                                    delegate: BarButton {
                                         id: trayItem
 
                                         required property var modelData
 
-                                        width: visible ? 24 : 0
-                                        height: Theme.height - 10
                                         visible: modelData.status !== Status.Passive
+                                        interactive: true
+                                        tooltip: [modelData.tooltipTitle || modelData.title, modelData.tooltipDescription].filter(part => part !== "").join("\n")
+                                        Accessible.name: modelData.title || modelData.tooltipTitle || "Application tray icon"
 
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: 5
-                                            color: trayMouse.containsMouse ? Theme.hover : "transparent"
-                                        }
-
-                                        Image {
-                                            anchors.centerIn: parent
+                                        indicator: Image {
                                             width: Theme.iconSize
                                             height: Theme.iconSize
                                             sourceSize.width: width * panel.devicePixelRatio
@@ -530,26 +524,25 @@ ShellRoot {
                                             fillMode: Image.PreserveAspectFit
                                         }
 
-                                        MouseArea {
-                                            id: trayMouse
-
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                                            onClicked: (event) => {
-                                                const item = trayItem.modelData;
-                                                if (event.button === Qt.RightButton || item.onlyMenu) {
-                                                    const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
-                                                    item.display(panel, pos.x, pos.y);
-                                                } else if (event.button === Qt.MiddleButton) {
-                                                    item.secondaryActivate();
-                                                } else {
-                                                    item.activate();
-                                                }
+                                        onClicked: (button) => {
+                                            const item = modelData;
+                                            if (button === Qt.RightButton || item.onlyMenu) {
+                                                const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
+                                                panel.closeOtherPopups(null);
+                                                item.display(panel, pos.x, pos.y);
+                                            } else if (button === Qt.MiddleButton) {
+                                                item.secondaryActivate();
+                                            } else {
+                                                item.activate();
                                             }
-                                            onWheel: (event) => {
-                                                return trayItem.modelData.scroll(event.angleDelta.y, false);
+                                        }
+                                        onScrolled: delta => modelData.scroll(delta, false)
+                                        Keys.onPressed: event => {
+                                            if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier))) {
+                                                clicked(Qt.RightButton);
+                                                event.accepted = true;
+                                            } else {
+                                                event.accepted = false;
                                             }
                                         }
 
