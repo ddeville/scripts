@@ -131,6 +131,13 @@ ShellRoot {
 
             required property var modelData
 
+            function closeOtherPopups(openingPopup) {
+                for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup]) {
+                    if (popup !== openingPopup)
+                        popup.close();
+                }
+            }
+
             screen: modelData
             implicitHeight: Theme.height
             color: Theme.background
@@ -150,6 +157,7 @@ ShellRoot {
 
                 anchorItem: powerButton
                 below: root.preview
+                onAboutToShow: panel.closeOtherPopups(sessionPopup)
                 onActionRequested: (action) => {
                     if (action === "lock")
                         root.command(["loginctl", "lock-session", Quickshell.env("XDG_SESSION_ID")]);
@@ -163,6 +171,7 @@ ShellRoot {
 
                 anchorItem: deviceControls
                 below: root.preview
+                onAboutToShow: panel.closeOtherPopups(devicePopup)
                 audio: root.audio
                 brightness: root.stats.backlight ?? -1
                 battery: root.stats.battery ?? -1
@@ -178,6 +187,7 @@ ShellRoot {
                 id: networkPopup
                 anchorItem: wifiButton
                 below: root.preview
+                onAboutToShow: panel.closeOtherPopups(networkPopup)
                 backend: network
                 onSettingsRequested: root.command(["nm-connection-editor"])
             }
@@ -188,12 +198,17 @@ ShellRoot {
                 anchorItem: clockButton
                 below: root.preview
                 today: clock.date
+                onVisibleChanged: {
+                    if (visible)
+                        panel.closeOtherPopups(calendarPopup);
+                }
             }
 
             NotificationPopup {
                 id: notificationPopup
                 anchorItem: notificationButton
                 below: root.preview
+                onAboutToShow: panel.closeOtherPopups(notificationPopup)
                 backend: notifications
             }
 
