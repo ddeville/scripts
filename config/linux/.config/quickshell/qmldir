@@ -1,4 +1,6 @@
 singleton Theme 1.0 Theme.qml
+Launcher 1.0 Launcher.qml
+LauncherPopup 1.0 LauncherPopup.qml
 BarButton 1.0 BarButton.qml
 Bspwm 1.0 Bspwm.qml
 CommandPoll 1.0 CommandPoll.qml
