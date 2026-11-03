@@ -72,14 +72,6 @@ Row {
             onScrolled: (delta) => {
                 return root.backend.cycle(root.monitor, delta);
             }
-
-            indicator: Rectangle {
-                width: 4
-                height: 4
-                radius: 2
-                color: !occupied ? "transparent" : urgent ? Theme.alert : focused ? Theme.selected : Theme.muted
-            }
-
         }
 
     }

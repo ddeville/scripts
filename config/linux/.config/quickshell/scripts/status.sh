@@ -44,10 +44,22 @@ stats)
     battery_status=$(<"$device/status")
     break
   done
+  network='{}'
+  for device in /sys/class/net/*; do
+    # Count physical links once, excluding VPNs and virtual bridges.
+    [ -e "$device/device" ] || continue
+    [ "$(<"$device/operstate")" = up ] || continue
+    network=$(jq -c --arg interface "${device##*/}" \
+      --argjson rx "$(<"$device/statistics/rx_bytes")" --argjson tx "$(<"$device/statistics/tx_bytes")" \
+      '. + {($interface): [$rx, $tx]}' <<<"$network")
+  done
+  read -r uptime _ </proc/uptime
   jq -cn --arg cpu "$cpu" --argjson memory "$memory" --argjson temperature "$temperature" \
     --argjson backlight "$backlight" --argjson battery "$battery" --arg batteryStatus "$battery_status" --argjson plugged "$plugged" \
+    --argjson network "$network" --argjson uptime "$uptime" \
     '{cpu: ($cpu | split(" ") | map(tonumber)), memory: $memory, temperature: $temperature,
-        backlight: $backlight, battery: $battery, batteryStatus: $batteryStatus, plugged: $plugged}'
+        backlight: $backlight, battery: $battery, batteryStatus: $batteryStatus, plugged: $plugged,
+        network: $network, uptime: $uptime}'
   ;;
 updates)
   # checkupdates uses exit code 2 for an empty update list.

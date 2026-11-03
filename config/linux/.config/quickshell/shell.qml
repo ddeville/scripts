@@ -14,12 +14,21 @@ ShellRoot {
     })
     property var previousCpu: null
     property int cpu: 0
+    property real downloadRate: 0
+    property real uploadRate: 0
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink ? sink.audio : null
     property bool notificationsPaused: false
+    property int pendingBrightness: -1
 
     function command(args) {
         Quickshell.execDetached(args);
+    }
+
+    function networkRate(bytes) {
+        if (bytes >= 1048576)
+            return (bytes / 1048576).toFixed(bytes < 10485760 ? 1 : 0) + "M";
+        return Math.round(bytes / 1024) + "K";
     }
 
     function toggleNotifications() {
@@ -41,8 +50,29 @@ ShellRoot {
         id: bspwm
     }
 
+    Network {
+        id: network
+    }
+
     PwObjectTracker {
         objects: root.sink ? [root.sink] : []
+    }
+
+    Process {
+        id: brightnessAction
+    }
+
+    Timer {
+        interval: 60
+        repeat: true
+        running: root.pendingBrightness >= 0
+        onTriggered: {
+            if (!brightnessAction.running) {
+                brightnessAction.command = ["brightnessctl", "set", root.pendingBrightness + "%"];
+                root.pendingBrightness = -1;
+                brightnessAction.running = true;
+            }
+        }
     }
 
     CommandPoll {
@@ -57,6 +87,20 @@ ShellRoot {
                 root.cpu = Math.round(100 * (1 - (next.cpu[1] - root.previousCpu[1]) / (next.cpu[0] - root.previousCpu[0])));
 
             root.previousCpu = next.cpu;
+            const elapsed = next.uptime - (root.stats.uptime ?? next.uptime);
+            let received = 0;
+            let sent = 0;
+            if (elapsed > 0 && elapsed < 10) {
+                for (const device in next.network) {
+                    const previous = root.stats.network?.[device];
+                    if (previous) {
+                        received += Math.max(0, next.network[device][0] - previous[0]) / elapsed;
+                        sent += Math.max(0, next.network[device][1] - previous[1]) / elapsed;
+                    }
+                }
+            }
+            root.downloadRate = received;
+            root.uploadRate = sent;
             root.stats = next;
         }
     }
@@ -115,18 +159,6 @@ ShellRoot {
             id: panel
 
             required property var modelData
-            property bool powerOpen: false
-            property string pendingPowerAction: ""
-
-            function power(action) {
-                if (pendingPowerAction === action) {
-                    root.command(["systemctl", action]);
-                    powerOpen = false;
-                    pendingPowerAction = "";
-                } else {
-                    pendingPowerAction = action;
-                }
-            }
 
             screen: modelData
             implicitHeight: Theme.height
@@ -140,6 +172,41 @@ ShellRoot {
                 right: true
                 top: root.preview
                 bottom: !root.preview
+            }
+
+            SessionPopup {
+                id: sessionPopup
+
+                anchorItem: powerButton
+                below: root.preview
+                onActionRequested: (action) => {
+                    return root.command(["systemctl", action]);
+                }
+            }
+
+            DevicePopup {
+                id: devicePopup
+
+                anchorItem: deviceControls
+                below: root.preview
+                audio: root.audio
+                audioName: root.sink ? root.sink.description : ""
+                brightness: root.stats.backlight ?? -1
+                battery: root.stats.battery ?? -1
+                plugged: root.stats.plugged ?? false
+                batteryStatus: root.stats.batteryStatus ?? ""
+                onBrightnessRequested: (percent) => {
+                    return root.pendingBrightness = percent;
+                }
+                onMixerRequested: root.command(["pavucontrol"])
+            }
+
+            NetworkPopup {
+                id: networkPopup
+                anchorItem: wifiButton
+                below: root.preview
+                backend: network
+                onSettingsRequested: root.command(["nm-connection-editor"])
             }
 
             Rectangle {
@@ -168,6 +235,11 @@ ShellRoot {
                         textWidth: 60
                     }
 
+                }
+
+                BarDivider {
+                    Layout.alignment: Qt.AlignVCenter
+                    visible: workspaces.width > 0
                 }
 
                 StatusGroup {
@@ -203,38 +275,9 @@ ShellRoot {
                         }
 
                         StatusGroup {
-                            visible: !root.offline && panel.width >= 1000
+                            id: machineStatus
 
-                            BarButton {
-                                visible: github.output !== ""
-                                glyph: "\uf09b"
-                                text: github.output === "offline" ? "ERR" : github.output
-                                foreground: github.output === "offline" ? Theme.alert : Number.parseInt(github.output) > 0 ? Theme.selected : Theme.muted
-                                interactive: true
-                                onClicked: root.command(["xdg-open", "https://github.com/notifications"])
-                            }
-
-                            BarButton {
-                                visible: email.output !== ""
-                                symbol: "mail"
-                                text: email.output === "offline" ? "ERR" : email.output
-                                foreground: email.output === "offline" ? Theme.alert : Number.parseInt(email.output) > 0 ? Theme.selected : Theme.muted
-                                interactive: true
-                                onClicked: root.command(["xdg-open", "https://app.fastmail.com/"])
-                            }
-
-                            BarButton {
-                                symbol: "updates"
-                                text: updates.output === "unavailable" ? "ERR" : updates.output || "…"
-                                foreground: updates.output === "unavailable" ? Theme.alert : Number.parseInt(updates.output) > 0 ? Theme.selected : Theme.muted
-                                interactive: true
-                                onClicked: updates.refresh()
-                            }
-
-                        }
-
-                        StatusGroup {
-                            visible: !panel.powerOpen && panel.width >= 1150
+                            visible: panel.width >= 1150
 
                             BarButton {
                                 caption: "CPU"
@@ -259,26 +302,104 @@ ShellRoot {
                                 foreground: root.stats.temperature >= 140 ? Theme.alert : Theme.foreground
                             }
 
+                            BarButton {
+                                id: networkStatus
+
+                                caption: "NET"
+                                stacked: true
+                                text: "↓" + root.networkRate(root.downloadRate) + " ↑" + root.networkRate(root.uploadRate)
+                                textWidth: Math.max(64, networkText.advanceWidth)
+                                tooltip: "Download: " + (root.downloadRate / 1024).toFixed(1) + " KiB/s\nUpload: " + (root.uploadRate / 1024).toFixed(1) + " KiB/s\n" + (Object.keys(root.stats.network ?? {}).join(", ") || "No active physical link")
+
+                                TextMetrics {
+                                    id: networkText
+
+                                    text: networkStatus.text
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSize
+                                }
+                            }
+
+                        }
+
+                        BarDivider {
+                            visible: machineStatus.visible && accountStatus.visible
+                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StatusGroup {
-                            visible: !panel.powerOpen
+                            id: accountStatus
+
+                            visible: !root.offline && panel.width >= 1000
+
+                            BarButton {
+                                visible: github.output !== ""
+                                glyph: "\uf09b"
+                                glyphSize: 14
+                                tooltip: github.output === "offline" ? "GitHub check unavailable" : "GitHub: " + github.output + " unread notifications"
+                                foreground: github.output === "offline" ? Theme.alert : Number.parseInt(github.output) > 0 ? Theme.selected : Theme.muted
+                                interactive: true
+                                onClicked: root.command(["xdg-open", "https://github.com/notifications"])
+                            }
+
+                            BarButton {
+                                visible: email.output !== ""
+                                symbol: "mail"
+                                tooltip: email.output === "offline" ? "Email check unavailable" : "Mail: " + email.output + " unread messages"
+                                foreground: email.output === "offline" ? Theme.alert : Number.parseInt(email.output) > 0 ? Theme.selected : Theme.muted
+                                interactive: true
+                                onClicked: root.command(["xdg-open", "https://app.fastmail.com/"])
+                            }
+
+                            BarButton {
+                                symbol: "updates"
+                                tooltip: updates.output === "unavailable" ? "Package check failed · click to retry" : updates.output === "" ? "Checking for updates…" : updates.output + " package updates · click to refresh"
+                                foreground: updates.output === "unavailable" ? Theme.alert : Number.parseInt(updates.output) > 0 ? Theme.selected : Theme.muted
+                                interactive: true
+                                onClicked: updates.refresh()
+                            }
+
+                        }
+
+                        BarDivider {
+                            visible: accountStatus.visible
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StatusGroup {
+                            id: deviceControls
+
+                            BarButton {
+                                id: wifiButton
+                                symbol: "wifi"
+                                level: network.state.current ? network.state.current.signal / 100 : 0
+                                muted: !network.state.enabled
+                                foreground: network.failed || !network.state.available ? Theme.alert : network.state.current ? Theme.foreground : Theme.muted
+                                tooltip: network.message || (!network.state.available ? "NetworkManager unavailable" : !network.state.enabled ? "Wi-Fi off" : network.state.current ? network.state.current.ssid + " · " + network.state.current.signal + "% signal" : "Wi-Fi · Not connected")
+                                tooltipEnabled: !networkPopup.visible
+                                interactive: true
+                                onClicked: networkPopup.visible = !networkPopup.visible
+                            }
 
                             BarButton {
                                 visible: typeof root.stats.battery === "number"
-                                symbol: root.stats.plugged ? "plug" : "battery"
+                                symbol: "battery"
                                 level: (root.stats.battery ?? 0) / 100
-                                text: root.stats.battery + "%"
-                                textWidth: 30
+                                plugged: root.stats.plugged ?? false
+                                tooltip: "Battery: " + root.stats.battery + "% · " + (root.stats.plugged ? "Plugged in" : "On battery")
+                                tooltipEnabled: !devicePopup.visible
                                 foreground: root.stats.battery <= 10 ? Theme.alert : Theme.foreground
+                                interactive: true
+                                onClicked: devicePopup.visible = !devicePopup.visible
                             }
 
                             BarButton {
                                 visible: typeof root.stats.backlight === "number" && panel.width >= 900
                                 symbol: "sun"
-                                text: root.stats.backlight + "%"
-                                textWidth: 30
+                                tooltip: "Brightness: " + root.stats.backlight + "%"
+                                tooltipEnabled: !devicePopup.visible
                                 interactive: true
+                                onClicked: devicePopup.visible = !devicePopup.visible
                                 onScrolled: (delta) => {
                                     if (delta !== 0)
                                         root.command(["brightnessctl", "set", delta > 0 ? "+5%" : "5%-"]);
@@ -290,15 +411,17 @@ ShellRoot {
                                 symbol: "volume"
                                 level: root.audio ? root.audio.volume : 0
                                 muted: !root.audio || root.audio.muted
-                                text: !root.audio ? "—" : root.audio.muted ? "MUTE" : Math.round(root.audio.volume * 100) + "%"
-                                textWidth: 30
+                                tooltip: !root.audio ? "No audio output" : "Volume: " + Math.round(root.audio.volume * 100) + "%" + (root.audio.muted ? " · Muted" : "")
+                                tooltipEnabled: !devicePopup.visible
                                 foreground: root.audio && root.audio.muted ? Theme.muted : root.audio && root.audio.volume > 1 ? Theme.alert : Theme.foreground
                                 interactive: true
                                 onClicked: (button) => {
                                     if (button === Qt.RightButton)
                                         root.command(["pavucontrol"]);
-                                    else if (button === Qt.LeftButton && root.audio)
+                                    else if (button === Qt.MiddleButton && root.audio)
                                         root.audio.muted = !root.audio.muted;
+                                    else if (button === Qt.LeftButton)
+                                        devicePopup.visible = !devicePopup.visible;
                                 }
                                 onScrolled: (delta) => {
                                     if (root.audio && delta !== 0)
@@ -309,28 +432,8 @@ ShellRoot {
 
                         }
 
-                        StatusGroup {
-                            visible: panel.powerOpen
-
-                            Repeater {
-                                model: ["suspend", "reboot", "poweroff"]
-
-                                delegate: BarButton {
-                                    required property string modelData
-
-                                    caption: panel.pendingPowerAction === modelData ? "CONFIRM" : "SESSION"
-                                    text: modelData
-                                    foreground: Theme.alert
-                                    interactive: true
-                                    onClicked: (button) => {
-                                        if (button === Qt.LeftButton)
-                                            panel.power(modelData);
-
-                                    }
-                                }
-
-                            }
-
+                        BarDivider {
+                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StatusGroup {
@@ -346,14 +449,15 @@ ShellRoot {
                             }
 
                             BarButton {
-                                symbol: panel.powerOpen ? "close" : "power"
-                                foreground: panel.powerOpen ? Theme.alert : Theme.muted
+                                id: powerButton
+
+                                symbol: "power"
+                                foreground: Theme.alert
                                 interactive: true
                                 onClicked: (button) => {
-                                    if (button === Qt.LeftButton) {
-                                        panel.powerOpen = !panel.powerOpen;
-                                        panel.pendingPowerAction = "";
-                                    }
+                                    if (button === Qt.LeftButton)
+                                        sessionPopup.visible = !sessionPopup.visible;
+
                                 }
                             }
 
