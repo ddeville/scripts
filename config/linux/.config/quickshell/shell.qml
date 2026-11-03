@@ -209,6 +209,14 @@ ShellRoot {
                 onSettingsRequested: root.command(["nm-connection-editor"])
             }
 
+            CalendarPopup {
+                id: calendarPopup
+
+                anchorItem: clockButton
+                below: root.preview
+                today: clock.date
+            }
+
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -230,9 +238,13 @@ ShellRoot {
                     Layout.minimumWidth: implicitWidth
 
                     BarButton {
+                        id: clockButton
+
                         caption: Qt.formatDateTime(clock.date, "ddd d MMM").toUpperCase()
                         text: Qt.formatDateTime(clock.date, "h:mm AP")
                         textWidth: 60
+                        interactive: true
+                        onClicked: calendarPopup.visible = !calendarPopup.visible
                     }
 
                 }

@@ -11,3 +11,4 @@ DevicePopup 1.0 DevicePopup.qml
 LevelSlider 1.0 LevelSlider.qml
 Network 1.0 Network.qml
 NetworkPopup 1.0 NetworkPopup.qml
+CalendarPopup 1.0 CalendarPopup.qml
