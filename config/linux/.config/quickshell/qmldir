@@ -12,3 +12,5 @@ LevelSlider 1.0 LevelSlider.qml
 Network 1.0 Network.qml
 NetworkPopup 1.0 NetworkPopup.qml
 CalendarPopup 1.0 CalendarPopup.qml
+Notifications 1.0 Notifications.qml
+NotificationPopup 1.0 NotificationPopup.qml
