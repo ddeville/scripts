@@ -397,8 +397,8 @@ ShellRoot {
                                 tooltipEnabled: !devicePopup.visible
                                 foreground: root.stats.battery <= 10 ? Theme.alert : Theme.foreground
                                 interactive: true
-                                active: devicePopup.visible
-                                onClicked: devicePopup.visible = !devicePopup.visible
+                                active: devicePopup.visible && devicePopup.activeSection === "battery"
+                                onClicked: devicePopup.toggleSection("battery")
                             }
 
                             BarButton {
@@ -407,8 +407,8 @@ ShellRoot {
                                 tooltip: "Brightness: " + root.stats.backlight + "%"
                                 tooltipEnabled: !devicePopup.visible
                                 interactive: true
-                                active: devicePopup.visible
-                                onClicked: devicePopup.visible = !devicePopup.visible
+                                active: devicePopup.visible && devicePopup.activeSection === "brightness"
+                                onClicked: devicePopup.toggleSection("brightness")
                                 onScrolled: (delta) => {
                                     if (delta !== 0)
                                         root.command(["brightnessctl", "set", delta > 0 ? "+5%" : "5%-"]);
@@ -424,14 +424,14 @@ ShellRoot {
                                 tooltipEnabled: !devicePopup.visible
                                 foreground: root.audio && root.audio.muted ? Theme.muted : root.audio && root.audio.volume > 1 ? Theme.alert : Theme.foreground
                                 interactive: true
-                                active: devicePopup.visible
+                                active: devicePopup.visible && devicePopup.activeSection === "volume"
                                 onClicked: (button) => {
                                     if (button === Qt.RightButton)
                                         root.command(["pavucontrol"]);
                                     else if (button === Qt.MiddleButton && root.audio)
                                         root.audio.muted = !root.audio.muted;
                                     else if (button === Qt.LeftButton)
-                                        devicePopup.visible = !devicePopup.visible;
+                                        devicePopup.toggleSection("volume");
                                 }
                                 onScrolled: (delta) => {
                                     if (root.audio && delta !== 0)
