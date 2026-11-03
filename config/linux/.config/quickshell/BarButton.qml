@@ -15,6 +15,7 @@ Controls.Control {
     property bool plugged: false
     property string tooltip: ""
     property bool tooltipEnabled: true
+    readonly property bool tooltipInPopup: !root.QsWindow.contentItem || root.Window.window !== root.QsWindow.contentItem.Window.window
     property bool tooltipReady: false
     readonly property bool tooltipWanted: tooltipEnabled && tooltip !== "" && mouse.containsMouse && !mouse.pressed
     property int textWidth: 0
@@ -169,9 +170,9 @@ Controls.Control {
     PopupWindow {
         readonly property bool below: Quickshell.env("QS_BAR_PREVIEW") === "1"
 
-        visible: root.tooltipReady && root.tooltipWanted
-        implicitWidth: tooltipText.implicitWidth + 16
-        implicitHeight: tooltipText.implicitHeight + 16
+        visible: !root.tooltipInPopup && root.tooltipReady && root.tooltipWanted
+        implicitWidth: barTooltipText.implicitWidth + 16
+        implicitHeight: barTooltipText.implicitHeight + 16
         color: "transparent"
         anchor.item: root
         anchor.edges: below ? Edges.Bottom : Edges.Top
@@ -189,11 +190,45 @@ Controls.Control {
         }
 
         Text {
-            id: tooltipText
+            id: barTooltipText
 
             anchors.centerIn: parent
             text: root.tooltip
             textFormat: Text.PlainText
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: 11
+            renderType: Text.QtRendering
+        }
+
+    }
+
+    Controls.ToolTip {
+        readonly property bool below: Quickshell.env("QS_BAR_PREVIEW") === "1"
+
+        parent: root
+        visible: root.tooltipInPopup && root.tooltipReady && root.tooltipWanted
+        popupType: Controls.Popup.Item
+        padding: 8
+        margins: 8
+        x: (root.width - width) / 2
+        y: below ? root.height + 8 : -height - 8
+        implicitWidth: Math.min(tooltipText.implicitWidth + 16, 400)
+        implicitHeight: tooltipText.implicitHeight + 16
+
+        background: Rectangle {
+            color: Theme.background
+            radius: 6
+            border.width: 1
+            border.color: Theme.border
+        }
+
+        contentItem: Text {
+            id: tooltipText
+
+            text: root.tooltip
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: 11
