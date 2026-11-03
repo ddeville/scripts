@@ -40,6 +40,10 @@ ShellRoot {
         id: bspwm
     }
 
+    Launcher {
+        id: launcher
+    }
+
     Network {
         id: network
     }
@@ -137,7 +141,7 @@ ShellRoot {
             required property var modelData
 
             function closeOtherPopups(openingPopup) {
-                for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup]) {
+                for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup]) {
                     if (popup !== openingPopup)
                         popup.close();
                 }
@@ -155,6 +159,30 @@ ShellRoot {
                 right: true
                 top: root.preview
                 bottom: !root.preview
+            }
+
+            Connections {
+                target: launcher
+
+                function onShowRequested(monitor) {
+                    panel.closeOtherPopups(null);
+                    if (panel.screen.name === monitor)
+                        launcherPopup.open();
+                }
+
+                function onCloseRequested() {
+                    launcherPopup.close();
+                }
+            }
+
+            LauncherPopup {
+                id: launcherPopup
+
+                anchorItem: panel.contentItem
+                backend: launcher
+                screenHeight: panel.screen.height
+                below: root.preview
+                onAboutToShow: panel.closeOtherPopups(launcherPopup)
             }
 
             SessionPopup {
