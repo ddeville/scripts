@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Controls as Controls
-import Quickshell.Services.Pipewire
 
 Controls.Popup {
     id: root
 
     required property Item anchorItem
+    required property AudioOutputs outputs
     property bool below: false
     property var audio: null
     property real brightness: -1
@@ -41,7 +41,10 @@ Controls.Popup {
     popupType: Controls.Popup.Window
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
-    onOpened: closeButton.forceActiveFocus(Qt.PopupFocusReason)
+    onOpened: {
+        outputs.refresh();
+        closeButton.forceActiveFocus(Qt.PopupFocusReason);
+    }
     onClosed: {
         activeSection = "";
         emphasizedSection = "";
@@ -135,6 +138,7 @@ Controls.Popup {
         }
 
         Rectangle {
+            visible: root.battery >= 0
             width: parent.width
             height: 1
             color: Theme.border
@@ -280,47 +284,106 @@ Controls.Popup {
         }
 
         Text {
-            text: "OUTPUT DEVICE"
+            text: "OUTPUT"
             color: Theme.muted
             font.family: Theme.font
             font.pixelSize: 9
             font.letterSpacing: 0.5
         }
 
-        Column {
+        Controls.ScrollView {
+            id: outputList
+
             width: parent.width
-            spacing: 4
+            implicitHeight: Math.min(outputRows.implicitHeight, 180)
+            contentWidth: availableWidth
+            clip: true
+            Controls.ScrollBar.horizontal.policy: Controls.ScrollBar.AlwaysOff
 
-            Repeater {
-                model: Pipewire.nodes.values.filter((node) => {
-                    return node.isSink && node.audio !== null && !node.isStream;
-                })
+            Column {
+                id: outputRows
 
-                delegate: BarButton {
-                    required property var modelData
+                width: parent.width
+                spacing: 4
 
-                    width: parent.width
-                    height: 30
-                    symbol: "volume"
-                    text: modelData.nickname || modelData.description || modelData.name
-                    textWidth: width - 33
-                    tooltip: (modelData.description || modelData.name) + (active ? " · Current output" : " · Use this output")
-                    active: Pipewire.defaultAudioSink === modelData
-                    foreground: active ? Theme.selected : Theme.foreground
-                    interactive: true
-                    onClicked: Pipewire.preferredDefaultAudioSink = modelData
+                Repeater {
+                    model: outputs.items
+
+                    delegate: BarButton {
+                        id: outputButton
+
+                        required property var model
+                        readonly property bool current: root.outputs.defaultSinkName === model.sinkName && model.activePort
+
+                        width: outputRows.width
+                        height: model.detail ? 42 : 32
+                        tooltip: model.description + (current ? " · Current output" : " · Use this output")
+                        active: current && root.outputs.items.count > 1
+                        foreground: active ? Theme.selected : Theme.foreground
+                        interactive: root.outputs.available && !root.outputs.busy && (root.outputs.items.count > 1 || !current)
+                        onClicked: outputs.select(model.sinkName, model.portName)
+                        onActiveFocusChanged: {
+                            if (activeFocus) {
+                                const view = outputList.contentItem;
+                                view.contentY = Math.max(0, Math.min(y, Math.max(view.contentY, y + height - view.height)));
+                            }
+                        }
+
+                        indicator: Row {
+                            spacing: 5
+
+                            BarIcon {
+                                name: outputButton.model.symbol
+                                color: outputButton.foreground
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Column {
+                                width: outputButton.width - 33
+                                spacing: 2
+
+                                Text {
+                                    width: parent.width
+                                    text: outputButton.model.label
+                                    textFormat: Text.PlainText
+                                    elide: Text.ElideRight
+                                    color: outputButton.foreground
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSize
+                                }
+
+                                Text {
+                                    visible: outputButton.model.detail !== ""
+                                    width: parent.width
+                                    text: outputButton.model.detail
+                                    textFormat: Text.PlainText
+                                    elide: Text.ElideRight
+                                    color: Theme.muted
+                                    font.family: Theme.font
+                                    font.pixelSize: 9
+                                }
+
+                            }
+
+                        }
+
+                    }
+
                 }
 
             }
 
-            Text {
-                visible: !root.audio
-                text: "No audio output"
-                color: Theme.muted
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-            }
+        }
 
+        Text {
+            visible: outputs.items.count === 0 || outputs.error !== ""
+            width: parent.width
+            text: outputs.error || (outputs.loading ? "Checking audio outputs…" : !outputs.available ? "Audio outputs unavailable" : "No audio outputs")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            color: outputs.error ? Theme.alert : Theme.muted
+            font.family: Theme.font
+            font.pixelSize: 10
         }
 
         Rectangle {
