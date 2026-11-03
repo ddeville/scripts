@@ -35,7 +35,7 @@ Scope {
             return ;
 
         error = "";
-        selection.command = ["timeout", "5", "bash", Quickshell.shellPath("scripts/audio-output.sh"), sink, port];
+        selection.command = ["timeout", "5", "bash", Quickshell.shellPath("services/scripts/audio-output.sh"), sink, port];
         selection.running = true;
     }
 

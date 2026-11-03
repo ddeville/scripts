@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import "../../ui"
+import "../../services"
 
 Controls.Popup {
     id: root
@@ -40,7 +42,7 @@ Controls.Popup {
                 font.pixelSize: 14
             }
 
-            BarButton {
+            Button {
                 id: closeButton
 
                 symbol: "close"
@@ -61,7 +63,7 @@ Controls.Popup {
             font.pixelSize: Theme.fontSize
         }
 
-        BarButton {
+        Button {
             visible: root.backend.paused
             width: parent.width
             height: 30
@@ -104,7 +106,7 @@ Controls.Popup {
                     "seconds": 0
                 }]
 
-                delegate: BarButton {
+                delegate: Button {
                     required property var modelData
 
                     width: parent.width

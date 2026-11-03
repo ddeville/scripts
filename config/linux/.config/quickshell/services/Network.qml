@@ -33,7 +33,7 @@ Scope {
     CommandPoll {
         id: poll
 
-        command: ["python3", Quickshell.shellPath("scripts/network.py")]
+        command: ["python3", Quickshell.shellPath("services/scripts/network.py")]
         interval: 5000
         onOutputChanged: {
             if (output !== "")

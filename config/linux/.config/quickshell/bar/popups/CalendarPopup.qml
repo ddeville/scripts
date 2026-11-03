@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import "../../ui"
 
 Controls.Popup {
     id: root
@@ -52,7 +53,7 @@ Controls.Popup {
                 renderType: Text.QtRendering
             }
 
-            BarButton {
+            Button {
                 id: previousButton
 
                 symbol: "chevron-left"
@@ -62,7 +63,7 @@ Controls.Popup {
                 onClicked: root.moveMonth(-1)
             }
 
-            BarButton {
+            Button {
                 symbol: "chevron-right"
                 tooltip: "Next month"
                 interactive: true
@@ -70,7 +71,7 @@ Controls.Popup {
                 onClicked: root.moveMonth(1)
             }
 
-            BarButton {
+            Button {
                 symbol: "close"
                 tooltip: "Close calendar"
                 foreground: Theme.muted
@@ -161,7 +162,7 @@ Controls.Popup {
         Row {
             width: parent.width
 
-            BarButton {
+            Button {
                 id: todayButton
 
                 text: "Today"

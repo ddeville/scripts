@@ -1,4 +1,5 @@
 import QtQuick
+import "../ui"
 
 Item {
     default property alias content: contentRow.data

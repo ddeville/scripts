@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import "../../ui"
+import "../../services"
 
 Controls.Popup {
     id: root
@@ -79,7 +81,7 @@ Controls.Popup {
                 renderType: Text.QtRendering
             }
 
-            BarButton {
+            Button {
                 id: closeButton
 
                 symbol: "close"
@@ -98,7 +100,7 @@ Controls.Popup {
             Row {
                 width: parent.width
 
-                BarButton {
+                Button {
                     symbol: "battery"
                     level: root.battery / 100
                     plugged: root.plugged
@@ -161,7 +163,7 @@ Controls.Popup {
             Row {
                 width: parent.width
 
-                BarButton {
+                Button {
                     symbol: "sun"
                 }
 
@@ -223,7 +225,7 @@ Controls.Popup {
             Row {
                 width: parent.width
 
-                BarButton {
+                Button {
                     symbol: "volume"
                     tooltip: root.audio && root.audio.muted ? "Unmute audio" : "Mute audio"
                     level: root.audio ? root.audio.volume : 0
@@ -326,7 +328,7 @@ Controls.Popup {
                 Repeater {
                     model: outputs.items
 
-                    delegate: BarButton {
+                    delegate: Button {
                         id: outputButton
 
                         required property var model
@@ -349,7 +351,7 @@ Controls.Popup {
                         indicator: Row {
                             spacing: 5
 
-                            BarIcon {
+                            Icon {
                                 name: outputButton.model.symbol
                                 color: outputButton.foreground
                                 anchors.verticalCenter: parent.verticalCenter
@@ -409,7 +411,7 @@ Controls.Popup {
             color: Theme.border
         }
 
-        BarButton {
+        Button {
             text: "Sound settings…"
             foreground: Theme.muted
             interactive: true

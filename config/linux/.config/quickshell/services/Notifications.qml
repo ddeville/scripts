@@ -17,14 +17,14 @@ Scope {
             return ;
 
         error = "";
-        action.command = ["bash", Quickshell.shellPath("scripts/notifications.sh")].concat(args);
+        action.command = ["bash", Quickshell.shellPath("services/scripts/notifications.sh")].concat(args);
         action.running = true;
     }
 
     CommandPoll {
         id: poll
 
-        command: ["timeout", "5", "bash", Quickshell.shellPath("scripts/notifications.sh"), "status"]
+        command: ["timeout", "5", "bash", Quickshell.shellPath("services/scripts/notifications.sh"), "status"]
         interval: 2000
         onOutputChanged: {
             root.available = output !== "";
