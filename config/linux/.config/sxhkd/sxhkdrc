@@ -98,11 +98,11 @@ super + {Left,Down,Up,Right}
 
 # media keys
 XF86AudioRaiseVolume
-	pactl set-sink-volume @DEFAULT_SINK@ +1%
+	pactl set-sink-volume @DEFAULT_SINK@ +1% && qs ipc call osd volume
 XF86AudioLowerVolume
-	pactl set-sink-volume @DEFAULT_SINK@ -1%
+	pactl set-sink-volume @DEFAULT_SINK@ -1% && qs ipc call osd volume
 XF86AudioMute
-	pactl set-sink-mute @DEFAULT_SINK@ toggle
+	pactl set-sink-mute @DEFAULT_SINK@ toggle && qs ipc call osd volume
 XF86AudioPlay
 	playerctl --player=spotify play-pause
 XF86AudioPrev
@@ -112,9 +112,9 @@ XF86AudioNext
 
 # screen brightness
 XF86MonBrightnessDown
-	brightnessctl set 5%-
+	brightnessctl set 5%- && qs ipc call osd brightness
 XF86MonBrightnessUp
-	brightnessctl set 5%+
+	brightnessctl set 5%+ && qs ipc call osd brightness
 
 # dunst
 ctrl + period

@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Services.Pipewire
 import "bar"
 import "launcher"
+import "osd"
 import "services"
 
 ShellRoot {
@@ -47,6 +48,25 @@ ShellRoot {
 
     PwObjectTracker {
         objects: root.sink ? [root.sink] : []
+    }
+
+    Osd {
+        id: osdService
+
+        audio: root.sink ? root.sink.audio : null
+        outputSymbol: outputService.currentOutput ? outputService.currentOutput.symbol : "volume"
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        OsdWindow {
+            required property var modelData
+
+            screen: modelData
+            monitorName: modelData.name
+            backend: osdService
+        }
     }
 
     Variants {
