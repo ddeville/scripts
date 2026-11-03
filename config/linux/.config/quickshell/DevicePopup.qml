@@ -41,7 +41,7 @@ Controls.Popup {
     popupType: Controls.Popup.Window
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
-    onOpened: closeButton.forceActiveFocus(Qt.TabFocusReason)
+    onOpened: closeButton.forceActiveFocus(Qt.PopupFocusReason)
     onClosed: {
         activeSection = "";
         emphasizedSection = "";
@@ -302,9 +302,9 @@ Controls.Popup {
                     width: parent.width
                     height: 30
                     symbol: "volume"
-                    text: modelData.description || modelData.name
+                    text: modelData.nickname || modelData.description || modelData.name
                     textWidth: width - 33
-                    tooltip: text + (active ? " · Current output" : " · Use this output")
+                    tooltip: (modelData.description || modelData.name) + (active ? " · Current output" : " · Use this output")
                     active: Pipewire.defaultAudioSink === modelData
                     foreground: active ? Theme.selected : Theme.foreground
                     interactive: true

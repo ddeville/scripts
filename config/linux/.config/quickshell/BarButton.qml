@@ -1,7 +1,8 @@
 import QtQuick
+import QtQuick.Controls as Controls
 import Quickshell
 
-Rectangle {
+Controls.Control {
     id: root
 
     property string text: ""
@@ -36,10 +37,6 @@ Rectangle {
     }
     implicitWidth: contentStack.implicitWidth + (stacked ? 8 : 12)
     implicitHeight: Theme.height - 10
-    radius: 5
-    color: active || selected ? Theme.selectionSurface : interactive && (mouse.containsMouse || activeFocus) ? Theme.hover : "transparent"
-    border.width: selected || (interactive && activeFocus) ? 1 : 0
-    border.color: Theme.selected
     activeFocusOnTab: interactive || activeFocus
     Accessible.role: interactive ? Accessible.Button : Accessible.StaticText
     Accessible.name: tooltip || text || caption || symbol
@@ -150,9 +147,10 @@ Rectangle {
         cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: (event) => {
-            if (root.interactive)
+            if (root.interactive) {
+                root.forceActiveFocus(Qt.MouseFocusReason);
                 root.clicked(event.button);
-
+            }
         }
         onWheel: (event) => {
             if (root.interactive)
@@ -202,6 +200,13 @@ Rectangle {
             renderType: Text.QtRendering
         }
 
+    }
+
+    background: Rectangle {
+        radius: 5
+        color: root.active || root.selected ? Theme.selectionSurface : root.interactive && (mouse.containsMouse || root.visualFocus) ? Theme.hover : "transparent"
+        border.width: root.selected || (root.interactive && root.visualFocus) ? 1 : 0
+        border.color: Theme.selected
     }
 
 }

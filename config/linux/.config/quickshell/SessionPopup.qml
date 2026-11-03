@@ -10,14 +10,14 @@ Controls.Popup {
 
     signal actionRequested(string action)
 
-    function choose(action) {
+    function choose(action, focusReason) {
         if (action.action === "lock") {
             close();
             actionRequested("lock");
             return ;
         }
         pendingAction = action;
-        cancelButton.forceActiveFocus();
+        cancelButton.forceActiveFocus(focusReason);
     }
 
     function confirm() {
@@ -39,7 +39,7 @@ Controls.Popup {
     onVisibleChanged: {
         pendingAction = null;
         if (visible)
-            actions.itemAt(0).forceActiveFocus();
+            actions.itemAt(0).forceActiveFocus(Qt.PopupFocusReason);
 
     }
 
@@ -130,7 +130,7 @@ Controls.Popup {
                         text: modelData.label
                         detail: modelData.detail
                         symbol: modelData.symbol
-                        onClicked: root.choose(modelData)
+                        onClicked: root.choose(modelData, visualFocus ? Qt.TabFocusReason : Qt.MouseFocusReason)
                     }
 
                 }
@@ -164,7 +164,7 @@ Controls.Popup {
                         text: "Cancel"
                         onClicked: {
                             root.pendingAction = null;
-                            actions.itemAt(0).forceActiveFocus();
+                            actions.itemAt(0).forceActiveFocus(visualFocus ? Qt.TabFocusReason : Qt.MouseFocusReason);
                         }
                     }
 

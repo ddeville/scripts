@@ -28,7 +28,7 @@ Controls.Popup {
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onAboutToShow: showToday()
-    onOpened: previousButton.forceActiveFocus(Qt.TabFocusReason)
+    onOpened: previousButton.forceActiveFocus(Qt.PopupFocusReason)
 
     Column {
         id: body
