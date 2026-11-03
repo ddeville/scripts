@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 
 Rectangle {
     id: root
@@ -7,8 +8,14 @@ Rectangle {
     property string caption: ""
     property string symbol: ""
     property string glyph: ""
+    property real glyphSize: Theme.iconSize
     property real level: 1
     property bool muted: false
+    property bool plugged: false
+    property string tooltip: ""
+    property bool tooltipEnabled: true
+    property bool tooltipReady: false
+    readonly property bool tooltipWanted: tooltipEnabled && tooltip !== "" && mouse.containsMouse && !mouse.pressed
     property int textWidth: 0
     property Component indicator: null
     property bool interactive: false
@@ -19,6 +26,13 @@ Rectangle {
     signal clicked(int button)
     signal scrolled(int delta)
 
+    onTooltipWantedChanged: {
+        tooltipReady = false;
+        if (tooltipWanted)
+            tooltipDelay.restart();
+        else
+            tooltipDelay.stop();
+    }
     implicitWidth: contentStack.implicitWidth + (stacked ? 8 : 12)
     implicitHeight: Theme.height - 10
     radius: 5
@@ -71,6 +85,7 @@ Rectangle {
                 color: root.foreground
                 level: root.level
                 muted: root.muted
+                plugged: root.plugged
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -79,7 +94,7 @@ Rectangle {
                 text: root.glyph
                 color: root.foreground
                 font.family: "Font Awesome 7 Brands"
-                font.pixelSize: Theme.iconSize
+                font.pixelSize: root.glyphSize
                 renderType: Text.QtRendering
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -105,16 +120,63 @@ Rectangle {
         id: mouse
 
         anchors.fill: parent
-        enabled: root.interactive
+        enabled: root.interactive || root.tooltip !== ""
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: (event) => {
-            return root.clicked(event.button);
+            if (root.interactive)
+                root.clicked(event.button);
+
         }
         onWheel: (event) => {
-            return root.scrolled(event.angleDelta.y);
+            if (root.interactive)
+                root.scrolled(event.angleDelta.y);
+
         }
+    }
+
+    Timer {
+        id: tooltipDelay
+
+        interval: 500
+        onTriggered: root.tooltipReady = true
+    }
+
+    PopupWindow {
+        readonly property bool below: Quickshell.env("QS_BAR_PREVIEW") === "1"
+
+        visible: root.tooltipReady && root.tooltipWanted
+        implicitWidth: tooltipText.implicitWidth + 16
+        implicitHeight: tooltipText.implicitHeight + 16
+        color: "transparent"
+        anchor.item: root
+        anchor.edges: below ? Edges.Bottom : Edges.Top
+        anchor.gravity: below ? Edges.Bottom : Edges.Top
+        anchor.rect.y: below ? root.height + 8 : -8
+        anchor.rect.width: root.width
+        anchor.rect.height: 1
+
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.background
+            radius: 6
+            border.width: 1
+            border.color: Theme.border
+        }
+
+        Text {
+            id: tooltipText
+
+            anchors.centerIn: parent
+            text: root.tooltip
+            textFormat: Text.PlainText
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: 11
+            renderType: Text.QtRendering
+        }
+
     }
 
 }

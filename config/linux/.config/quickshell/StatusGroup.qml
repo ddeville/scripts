@@ -1,12 +1,10 @@
 import QtQuick
 
-Rectangle {
+Item {
     default property alias content: contentRow.data
 
     implicitWidth: contentRow.implicitWidth + 4
     implicitHeight: Theme.height - 6
-    color: Theme.surface
-    radius: 7
 
     data: Row {
         id: contentRow
