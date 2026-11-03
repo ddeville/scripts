@@ -10,7 +10,7 @@ Controls.Popup {
     required property Launcher backend
     required property real screenHeight
     property bool below: false
-    property int toggleKey: 0
+    property int dismissKey: 0
     readonly property var matches: Search.search(backend.applications, search.text, backend.history)
 
     function moveSelection(delta) {
@@ -40,7 +40,7 @@ Controls.Popup {
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {
-        toggleKey = 0;
+        dismissKey = 0;
         backend.opened = true;
         search.clear();
         results.currentIndex = matches.length ? 0 : -1;
@@ -84,19 +84,19 @@ Controls.Popup {
             Keys.onUpPressed: root.moveSelection(-1)
             Keys.onTabPressed: root.moveSelection(1)
             Keys.onBacktabPressed: root.moveSelection(-1)
-            Keys.onEscapePressed: root.close()
+            Keys.onEscapePressed: root.dismissKey = Qt.Key_Escape
             // Popup windows grab the keyboard, including sxhkd's launcher shortcuts.
             Keys.onPressed: (event) => {
                 if (root.isToggleShortcut(event)) {
-                    root.toggleKey = event.key;
+                    root.dismissKey = event.key;
                     event.accepted = true;
                 }
             }
             Keys.onReleased: (event) => {
-                if (event.key === root.toggleKey) {
+                if (event.key === root.dismissKey) {
                     event.accepted = true;
                     if (!event.isAutoRepeat) {
-                        root.toggleKey = 0;
+                        root.dismissKey = 0;
                         root.close();
                     }
                 }

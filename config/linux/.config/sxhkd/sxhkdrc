@@ -7,9 +7,10 @@ super + backslash
 	google-chrome-stable
 
 # program launcher
+# Open after sxhkd releases its keyboard grab.
 super + @space
 	qs ipc call launcher toggle
-super + d
+super + @d
 	qs ipc call launcher toggle
 ctrl + @space
 	qs ipc call launcher toggle
