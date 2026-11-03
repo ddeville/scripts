@@ -91,26 +91,24 @@ Controls.Popup {
 
         }
 
-        Row {
+        Column {
             visible: root.battery >= 0
             width: parent.width
-            spacing: 10
 
-            BarIcon {
-                name: "battery"
-                level: root.battery / 100
-                plugged: root.plugged
-                implicitWidth: 24
-                implicitHeight: 24
-                color: root.battery <= 10 ? Theme.alert : Theme.foreground
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Row {
+                width: parent.width
 
-            Column {
-                spacing: 3
+                BarButton {
+                    symbol: "battery"
+                    level: root.battery / 100
+                    plugged: root.plugged
+                    foreground: root.battery <= 10 ? Theme.alert : Theme.foreground
+                }
 
                 Text {
-                    text: root.battery + "% · " + (root.plugged ? "Plugged in" : "On battery")
+                    width: parent.width - 28 - batteryValue.implicitWidth
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Battery"
                     color: root.emphasizedSection === "battery" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -126,13 +124,25 @@ Controls.Popup {
                 }
 
                 Text {
-                    text: root.batteryStatus
-                    color: Theme.muted
+                    id: batteryValue
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.battery + "%"
+                    color: root.battery <= 10 ? Theme.alert : Theme.muted
                     font.family: Theme.font
-                    font.pixelSize: 9
+                    font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
                 }
 
+            }
+
+            Text {
+                x: 28
+                text: root.batteryStatus || (root.plugged ? "Plugged in" : "On battery")
+                color: Theme.muted
+                font.family: Theme.font
+                font.pixelSize: 9
+                renderType: Text.QtRendering
             }
 
         }
@@ -158,7 +168,7 @@ Controls.Popup {
                 Text {
                     width: parent.width - 28 - brightnessValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Brightness"
+                    text: "Display"
                     color: root.emphasizedSection === "brightness" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -200,6 +210,13 @@ Controls.Popup {
 
         }
 
+        Rectangle {
+            visible: root.brightness >= 0
+            width: parent.width
+            height: 1
+            color: Theme.border
+        }
+
         Column {
             width: parent.width
 
@@ -219,7 +236,7 @@ Controls.Popup {
                 Text {
                     width: parent.width - 28 - volumeValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.audio && root.audio.muted ? "Volume · muted" : "Volume"
+                    text: root.audio && root.audio.muted ? "Sound · muted" : "Sound"
                     color: root.emphasizedSection === "volume" ? Theme.selected : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -284,7 +301,7 @@ Controls.Popup {
         }
 
         Text {
-            text: "OUTPUT"
+            text: "AUDIO OUTPUTS"
             color: Theme.muted
             font.family: Theme.font
             font.pixelSize: 9
