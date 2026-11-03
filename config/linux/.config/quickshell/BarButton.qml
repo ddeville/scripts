@@ -20,6 +20,7 @@ Rectangle {
     property Component indicator: null
     property bool interactive: false
     property bool active: false
+    property bool selected: false
     property bool stacked: false
     property color foreground: Theme.foreground
 
@@ -36,9 +37,32 @@ Rectangle {
     implicitWidth: contentStack.implicitWidth + (stacked ? 8 : 12)
     implicitHeight: Theme.height - 10
     radius: 5
-    color: active ? Theme.selectionSurface : interactive && mouse.containsMouse ? Theme.hover : "transparent"
-    border.width: active ? 1 : 0
+    color: active || selected ? Theme.selectionSurface : interactive && (mouse.containsMouse || activeFocus) ? Theme.hover : "transparent"
+    border.width: selected || (interactive && activeFocus) ? 1 : 0
     border.color: Theme.selected
+    activeFocusOnTab: interactive || activeFocus
+    Accessible.role: interactive ? Accessible.Button : Accessible.StaticText
+    Accessible.name: tooltip || text || caption || symbol
+    Accessible.onPressAction: {
+        if (interactive)
+            clicked(Qt.LeftButton);
+
+    }
+    Keys.onReturnPressed: {
+        if (interactive)
+            clicked(Qt.LeftButton);
+
+    }
+    Keys.onEnterPressed: {
+        if (interactive)
+            clicked(Qt.LeftButton);
+
+    }
+    Keys.onSpacePressed: {
+        if (interactive)
+            clicked(Qt.LeftButton);
+
+    }
 
     Column {
         id: contentStack
@@ -104,6 +128,7 @@ Rectangle {
                 width: root.textWidth > 0 ? root.textWidth : implicitWidth
                 text: root.text
                 textFormat: Text.PlainText
+                elide: Text.ElideRight
                 horizontalAlignment: root.stacked ? Text.AlignHCenter : Text.AlignLeft
                 color: root.foreground
                 font.family: Theme.font

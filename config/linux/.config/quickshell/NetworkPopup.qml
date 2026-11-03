@@ -21,7 +21,10 @@ Controls.Popup {
     popupType: Controls.Popup.Window
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
-    onOpened: backend.refresh()
+    onOpened: {
+        backend.refresh();
+        radio.forceActiveFocus(Qt.TabFocusReason);
+    }
 
     Column {
         id: body
@@ -61,6 +64,8 @@ Controls.Popup {
                     height: 16
                     radius: 8
                     color: radio.checked ? Theme.selected : Theme.hover
+                    border.width: radio.visualFocus ? 1 : 0
+                    border.color: Theme.foreground
 
                     Rectangle {
                         x: radio.checked ? 18 : 2
@@ -77,6 +82,7 @@ Controls.Popup {
 
             BarButton {
                 symbol: "close"
+                tooltip: "Close Wi-Fi"
                 foreground: Theme.muted
                 interactive: true
                 onClicked: root.close()
@@ -144,6 +150,7 @@ Controls.Popup {
 
             BarButton {
                 symbol: "restart"
+                tooltip: "Scan for networks"
                 foreground: Theme.muted
                 interactive: !root.backend.busy
                 onClicked: root.backend.run(["device", "wifi", "rescan", "ifname", root.state.device], "Scanning…")
@@ -173,10 +180,28 @@ Controls.Popup {
 
                         required property var modelData
 
+                        function connectNetwork() {
+                            if (root.backend.busy || modelData.active)
+                                return ;
+
+                            // Let NetworkManager's credential dialog take focus if needed.
+                            root.close();
+                            root.backend.run(["device", "wifi", "connect", modelData.bssid, "ifname", root.state.device], "Connecting to " + modelData.ssid + "…");
+                        }
+
                         width: networks.width
                         height: 40
                         radius: 5
-                        color: networkMouse.containsMouse ? Theme.hover : modelData.active ? Theme.surface : "transparent"
+                        color: networkMouse.containsMouse || activeFocus ? Theme.hover : modelData.active ? Theme.surface : "transparent"
+                        border.width: activeFocus ? 1 : 0
+                        border.color: Theme.selected
+                        activeFocusOnTab: (!root.backend.busy && !modelData.active) || activeFocus
+                        Accessible.role: Accessible.Button
+                        Accessible.name: modelData.ssid + (modelData.active ? " · Connected" : " · Connect")
+                        Accessible.onPressAction: connectNetwork()
+                        Keys.onReturnPressed: connectNetwork()
+                        Keys.onEnterPressed: connectNetwork()
+                        Keys.onSpacePressed: connectNetwork()
 
                         BarIcon {
                             x: 6
@@ -223,11 +248,7 @@ Controls.Popup {
                             hoverEnabled: true
                             enabled: !root.backend.busy && !networkRow.modelData.active
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                // Let NetworkManager's credential dialog take focus if needed.
-                                root.close();
-                                root.backend.run(["device", "wifi", "connect", networkRow.modelData.bssid, "ifname", root.state.device], "Connecting to " + networkRow.modelData.ssid + "…");
-                            }
+                            onClicked: networkRow.connectNetwork()
                         }
 
                     }

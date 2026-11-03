@@ -63,7 +63,7 @@ Row {
             text: label
             interactive: true
             foreground: urgent ? Theme.alert : focused ? Theme.selected : occupied ? Theme.foreground : Theme.emptyDesktop
-            active: focused
+            selected: focused
             onClicked: (button) => {
                 if (button === Qt.LeftButton)
                     root.backend.focus(desktopId);

@@ -18,7 +18,6 @@ ShellRoot {
     property real uploadRate: 0
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink ? sink.audio : null
-    property bool notificationsPaused: false
     property int pendingBrightness: -1
 
     function command(args) {
@@ -29,15 +28,6 @@ ShellRoot {
         if (bytes >= 1048576)
             return (bytes / 1048576).toFixed(bytes < 10485760 ? 1 : 0) + "M";
         return Math.round(bytes / 1024) + "K";
-    }
-
-    function toggleNotifications() {
-        if (notificationAction.running)
-            return ;
-
-        notificationsPaused = !notificationsPaused;
-        notificationAction.command = ["dunstctl", "set-paused", notificationsPaused ? "true" : "false"];
-        notificationAction.running = true;
     }
 
     SystemClock {
@@ -105,27 +95,8 @@ ShellRoot {
         }
     }
 
-    CommandPoll {
+    Notifications {
         id: notifications
-
-        command: ["timeout", "3", "dunstctl", "is-paused"]
-        interval: 2000
-        onOutputChanged: {
-            if (!notificationAction.running)
-                root.notificationsPaused = output === "true";
-
-        }
-    }
-
-    Process {
-        id: notificationAction
-
-        onExited: (code, status) => {
-            if (code !== 0 || status !== 0)
-                root.notificationsPaused = notifications.output === "true";
-
-            notifications.refresh();
-        }
     }
 
     CommandPoll {
@@ -180,7 +151,10 @@ ShellRoot {
                 anchorItem: powerButton
                 below: root.preview
                 onActionRequested: (action) => {
-                    return root.command(["systemctl", action]);
+                    if (action === "lock")
+                        root.command(["loginctl", "lock-session", Quickshell.env("XDG_SESSION_ID")]);
+                    else
+                        root.command(["systemctl", action]);
                 }
             }
 
@@ -190,7 +164,6 @@ ShellRoot {
                 anchorItem: deviceControls
                 below: root.preview
                 audio: root.audio
-                audioName: root.sink ? root.sink.description : ""
                 brightness: root.stats.backlight ?? -1
                 battery: root.stats.battery ?? -1
                 plugged: root.stats.plugged ?? false
@@ -215,6 +188,13 @@ ShellRoot {
                 anchorItem: clockButton
                 below: root.preview
                 today: clock.date
+            }
+
+            NotificationPopup {
+                id: notificationPopup
+                anchorItem: notificationButton
+                below: root.preview
+                backend: notifications
             }
 
             Rectangle {
@@ -244,6 +224,7 @@ ShellRoot {
                         text: Qt.formatDateTime(clock.date, "h:mm AP")
                         textWidth: 60
                         interactive: true
+                        active: calendarPopup.visible
                         onClicked: calendarPopup.visible = !calendarPopup.visible
                     }
 
@@ -292,6 +273,37 @@ ShellRoot {
                             visible: panel.width >= 1150
 
                             BarButton {
+                                id: networkStatus
+
+                                caption: "NET"
+                                stacked: true
+                                tooltip: "Download: " + (root.downloadRate / 1024).toFixed(1) + " KiB/s\nUpload: " + (root.uploadRate / 1024).toFixed(1) + " KiB/s\n" + (Object.keys(root.stats.network ?? {}).join(", ") || "No active physical link")
+                                indicator: Row {
+                                    spacing: 8
+
+                                    Repeater {
+                                        model: [{ arrow: "↓", rate: root.downloadRate }, { arrow: "↑", rate: root.uploadRate }]
+                                        delegate: Row {
+                                            required property var modelData
+                                            spacing: 3
+                                            Text {
+                                                text: modelData.arrow
+                                                color: Theme.muted
+                                                font.family: Theme.font
+                                                font.pixelSize: Theme.fontSize
+                                            }
+                                            Text {
+                                                text: root.networkRate(modelData.rate)
+                                                color: Theme.foreground
+                                                font.family: Theme.font
+                                                font.pixelSize: Theme.fontSize
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            BarButton {
                                 caption: "CPU"
                                 stacked: true
                                 text: root.cpu + "%"
@@ -312,24 +324,6 @@ ShellRoot {
                                 text: root.stats.temperature + "°F"
                                 textWidth: 38
                                 foreground: root.stats.temperature >= 140 ? Theme.alert : Theme.foreground
-                            }
-
-                            BarButton {
-                                id: networkStatus
-
-                                caption: "NET"
-                                stacked: true
-                                text: "↓" + root.networkRate(root.downloadRate) + " ↑" + root.networkRate(root.uploadRate)
-                                textWidth: Math.max(64, networkText.advanceWidth)
-                                tooltip: "Download: " + (root.downloadRate / 1024).toFixed(1) + " KiB/s\nUpload: " + (root.uploadRate / 1024).toFixed(1) + " KiB/s\n" + (Object.keys(root.stats.network ?? {}).join(", ") || "No active physical link")
-
-                                TextMetrics {
-                                    id: networkText
-
-                                    text: networkStatus.text
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.fontSize
-                                }
                             }
 
                         }
@@ -390,6 +384,7 @@ ShellRoot {
                                 tooltip: network.message || (!network.state.available ? "NetworkManager unavailable" : !network.state.enabled ? "Wi-Fi off" : network.state.current ? network.state.current.ssid + " · " + network.state.current.signal + "% signal" : "Wi-Fi · Not connected")
                                 tooltipEnabled: !networkPopup.visible
                                 interactive: true
+                                active: networkPopup.visible
                                 onClicked: networkPopup.visible = !networkPopup.visible
                             }
 
@@ -402,6 +397,7 @@ ShellRoot {
                                 tooltipEnabled: !devicePopup.visible
                                 foreground: root.stats.battery <= 10 ? Theme.alert : Theme.foreground
                                 interactive: true
+                                active: devicePopup.visible
                                 onClicked: devicePopup.visible = !devicePopup.visible
                             }
 
@@ -411,6 +407,7 @@ ShellRoot {
                                 tooltip: "Brightness: " + root.stats.backlight + "%"
                                 tooltipEnabled: !devicePopup.visible
                                 interactive: true
+                                active: devicePopup.visible
                                 onClicked: devicePopup.visible = !devicePopup.visible
                                 onScrolled: (delta) => {
                                     if (delta !== 0)
@@ -427,6 +424,7 @@ ShellRoot {
                                 tooltipEnabled: !devicePopup.visible
                                 foreground: root.audio && root.audio.muted ? Theme.muted : root.audio && root.audio.volume > 1 ? Theme.alert : Theme.foreground
                                 interactive: true
+                                active: devicePopup.visible
                                 onClicked: (button) => {
                                     if (button === Qt.RightButton)
                                         root.command(["pavucontrol"]);
@@ -450,12 +448,16 @@ ShellRoot {
 
                         StatusGroup {
                             BarButton {
-                                symbol: root.notificationsPaused ? "bell-off" : "bell"
-                                foreground: root.notificationsPaused ? Theme.muted : Theme.selected
+                                id: notificationButton
+                                symbol: notifications.paused ? "bell-off" : "bell"
+                                foreground: !notifications.available || notifications.error !== "" ? Theme.alert : notifications.paused ? Theme.muted : Theme.selected
+                                tooltip: notifications.summary + " · Click to manage"
+                                tooltipEnabled: !notificationPopup.visible
+                                active: notificationPopup.visible
                                 interactive: true
                                 onClicked: (button) => {
                                     if (button === Qt.LeftButton)
-                                        root.toggleNotifications();
+                                        notificationPopup.visible = !notificationPopup.visible;
 
                                 }
                             }
@@ -464,7 +466,9 @@ ShellRoot {
                                 id: powerButton
 
                                 symbol: "power"
-                                foreground: Theme.alert
+                                tooltip: "Session controls"
+                                tooltipEnabled: !sessionPopup.visible
+                                active: sessionPopup.visible
                                 interactive: true
                                 onClicked: (button) => {
                                     if (button === Qt.LeftButton)

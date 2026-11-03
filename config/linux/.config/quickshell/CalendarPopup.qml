@@ -28,6 +28,7 @@ Controls.Popup {
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onAboutToShow: showToday()
+    onOpened: previousButton.forceActiveFocus(Qt.TabFocusReason)
 
     Column {
         id: body
@@ -52,7 +53,10 @@ Controls.Popup {
             }
 
             BarButton {
+                id: previousButton
+
                 symbol: "chevron-left"
+                tooltip: "Previous month"
                 interactive: true
                 Accessible.name: "Previous month"
                 onClicked: root.moveMonth(-1)
@@ -60,6 +64,7 @@ Controls.Popup {
 
             BarButton {
                 symbol: "chevron-right"
+                tooltip: "Next month"
                 interactive: true
                 Accessible.name: "Next month"
                 onClicked: root.moveMonth(1)
@@ -67,6 +72,7 @@ Controls.Popup {
 
             BarButton {
                 symbol: "close"
+                tooltip: "Close calendar"
                 foreground: Theme.muted
                 interactive: true
                 Accessible.name: "Close calendar"

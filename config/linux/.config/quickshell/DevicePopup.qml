@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as Controls
+import Quickshell.Services.Pipewire
 
 Controls.Popup {
     id: root
@@ -7,7 +8,6 @@ Controls.Popup {
     required property Item anchorItem
     property bool below: false
     property var audio: null
-    property string audioName: ""
     property real brightness: -1
     property real battery: -1
     property bool plugged: false
@@ -26,6 +26,7 @@ Controls.Popup {
     popupType: Controls.Popup.Window
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
+    onOpened: closeButton.forceActiveFocus(Qt.TabFocusReason)
 
     Column {
         id: body
@@ -49,7 +50,10 @@ Controls.Popup {
             }
 
             BarButton {
+                id: closeButton
+
                 symbol: "close"
+                tooltip: "Close quick controls"
                 foreground: Theme.muted
                 interactive: true
                 onClicked: root.close()
@@ -157,6 +161,7 @@ Controls.Popup {
 
                 BarButton {
                     symbol: "volume"
+                    tooltip: root.audio && root.audio.muted ? "Unmute audio" : "Mute audio"
                     level: root.audio ? root.audio.volume : 0
                     muted: !root.audio || root.audio.muted
                     foreground: root.audio && root.audio.muted ? Theme.muted : Theme.foreground
@@ -221,14 +226,48 @@ Controls.Popup {
 
             }
 
+        }
+
+        Text {
+            text: "OUTPUT DEVICE"
+            color: Theme.muted
+            font.family: Theme.font
+            font.pixelSize: 9
+            font.letterSpacing: 0.5
+        }
+
+        Column {
+            width: parent.width
+            spacing: 4
+
+            Repeater {
+                model: Pipewire.nodes.values.filter((node) => {
+                    return node.isSink && node.audio !== null && !node.isStream;
+                })
+
+                delegate: BarButton {
+                    required property var modelData
+
+                    width: parent.width
+                    height: 30
+                    symbol: "volume"
+                    text: modelData.description || modelData.name
+                    textWidth: width - 33
+                    tooltip: text + (active ? " · Current output" : " · Use this output")
+                    active: Pipewire.defaultAudioSink === modelData
+                    foreground: active ? Theme.selected : Theme.foreground
+                    interactive: true
+                    onClicked: Pipewire.preferredDefaultAudioSink = modelData
+                }
+
+            }
+
             Text {
-                width: parent.width
-                text: root.audioName || "No audio output"
-                elide: Text.ElideRight
+                visible: !root.audio
+                text: "No audio output"
                 color: Theme.muted
                 font.family: Theme.font
-                font.pixelSize: 9
-                renderType: Text.QtRendering
+                font.pixelSize: Theme.fontSize
             }
 
         }
