@@ -2,6 +2,7 @@ local hostname_file = assert(io.open('/etc/hostname'))
 local hostname = hostname_file:read('*l')
 hostname_file:close()
 
+hl.env('PATH', '/usr/local/bin:/usr/bin:' .. os.getenv('HOME') .. '/.local/bin')
 hl.env('XCURSOR_THEME', 'Adwaita')
 hl.env('XCURSOR_SIZE', '24')
 hl.env('HYPRCURSOR_SIZE', '24')
