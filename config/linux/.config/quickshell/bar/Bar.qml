@@ -20,6 +20,7 @@ PanelWindow {
     required property AudioOutputs audioOutputs
     required property date date
     property var audio: null
+    readonly property var trayItems: SystemTray.items.values.filter(item => item.status !== Status.Passive)
 
     function command(args) {
         Quickshell.execDetached(args);
@@ -33,7 +34,7 @@ PanelWindow {
 
     function closeOtherPopups(openingPopup) {
         let closed = false;
-        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup]) {
+        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup, trayPopup]) {
             if (popup !== openingPopup && popup.visible) {
                 closed = true;
                 popup.close();
@@ -157,6 +158,18 @@ PanelWindow {
         anchorItem: notificationButton
         onAboutToShow: panel.closeOtherPopups(notificationPopup)
         backend: panel.notifications
+    }
+
+    TrayPopup {
+        id: trayPopup
+
+        anchorItem: trayButton
+        items: panel.trayItems
+        onAboutToShow: panel.closeOtherPopups(trayPopup)
+        onMenuRequested: item => {
+            const pos = trayButton.mapToItem(panel.contentItem, 0, 0);
+            item.display(panel, pos.x, pos.y);
+        }
     }
 
     Rectangle {
@@ -410,6 +423,20 @@ PanelWindow {
 
                 StatusGroup {
                     Button {
+                        id: trayButton
+
+                        symbol: "apps"
+                        tooltip: "Application tray"
+                        tooltipEnabled: !trayPopup.visible
+                        interactive: true
+                        active: trayPopup.visible
+                        onClicked: button => {
+                            if (button === Qt.LeftButton)
+                                trayPopup.visible = !trayPopup.visible;
+                        }
+                    }
+
+                    Button {
                         id: notificationButton
                         symbol: panel.notifications.paused ? "bell-off" : "bell"
                         foreground: !panel.notifications.available || panel.notifications.error !== "" ? Theme.alert : panel.notifications.paused ? Theme.muted : Theme.selected
@@ -437,66 +464,6 @@ PanelWindow {
                                 sessionPopup.visible = !sessionPopup.visible;
 
                         }
-                    }
-
-                }
-
-                StatusGroup {
-                    visible: trayRow.implicitWidth > 0
-
-                    Row {
-                        id: trayRow
-
-                        spacing: 4
-
-                        Repeater {
-                            model: SystemTray.items
-
-                            delegate: Button {
-                                id: trayItem
-
-                                required property var modelData
-
-                                visible: modelData.status !== Status.Passive
-                                interactive: true
-                                tooltip: [modelData.tooltipTitle || modelData.title, modelData.tooltipDescription].filter(part => part !== "").join("\n")
-                                Accessible.name: modelData.title || modelData.tooltipTitle || "Application tray icon"
-
-                                indicator: Image {
-                                    width: Theme.iconSize
-                                    height: Theme.iconSize
-                                    sourceSize.width: width * panel.devicePixelRatio
-                                    sourceSize.height: height * panel.devicePixelRatio
-                                    source: trayItem.modelData.icon
-                                    fillMode: Image.PreserveAspectFit
-                                }
-
-                                onClicked: (button) => {
-                                    const item = modelData;
-                                    if (button === Qt.RightButton || item.onlyMenu) {
-                                        const pos = trayItem.mapToItem(panel.contentItem, 0, 0);
-                                        panel.closeOtherPopups(null);
-                                        item.display(panel, pos.x, pos.y);
-                                    } else if (button === Qt.MiddleButton) {
-                                        item.secondaryActivate();
-                                    } else {
-                                        item.activate();
-                                    }
-                                }
-                                onScrolled: delta => modelData.scroll(delta, false)
-                                Keys.onPressed: event => {
-                                    if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier))) {
-                                        clicked(Qt.RightButton);
-                                        event.accepted = true;
-                                    } else {
-                                        event.accepted = false;
-                                    }
-                                }
-
-                            }
-
-                        }
-
                     }
 
                 }
