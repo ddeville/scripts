@@ -1,0 +1,11 @@
+[Unit]
+Description=Quickshell desktop shell
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=HYPRLAND_INSTANCE_SIGNATURE
+
+[Service]
+ExecStart=/usr/bin/qs --no-duplicate
+Restart=on-failure
+RestartSec=2
+Slice=session.slice
