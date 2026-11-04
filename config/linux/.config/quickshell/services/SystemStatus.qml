@@ -5,7 +5,6 @@ import Quickshell.Io
 Scope {
     id: root
 
-    property bool offline: false
     property int pendingBrightness: -1
     readonly property string updates: updatesPoll.output
     readonly property string email: emailPoll.output
@@ -75,7 +74,6 @@ Scope {
     CommandPoll {
         id: updatesPoll
 
-        enabled: !root.offline
         command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "updates"]
         interval: 300000
     }
@@ -83,7 +81,6 @@ Scope {
     CommandPoll {
         id: emailPoll
 
-        enabled: !root.offline
         command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "email"]
         interval: 60000
     }
@@ -91,7 +88,6 @@ Scope {
     CommandPoll {
         id: githubPoll
 
-        enabled: !root.offline
         command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "github"]
         interval: 60000
     }

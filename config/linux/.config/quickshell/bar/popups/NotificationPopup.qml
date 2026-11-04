@@ -8,13 +8,12 @@ Controls.Popup {
 
     required property Item anchorItem
     required property Notifications backend
-    property bool below: false
 
     implicitWidth: 280
     implicitHeight: body.implicitHeight + 24
     parent: anchorItem
     x: anchorItem.width - width
-    y: below ? anchorItem.height + 8 : -height - 8
+    y: -height - 8
     padding: 0
     margins: -1
     popupType: Controls.Popup.Window

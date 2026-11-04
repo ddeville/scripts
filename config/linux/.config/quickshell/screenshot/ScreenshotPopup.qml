@@ -8,7 +8,6 @@ Controls.Popup {
     required property Item anchorItem
     required property Screenshot backend
     required property real screenHeight
-    property bool below: false
     property int shownRevision: -1
     property bool escapePressed: false
 
@@ -16,7 +15,7 @@ Controls.Popup {
     implicitWidth: Math.min(560, anchorItem.width - 32)
     implicitHeight: body.implicitHeight + 32
     x: (anchorItem.width - width) / 2
-    y: below ? (screenHeight - height) / 2 : anchorItem.height - (screenHeight + height) / 2
+    y: anchorItem.height - (screenHeight + height) / 2
     padding: 16
     margins: -1
     popupType: Controls.Popup.Window

@@ -20,7 +20,6 @@ PanelWindow {
     required property AudioOutputs audioOutputs
     required property date date
     property var audio: null
-    property bool preview: false
 
     function command(args) {
         Quickshell.execDetached(args);
@@ -43,13 +42,12 @@ PanelWindow {
     color: Theme.background
     // X11 reserves physical pixels; Wayland reserves logical pixels.
     exclusiveZone: Math.round(implicitHeight * (Quickshell.env("XDG_SESSION_TYPE") === "x11" ? devicePixelRatio : 1))
-    exclusionMode: panel.preview ? ExclusionMode.Ignore : ExclusionMode.Normal
+    exclusionMode: ExclusionMode.Normal
 
     anchors {
         left: true
         right: true
-        top: panel.preview
-        bottom: !panel.preview
+        bottom: true
     }
 
     Connections {
@@ -72,7 +70,6 @@ PanelWindow {
         anchorItem: panel.contentItem
         backend: panel.launcher
         screenHeight: panel.screen.height
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(launcherPopup)
     }
 
@@ -100,7 +97,6 @@ PanelWindow {
         anchorItem: panel.contentItem
         backend: panel.screenshot
         screenHeight: panel.screen.height
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(screenshotPopup)
     }
 
@@ -108,7 +104,6 @@ PanelWindow {
         id: sessionPopup
 
         anchorItem: powerButton
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(sessionPopup)
         onActionRequested: (action) => {
             if (action === "lock")
@@ -122,7 +117,6 @@ PanelWindow {
         id: devicePopup
 
         anchorItem: deviceControls
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(devicePopup)
         audio: panel.audio
         outputs: panel.audioOutputs
@@ -137,7 +131,6 @@ PanelWindow {
     NetworkPopup {
         id: networkPopup
         anchorItem: wifiButton
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(networkPopup)
         backend: panel.network
         onSettingsRequested: panel.command(["nm-connection-editor"])
@@ -147,7 +140,6 @@ PanelWindow {
         id: calendarPopup
 
         anchorItem: clockButton
-        below: panel.preview
         today: panel.date
         onVisibleChanged: {
             if (visible)
@@ -158,7 +150,6 @@ PanelWindow {
     NotificationPopup {
         id: notificationPopup
         anchorItem: notificationButton
-        below: panel.preview
         onAboutToShow: panel.closeOtherPopups(notificationPopup)
         backend: panel.notifications
     }
@@ -166,7 +157,7 @@ PanelWindow {
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
-        y: panel.preview ? parent.height - height : 0
+        y: 0
         height: 1
         color: Theme.border
     }
@@ -302,7 +293,7 @@ PanelWindow {
                 StatusGroup {
                     id: accountStatus
 
-                    visible: !panel.status.offline && panel.width >= 1000
+                    visible: panel.width >= 1000
 
                     Button {
                         visible: panel.status.github !== ""

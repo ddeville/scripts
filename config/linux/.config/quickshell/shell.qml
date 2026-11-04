@@ -10,7 +10,6 @@ import "services"
 ShellRoot {
     id: root
 
-    readonly property bool preview: Quickshell.env("QS_BAR_PREVIEW") === "1"
     readonly property var sink: Pipewire.defaultAudioSink
 
     SystemClock {
@@ -21,8 +20,6 @@ ShellRoot {
 
     SystemStatus {
         id: systemStatus
-
-        offline: Quickshell.env("QS_BAR_OFFLINE") === "1"
     }
 
     Bspwm {
@@ -43,8 +40,6 @@ ShellRoot {
 
     AudioOutputs {
         id: outputService
-
-        enabled: true
     }
 
     PwObjectTracker {
@@ -83,7 +78,6 @@ ShellRoot {
             required property var modelData
 
             screen: modelData
-            preview: root.preview
             date: clock.date
             status: systemStatus
             bspwm: bspwmService
