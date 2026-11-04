@@ -33,7 +33,11 @@ hl.config({
       clickfinger_behavior = true,
     },
   },
-  misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
+  misc = {
+    disable_hyprland_logo = true,
+    disable_splash_rendering = true,
+    focus_on_activate = true, -- Follow existing windows when opening links or files.
+  },
 })
 
 -- Unknown displays use automatic settings; positions below are logical pixels after scaling.
