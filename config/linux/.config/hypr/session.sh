@@ -2,8 +2,8 @@
 
 set -u -o pipefail
 
-# Hyprland imports display variables; also pass our session and toolkit settings to services.
-systemctl --user import-environment XDG_SESSION_TYPE XDG_SESSION_ID QT_QPA_PLATFORM XCURSOR_THEME XCURSOR_SIZE HYPRCURSOR_SIZE
+# Publish the desktop PATH and toolkit settings before starting session services.
+dbus-update-activation-environment --systemd PATH XDG_SESSION_TYPE XDG_SESSION_ID QT_QPA_PLATFORM XCURSOR_THEME XCURSOR_SIZE HYPRCURSOR_SIZE
 
 # Start only for this session; the units stop with graphical-session.target.
 systemctl --user start \
