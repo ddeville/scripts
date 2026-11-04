@@ -185,11 +185,18 @@ xorg
 xorg-xinit
 xss-lock
 
-# ======== Wayland Screenshots ========
+# ============= Wayland =============
 
 grim
+hypridle
+hyprland
+hyprlock
+hyprpaper
+hyprsunset
 slurp
 wl-clipboard
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
 
 # =========== X11 Programs ==========
 
