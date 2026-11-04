@@ -184,7 +184,6 @@ xss-lock
 
 # ============= Wayland =============
 
-cage
 greetd
 greetd-regreet
 grim
