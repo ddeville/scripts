@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime.version": "Lua 5.5",
+  "workspace.checkThirdParty": false,
+  "workspace.library": ["/usr/share/hypr/stubs"]
+}
