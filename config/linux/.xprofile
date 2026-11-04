@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ "${XDG_SESSION_TYPE:-}" = wayland ] && return
+
 SCRIPT_DIR=$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 
 if [[ $(hostname) == "arch" ]]; then
