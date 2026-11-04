@@ -124,9 +124,9 @@ ctrl + shift + period
 ctrl + alt + period
 	dunstctl history-pop
 
-# maim
-ctrl + shift + 3
-	maim -s "$HOME/data/Pictures/screenshots/screenshot-$(date +%Y_%m_%d-%H_%M_%S).png"
+# screenshots
+ctrl + shift + @3
+	qs ipc call screenshot capture full
 
-ctrl + shift + 4
-	maim -s | xclip -selection clipboard -t image/png
+ctrl + shift + @4
+	qs ipc call screenshot capture region
