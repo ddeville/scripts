@@ -15,6 +15,7 @@ hl.config({
     border_size = 1,
     col = { active_border = 'rgb(ffaf00)', inactive_border = 'rgb(504945)' },
   },
+  -- Keep split orientations stable and divide new tiles evenly.
   dwindle = { preserve_split = true, default_split_ratio = 1.0 },
   decoration = {
     rounding = 0,
@@ -35,6 +36,7 @@ hl.config({
   misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
 })
 
+-- Unknown displays use automatic settings; positions below are logical pixels after scaling.
 hl.monitor({ output = '', mode = 'preferred', position = 'auto', scale = 'auto' })
 if hostname == 'framework' then
   hl.monitor({ output = 'eDP-1', mode = '2256x1504', position = '0x0', scale = 1.6 })
@@ -43,6 +45,7 @@ elseif hostname == 'arch' then
   hl.monitor({ output = 'DP-2', mode = '3840x2160', position = '2560x0', scale = 1.5, transform = 3 })
 end
 
+-- Let windows for those programs float.
 for _, class in ipairs({
   'com.onepassword.OnePassword',
   'org.pulseaudio.pavucontrol',
@@ -55,10 +58,10 @@ for _, class in ipairs({
   hl.window_rule({ match = { class = class }, float = true })
 end
 
-local workspaces = require('workspaces')
-workspaces.setup(hostname)
-require('bindings').setup(workspaces)
+require('workspaces').setup(hostname)
+require('bindings').setup()
 
+-- Start session services once; reloading settings should not launch more copies.
 hl.on('hyprland.start', function()
   hl.exec_cmd('"$HOME/.config/hypr/session.sh"')
 end)
