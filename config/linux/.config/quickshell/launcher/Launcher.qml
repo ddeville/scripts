@@ -24,7 +24,7 @@ Scope {
 
     function launch(entry) {
         closeRequested();
-        Quickshell.execDetached(Search.launchContext(entry, Quickshell.env("HOME")));
+        Applications.launch(Search.launchContext(entry, Quickshell.env("HOME")));
         const usage = Object.assign({}, historyData.usage);
         usage[entry.id] = {count: (usage[entry.id]?.count || 0) + 1, lastUsed: Date.now()};
         historyData.usage = usage;
