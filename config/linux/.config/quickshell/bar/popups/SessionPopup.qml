@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Controls as Controls
 import "../../ui"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     property var pendingAction: null
 
     signal actionRequested(string action)
@@ -28,13 +27,7 @@ Controls.Popup {
 
     implicitWidth: 250
     implicitHeight: body.implicitHeight + 24
-    parent: anchorItem
-    x: anchorItem.width - width
-    y: -height - 8
     padding: 0
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onVisibleChanged: {
         pendingAction = null;

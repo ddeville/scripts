@@ -15,7 +15,7 @@ Controls.Control {
     property bool plugged: false
     property string tooltip: ""
     property bool tooltipEnabled: true
-    readonly property bool tooltipInPopup: !root.QsWindow.contentItem || root.Window.window !== root.QsWindow.contentItem.Window.window
+    readonly property bool tooltipInPopup: root.QsWindow.window?.shellPopup === true || !root.QsWindow.contentItem || root.Window.window !== root.QsWindow.contentItem.Window.window
     property bool tooltipReady: false
     readonly property bool tooltipWanted: tooltipEnabled && tooltip !== "" && mouse.containsMouse && !mouse.pressed
     property int textWidth: 0

@@ -2,24 +2,19 @@ import QtQuick
 import QtQuick.Controls as Controls
 import "../ui"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property Screenshot backend
     required property real screenHeight
     property int shownCaptureId: -1
     property bool escapePressed: false
 
-    parent: anchorItem
     implicitWidth: Math.min(560, anchorItem.width - 32)
     implicitHeight: body.implicitHeight + 32
-    x: (anchorItem.width - width) / 2
-    y: anchorItem.height - (screenHeight + height) / 2
+    popupX: (anchorItem.width - width) / 2
+    popupY: anchorItem.height - (screenHeight + height) / 2
     padding: 16
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {
         shownCaptureId = backend.captureId;
