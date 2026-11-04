@@ -15,8 +15,8 @@ hl.config({
     border_size = 1,
     col = { active_border = 'rgb(ffaf00)', inactive_border = 'rgb(504945)' },
   },
-  -- Keep split orientations stable and divide new tiles evenly.
-  dwindle = { preserve_split = true, default_split_ratio = 1.0 },
+  -- Keep split orientations stable; place new windows to the right or below.
+  dwindle = { preserve_split = true, default_split_ratio = 1.0, force_split = 2 },
   decoration = {
     rounding = 0,
     shadow = { enabled = false },
