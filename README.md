@@ -48,13 +48,6 @@ format = "%a %b %d %I:%M%p"
 locale = "en_US"
 ```
 
-To unlock GNOME Keyring with the login password, append these lines to `/etc/pam.d/greetd`:
-
-```
--auth      optional     pam_gnome_keyring.so
--session   optional     pam_gnome_keyring.so auto_start
-```
-
 ## Maintenance
 
 - Run `make -C install shell-plugins` to update the shell plugins.

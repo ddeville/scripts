@@ -57,6 +57,13 @@ command = "dbus-run-session cage -s -mlast -d -- regreet"
 user = "greeter"
 EOF
 
+if ! grep -q 'pam_gnome_keyring.so' /etc/pam.d/greetd; then
+  cat >>/etc/pam.d/greetd <<'EOF'
+-auth      optional     pam_gnome_keyring.so
+-session   optional     pam_gnome_keyring.so auto_start
+EOF
+fi
+
 # Setup the systemd services
 systemctl enable NetworkManager
 systemctl enable systemd-timedated
