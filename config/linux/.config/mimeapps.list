@@ -2,9 +2,9 @@
 application/pdf=mupdf.desktop
 application/xps=mupdf.desktop
 application/vnd.ms-xpsdocument=mupdf.desktop
-image/png=sxiv.desktop
-image/jpg=sxiv.desktop
-image/jpeg=sxiv.desktop
+image/png=org.gnome.Loupe.desktop
+image/jpg=org.gnome.Loupe.desktop
+image/jpeg=org.gnome.Loupe.desktop
 x-scheme-handler/http=google-chrome.desktop
 x-scheme-handler/https=google-chrome.desktop
 text/html=google-chrome.desktop

@@ -202,11 +202,11 @@ xdg-desktop-portal-hyprland
 
 firefox
 ghostty
+loupe
 mupdf
 nautilus
 remmina
 spotify-launcher
-sxiv
 virt-manager
 
 # ========== Virtualization =========
