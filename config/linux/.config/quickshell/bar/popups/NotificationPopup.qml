@@ -3,21 +3,14 @@ import QtQuick.Controls as Controls
 import "../../ui"
 import "../../services"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property Notifications backend
 
     implicitWidth: 280
     implicitHeight: body.implicitHeight + 24
-    parent: anchorItem
-    x: anchorItem.width - width
-    y: -height - 8
     padding: 0
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: closeButton.forceActiveFocus(Qt.PopupFocusReason)
 

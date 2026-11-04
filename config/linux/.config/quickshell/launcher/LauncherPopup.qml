@@ -4,10 +4,9 @@ import Quickshell
 import "LauncherSearch.js" as Search
 import "../ui"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property Launcher backend
     required property real screenHeight
     property int dismissKey: 0
@@ -29,15 +28,11 @@ Controls.Popup {
         return (event.modifiers === Qt.MetaModifier && (event.key === Qt.Key_D || event.key === Qt.Key_Space)) || (event.modifiers === Qt.ControlModifier && event.key === Qt.Key_Space);
     }
 
-    parent: anchorItem
     implicitWidth: Math.min(540, anchorItem.width - 32)
     implicitHeight: Math.min(500, screenHeight - 80)
-    x: (anchorItem.width - width) / 2
-    y: anchorItem.height - (screenHeight + height) / 2
+    popupX: (anchorItem.width - width) / 2
+    popupY: anchorItem.height - (screenHeight + height) / 2
     padding: 16
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {
         dismissKey = 0;

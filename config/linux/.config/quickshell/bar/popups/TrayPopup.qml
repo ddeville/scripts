@@ -3,23 +3,16 @@ import QtQuick.Controls as Controls
 import Quickshell
 import "../../ui"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property var items
 
     signal menuRequested(var item)
 
-    parent: anchorItem
     implicitWidth: 240
     implicitHeight: list.implicitHeight + 24
-    x: anchorItem.width - width
-    y: -height - 8
     padding: 12
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
         // Reused X11 popups can be below windows opened since their creation.

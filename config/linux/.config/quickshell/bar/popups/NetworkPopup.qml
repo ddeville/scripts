@@ -3,10 +3,9 @@ import QtQuick.Controls as Controls
 import "../../ui"
 import "../../services"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property Network backend
     readonly property var state: backend.state
 
@@ -14,13 +13,7 @@ Controls.Popup {
 
     implicitWidth: 300
     implicitHeight: body.implicitHeight + 24
-    parent: anchorItem
-    x: anchorItem.width - width
-    y: -height - 8
     padding: 0
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
         backend.refresh();

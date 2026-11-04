@@ -1,3 +1,4 @@
+import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
@@ -10,9 +11,19 @@ Scope {
             name: workspace.name,
             monitor: workspace.monitor.name,
             focused: workspace.active,
-            occupied: workspace.toplevels.values.length > 0,
+            occupied: workspace.lastIpcObject.windows > 0,
             urgent: workspace.urgent
         }))
+
+    // Window events use workspace IDs even when the displayed workspaces have names.
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event) {
+            if (["openwindow", "closewindow", "movewindowv2"].includes(event.name))
+                Hyprland.refreshWorkspaces();
+        }
+    }
 
     function focus(id) {
         Hyprland.dispatch("hl.dsp.focus({ workspace = " + Number(id) + " })");

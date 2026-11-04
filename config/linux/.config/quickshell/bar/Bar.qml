@@ -200,7 +200,7 @@ PanelWindow {
                 textWidth: 60
                 interactive: true
                 active: calendarPopup.visible
-                onClicked: calendarPopup.visible = !calendarPopup.visible
+                onClicked: calendarPopup.toggle()
             }
 
         }
@@ -360,7 +360,7 @@ PanelWindow {
                         tooltipEnabled: !networkPopup.visible
                         interactive: true
                         active: networkPopup.visible
-                        onClicked: networkPopup.visible = !networkPopup.visible
+                        onClicked: networkPopup.toggle()
                     }
 
                     Button {
@@ -432,7 +432,7 @@ PanelWindow {
                         active: trayPopup.visible
                         onClicked: button => {
                             if (button === Qt.LeftButton)
-                                trayPopup.visible = !trayPopup.visible;
+                                trayPopup.toggle();
                         }
                     }
 
@@ -446,7 +446,7 @@ PanelWindow {
                         interactive: true
                         onClicked: (button) => {
                             if (button === Qt.LeftButton)
-                                notificationPopup.visible = !notificationPopup.visible;
+                                notificationPopup.toggle();
 
                         }
                     }
@@ -461,7 +461,7 @@ PanelWindow {
                         interactive: true
                         onClicked: (button) => {
                             if (button === Qt.LeftButton)
-                                sessionPopup.visible = !sessionPopup.visible;
+                                sessionPopup.toggle();
 
                         }
                     }

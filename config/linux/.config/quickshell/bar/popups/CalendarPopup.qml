@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Controls as Controls
 import "../../ui"
 
-Controls.Popup {
+ShellPopup {
     id: root
 
-    required property Item anchorItem
     required property date today
     property date displayedMonth: new Date(today.getFullYear(), today.getMonth(), 1, 12)
 
@@ -19,13 +18,8 @@ Controls.Popup {
 
     implicitWidth: 300
     implicitHeight: body.implicitHeight + 24
-    parent: anchorItem
-    x: 0
-    y: -height - 8
+    popupX: 0
     padding: 0
-    margins: -1
-    popupType: Controls.Popup.Window
-    focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onAboutToShow: showToday()
     onOpened: previousButton.forceActiveFocus(Qt.PopupFocusReason)
