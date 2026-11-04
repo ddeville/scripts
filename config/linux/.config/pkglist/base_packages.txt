@@ -167,9 +167,6 @@ dunst
 gnome-themes-extra
 i3lock
 libnotify
-lightdm
-lightdm-gtk-greeter
-lightdm-gtk-greeter-settings
 lxappearance
 maim
 picom
@@ -187,6 +184,9 @@ xss-lock
 
 # ============= Wayland =============
 
+cage
+greetd
+greetd-regreet
 grim
 hypridle
 hyprland
