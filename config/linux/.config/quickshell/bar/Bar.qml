@@ -5,6 +5,7 @@ import Quickshell.Services.SystemTray
 import "../ui"
 import "../services"
 import "../launcher"
+import "../screenshot"
 import "popups"
 
 PanelWindow {
@@ -13,6 +14,7 @@ PanelWindow {
     required property SystemStatus status
     required property Bspwm bspwm
     required property Launcher launcher
+    required property Screenshot screenshot
     required property Network network
     required property Notifications notifications
     required property AudioOutputs audioOutputs
@@ -31,7 +33,7 @@ PanelWindow {
     }
 
     function closeOtherPopups(openingPopup) {
-        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup]) {
+        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup]) {
             if (popup !== openingPopup)
                 popup.close();
         }
@@ -72,6 +74,34 @@ PanelWindow {
         screenHeight: panel.screen.height
         below: panel.preview
         onAboutToShow: panel.closeOtherPopups(launcherPopup)
+    }
+
+    Connections {
+        target: panel.screenshot
+
+        function onPrepareCapture() {
+            panel.closeOtherPopups(null);
+        }
+
+        function onCloseRequested() {
+            screenshotPopup.close();
+        }
+
+        function onShowRequested(monitor) {
+            panel.closeOtherPopups(null);
+            if (panel.screen.name === monitor)
+                screenshotPopup.open();
+        }
+    }
+
+    ScreenshotPopup {
+        id: screenshotPopup
+
+        anchorItem: panel.contentItem
+        backend: panel.screenshot
+        screenHeight: panel.screen.height
+        below: panel.preview
+        onAboutToShow: panel.closeOtherPopups(screenshotPopup)
     }
 
     SessionPopup {

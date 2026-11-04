@@ -185,6 +185,12 @@ xorg
 xorg-xinit
 xss-lock
 
+# ======== Wayland Screenshots ========
+
+grim
+slurp
+wl-clipboard
+
 # =========== X11 Programs ==========
 
 firefox

@@ -4,6 +4,7 @@ import Quickshell.Services.Pipewire
 import "bar"
 import "launcher"
 import "osd"
+import "screenshot"
 import "services"
 
 ShellRoot {
@@ -57,6 +58,12 @@ ShellRoot {
         outputSymbol: outputService.currentOutput ? outputService.currentOutput.symbol : "volume"
     }
 
+    Screenshot {
+        id: screenshotService
+
+        onPrepareCapture: osdService.visible = false
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -81,6 +88,7 @@ ShellRoot {
             status: systemStatus
             bspwm: bspwmService
             launcher: launcherService
+            screenshot: screenshotService
             network: networkService
             notifications: notificationService
             audioOutputs: outputService
