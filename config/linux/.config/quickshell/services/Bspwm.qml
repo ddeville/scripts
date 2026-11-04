@@ -21,18 +21,6 @@ Scope {
             snapshot.running = true;
     }
 
-    function cycle(monitor, delta) {
-        const desktops = workspaces.filter((workspace) => {
-            return workspace.monitor === monitor;
-        });
-        const current = desktops.findIndex((workspace) => {
-            return workspace.focused;
-        });
-        if (current >= 0 && delta !== 0)
-            focus(desktops[(current + (delta > 0 ? -1 : 1) + desktops.length) % desktops.length].id);
-
-    }
-
     Process {
         id: snapshot
 
