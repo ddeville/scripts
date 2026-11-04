@@ -14,7 +14,7 @@ function M.setup(workspace_count)
   end
 
   -- Session
-  hl.bind('SUPER + SHIFT + d', exec('loginctl lock-session'))
+  hl.bind('SUPER + SHIFT + d', exec('loginctl lock-session'), { release = true })
   hl.bind('SUPER + SHIFT + s', exec('systemctl suspend'))
   hl.bind('SUPER + Escape', hl.dsp.reload_config())
   hl.bind('SUPER + CTRL + r', hl.dsp.reload_config())
