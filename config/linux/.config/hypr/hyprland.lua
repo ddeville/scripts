@@ -58,8 +58,8 @@ for _, class in ipairs({
   hl.window_rule({ match = { class = class }, float = true })
 end
 
-require('workspaces').setup(hostname)
-require('bindings').setup()
+local workspaces = require('workspaces').setup(hostname)
+require('bindings').setup(#workspaces)
 
 -- Start session services once; reloading settings should not launch more copies.
 hl.on('hyprland.start', function()

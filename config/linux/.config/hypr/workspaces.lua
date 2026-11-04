@@ -14,18 +14,21 @@ local layouts = {
 local floating_names = { flt = true }
 
 function M.setup(hostname)
+  local workspaces = {}
   local floating = {}
-  local id = 0
+
   for _, group in ipairs(layouts[hostname] or layouts.default) do
     for index, name in ipairs(group.names) do
-      id = id + 1
-      hl.workspace_rule({
+      local id = #workspaces + 1
+      local workspace = {
         workspace = tostring(id),
         monitor = group.monitor,
         default = index == 1,
         default_name = name,
         persistent = true, -- Keep empty workspaces available in the bar and shortcuts.
-      })
+      }
+      workspaces[id] = workspace
+      hl.workspace_rule(workspace)
       if floating_names[name] then
         floating[id] = true
         hl.window_rule({ match = { workspace = tostring(id) }, float = true })
@@ -39,6 +42,8 @@ function M.setup(hostname)
       hl.dispatch(hl.dsp.window.float({ window = window, action = 'enable' }))
     end
   end)
+
+  return workspaces
 end
 
 return M
