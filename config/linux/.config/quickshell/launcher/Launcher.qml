@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../services"
 import "LauncherSearch.js" as Search
 
 Scope {
@@ -38,20 +39,10 @@ Scope {
         }
     }
 
-    Process {
+    FocusedMonitor {
         id: focusedMonitor
 
-        command: ["bspc", "query", "-M", "-m", "focused", "--names"]
-        onExited: {
-            const name = monitorName.text.trim();
-            const screen = Quickshell.screens.find(screen => screen.name === name) || Quickshell.screens[0];
-            if (screen)
-                root.showRequested(screen.name);
-        }
-
-        stdout: StdioCollector {
-            id: monitorName
-        }
+        onResolved: name => root.showRequested(name)
     }
 
     Process {

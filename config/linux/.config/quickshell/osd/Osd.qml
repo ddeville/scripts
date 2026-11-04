@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../services"
 
 Scope {
     id: root
@@ -44,25 +45,14 @@ Scope {
         }
     }
 
-    Process {
+    FocusedMonitor {
         id: monitorQuery
 
-        command: ["timeout", "1", "bash", Quickshell.shellPath("services/scripts/focused-monitor.sh")]
-        onExited: {
-            const name = monitorOutput.text.trim();
-            const screen = Quickshell.screens.find(screen => screen.name === name) || Quickshell.screens[0];
-            if (screen) {
-                root.monitorName = screen.name;
-                root.visible = true;
-                hideTimer.restart();
-            }
+        onResolved: name => {
+            root.monitorName = name;
+            root.visible = true;
+            hideTimer.restart();
         }
-
-        stdout: StdioCollector {
-            id: monitorOutput
-        }
-
-        stderr: StdioCollector {}
     }
 
     Process {
