@@ -8,10 +8,9 @@ Scope {
     property list<string> command
     property int interval: 3000
     property string output: ""
-    property bool enabled: true
 
     function refresh() {
-        if (enabled && !process.running)
+        if (!process.running)
             process.running = true;
 
     }
@@ -39,7 +38,7 @@ Scope {
 
     Timer {
         interval: root.interval
-        running: root.enabled
+        running: true
         repeat: true
         onTriggered: root.refresh()
     }

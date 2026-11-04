@@ -7,7 +7,6 @@ import "AudioOutputs.js" as OutputData
 Scope {
     id: root
 
-    property bool enabled: false
     property bool available: false
     property string error: ""
     readonly property bool busy: selection.running
@@ -25,7 +24,7 @@ Scope {
     }
 
     function refresh() {
-        if (enabled && !query.running && !selection.running)
+        if (!query.running && !selection.running)
             query.running = true;
 
     }
@@ -56,7 +55,6 @@ Scope {
 
     }
 
-    onEnabledChanged: refresh()
     Component.onCompleted: refresh()
 
     ListModel {
@@ -102,7 +100,7 @@ Scope {
 
     Timer {
         interval: 2000
-        running: root.enabled
+        running: true
         repeat: true
         onTriggered: root.refresh()
     }

@@ -168,16 +168,14 @@ Controls.Control {
     }
 
     PopupWindow {
-        readonly property bool below: Quickshell.env("QS_BAR_PREVIEW") === "1"
-
         visible: !root.tooltipInPopup && root.tooltipReady && root.tooltipWanted
         implicitWidth: barTooltipText.implicitWidth + 16
         implicitHeight: barTooltipText.implicitHeight + 16
         color: "transparent"
         anchor.item: root
-        anchor.edges: below ? Edges.Bottom : Edges.Top
-        anchor.gravity: below ? Edges.Bottom : Edges.Top
-        anchor.rect.y: below ? root.height + 8 : -8
+        anchor.edges: Edges.Top
+        anchor.gravity: Edges.Top
+        anchor.rect.y: -8
         anchor.rect.width: root.width
         anchor.rect.height: 1
 
@@ -204,15 +202,13 @@ Controls.Control {
     }
 
     Controls.ToolTip {
-        readonly property bool below: Quickshell.env("QS_BAR_PREVIEW") === "1"
-
         parent: root
         visible: root.tooltipInPopup && root.tooltipReady && root.tooltipWanted
         popupType: Controls.Popup.Item
         padding: 8
         margins: 8
         x: (root.width - width) / 2
-        y: below ? root.height + 8 : -height - 8
+        y: -height - 8
         implicitWidth: Math.min(tooltipText.implicitWidth + 16, 400)
         implicitHeight: tooltipText.implicitHeight + 16
 

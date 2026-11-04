@@ -7,7 +7,6 @@ Controls.Popup {
 
     required property Item anchorItem
     required property date today
-    property bool below: false
     property date displayedMonth: new Date(today.getFullYear(), today.getMonth(), 1, 12)
 
     function showToday() {
@@ -22,7 +21,7 @@ Controls.Popup {
     implicitHeight: body.implicitHeight + 24
     parent: anchorItem
     x: 0
-    y: below ? anchorItem.height + 8 : -height - 8
+    y: -height - 8
     padding: 0
     margins: -1
     popupType: Controls.Popup.Window
