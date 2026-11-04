@@ -22,8 +22,8 @@ ShellRoot {
         id: systemStatus
     }
 
-    Bspwm {
-        id: bspwmService
+    Workspaces {
+        id: desktopWorkspaces
     }
 
     Launcher {
@@ -85,7 +85,7 @@ ShellRoot {
             screen: modelData
             date: clock.date
             status: systemStatus
-            bspwm: bspwmService
+            workspaceService: desktopWorkspaces
             launcher: launcherService
             screenshot: screenshotService
             network: networkService

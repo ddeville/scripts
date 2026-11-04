@@ -5,7 +5,7 @@ import "../services"
 Row {
     id: root
 
-    required property Bspwm backend
+    required property Workspaces backend
     required property string monitor
 
     // Preserve button instances when focus changes, including during a click.

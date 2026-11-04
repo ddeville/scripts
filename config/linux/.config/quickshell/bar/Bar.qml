@@ -12,7 +12,7 @@ PanelWindow {
     id: panel
 
     required property SystemStatus status
-    required property Bspwm bspwm
+    required property Workspaces workspaceService
     required property Launcher launcher
     required property Screenshot screenshot
     required property Network network
@@ -217,7 +217,7 @@ PanelWindow {
             WorkspaceStrip {
                 id: workspaces
 
-                backend: panel.bspwm
+                backend: panel.workspaceService
                 monitor: panel.screen.name
             }
 
