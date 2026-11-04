@@ -28,19 +28,31 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 - Edit `/etc/pam.d/polkit-1` and add `auth sufficient pam_fprintd.so` to the top
 - Repeat with whatever file is appropriate in `/etc/pam.d/*`
 
-### Lightdm on Arch Linux
+### ReGreet on Arch Linux
 
-Edit the `/etc/lightdm/lightdm-gtk-greeter.conf` config file and add the following:
+Copy the background to `/usr/share/backgrounds/18.jpg` and edit `/etc/greetd/regreet.toml`:
+
+```toml
+[background]
+path = "/usr/share/backgrounds/18.jpg"
+fit = "Cover"
+
+[GTK]
+application_prefer_dark_theme = true
+theme_name = "Adwaita"
+icon_theme_name = "Adwaita"
+font_name = "Public Sans"
+
+[widget.clock]
+format = "%a %b %d %I:%M%p"
+locale = "en_US"
+```
+
+To unlock GNOME Keyring with the login password, append these lines to `/etc/pam.d/greetd`:
 
 ```
-[greeter]
-xft-dpi=160
-background=/usr/share/backgrounds/18.jpg # copy the background to this location
-clock-format=%a %b %d %I:%M%p
-indicators=~session;~spacer;~clock;~spacer;~power
-theme-name=Adwaita-dark
-icon-theme-name=Adwaita
-font-name="Public Sans"
+-auth      optional     pam_gnome_keyring.so
+-session   optional     pam_gnome_keyring.so auto_start
 ```
 
 ## Maintenance
