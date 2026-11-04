@@ -38,6 +38,8 @@ hl.config({
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
     focus_on_activate = true, -- Follow existing windows when opening links or files.
+    key_press_enables_dpms = true,
+    mouse_move_enables_dpms = true,
   },
 })
 
