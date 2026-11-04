@@ -53,8 +53,24 @@ cat >/etc/greetd/config.toml <<'EOF'
 vt = 1
 
 [default_session]
-command = "dbus-run-session cage -s -mlast -d -- regreet"
+command = "dbus-run-session start-hyprland -- -c /etc/greetd/hyprland.lua"
 user = "greeter"
+EOF
+
+cat >/etc/greetd/hyprland.lua <<'EOF'
+hl.monitor({ output = '', mode = 'preferred', position = 'auto', scale = 1.6 })
+hl.config({
+  animations = { enabled = false },
+  misc = {
+    disable_hyprland_logo = true,
+    disable_splash_rendering = true,
+    disable_hyprland_guiutils_check = true,
+  },
+  xwayland = { enabled = false },
+})
+hl.on('hyprland.start', function()
+  hl.exec_cmd("regreet; hyprctl dispatch 'hl.dsp.exit()'")
+end)
 EOF
 
 if ! grep -q 'pam_gnome_keyring.so' /etc/pam.d/greetd; then
