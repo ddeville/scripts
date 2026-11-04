@@ -32,10 +32,14 @@ PanelWindow {
     }
 
     function closeOtherPopups(openingPopup) {
+        let closed = false;
         for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup]) {
-            if (popup !== openingPopup)
+            if (popup !== openingPopup && popup.visible) {
+                closed = true;
                 popup.close();
+            }
         }
+        return closed;
     }
 
     implicitHeight: Theme.height
@@ -77,7 +81,8 @@ PanelWindow {
         target: panel.screenshot
 
         function onPrepareCapture() {
-            panel.closeOtherPopups(null);
+            if (panel.closeOtherPopups(null))
+                panel.screenshot.waitForWindows();
         }
 
         function onCloseRequested() {
