@@ -1,33 +1,6 @@
 local M = {}
 
-local directions = {
-  { key = 'h', arrow = 'Left', direction = 'l', x = -20, y = 0 },
-  { key = 'j', arrow = 'Down', direction = 'd', x = 0, y = 20 },
-  { key = 'k', arrow = 'Up', direction = 'u', x = 0, y = -20 },
-  { key = 'l', arrow = 'Right', direction = 'r', x = 20, y = 0 },
-}
-
-local function swap_largest_window()
-  local active = hl.get_active_window()
-  if not active then
-    return
-  end
-  local largest
-  for _, candidate in ipairs(hl.get_workspace_windows(active.workspace)) do
-    if
-      candidate ~= active
-      and not candidate.floating
-      and (not largest or candidate.size.x * candidate.size.y > largest.size.x * largest.size.y)
-    then
-      largest = candidate
-    end
-  end
-  if largest then
-    hl.dispatch(hl.dsp.window.swap({ target = largest }))
-  end
-end
-
-function M.setup()
+function M.setup(workspace_count)
   local exec = hl.dsp.exec_cmd
   local window = hl.dsp.window
   local repeat_key = { repeating = true }
@@ -63,27 +36,42 @@ function M.setup()
   hl.bind('SUPER + m', window.fullscreen({ mode = 'maximized' }))
   hl.bind('SUPER + CTRL + y', window.pin())
 
-  -- Window navigation and geometry
-  -- HJKL focuses; Shift swaps; Alt grows along that axis and Alt+Shift shrinks.
-  for _, entry in ipairs(directions) do
-    local key = entry.key
-    local x, y = math.abs(entry.x), math.abs(entry.y)
-    hl.bind('SUPER + ' .. key, hl.dsp.focus({ direction = entry.direction }), repeat_key)
-    hl.bind('SUPER + SHIFT + ' .. key, window.swap({ direction = entry.direction }), repeat_key)
-    hl.bind('SUPER + ALT + ' .. key, window.resize({ x = x, y = y, relative = true }), repeat_key)
-    hl.bind('SUPER + ALT + SHIFT + ' .. key, window.resize({ x = -x, y = -y, relative = true }), repeat_key)
-    hl.bind('SUPER + ' .. entry.arrow, window.move({ x = entry.x, y = entry.y, relative = true }), repeat_key)
-  end
+  -- Window focus
+  hl.bind('SUPER + h', hl.dsp.focus({ direction = 'l' }), repeat_key)
+  hl.bind('SUPER + j', hl.dsp.focus({ direction = 'd' }), repeat_key)
+  hl.bind('SUPER + k', hl.dsp.focus({ direction = 'u' }), repeat_key)
+  hl.bind('SUPER + l', hl.dsp.focus({ direction = 'r' }), repeat_key)
   hl.bind('SUPER + c', window.cycle_next())
   hl.bind('SUPER + SHIFT + c', window.cycle_next({ next = false }))
   hl.bind('SUPER + grave', hl.dsp.focus({ last = true }))
-  hl.bind('SUPER + g', swap_largest_window)
+
+  -- Swap windows
+  hl.bind('SUPER + SHIFT + h', window.swap({ direction = 'l' }), repeat_key)
+  hl.bind('SUPER + SHIFT + j', window.swap({ direction = 'd' }), repeat_key)
+  hl.bind('SUPER + SHIFT + k', window.swap({ direction = 'u' }), repeat_key)
+  hl.bind('SUPER + SHIFT + l', window.swap({ direction = 'r' }), repeat_key)
+
+  -- Grow / shrink windows
+  hl.bind('SUPER + ALT + h', window.resize({ x = 20, y = 0, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + j', window.resize({ x = 0, y = 20, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + k', window.resize({ x = 0, y = 20, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + l', window.resize({ x = 20, y = 0, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + SHIFT + h', window.resize({ x = -20, y = 0, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + SHIFT + j', window.resize({ x = 0, y = -20, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + SHIFT + k', window.resize({ x = 0, y = -20, relative = true }), repeat_key)
+  hl.bind('SUPER + ALT + SHIFT + l', window.resize({ x = -20, y = 0, relative = true }), repeat_key)
+
+  -- Move floating windows; drag or resize with the mouse
+  hl.bind('SUPER + Left', window.move({ x = -20, y = 0, relative = true }), repeat_key)
+  hl.bind('SUPER + Down', window.move({ x = 0, y = 20, relative = true }), repeat_key)
+  hl.bind('SUPER + Up', window.move({ x = 0, y = -20, relative = true }), repeat_key)
+  hl.bind('SUPER + Right', window.move({ x = 20, y = 0, relative = true }), repeat_key)
   hl.bind('SUPER + mouse:272', window.drag(), { mouse = true })
   hl.bind('SUPER + mouse:273', window.resize(), { mouse = true })
 
   -- Workspaces and monitors
-  -- Workspace IDs continue across monitors; 0 selects workspace 10.
-  for id = 1, 10 do
+  -- Bind only configured workspaces; 0 selects workspace 10 when present.
+  for id = 1, math.min(workspace_count, 10) do
     local key = tostring(id % 10)
     hl.bind('SUPER + ' .. key, hl.dsp.focus({ workspace = id }))
     hl.bind('SUPER + SHIFT + ' .. key, window.move({ workspace = id }))
