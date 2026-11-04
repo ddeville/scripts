@@ -48,6 +48,15 @@ grub-mkconfig -o /boot/grub/grub.cfg
 readarray -t base_packages < <(grep -Ev "^#|^$" "/scripts/config/linux/.config/pkglist/base_packages.txt")
 pacman -S --needed "${base_packages[@]}"
 
+cat >/etc/greetd/config.toml <<'EOF'
+[terminal]
+vt = 1
+
+[default_session]
+command = "dbus-run-session cage -s -mlast -d -- regreet"
+user = "greeter"
+EOF
+
 # Setup the systemd services
 systemctl enable NetworkManager
 systemctl enable systemd-timedated
@@ -58,7 +67,7 @@ systemctl enable fstrim.timer
 systemctl enable firewalld
 systemctl enable acpid
 systemctl enable libvirtd
-systemctl enable lightdm
+systemctl enable greetd
 
 # Create user and make sure it can sudo
 printf "\e[1;32m==> Creating new user\n\e[0m"
