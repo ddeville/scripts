@@ -131,7 +131,7 @@ PanelWindow {
         plugged: panel.status.stats.plugged ?? false
         batteryStatus: panel.status.stats.batteryStatus ?? ""
         onBrightnessRequested: percent => panel.status.setBrightness(percent)
-        onMixerRequested: panel.command(["pavucontrol"])
+        onMixerRequested: Applications.launch(["pavucontrol"])
     }
 
     NetworkPopup {
@@ -139,7 +139,7 @@ PanelWindow {
         anchorItem: wifiButton
         onAboutToShow: panel.closeOtherPopups(networkPopup)
         backend: panel.network
-        onSettingsRequested: panel.command(["nm-connection-editor"])
+        onSettingsRequested: Applications.launch(["nm-connection-editor"])
     }
 
     CalendarPopup {
@@ -320,7 +320,7 @@ PanelWindow {
                         tooltip: panel.status.github === "offline" ? "GitHub check unavailable" : "GitHub: " + panel.status.github + " unread notifications"
                         foreground: panel.status.github === "offline" ? Theme.alert : Number.parseInt(panel.status.github) > 0 ? Theme.selected : Theme.muted
                         interactive: true
-                        onClicked: panel.command(["xdg-open", "https://github.com/notifications"])
+                        onClicked: Applications.launch(["xdg-open", "https://github.com/notifications"])
                     }
 
                     Button {
@@ -329,7 +329,7 @@ PanelWindow {
                         tooltip: panel.status.email === "offline" ? "Email check unavailable" : "Mail: " + panel.status.email + " unread messages"
                         foreground: panel.status.email === "offline" ? Theme.alert : Number.parseInt(panel.status.email) > 0 ? Theme.selected : Theme.muted
                         interactive: true
-                        onClicked: panel.command(["xdg-open", "https://app.fastmail.com/"])
+                        onClicked: Applications.launch(["xdg-open", "https://app.fastmail.com/"])
                     }
 
                     Button {
@@ -402,7 +402,7 @@ PanelWindow {
                         active: devicePopup.visible && devicePopup.activeSection === "volume"
                         onClicked: (button) => {
                             if (button === Qt.RightButton)
-                                panel.command(["pavucontrol"]);
+                                Applications.launch(["pavucontrol"]);
                             else if (button === Qt.MiddleButton && panel.audio)
                                 panel.audio.muted = !panel.audio.muted;
                             else if (button === Qt.LeftButton)

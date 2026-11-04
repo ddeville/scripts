@@ -65,7 +65,9 @@ copy)
   require_capture "${2:?Missing screenshot}"
   if "$wayland"; then
     require_command wl-copy
-    wl-copy --type image/png <"$2"
+    # Keep the clipboard owner alive across Quickshell service restarts.
+    systemd-run --user --scope --collect --quiet --slice=app.slice \
+      --property=PartOf=graphical-session.target -- wl-copy --type image/png <"$2"
   else
     require_command xclip
     xclip -selection clipboard -t image/png -i "$2"

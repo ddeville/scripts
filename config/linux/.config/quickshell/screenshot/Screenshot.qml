@@ -79,7 +79,7 @@ Scope {
     function openSaved() {
         const path = savedPath;
         closeRequested();
-        Quickshell.execDetached(["xdg-open", path]);
+        Applications.launch(["xdg-open", path]);
     }
 
     IpcHandler {
