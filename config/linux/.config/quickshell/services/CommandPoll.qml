@@ -21,14 +21,10 @@ Scope {
         id: process
 
         command: root.command
-        onExited: (code, status) => {
-            if (code !== 0 || status !== 0)
-                root.output = "";
-
-        }
+        onExited: (code, status) => root.output = code === 0 && status === 0 ? result.text.trim() : ""
 
         stdout: StdioCollector {
-            onStreamFinished: root.output = text.trim()
+            id: result
         }
 
         stderr: StdioCollector {

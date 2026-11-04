@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../services"
 
 Scope {
     id: root
@@ -12,6 +13,7 @@ Scope {
     property string error: ""
     property string mode: "region"
     property string actionName: ""
+    // A closing popup may still refer to the capture being replaced.
     property int revision: 0
     property bool discardWhenIdle: false
     readonly property bool busy: captureDelay.running || captureProcess.running || action.running || monitorQuery.running
@@ -86,6 +88,7 @@ Scope {
     Timer {
         id: captureDelay
 
+        // Allow the popup windows to disappear before capturing the screen.
         interval: 100
         onTriggered: captureProcess.running = true
     }
@@ -127,8 +130,9 @@ Scope {
             } else {
                 root.savedPath = actionOutput.text.trim();
                 root.message = "Saved to " + root.savedPath;
+                // Let the busy binding settle before closing and discarding.
                 if (root.actionName === "open")
-                    Qt.callLater(() => root.openSaved());
+                    Qt.callLater(root.openSaved);
             }
         }
 
@@ -136,18 +140,9 @@ Scope {
         stderr: StdioCollector { id: actionErrors }
     }
 
-    Process {
+    FocusedMonitor {
         id: monitorQuery
 
-        command: ["timeout", "1", "bash", Quickshell.shellPath("services/scripts/focused-monitor.sh")]
-        onExited: {
-            const name = monitorOutput.text.trim();
-            const screen = Quickshell.screens.find(screen => screen.name === name) || Quickshell.screens[0];
-            if (screen)
-                root.showRequested(screen.name);
-        }
-
-        stdout: StdioCollector { id: monitorOutput }
-        stderr: StdioCollector {}
+        onResolved: name => root.showRequested(name)
     }
 }

@@ -450,7 +450,9 @@ PanelWindow {
                             delegate: Button {
                                 id: trayItem
 
-                                                            visible: modelData.status !== Status.Passive
+                                required property var modelData
+
+                                visible: modelData.status !== Status.Passive
                                 interactive: true
                                 tooltip: [modelData.tooltipTitle || modelData.title, modelData.tooltipDescription].filter(part => part !== "").join("\n")
                                 Accessible.name: modelData.title || modelData.tooltipTitle || "Application tray icon"

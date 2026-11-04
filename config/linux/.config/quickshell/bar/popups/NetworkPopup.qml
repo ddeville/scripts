@@ -1,12 +1,13 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import "../../ui"
+import "../../services"
 
 Controls.Popup {
     id: root
 
     required property Item anchorItem
-    required property var backend
+    required property Network backend
     readonly property var state: backend.state
 
     signal settingsRequested()
