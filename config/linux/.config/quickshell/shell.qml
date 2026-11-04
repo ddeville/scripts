@@ -56,7 +56,12 @@ ShellRoot {
     Screenshot {
         id: screenshotService
 
-        onPrepareCapture: osdService.visible = false
+        onPrepareCapture: {
+            if (osdService.visible) {
+                osdService.visible = false;
+                screenshotService.waitForWindows();
+            }
+        }
     }
 
     Variants {

@@ -14,8 +14,8 @@ Scope {
     property string mode: "region"
     property string actionName: ""
     // A closing popup may still refer to the capture being replaced.
-    property int revision: 0
-    property bool discardWhenIdle: false
+    property int captureId: 0
+    property bool discardAfterAction: false
     readonly property bool busy: captureDelay.running || captureProcess.running || action.running || monitorQuery.running
     readonly property string helper: Quickshell.shellPath("services/scripts/screenshot.sh")
 
@@ -28,29 +28,34 @@ Scope {
             Quickshell.execDetached(["bash", helper, "discard", imagePath]);
         imagePath = "";
         savedPath = "";
-        discardWhenIdle = false;
+        discardAfterAction = false;
     }
 
-    function dismiss(shownRevision) {
-        if (shownRevision !== revision)
+    function dismiss(shownCaptureId) {
+        if (shownCaptureId !== captureId)
             return;
-        if (busy)
-            discardWhenIdle = true;
+        if (action.running)
+            discardAfterAction = true;
         else
             discard();
+    }
+
+    // prepareCapture handlers call this when they hide a visible window.
+    function waitForWindows() {
+        captureDelay.restart();
     }
 
     function capture(nextMode) {
         if (busy || (nextMode !== "full" && nextMode !== "region"))
             return;
-        revision++;
-        closeRequested();
+        captureId++;
         discard();
         error = "";
         message = "";
         mode = nextMode;
         prepareCapture();
-        captureDelay.restart();
+        if (!captureDelay.running)
+            captureProcess.running = true;
     }
 
     function perform(name) {
@@ -117,7 +122,7 @@ Scope {
         id: action
 
         onExited: (code, status) => {
-            if (root.discardWhenIdle) {
+            if (root.discardAfterAction) {
                 root.discard();
                 return;
             }
@@ -130,9 +135,8 @@ Scope {
             } else {
                 root.savedPath = actionOutput.text.trim();
                 root.message = "Saved to " + root.savedPath;
-                // Let the busy binding settle before closing and discarding.
                 if (root.actionName === "open")
-                    Qt.callLater(root.openSaved);
+                    root.openSaved();
             }
         }
 

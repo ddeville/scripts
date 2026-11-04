@@ -8,7 +8,7 @@ Controls.Popup {
     required property Item anchorItem
     required property Screenshot backend
     required property real screenHeight
-    property int shownRevision: -1
+    property int shownCaptureId: -1
     property bool escapePressed: false
 
     parent: anchorItem
@@ -22,14 +22,14 @@ Controls.Popup {
     focus: true
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {
-        shownRevision = backend.revision;
+        shownCaptureId = backend.captureId;
         escapePressed = false;
         if (backend.imagePath !== "")
             copyButton.forceActiveFocus(Qt.ShortcutFocusReason);
         else
             retryButton.forceActiveFocus(Qt.ShortcutFocusReason);
     }
-    onClosed: backend.dismiss(shownRevision)
+    onClosed: backend.dismiss(shownCaptureId)
 
     background: Rectangle {
         radius: 10
