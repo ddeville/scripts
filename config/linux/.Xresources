@@ -1,8 +1,0 @@
-*faceName: Public Sans
-
-Xft.lcdfilter: lcddefault
-Xft.autohint: true
-Xft.hinting: true
-Xft.hintstyle: hintslight
-Xft.antialias:  true
-Xft.rgba: rgb
