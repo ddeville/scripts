@@ -24,6 +24,7 @@ Item {
         "power": "M12 3 V12 M7 5 A8 8 0 1 0 17 5",
         "apps": "M4 4 H10 V10 H4 Z M14 4 H20 V10 H14 Z M4 14 H10 V20 H4 Z M14 14 H20 V20 H14 Z",
         "lock": "M5 10 H19 V21 H5 Z M8 10 V7 A4 4 0 0 1 16 7 V10 M12 14 V17",
+        "logout": "M10 4 H4 V20 H10 M10 12 H21 M17 8 L21 12 L17 16",
         "moon": "M20 14 A8 8 0 1 1 10 4 A7 7 0 0 0 20 14 Z",
         "restart": "M20 10 A8 8 0 1 0 19 17 M20 4 V10 H14",
         "close": "M6 6 L18 18 M18 6 L6 18",
