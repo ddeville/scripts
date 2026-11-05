@@ -195,8 +195,7 @@
 
     ### Misc/Advanced ###
 
-    # dmenu path.
-    dmenu = /usr/bin/dmenu -p dunst:
+    dmenu = /usr/bin/fuzzel --dmenu --minimal-lines --prompt="Action: "
 
     # Browser for opening urls in context menu.
     browser = /usr/bin/google-chrome-stable -new-tab
