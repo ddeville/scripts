@@ -232,7 +232,7 @@ core_brightness_defaults_val='{
 }'
 sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist "$core_brightness_defaults_key" "$core_brightness_defaults_val"
 
-"$HOME/scripts/bin/common/.local/bin/update-kb-settings"
+"$HOME/scripts/bin/macos/.local/bin/update-kb-settings"
 
 # Use touch id for sudo
 sudo_local_pam="/etc/pam.d/sudo_local"
