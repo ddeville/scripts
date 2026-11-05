@@ -4,10 +4,6 @@ umask 077
 export LC_ALL=C
 
 runtime_dir="${XDG_RUNTIME_DIR:?}/quickshell-screenshots"
-wayland=false
-if [ "${XDG_SESSION_TYPE:-}" = wayland ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
-  wayland=true
-fi
 
 require_command() {
   command -v "$1" >/dev/null || {
@@ -32,30 +28,18 @@ capture)
   errors=$(mktemp "$runtime_dir/errors-XXXXXX")
   keep=false
   trap 'rm -f -- "$errors"; if ! "$keep"; then rm -f -- "$image"; fi' EXIT
-  if "$wayland"; then
-    require_command grim
-    if [ "$mode" = region ]; then
-      require_command slurp
-      if ! geometry=$(slurp 2>"$errors"); then
-        message=$(<"$errors")
-        [[ -z $message || ${message,,} == *cancel* ]] && exit 2
-        cat "$errors" >&2
-        exit 1
-      fi
-      grim -g "$geometry" "$image"
-    else
-      grim "$image"
-    fi
-  else
-    require_command maim
-    selection=()
-    [ "$mode" != region ] || selection=(--select)
-    if ! maim "${selection[@]}" --hidecursor --format=png "$image" 2>"$errors"; then
+  require_command grim
+  if [ "$mode" = region ]; then
+    require_command slurp
+    if ! geometry=$(slurp 2>"$errors"); then
       message=$(<"$errors")
-      [[ ${message,,} == *cancel* ]] && exit 2
+      [[ -z $message || ${message,,} == *cancel* ]] && exit 2
       cat "$errors" >&2
       exit 1
     fi
+    grim -g "$geometry" "$image"
+  else
+    grim "$image"
   fi
   [ -s "$image" ] || exit 1
   keep=true
@@ -63,15 +47,10 @@ capture)
   ;;
 copy)
   require_capture "${2:?Missing screenshot}"
-  if "$wayland"; then
-    require_command wl-copy
-    # Keep the clipboard owner alive across Quickshell service restarts.
-    systemd-run --user --scope --collect --quiet --slice=app.slice \
-      --property=PartOf=graphical-session.target -- wl-copy --type image/png <"$2"
-  else
-    require_command xclip
-    xclip -selection clipboard -t image/png -i "$2"
-  fi
+  require_command wl-copy
+  # Keep the clipboard owner alive across Quickshell service restarts.
+  systemd-run --user --scope --collect --quiet --slice=app.slice \
+    --property=PartOf=graphical-session.target -- wl-copy --type image/png <"$2"
   ;;
 save)
   require_capture "${2:?Missing screenshot}"

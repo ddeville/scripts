@@ -15,9 +15,6 @@ ShellPopup {
     padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
-        // Reused X11 popups can be below windows opened since their creation.
-        if (Quickshell.env("XDG_SESSION_TYPE") === "x11")
-            contentItem.Window.window.raise();
         if (entries.count > 0)
             entries.itemAt(0).forceActiveFocus(Qt.PopupFocusReason);
         else

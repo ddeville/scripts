@@ -45,8 +45,7 @@ PanelWindow {
 
     implicitHeight: Theme.height
     color: Theme.background
-    // X11 reserves physical pixels; Wayland reserves logical pixels.
-    exclusiveZone: Math.round(implicitHeight * (Quickshell.env("XDG_SESSION_TYPE") === "x11" ? devicePixelRatio : 1))
+    exclusiveZone: implicitHeight
     exclusionMode: ExclusionMode.Normal
 
     anchors {
