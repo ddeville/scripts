@@ -80,6 +80,12 @@ if ! grep -q 'pam_gnome_keyring.so' /etc/pam.d/greetd; then
 EOF
 fi
 
+# Hyprlock handles fingerprints separately so password authentication never waits for the reader.
+cat >/etc/pam.d/hyprlock <<'EOF'
+#%PAM-1.0
+auth include system-login
+EOF
+
 # Setup the systemd services
 systemctl enable NetworkManager
 systemctl enable systemd-timedated
