@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls as Controls
 import "../../ui"
@@ -69,6 +71,8 @@ ShellPopup {
                 model: root.state.wired
 
                 Column {
+                    id: wiredConnection
+
                     required property var modelData
 
                     width: parent.width
@@ -76,19 +80,19 @@ ShellPopup {
 
                     Text {
                         width: parent.width
-                        text: modelData.device + " · " + (modelData.connected ? "Connected" : "Not connected")
+                        text: wiredConnection.modelData.device + " · " + (wiredConnection.modelData.connected ? "Connected" : "Not connected")
                         textFormat: Text.PlainText
                         elide: Text.ElideRight
-                        color: modelData.connected ? Theme.selected : Theme.muted
+                        color: wiredConnection.modelData.connected ? Theme.selected : Theme.muted
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
                         renderType: Text.QtRendering
                     }
 
                     Text {
-                        visible: modelData.connected
+                        visible: wiredConnection.modelData.connected
                         width: parent.width
-                        text: modelData.address || "Obtaining address…"
+                        text: wiredConnection.modelData.address || "Obtaining address…"
                         textFormat: Text.PlainText
                         elide: Text.ElideRight
                         color: Theme.muted

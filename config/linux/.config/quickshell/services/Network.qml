@@ -47,7 +47,8 @@ Scope {
     Process {
         id: action
 
-        environment: ({
+        // Qt converts this QML object to the QVariantHash accepted by Process.
+        environment: ({ // qmllint disable incompatible-type
             "LC_ALL": "C"
         })
         onExited: (code, status) => {

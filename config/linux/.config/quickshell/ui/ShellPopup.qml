@@ -51,8 +51,11 @@ Controls.Popup {
             left: true
             bottom: true
         }
+        // Quickshell 0.3.2 exports opaque margins/screen types in its window metadata.
+        // qmllint disable missing-property redundant-optional-chaining
         margins.left: Math.max(8, Math.min(root.anchorPosition.x + root.popupX, (screen?.width ?? 0) - implicitWidth - 8))
         margins.bottom: Math.max(8, (root.anchorWindow?.height ?? 0) - root.anchorPosition.y - root.popupY - implicitHeight)
+        // qmllint enable missing-property redundant-optional-chaining
         implicitWidth: root.implicitWidth
         implicitHeight: root.implicitHeight
         exclusionMode: ExclusionMode.Ignore
