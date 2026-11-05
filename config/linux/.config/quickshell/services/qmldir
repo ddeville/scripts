@@ -1,6 +1,5 @@
 singleton Applications 1.0 Applications.qml
 AudioOutputs 1.0 AudioOutputs.qml
-Bspwm 1.0 Bspwm.qml
 CommandPoll 1.0 CommandPoll.qml
 FocusedMonitor 1.0 FocusedMonitor.qml
 Network 1.0 Network.qml
