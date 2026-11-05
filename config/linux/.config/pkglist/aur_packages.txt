@@ -15,12 +15,11 @@ kubelogin-bin
 
 terraform-ls
 
-# =========== X11 Programs ==========
+# ============ Applications =========
 
 1password
 google-chrome
 input-remapper-bin
-nitrogen
 
 # ============== Fonts ==============
 
