@@ -20,6 +20,10 @@ Scope {
         target: Hyprland
 
         function onRawEvent(event) {
+            // Hyprland 0.57 reports workspace addresses in focusedmon, which Quickshell reads as names.
+            if (event.name === "focusedmonv2")
+                Hyprland.refreshMonitors();
+
             if (["openwindow", "closewindow", "movewindowv2"].includes(event.name))
                 Hyprland.refreshWorkspaces();
         }
