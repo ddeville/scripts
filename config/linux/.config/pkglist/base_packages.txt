@@ -167,7 +167,6 @@ gnome-themes-extra
 gst-libav
 libnotify
 quickshell
-tk
 
 # ============= Wayland =============
 
