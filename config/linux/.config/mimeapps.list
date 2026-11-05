@@ -1,7 +1,5 @@
 [Default Applications]
-application/pdf=mupdf.desktop
-application/xps=mupdf.desktop
-application/vnd.ms-xpsdocument=mupdf.desktop
+application/pdf=org.gnome.Papers.desktop
 image/png=org.gnome.Loupe.desktop
 image/jpg=org.gnome.Loupe.desktop
 image/jpeg=org.gnome.Loupe.desktop

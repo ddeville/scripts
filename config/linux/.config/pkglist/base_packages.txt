@@ -190,8 +190,8 @@ xorg-xwayland
 firefox
 ghostty
 loupe
-mupdf
 nautilus
+papers
 remmina
 spotify-launcher
 virt-manager
