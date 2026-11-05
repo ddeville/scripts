@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain KeyRepeat -int 1
+
+# Remap Caps Lock as Control (see https://developer.apple.com/library/archive/technotes/tn2450/_index.html)
+modifiermapping="$(
+  hidutil list --ndjson | jq -r '
+    select(
+      ."Built-In" == true and
+      .PrimaryUsagePage == 1 and
+      .PrimaryUsage == 6
+    )
+    | "com.apple.keyboard.modifiermapping.\(.VendorID)-\(.ProductID)-0"
+  ' | head -n1
+)"
+if [[ -n $modifiermapping ]]; then
+  hidutil property --set '{
+    "UserKeyMapping": [{
+      "HIDKeyboardModifierMappingSrc": 0x700000039,
+      "HIDKeyboardModifierMappingDst": 0x7000000E0,
+    }]
+  }'
+  # OpenStep dictionary literals store these numbers as strings; use typed integers.
+  defaults -currentHost write NSGlobalDomain "$modifiermapping" -array '<dict>
+    <key>HIDKeyboardModifierMappingSrc</key><integer>30064771129</integer>
+    <key>HIDKeyboardModifierMappingDst</key><integer>30064771296</integer>
+  </dict>'
+else
+  echo "Unable to find a built-in keyboard for persistent modifier mapping." >&2
+fi
