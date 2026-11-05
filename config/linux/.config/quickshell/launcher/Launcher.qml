@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -60,10 +62,13 @@ Scope {
         printErrors: false
         onSaveFailed: console.warn("Could not save launcher history")
 
-        JsonAdapter {
-            id: historyData
+        // Quickshell 0.3.2 omits the C++ namespace from FileView.adapter's type metadata.
+        adapter: historyData // qmllint disable missing-type
+    }
 
-            property var usage: ({})
-        }
+    JsonAdapter {
+        id: historyData
+
+        property var usage: ({})
     }
 }

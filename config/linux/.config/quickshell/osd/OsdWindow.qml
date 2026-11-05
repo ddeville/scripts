@@ -2,7 +2,8 @@ import QtQuick
 import Quickshell
 import "../ui"
 
-PanelWindow {
+// Quickshell chooses a concrete PanelWindow backend at runtime.
+PanelWindow { // qmllint disable uncreatable-type
     id: root
 
     required property Osd backend
@@ -13,7 +14,8 @@ PanelWindow {
     implicitWidth: 300
     implicitHeight: 74
     anchors.bottom: true
-    margins.bottom: Theme.height + 24
+    // Quickshell 0.3.2 exports margins as opaque in its window metadata.
+    margins.bottom: Theme.height + 24 // qmllint disable missing-property
     exclusionMode: ExclusionMode.Ignore
     focusable: false
     color: "transparent"

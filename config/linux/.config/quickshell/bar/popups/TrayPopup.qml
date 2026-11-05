@@ -1,6 +1,7 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls as Controls
-import Quickshell
 import "../../ui"
 
 ShellPopup {
@@ -92,7 +93,7 @@ ShellPopup {
                     onScrolled: delta => modelData.scroll(delta, false)
                     onActiveFocusChanged: {
                         if (activeFocus) {
-                            const view = list.contentItem;
+                            const view = list.contentItem as Flickable;
                             view.contentY = Math.max(0, Math.min(y, Math.max(view.contentY, y + height - view.height)));
                         }
                     }

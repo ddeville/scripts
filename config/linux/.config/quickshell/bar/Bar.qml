@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -8,7 +10,8 @@ import "../launcher"
 import "../screenshot"
 import "popups"
 
-PanelWindow {
+// Quickshell chooses a concrete PanelWindow backend at runtime.
+PanelWindow { // qmllint disable uncreatable-type
     id: panel
 
     required property SystemStatus status
@@ -20,7 +23,8 @@ PanelWindow {
     required property AudioOutputs audioOutputs
     required property date date
     property var audio: null
-    readonly property var trayItems: SystemTray.items.values.filter(item => item.status !== Status.Passive)
+    // Quickshell's tray metadata leaves ObjectModel opaque to qmllint.
+    readonly property var trayItems: SystemTray.items.values.filter(item => item.status !== Status.Passive) // qmllint disable missing-property
 
     function command(args) {
         Quickshell.execDetached(args);
@@ -59,7 +63,8 @@ PanelWindow {
 
         function onShowRequested(monitor) {
             panel.closeOtherPopups(null);
-            if (panel.screen.name === monitor)
+            // Quickshell 0.3.2 exports the window's screen type as opaque to qmllint.
+            if (panel.screen.name === monitor) // qmllint disable missing-property
                 launcherPopup.open();
         }
 
@@ -73,7 +78,7 @@ PanelWindow {
 
         anchorItem: panel.contentItem
         backend: panel.launcher
-        screenHeight: panel.screen.height
+        screenHeight: panel.screen.height // qmllint disable missing-property
         onAboutToShow: panel.closeOtherPopups(launcherPopup)
     }
 
@@ -91,7 +96,7 @@ PanelWindow {
 
         function onShowRequested(monitor) {
             panel.closeOtherPopups(null);
-            if (panel.screen.name === monitor)
+            if (panel.screen.name === monitor) // qmllint disable missing-property
                 screenshotPopup.open();
         }
     }
@@ -101,7 +106,7 @@ PanelWindow {
 
         anchorItem: panel.contentItem
         backend: panel.screenshot
-        screenHeight: panel.screen.height
+        screenHeight: panel.screen.height // qmllint disable missing-property
         onAboutToShow: panel.closeOtherPopups(screenshotPopup)
     }
 
@@ -219,7 +224,7 @@ PanelWindow {
                 id: workspaces
 
                 backend: panel.workspaceService
-                monitor: panel.screen.name
+                monitor: panel.screen.name // qmllint disable missing-property
             }
 
         }
@@ -260,16 +265,18 @@ PanelWindow {
                             Repeater {
                                 model: [{ arrow: "↓", rate: panel.status.downloadRate }, { arrow: "↑", rate: panel.status.uploadRate }]
                                 delegate: Row {
+                                    id: networkDirection
+
                                     required property var modelData
                                     spacing: 3
                                     Text {
-                                        text: modelData.arrow
+                                        text: networkDirection.modelData.arrow
                                         color: Theme.muted
                                         font.family: Theme.font
                                         font.pixelSize: Theme.fontSize
                                     }
                                     Text {
-                                        text: panel.networkRate(modelData.rate)
+                                        text: panel.networkRate(networkDirection.modelData.rate)
                                         color: Theme.foreground
                                         font.family: Theme.font
                                         font.pixelSize: Theme.fontSize

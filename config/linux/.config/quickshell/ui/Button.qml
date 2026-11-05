@@ -15,7 +15,8 @@ Controls.Control {
     property bool plugged: false
     property string tooltip: ""
     property bool tooltipEnabled: true
-    readonly property bool tooltipInPopup: root.QsWindow.window?.shellPopup === true || !root.QsWindow.contentItem || root.Window.window !== root.QsWindow.contentItem.Window.window
+    // QsWindow exposes QObject; ShellPopup adds the shellPopup property at runtime.
+    readonly property bool tooltipInPopup: root.QsWindow.window?.shellPopup === true || !root.QsWindow.contentItem || root.Window.window !== root.QsWindow.contentItem.Window.window // qmllint disable missing-property
     property bool tooltipReady: false
     readonly property bool tooltipWanted: tooltipEnabled && tooltip !== "" && mouse.containsMouse && !mouse.pressed
     property int textWidth: 0
@@ -172,12 +173,15 @@ Controls.Control {
         implicitWidth: barTooltipText.implicitWidth + 16
         implicitHeight: barTooltipText.implicitHeight + 16
         color: "transparent"
+        // Quickshell 0.3.2 exports PopupAnchor as opaque in its window metadata.
+        // qmllint disable missing-property unresolved-type unqualified
         anchor.item: root
         anchor.edges: Edges.Top
         anchor.gravity: Edges.Top
         anchor.rect.y: -8
         anchor.rect.width: root.width
         anchor.rect.height: 1
+        // qmllint enable missing-property unresolved-type unqualified
 
         Rectangle {
             anchors.fill: parent

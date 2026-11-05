@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls as Controls
 import "../../ui"
@@ -284,7 +286,7 @@ ShellPopup {
                 spacing: 4
 
                 Repeater {
-                    model: outputs.items
+                    model: root.outputs.items
 
                     delegate: Button {
                         id: outputButton
@@ -298,10 +300,10 @@ ShellPopup {
                         active: current && root.outputs.items.count > 1
                         foreground: active ? Theme.selected : Theme.foreground
                         interactive: root.outputs.available && !root.outputs.busy && (root.outputs.items.count > 1 || !current)
-                        onClicked: outputs.select(model.sinkName, model.portName)
+                        onClicked: root.outputs.select(model.sinkName, model.portName)
                         onActiveFocusChanged: {
                             if (activeFocus) {
-                                const view = outputList.contentItem;
+                                const view = outputList.contentItem as Flickable;
                                 view.contentY = Math.max(0, Math.min(y, Math.max(view.contentY, y + height - view.height)));
                             }
                         }
@@ -353,12 +355,12 @@ ShellPopup {
         }
 
         Text {
-            visible: outputs.items.count === 0 || outputs.error !== ""
+            visible: root.outputs.items.count === 0 || root.outputs.error !== ""
             width: parent.width
-            text: outputs.error || (outputs.loading ? "Checking audio outputs…" : !outputs.available ? "Audio outputs unavailable" : "No audio outputs")
+            text: root.outputs.error || (root.outputs.loading ? "Checking audio outputs…" : !root.outputs.available ? "Audio outputs unavailable" : "No audio outputs")
             textFormat: Text.PlainText
             wrapMode: Text.Wrap
-            color: outputs.error ? Theme.alert : Theme.muted
+            color: root.outputs.error ? Theme.alert : Theme.muted
             font.family: Theme.font
             font.pixelSize: 10
         }
