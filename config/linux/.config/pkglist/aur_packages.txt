@@ -18,6 +18,7 @@ terraform-ls
 # ============ Applications =========
 
 1password
+dropbox
 google-chrome
 input-remapper-bin
 
