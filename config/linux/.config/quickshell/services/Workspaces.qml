@@ -1,14 +1,14 @@
 import QtQuick
 import Quickshell
+import "hyprland" as HyprlandBackend
 
 Scope {
     id: root
 
-    readonly property var workspaces: backend.item ? backend.item.workspaces : []
+    readonly property var workspaces: backend.workspaces
 
     function focus(id) {
-        if (backend.item)
-            backend.item.focus(id);
+        backend.focus(id);
     }
 
     function cycle(monitor, delta) {
@@ -18,9 +18,7 @@ Scope {
             focus(desktops[(current + (delta > 0 ? -1 : 1) + desktops.length) % desktops.length].id);
     }
 
-    Loader {
+    HyprlandBackend.Workspaces {
         id: backend
-
-        source: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") ? "hyprland/Workspaces.qml" : "Bspwm.qml"
     }
 }

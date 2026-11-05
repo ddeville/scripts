@@ -80,7 +80,6 @@ ShellPopup {
             Keys.onTabPressed: root.moveSelection(1)
             Keys.onBacktabPressed: root.moveSelection(-1)
             Keys.onEscapePressed: root.dismissKey = Qt.Key_Escape
-            // Popup windows grab the keyboard, including sxhkd's launcher shortcuts.
             Keys.onPressed: (event) => {
                 if (root.isToggleShortcut(event)) {
                     root.dismissKey = event.key;

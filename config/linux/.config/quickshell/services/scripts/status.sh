@@ -4,13 +4,6 @@ set -eu -o pipefail
 export LC_ALL=C
 
 case "${1:-}" in
-workspaces)
-  bspc wm -d | jq -c '[.monitors[] | . as $monitor | .desktops[] | {
-      monitor: $monitor.name, id: .id, name: .name,
-      focused: (.id == $monitor.focusedDesktopId), occupied: (.root != null),
-      urgent: ([.root | .. | objects | .client? // empty | .urgent] | any)
-    }]'
-  ;;
 stats)
   cpu=$(awk '/^cpu / {total=0; for(i=2;i<=9;i++) total+=$i; printf "%.0f %.0f\n", total, $5+$6; exit}' /proc/stat)
   memory=$(awk '/^MemTotal:/ {total=$2} /^MemAvailable:/ {available=$2} END {printf "%.0f", 100*(total-available)/total}' /proc/meminfo)
@@ -105,7 +98,7 @@ github)
   fi
   ;;
 *)
-  echo "Usage: $0 {workspaces|stats|updates|email|github}" >&2
+  echo "Usage: $0 {stats|updates|email|github}" >&2
   exit 1
   ;;
 esac
