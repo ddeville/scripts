@@ -164,6 +164,7 @@ yaml-language-server
 brightnessctl
 dunst
 gnome-themes-extra
+gst-libav
 libnotify
 quickshell
 tk
@@ -193,6 +194,7 @@ loupe
 nautilus
 papers
 remmina
+showtime
 spotify-launcher
 virt-manager
 
