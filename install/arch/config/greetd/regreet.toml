@@ -1,4 +1,4 @@
-skip_selection = true
+skip_selection = false
 
 [background]
 path = "/usr/share/backgrounds/login"
