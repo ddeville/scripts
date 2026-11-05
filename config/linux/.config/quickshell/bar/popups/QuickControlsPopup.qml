@@ -13,7 +13,6 @@ ShellPopup {
     property bool plugged: false
     property string batteryStatus: ""
     property string activeSection: ""
-    property string emphasizedSection: ""
 
     signal brightnessRequested(int percent)
     signal mixerRequested()
@@ -24,11 +23,11 @@ ShellPopup {
             return ;
         }
         activeSection = section;
-        emphasizedSection = section;
-        if (!visible)
+        if (!visible) {
+            outputRows.forceLayout();
+            body.forceLayout();
             open();
-
-        emphasisTimer.restart();
+        }
     }
 
     implicitWidth: 280
@@ -41,15 +40,6 @@ ShellPopup {
     }
     onClosed: {
         activeSection = "";
-        emphasizedSection = "";
-        emphasisTimer.stop();
-    }
-
-    Timer {
-        id: emphasisTimer
-
-        interval: 1200
-        onTriggered: root.emphasizedSection = ""
     }
 
     Column {
@@ -103,18 +93,10 @@ ShellPopup {
                     width: parent.width - 28 - batteryValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Battery"
-                    color: root.emphasizedSection === "battery" ? Theme.selected : Theme.foreground
+                    color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 160
-                        }
-
-                    }
-
                 }
 
                 Text {
@@ -163,18 +145,10 @@ ShellPopup {
                     width: parent.width - 28 - brightnessValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Display"
-                    color: root.emphasizedSection === "brightness" ? Theme.selected : Theme.foreground
+                    color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 160
-                        }
-
-                    }
-
                 }
 
                 Text {
@@ -231,18 +205,10 @@ ShellPopup {
                     width: parent.width - 28 - volumeValue.implicitWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.audio && root.audio.muted ? "Sound · muted" : "Sound"
-                    color: root.emphasizedSection === "volume" ? Theme.selected : Theme.foreground
+                    color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     renderType: Text.QtRendering
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 160
-                        }
-
-                    }
-
                 }
 
                 Text {
