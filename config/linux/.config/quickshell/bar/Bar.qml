@@ -352,11 +352,11 @@ PanelWindow {
 
                     Button {
                         id: wifiButton
-                        symbol: "wifi"
+                        symbol: panel.network.wiredConnection ? "ethernet" : "wifi"
                         level: panel.network.state.current ? panel.network.state.current.signal / 100 : 0
                         muted: !panel.network.state.enabled
-                        foreground: panel.network.failed || !panel.network.state.available ? Theme.alert : panel.network.state.current ? Theme.foreground : Theme.muted
-                        tooltip: panel.network.message || (!panel.network.state.available ? "NetworkManager unavailable" : !panel.network.state.enabled ? "Wi-Fi off" : panel.network.state.current ? panel.network.state.current.ssid + " · " + panel.network.state.current.signal + "% signal" : "Wi-Fi · Not connected")
+                        foreground: panel.network.failed || !panel.network.state.available ? Theme.alert : panel.network.wiredConnection || panel.network.state.current ? Theme.foreground : Theme.muted
+                        tooltip: panel.network.message || (!panel.network.state.available ? "NetworkManager unavailable" : panel.network.wiredConnection ? "Ethernet · " + panel.network.wiredConnection.device : !panel.network.state.enabled ? "Wi-Fi off" : panel.network.state.current ? panel.network.state.current.ssid + " · " + panel.network.state.current.signal + "% signal" : "Wi-Fi · Not connected")
                         tooltipEnabled: !networkPopup.visible
                         interactive: true
                         active: networkPopup.visible

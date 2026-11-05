@@ -10,11 +10,13 @@ Scope {
         "enabled": false,
         "device": "",
         "current": null,
-        "networks": []
+        "networks": [],
+        "wired": []
     })
     property string message: ""
     property bool failed: false
     readonly property bool busy: action.running
+    readonly property var wiredConnection: state.wired.find(connection => connection.connected) ?? null
 
     function refresh() {
         poll.refresh();
