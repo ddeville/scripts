@@ -35,6 +35,8 @@ pause)
   if [ "$seconds" -gt 0 ]; then
     until=$(($(date +%s) + seconds))
     if ! systemd-run --user --quiet --collect --unit="$unit" \
+      --property=PartOf=graphical-session.target \
+      --timer-property=PartOf=graphical-session.target \
       --on-calendar="@$until" --timer-property=AccuracySec=1s \
       /usr/bin/dunstctl set-paused false; then
       dunstctl set-paused false
