@@ -39,7 +39,6 @@ local ensure_installed = {
   'rust',
   'sql',
   'starlark',
-  'sxhkdrc',
   'terraform',
   'toml',
   'typescript',
