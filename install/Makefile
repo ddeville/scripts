@@ -1,4 +1,4 @@
-.PHONY: install packages stow shell-plugins
+.PHONY: install packages system-config stow shell-plugins
 
 UNAME_S := $(shell uname -s)
 
@@ -16,6 +16,11 @@ ifeq ($(UNAME_S),Linux)
 endif
 ifeq ($(UNAME_S),Darwin)
 	@./macos/install_packages.sh
+endif
+
+system-config:
+ifeq ($(UNAME_S),Linux)
+	@sudo ./arch/configure_system.sh
 endif
 
 stow:
