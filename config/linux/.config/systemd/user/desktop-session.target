@@ -1,0 +1,6 @@
+[Unit]
+Description=Desktop services and application autostart
+PartOf=graphical-session.target
+After=graphical-session.target
+
+Wants=hypridle.service hyprpaper.service hyprsunset.service quickshell.service polkit-mate.service xdg-desktop-autostart.target
