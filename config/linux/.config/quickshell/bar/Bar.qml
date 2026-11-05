@@ -317,7 +317,7 @@ PanelWindow {
                         glyph: "\uf09b"
                         glyphSize: 14
                         tooltip: panel.status.github === "offline" ? "GitHub check unavailable" : "GitHub: " + panel.status.github + " unread notifications"
-                        foreground: panel.status.github === "offline" ? Theme.alert : Number.parseInt(panel.status.github) > 0 ? Theme.selected : Theme.muted
+                        foreground: panel.status.github === "offline" ? Theme.alert : Number.parseInt(panel.status.github) > 0 ? Theme.selected : Theme.foreground
                         interactive: true
                         onClicked: Applications.launch(["xdg-open", "https://github.com/notifications"])
                     }
@@ -326,7 +326,7 @@ PanelWindow {
                         visible: panel.status.email !== ""
                         symbol: "mail"
                         tooltip: panel.status.email === "offline" ? "Email check unavailable" : "Mail: " + panel.status.email + " unread messages"
-                        foreground: panel.status.email === "offline" ? Theme.alert : Number.parseInt(panel.status.email) > 0 ? Theme.selected : Theme.muted
+                        foreground: panel.status.email === "offline" ? Theme.alert : Number.parseInt(panel.status.email) > 0 ? Theme.selected : Theme.foreground
                         interactive: true
                         onClicked: Applications.launch(["xdg-open", "https://app.fastmail.com/"])
                     }
@@ -334,7 +334,7 @@ PanelWindow {
                     Button {
                         symbol: "updates"
                         tooltip: panel.status.updates === "unavailable" ? "Package check failed · click to retry" : panel.status.updates === "" ? "Checking for updates…" : panel.status.updates + " package updates · click to refresh"
-                        foreground: panel.status.updates === "unavailable" ? Theme.alert : Number.parseInt(panel.status.updates) > 0 ? Theme.selected : Theme.muted
+                        foreground: panel.status.updates === "unavailable" ? Theme.alert : Number.parseInt(panel.status.updates) > 0 ? Theme.selected : Theme.foreground
                         interactive: true
                         onClicked: panel.status.refreshUpdates()
                     }
