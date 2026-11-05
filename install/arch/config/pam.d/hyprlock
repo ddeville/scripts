@@ -1,0 +1,4 @@
+#%PAM-1.0
+
+# Hyprlock handles fingerprints separately so password authentication never waits for the reader.
+auth include system-login

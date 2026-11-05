@@ -48,55 +48,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 readarray -t base_packages < <(grep -Ev "^#|^$" "/scripts/config/linux/.config/pkglist/base_packages.txt")
 pacman -S --needed "${base_packages[@]}"
 
-cat >/etc/greetd/config.toml <<'EOF'
-[terminal]
-vt = 1
-
-[default_session]
-command = "dbus-run-session start-hyprland -- -c /etc/greetd/hyprland.lua"
-user = "greeter"
-EOF
-
-cat >/etc/greetd/hyprland.lua <<'EOF'
-hl.monitor({ output = '', mode = 'preferred', position = 'auto', scale = 1.6 })
-hl.config({
-  animations = { enabled = false },
-  misc = {
-    disable_hyprland_logo = true,
-    disable_splash_rendering = true,
-    disable_hyprland_guiutils_check = true,
-  },
-  xwayland = { enabled = false },
-})
-hl.on('hyprland.start', function()
-  hl.exec_cmd("regreet; hyprctl dispatch 'hl.dsp.exit()'")
-end)
-EOF
-
-if ! grep -q 'pam_gnome_keyring.so' /etc/pam.d/greetd; then
-  cat >>/etc/pam.d/greetd <<'EOF'
--auth      optional     pam_gnome_keyring.so
--session   optional     pam_gnome_keyring.so auto_start
-EOF
-fi
-
-# Hyprlock handles fingerprints separately so password authentication never waits for the reader.
-cat >/etc/pam.d/hyprlock <<'EOF'
-#%PAM-1.0
-auth include system-login
-EOF
-
-# Setup the systemd services
-systemctl enable NetworkManager
-systemctl enable systemd-timedated
-systemctl enable bluetooth
-systemctl enable sshd
-systemctl enable avahi-daemon
-systemctl enable fstrim.timer
-systemctl enable firewalld
-systemctl enable acpid
-systemctl enable libvirtd
-systemctl enable greetd
+/scripts/install/arch/configure_system.sh
 
 # Create user and make sure it can sudo
 printf "\e[1;32m==> Creating new user\n\e[0m"

@@ -1,0 +1,13 @@
+[background]
+path = "/usr/share/backgrounds/login"
+fit = "Cover"
+
+[GTK]
+application_prefer_dark_theme = true
+theme_name = "Adwaita"
+icon_theme_name = "Adwaita"
+font_name = "Public Sans"
+
+[widget.clock]
+format = "%a %b %d %I:%M%p"
+locale = "en_US"
