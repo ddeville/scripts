@@ -8,6 +8,9 @@ theme_name = "Adwaita"
 icon_theme_name = "Adwaita"
 font_name = "Public Sans"
 
+[appearance]
+greeting_msg = "Select Login, then scan your fingerprint."
+
 [widget.clock]
 format = "%a %b %d %I:%M%p"
 locale = "en_US"
