@@ -15,41 +15,36 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 ## Post-installation
 
 - On MacOS, use Ghostty as the default terminal and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools". The installer associates Unix executables with Ghostty.
-- On Arch Linux, edit `config/linux/.xprofile` and `config/linux/.config/bspwm/bspwmrc` to tweak settings related to the display and overall machine type
+- On Arch Linux, adjust displays in `config/linux/.config/hypr/hyprland.lua` and workspace assignments in `config/linux/.config/hypr/workspaces.lua`.
 - Check health of a few Neovim plugins and make sure that the appropriate packages are installed:
     - `nvim +checkhealth lazy`
     - `nvim +checkhealth mason`
     - `nvim +checkhealth conform`
     - `nvim +checkhealth` to check health of everything at once
 
-### Biometrics on Arch Linux
+### System configuration on Arch Linux
 
-- Enroll finger `fprintd-enroll damien -f right-index-finger`
-- Edit `/etc/pam.d/polkit-1` and add `auth sufficient pam_fprintd.so` to the top
-- Repeat with whatever file is appropriate in `/etc/pam.d/*`
+[install/arch/config/](install/arch/config/) contains the greeter and PAM configuration copied into `/etc` by the Arch installer. Edit the repository files and run `make -C install system-config` to apply changes. This also enables system services without restarting them; edits made directly to the managed files in `/etc` are overwritten.
 
-### ReGreet on Arch Linux
+Fingerprint authentication is configured for login, sudo, polkit, and hyprlock. Enroll fingerprints separately with `fprintd-enroll damien -f right-index-finger`.
 
-Copy the background to `/usr/share/backgrounds/18.jpg` and edit `/etc/greetd/regreet.toml`:
+### Backgrounds on Arch Linux
 
-```toml
-[background]
-path = "/usr/share/backgrounds/18.jpg"
-fit = "Cover"
+Place images in `/usr/share/backgrounds`, keeping their original extensions, and create these symlinks. The installer creates the directory; images and links are managed manually.
 
-[GTK]
-application_prefer_dark_theme = true
-theme_name = "Adwaita"
-icon_theme_name = "Adwaita"
-font_name = "Public Sans"
+| Path | Used by |
+| --- | --- |
+| `/usr/share/backgrounds/wallpaper` | Hyprpaper desktop wallpaper |
+| `/usr/share/backgrounds/login` | ReGreet login background |
+| `/usr/share/backgrounds/lock` | Hyprlock lock background |
 
-[widget.clock]
-format = "%a %b %d %I:%M%p"
-locale = "en_US"
-```
+For example, `sudo ln -sfn 18.jpg /usr/share/backgrounds/login` selects `18.jpg` as the login background.
+
+Run `systemctl --user restart hyprpaper.service` after changing the wallpaper. Login and lock backgrounds load on their next launch. Missing images leave a plain background without preventing login or locking.
 
 ## Maintenance
 
 - Run `make -C install shell-plugins` to update the shell plugins.
 - Run `make -C install stow` whenever there's a new file that should be symlinked.
 - Run `make -C install packages` to install/update all packages.
+- On Arch Linux, run `make -C install system-config` to apply system configuration changes.
