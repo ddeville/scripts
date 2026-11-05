@@ -170,6 +170,7 @@ tk
 
 # ============= Wayland =============
 
+fuzzel
 greetd
 greetd-regreet
 grim
