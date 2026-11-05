@@ -14,6 +14,30 @@ permissions:
   contents: read
 
 jobs:
+  qmllint:
+    name: QML Lint
+    runs-on: ubuntu-latest
+    container: archlinux:base
+    steps:
+      - name: Install Qt and Quickshell
+        run: pacman -Syu --noconfirm --needed git qt6-declarative quickshell
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Run qmllint
+        shell: bash
+        run: |
+          result=0
+          while IFS= read -r -d '' file; do
+            args=()
+            qmldir="${file%/*}/qmldir"
+            if [ -f "$qmldir" ]; then
+              args=(-i "$qmldir")
+            fi
+            /usr/lib/qt6/bin/qmllint --max-warnings 0 "${args[@]}" "$file" || result=1
+          done < <(find config/linux/.config/quickshell -name '*.qml' -print0)
+
+          exit "$result"
+
   stylua:
     # This runs `stylua`: https://github.com/JohnnyMorganz/StyLua
     name: Stylua
