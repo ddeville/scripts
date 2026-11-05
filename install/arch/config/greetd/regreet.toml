@@ -1,3 +1,5 @@
+skip_selection = true
+
 [background]
 path = "/usr/share/backgrounds/login"
 fit = "Cover"
@@ -7,9 +9,6 @@ application_prefer_dark_theme = true
 theme_name = "Adwaita"
 icon_theme_name = "Adwaita"
 font_name = "Public Sans"
-
-[appearance]
-greeting_msg = "Select Login, then scan your fingerprint."
 
 [widget.clock]
 format = "%a %b %d %I:%M%p"
