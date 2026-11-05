@@ -159,28 +159,14 @@ ty
 typescript-language-server
 yaml-language-server
 
-# =============== X11 ===============
+# ============= Desktop ============
 
 brightnessctl
-bspwm
 dunst
 gnome-themes-extra
-i3lock
 libnotify
-lxappearance
-maim
-picom
-polybar
 quickshell
-redshift
-rofi
-sxhkd
 tk
-xclip
-xdotool
-xorg
-xorg-xinit
-xss-lock
 
 # ============= Wayland =============
 
@@ -196,8 +182,9 @@ slurp
 wl-clipboard
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
+xorg-xwayland
 
-# =========== X11 Programs ==========
+# ============ Applications =========
 
 firefox
 ghostty
@@ -240,4 +227,3 @@ ttf-liberation
 ttf-linux-libertine
 ttf-opensans
 woff2-font-awesome
-xorg-fonts-misc
