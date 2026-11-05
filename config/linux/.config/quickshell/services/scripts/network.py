@@ -36,7 +36,19 @@ def rows(fields, *args):
 
 
 def status():
-    devices = rows("DEVICE,TYPE,STATE", "device", "status")
+    devices = rows("DEVICE,TYPE,STATE,CONNECTION", "device", "status")
+    wired = [
+        {
+            "device": device,
+            "connection": connection,
+            "connected": state == "connected",
+            "address": nmcli("--get-values", "IP4.ADDRESS", "device", "show", device)
+            if state == "connected"
+            else "",
+        }
+        for device, kind, state, connection in devices
+        if kind == "ethernet"
+    ]
     wifi = [row for row in devices if row[1] == "wifi"]
     device = next(
         (row[0] for row in wifi if row[2] == "connected"), wifi[0][0] if wifi else ""
@@ -86,6 +98,7 @@ def status():
         "current": current,
         "address": address,
         "networks": networks,
+        "wired": wired,
     }
 
 
@@ -101,6 +114,7 @@ if __name__ == "__main__":
                     "device": "",
                     "current": None,
                     "networks": [],
+                    "wired": [],
                 }
             )
         )

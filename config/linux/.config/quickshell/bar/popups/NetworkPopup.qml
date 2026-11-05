@@ -17,7 +17,7 @@ ShellPopup {
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
         backend.refresh();
-        radio.forceActiveFocus(Qt.PopupFocusReason);
+        closeButton.forceActiveFocus(Qt.PopupFocusReason);
     }
 
     Column {
@@ -32,12 +32,91 @@ ShellPopup {
             width: parent.width
 
             Text {
-                width: parent.width - radio.width - 32
+                width: parent.width - closeButton.width
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Network"
+                color: Theme.foreground
+                font.family: Theme.font
+                font.pixelSize: 14
+                renderType: Text.QtRendering
+            }
+
+            Button {
+                id: closeButton
+
+                symbol: "close"
+                tooltip: "Close network"
+                foreground: Theme.muted
+                interactive: true
+                onClicked: root.close()
+            }
+        }
+
+        Column {
+            visible: root.state.wired.length > 0
+            width: parent.width
+            spacing: 8
+
+            Text {
+                text: "Ethernet"
+                color: Theme.foreground
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSize
+                renderType: Text.QtRendering
+            }
+
+            Repeater {
+                model: root.state.wired
+
+                Column {
+                    required property var modelData
+
+                    width: parent.width
+                    spacing: 4
+
+                    Text {
+                        width: parent.width
+                        text: modelData.device + " · " + (modelData.connected ? "Connected" : "Not connected")
+                        textFormat: Text.PlainText
+                        elide: Text.ElideRight
+                        color: modelData.connected ? Theme.selected : Theme.muted
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize
+                        renderType: Text.QtRendering
+                    }
+
+                    Text {
+                        visible: modelData.connected
+                        width: parent.width
+                        text: modelData.address || "Obtaining address…"
+                        textFormat: Text.PlainText
+                        elide: Text.ElideRight
+                        color: Theme.muted
+                        font.family: Theme.font
+                        font.pixelSize: 9
+                        renderType: Text.QtRendering
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            visible: root.state.wired.length > 0
+            width: parent.width
+            height: 1
+            color: Theme.border
+        }
+
+        Row {
+            width: parent.width
+
+            Text {
+                width: parent.width - radio.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Wi-Fi"
                 color: Theme.foreground
                 font.family: Theme.font
-                font.pixelSize: 14
+                font.pixelSize: Theme.fontSize
                 renderType: Text.QtRendering
             }
 
@@ -72,14 +151,6 @@ ShellPopup {
 
                 }
 
-            }
-
-            Button {
-                symbol: "close"
-                tooltip: "Close Wi-Fi"
-                foreground: Theme.muted
-                interactive: true
-                onClicked: root.close()
             }
 
         }
@@ -122,6 +193,7 @@ ShellPopup {
         }
 
         Rectangle {
+            visible: root.state.enabled && root.state.device !== ""
             width: parent.width
             height: 1
             color: Theme.border
