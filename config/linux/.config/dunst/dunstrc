@@ -7,10 +7,6 @@
     #   keyboard: follow window with keyboard focus
     #   none: don't follow anything
     #
-    # "keyboard" needs a window manager that exports the
-    # _NET_ACTIVE_WINDOW property.
-    # This should be the case for almost all modern window managers.
-    #
     # If this option is set to mouse or keyboard, the monitor option
     # will be ignored.
     follow = none
@@ -23,7 +19,7 @@
     # The minimum and maximum height of a single notification, excluding the frame.
     height = (64, 400)
 
-    # Position the notification in the top right corner
+    # Position the notification in the bottom right corner
     origin = bottom-right
 
     # Offset from the origin
@@ -57,11 +53,6 @@
     # Shrink window if it's smaller than the width.  Will be ignored if
     # width is 0.
     shrink = no
-
-    # The transparency of the window.  Range: [0; 100].
-    # This option will only work if a compositing window manager is
-    # present (e.g. xcompmgr, compiz, etc.).
-    transparency = 0
 
     # Draw a line of "separator_height" pixel height between two
     # notifications.
@@ -190,8 +181,8 @@
     # Scale larger icons down to this size, set to 0 to disable
     max_icon_size = 48
 
-    # Paths to default icons.
-    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+    enable_recursive_icon_lookup = true
+    icon_theme = Adwaita
 
     ### History ###
 
@@ -213,12 +204,6 @@
     # Always run rule-defined scripts, even if the notification is suppressed
     always_run_script = true
 
-    # Define the title of the windows spawned by dunst
-    title = Dunst
-
-    # Define the class of the windows spawned by dunst
-    class = Dunst
-
     # Define the corner radius of the notification window
     # in pixel size. If the radius is 0, you have no rounded
     # corners.
@@ -233,7 +218,6 @@
     ignore_dbusclose = false
 
     ### Wayland ###
-    # These settings are Wayland-specific. They have no effect when using X11
 
     # Uncomment this if you want to let notications appear under fullscreen
     # applications (default: overlay)
@@ -241,18 +225,6 @@
 
     # Set this to true to use X11 output on Wayland.
     force_xwayland = false
-
-    ### Legacy
-
-    # Use the Xinerama extension instead of RandR for multi-monitor support.
-    # This setting is provided for compatibility with older nVidia drivers that
-    # do not support RandR and using it on systems that support RandR is highly
-    # discouraged.
-    #
-    # By enabling this setting dunst will not be able to detect when a monitor
-    # is connected or disconnected which might break follow mode if the screen
-    # layout changes.
-    force_xinerama = false
 
     ### mouse
 
@@ -280,15 +252,5 @@
 [urgency_critical]
     background = "#fb4934"
     foreground = "#ebdbb2"
-
-# Experimental features that may or may not work correctly. Do not expect them
-# to have a consistent behaviour across releases.
-[experimental]
-    # Calculate the dpi to use on a per-monitor basis.
-    # If this setting is enabled the Xft.dpi value will be ignored and instead
-    # dunst will attempt to calculate an appropriate dpi value for each monitor
-    # using the resolution and physical size. This might be useful in setups
-    # where there are multiple screens with very different dpi values.
-    per_monitor_dpi = false
 
 # vim: ft=cfg
