@@ -100,6 +100,11 @@ ShellPopup {
                         "detail": "Lock this session",
                         "symbol": "lock"
                     }, {
+                        "action": "logout",
+                        "label": "Log out",
+                        "detail": "End this session",
+                        "symbol": "logout"
+                    }, {
                         "action": "suspend",
                         "label": "Suspend",
                         "detail": "Put this session to sleep",

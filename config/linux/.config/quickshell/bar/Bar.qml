@@ -113,6 +113,8 @@ PanelWindow {
         onActionRequested: (action) => {
             if (action === "lock")
                 panel.command(["loginctl", "lock-session", Quickshell.env("XDG_SESSION_ID")]);
+            else if (action === "logout")
+                panel.command(["hyprctl", "eval", "hl.dispatch(hl.dsp.exit())"]);
             else
                 panel.command(["systemctl", action]);
         }
