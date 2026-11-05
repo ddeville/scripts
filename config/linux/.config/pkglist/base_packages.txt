@@ -146,6 +146,7 @@ shfmt
 sops
 staticcheck
 stylua
+talosctl
 terraform
 uv
 
@@ -164,6 +165,7 @@ yaml-language-server
 brightnessctl
 dunst
 gnome-themes-extra
+gpac
 gst-libav
 libnotify
 quickshell
