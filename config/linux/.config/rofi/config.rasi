@@ -1,8 +1,0 @@
-configuration {
-  modi: "window,drun,ssh,combi";
-  font: "Public Sans 12";
-  combi-modi: "window,drun,ssh";
-  show-icons: true;
-  icon-theme: "Faenza";
-}
-@theme "gruvbox-dark-soft"
