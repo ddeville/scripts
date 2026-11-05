@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=NetworkManager Applet
+Exec=nm-applet --indicator
+NotShowIn=KDE;GNOME;
