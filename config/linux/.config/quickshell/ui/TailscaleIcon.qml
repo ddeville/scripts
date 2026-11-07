@@ -33,7 +33,7 @@ Item {
                 radius: 2
                 antialiasing: true
                 visible: !marked || (root.exitNodeOnline ? index < 7 : index < 4 || index === 6)
-                color: root.connected && (index === 3 || index === 4 || index === 5 || index === 7) ? "#ffffff" : "#666666"
+                color: root.connected && (index === 3 || index === 4 || index === 5 || index === 7) ? Theme.foreground : "#666666"
             }
         }
 
@@ -43,7 +43,7 @@ Item {
             preferredRendererType: Shape.CurveRenderer
 
             ShapePath {
-                strokeColor: root.exitNodeOnline ? "#ffffff" : "#e56f4a"
+                strokeColor: root.exitNodeOnline ? Theme.foreground : "#e56f4a"
                 strokeWidth: 2
                 capStyle: ShapePath.RoundCap
                 joinStyle: ShapePath.RoundJoin
