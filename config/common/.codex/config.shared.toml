@@ -1,0 +1,12 @@
+approval_policy = "on-request"
+approvals_reviewer = "guardian_subagent"
+personality = "pragmatic"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+
+[tui]
+animations = false
+notification_method = "auto"
+status_line = ["model-with-reasoning", "context-used", "current-dir", "codex-version", "fast-mode", "run-state"]
+terminal_title = ["app-name", "thread-id"]
+theme = "gruvbox-dark"

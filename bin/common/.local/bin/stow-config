@@ -37,3 +37,5 @@ git -C "$HOME/scripts" clean --force -d -- config bin
 
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$HOME" --verbose
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
+
+uv run --quiet --script "$HOME/.codex/bin/update-config.py"
