@@ -1,18 +1,13 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = ["websockets==15.0.1"]
-# ///
 """Read local Codex state without subscribing to or resuming conversations."""
 
-import argparse
 import json
 import os
-import sys
 import tempfile
 import time
 from pathlib import Path
 from typing import Any
 
+from tmux import pane_matches
 from websockets.exceptions import WebSocketException
 from websockets.sync.client import ClientConnection, unix_connect
 
@@ -158,6 +153,9 @@ def snapshot(client: CodexClient) -> JsonObject:
         client.close()
         agents = []
         error = str(exc) or type(exc).__name__
+    panes = pane_matches([agent["id"] for agent in agents])
+    for agent in agents:
+        agent["tmux_panes"] = panes.get(agent["id"], [])
     agents.sort(
         key=lambda agent: (
             STATES.index(agent["status"]),
@@ -242,35 +240,13 @@ def write_snapshot(path: Path, data: JsonObject) -> None:
             temporary.unlink(missing_ok=True)
 
 
-def main() -> None:
+def run(
+    watch: bool,
+    interval: float,
+    output: Path | None,
+    thread_id: str | None,
+) -> None:
     """Write one snapshot or keep publishing updates."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--watch",
-        action="store_true",
-        help="Emit a fresh snapshot each interval; reconnect after errors",
-    )
-    parser.add_argument(
-        "--interval",
-        type=float,
-        default=2,
-        help="Polling interval in seconds (default: 2)",
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        help="Atomically write JSON to this file instead of stdout",
-    )
-    parser.add_argument(
-        "--detail",
-        metavar="THREAD_ID",
-        help="Read metadata and the latest turn summary for one conversation",
-    )
-    args = parser.parse_args()
-    if args.interval <= 0:
-        parser.error("--interval must be positive")
-    if args.detail and args.watch:
-        parser.error("--detail cannot be combined with --watch")
     socket_path = (
         Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser()
         / "app-server-control/app-server-control.sock"
@@ -279,23 +255,13 @@ def main() -> None:
     try:
         while True:
             started = time.monotonic()
-            data = detail(client, args.detail) if args.detail else snapshot(client)
-            if args.output:
-                write_snapshot(args.output, data)
+            data = detail(client, thread_id) if thread_id else snapshot(client)
+            if output:
+                write_snapshot(output, data)
             else:
                 print(json.dumps(data, ensure_ascii=False), flush=True)
-            if not args.watch:
+            if not watch:
                 return
-            time.sleep(max(0, args.interval - (time.monotonic() - started)))
+            time.sleep(max(0, interval - (time.monotonic() - started)))
     finally:
         client.close()
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except (KeyboardInterrupt, BrokenPipeError):
-        pass
-    except (OSError, WebSocketException, RpcError, ValueError) as exc:
-        print(f"codex-status: {exc}", file=sys.stderr)
-        sys.exit(1)

@@ -1,12 +1,9 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = []
-# ///
-"""Render codex-status JSON for the terminal picker."""
+"""Render Codex conversations and navigate to their tmux panes."""
 
 import argparse
 import json
 import os
+import shlex
 import sys
 import time
 from pathlib import Path
@@ -107,6 +104,33 @@ def state_message(path: Path) -> None:
         print("\nWaiting for a fresh snapshot from the local Codex server.")
 
 
+def open_thread(path: Path, thread_id: str, client: str) -> None:
+    """Emit an fzf action to switch panes or explain why navigation is unavailable."""
+    from tmux import pane_matches
+
+    if not os.environ.get("TMUX"):
+        print("change-footer(Open the picker inside tmux to switch panes)")
+        return
+    data, _ = load_snapshot(path)
+    if data is None:
+        print("change-footer(Status unavailable; wait for a refresh)")
+        return
+    ids = [agent["id"] for agent in data["agents"]]
+    panes = pane_matches(ids).get(thread_id, [])
+    if not panes:
+        print("change-footer(No matching tmux pane · Alt-Enter expand · Esc close)")
+        return
+    if len(panes) > 1:
+        print(
+            "change-footer(Thread is open in multiple panes · Alt-Enter expand · Esc close)"
+        )
+        return
+    command = ["tmux", "switch-client", "-t", panes[0]]
+    if client:
+        command.extend(["-c", client])
+    print("become:" + shlex.join(command))
+
+
 def item_text(item: JsonObject) -> tuple[str, str] | tuple[None, None]:
     """Extract a label and display text from a conversation item."""
     kind = item.get("type")
@@ -175,18 +199,24 @@ def detail() -> None:
 
 
 def main() -> None:
-    """Render the requested picker section."""
+    """Render a picker section or prepare pane navigation."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("rows", "header", "message", "detail"))
+    parser.add_argument("mode", choices=("rows", "header", "message", "detail", "open"))
     parser.add_argument("--snapshot", type=Path)
-    parser.add_argument("--wait", action="store_true")
+    parser.add_argument("--thread")
+    parser.add_argument("--client", default="")
     args = parser.parse_args()
-    if args.wait:
-        deadline = time.monotonic() + 1
+    if args.mode == "rows":
+        deadline = time.monotonic() + 10
         while not args.snapshot.exists() and time.monotonic() < deadline:
+            log = args.snapshot.with_name("collector.log")
+            if log.exists() and log.stat().st_size:
+                break
             time.sleep(0.02)
     if args.mode == "detail":
         detail()
+    elif args.mode == "open":
+        open_thread(args.snapshot, args.thread, args.client)
     elif args.mode == "rows":
         rows(args.snapshot, os.environ.get("FZF_PROMPT") == "Attention › ")
     elif args.mode == "header":
