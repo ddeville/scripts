@@ -15,12 +15,12 @@ from typing import Any
 type JsonObject = dict[str, Any]
 
 STYLES = {
-    "approval": (33, "Approval"),
-    "input": (33, "Input"),
+    "approval": (31, "Approval"),
+    "input": (31, "Input"),
     "ready": (32, "Ready"),
     "working": (36, "Working"),
     "idle": (90, "Idle"),
-    "error": (31, "Error"),
+    "error": (35, "Error"),
     "unknown": (90, "Unknown"),
 }
 
@@ -78,7 +78,7 @@ def rows(path: Path, attention: bool) -> None:
         if agent["parent_id"]:
             title = "↳ " + title
         print(
-            f"{agent['id']}\t\033[{color}m●\033[0m {label:8s}  "
+            f"{agent['id']}\t\033[{color}m● {label:8s}\033[0m  "
             f"\033[90m{project:14s}\033[0m {title}"
         )
 
@@ -134,7 +134,7 @@ def detail() -> None:
         return
     color, label = STYLES[agent["status"]]
     print(f"{clean(agent['title'])}\n")
-    print(f"\033[{color}m●\033[0m {label}\n")
+    print(f"\033[{color}m● {label}\033[0m\n")
     print(f"\033[90mPROJECT\033[0m  {clean(agent['project'])}")
     print(f"\033[90mPATH\033[0m     {clean(agent['cwd'])}")
     if agent.get("model"):
