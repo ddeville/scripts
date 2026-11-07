@@ -50,7 +50,7 @@ FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE='' fzf </dev/null \
   --with-shell='bash -c' \
   --bind="start:reload-sync($render rows --wait)" \
   --bind="every(2):reload-sync($render rows)" \
-  --bind="load:transform-header($render header)+refresh-preview" \
+  --bind="load:bg-transform-header($render header)+refresh-preview" \
   --bind="ctrl-f:transform($toggle_command)+reload-sync($render rows)" \
   --bind="enter:change-preview-window(down,99%,wrap,border-none|$preview_layout)" \
   --bind='ctrl-/:toggle-preview,alt-j:preview-down,alt-k:preview-up' || result=$?
