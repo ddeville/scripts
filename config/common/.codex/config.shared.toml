@@ -8,5 +8,5 @@ web_search = "cached"
 animations = false
 notification_method = "auto"
 status_line = ["model-with-reasoning", "context-used", "current-dir", "codex-version", "fast-mode", "run-state"]
-terminal_title = ["app-name", "thread-id"]
+terminal_title = ["activity", "thread-name", "project-name", "thread-id"]
 theme = "gruvbox-dark"
