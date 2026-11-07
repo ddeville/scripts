@@ -5,4 +5,5 @@ FocusedMonitor 1.0 FocusedMonitor.qml
 Network 1.0 Network.qml
 Notifications 1.0 Notifications.qml
 SystemStatus 1.0 SystemStatus.qml
+Tailscale 1.0 Tailscale.qml
 Workspaces 1.0 Workspaces.qml

@@ -4,3 +4,4 @@ NotificationPopup 1.0 NotificationPopup.qml
 QuickControlsPopup 1.0 QuickControlsPopup.qml
 SessionPopup 1.0 SessionPopup.qml
 TrayPopup 1.0 TrayPopup.qml
+TailscalePopup 1.0 TailscalePopup.qml

@@ -38,6 +38,10 @@ ShellRoot {
         id: networkService
     }
 
+    Tailscale {
+        id: tailscaleService
+    }
+
     Notifications {
         id: notificationService
     }
@@ -93,6 +97,7 @@ ShellRoot {
             launcher: launcherService
             screenshot: screenshotService
             network: networkService
+            tailscale: tailscaleService
             notifications: notificationService
             audioOutputs: outputService
             audio: root.sink ? root.sink.audio : null
