@@ -55,12 +55,13 @@ Scope {
         message = description;
         failed = false;
         loginUrl = "";
-        action.command = ["tailscale"].concat(args);
+        action.command = ["timeout", "--foreground", "30s", "tailscale"].concat(args);
         action.running = true;
     }
 
     function setConnected(connected) {
-        run(connected ? ["up", "--timeout=30s"] : ["down"], connected ? "Connecting…" : "Disconnecting…");
+        // Only a flag-free `up` reconnects without revalidating saved preferences.
+        run(connected ? ["up"] : ["down"], connected ? "Connecting…" : "Disconnecting…");
     }
 
     function selectExitNode(address) {
@@ -99,7 +100,7 @@ Scope {
 
         onExited: (code, status) => {
             root.failed = code !== 0 || status !== 0;
-            root.message = root.failed ? (errors.text.trim() || "Tailscale action failed") : "";
+            root.message = code === 124 ? "Tailscale timed out. Check the connection status and try again." : root.failed ? (errors.text.trim() || "Tailscale action failed") : "";
             poll.refresh();
         }
 
