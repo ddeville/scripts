@@ -2,7 +2,7 @@
 # requires-python = ">=3.12"
 # dependencies = ["websockets==15.0.1"]
 # ///
-"""Open the Codex picker or export conversation status as JSON."""
+"""Open the Codex picker, render fzf content, or export status as JSON."""
 
 import argparse
 import sys
@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def main() -> None:
-    """Choose the interactive picker or a JSON status output."""
+    """Dispatch the picker, fzf rendering, or JSON status output."""
     parser = argparse.ArgumentParser(prog="codex-status", description=__doc__)
     parser.add_argument("--json", action="store_true", help="Print one status snapshot")
     parser.add_argument("--watch", action="store_true", help="Stream status snapshots")
@@ -27,12 +27,28 @@ def main() -> None:
         "--detail", metavar="THREAD_ID", help="Print conversation details"
     )
     parser.add_argument("--client", default="", help=argparse.SUPPRESS)
+    commands = parser.add_subparsers(dest="command")
+    renderer = commands.add_parser("render", help="Render content for fzf")
+    renderer.add_argument(
+        "mode", choices=("rows", "header", "message", "detail", "open")
+    )
+    renderer.add_argument("--snapshot", type=Path)
+    renderer.add_argument("--thread")
+    renderer.add_argument("--client", default="")
     args = parser.parse_args()
     if args.interval <= 0:
         parser.error("--interval must be positive")
     if args.detail and args.watch:
         parser.error("--detail cannot be combined with --watch")
-    if args.json or args.watch or args.output or args.detail:
+    if args.command == "render":
+        import render
+
+        if args.mode != "detail" and args.snapshot is None:
+            renderer.error("--snapshot is required")
+        if args.mode == "open" and args.thread is None:
+            renderer.error("--thread is required")
+        render.run(args.mode, args.snapshot, args.thread, args.client)
+    elif args.json or args.watch or args.output or args.detail:
         import status
         from websockets.exceptions import WebSocketException
 

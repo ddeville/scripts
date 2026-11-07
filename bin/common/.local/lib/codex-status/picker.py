@@ -24,9 +24,7 @@ def run(client: str) -> None:
     with tempfile.TemporaryDirectory(prefix="codex-status-") as temporary:
         runtime = Path(temporary)
         snapshot = runtime / "state.json"
-        render = shlex.join(
-            [sys.executable, str(directory / "render.py"), "--snapshot", str(snapshot)]
-        )
+        render = shlex.join([*command, "render", "--snapshot", str(snapshot)])
         status = shlex.join(command)
         preview = (
             f"if [[ {{1}} == - ]]; then {render} message; "

@@ -1,6 +1,5 @@
 """Render Codex conversations and navigate to their tmux panes."""
 
-import argparse
 import json
 import os
 import shlex
@@ -198,32 +197,25 @@ def detail() -> None:
         print("\n\033[90mRecent history unavailable for this conversation.\033[0m")
 
 
-def main() -> None:
+def run(mode: str, snapshot: Path | None, thread_id: str | None, client: str) -> None:
     """Render a picker section or prepare pane navigation."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("rows", "header", "message", "detail", "open"))
-    parser.add_argument("--snapshot", type=Path)
-    parser.add_argument("--thread")
-    parser.add_argument("--client", default="")
-    args = parser.parse_args()
-    if args.mode == "rows":
+    if mode == "detail":
+        detail()
+        return
+    assert snapshot is not None
+    if mode == "rows":
         deadline = time.monotonic() + 10
-        while not args.snapshot.exists() and time.monotonic() < deadline:
-            log = args.snapshot.with_name("collector.log")
+        while not snapshot.exists() and time.monotonic() < deadline:
+            log = snapshot.with_name("collector.log")
             if log.exists() and log.stat().st_size:
                 break
             time.sleep(0.02)
-    if args.mode == "detail":
-        detail()
-    elif args.mode == "open":
-        open_thread(args.snapshot, args.thread, args.client)
-    elif args.mode == "rows":
-        rows(args.snapshot, os.environ.get("FZF_PROMPT") == "Attention › ")
-    elif args.mode == "header":
-        header(args.snapshot)
+    if mode == "open":
+        assert thread_id is not None
+        open_thread(snapshot, thread_id, client)
+    elif mode == "rows":
+        rows(snapshot, os.environ.get("FZF_PROMPT") == "Attention › ")
+    elif mode == "header":
+        header(snapshot)
     else:
-        state_message(args.snapshot)
-
-
-if __name__ == "__main__":
-    main()
+        state_message(snapshot)
