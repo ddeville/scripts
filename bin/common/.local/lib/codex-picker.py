@@ -90,7 +90,9 @@ def header(path: Path) -> None:
         print(f"{error}\nRetrying every 2 seconds")
         return
     counts = data["counts"]
-    stamp = time.strftime("%H:%M:%S", time.localtime(data["generated_at"]))
+    stamp = time.strftime("%I:%M:%S %p", time.localtime(data["generated_at"])).lstrip(
+        "0"
+    )
     print(
         f"{counts['attention']} attention · {counts['working']} working · {counts['idle']} idle"
     )
