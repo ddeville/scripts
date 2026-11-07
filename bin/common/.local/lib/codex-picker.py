@@ -16,7 +16,7 @@ type JsonObject = dict[str, Any]
 
 STYLES = {
     "approval": (33, "Approval"),
-    "input": (35, "Input"),
+    "input": (33, "Input"),
     "ready": (32, "Ready"),
     "working": (36, "Working"),
     "idle": (90, "Idle"),
@@ -77,7 +77,10 @@ def rows(path: Path, attention: bool) -> None:
         title = clean(agent["title"])
         if agent["parent_id"]:
             title = "↳ " + title
-        print(f"{agent['id']}\t\033[{color}m● {label:8s}\033[0m  {project:14s} {title}")
+        print(
+            f"{agent['id']}\t\033[{color}m●\033[0m {label:8s}  "
+            f"\033[90m{project:14s}\033[0m {title}"
+        )
 
 
 def header(path: Path) -> None:
@@ -131,7 +134,7 @@ def detail() -> None:
         return
     color, label = STYLES[agent["status"]]
     print(f"{clean(agent['title'])}\n")
-    print(f"\033[{color}m● {label}\033[0m\n")
+    print(f"\033[{color}m●\033[0m {label}\n")
     print(f"\033[90mPROJECT\033[0m  {clean(agent['project'])}")
     print(f"\033[90mPATH\033[0m     {clean(agent['cwd'])}")
     if agent.get("model"):
