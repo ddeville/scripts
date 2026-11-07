@@ -6,7 +6,7 @@ import "../services"
 Scope {
     id: root
 
-    property string saveDirectory: Quickshell.env("HOME") + "/data/Pictures/screenshots"
+    property string saveDirectory: Quickshell.env("HOME") + "screenshots"
     property string imagePath: ""
     property string savedPath: ""
     property string message: ""
