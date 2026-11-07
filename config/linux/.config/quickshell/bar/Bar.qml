@@ -19,12 +19,13 @@ PanelWindow { // qmllint disable uncreatable-type
     required property Launcher launcher
     required property Screenshot screenshot
     required property Network network
+    required property Tailscale tailscale
     required property Notifications notifications
     required property AudioOutputs audioOutputs
     required property date date
     property var audio: null
     // Quickshell's tray metadata leaves ObjectModel opaque to qmllint.
-    readonly property var trayItems: SystemTray.items.values.filter(item => item.status !== Status.Passive) // qmllint disable missing-property
+    readonly property var trayItems: SystemTray.items.values.filter(item => item.status !== Status.Passive && item.id !== "tailscale") // qmllint disable missing-property
 
     function command(args) {
         Quickshell.execDetached(args);
@@ -38,7 +39,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
     function closeOtherPopups(openingPopup) {
         let closed = false;
-        for (const popup of [sessionPopup, devicePopup, networkPopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup, trayPopup]) {
+        for (const popup of [sessionPopup, devicePopup, networkPopup, tailscalePopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup, trayPopup]) {
             if (popup !== openingPopup && popup.visible) {
                 closed = true;
                 popup.close();
@@ -146,6 +147,13 @@ PanelWindow { // qmllint disable uncreatable-type
         onAboutToShow: panel.closeOtherPopups(networkPopup)
         backend: panel.network
         onSettingsRequested: Applications.launch(["nm-connection-editor"])
+    }
+
+    TailscalePopup {
+        id: tailscalePopup
+        anchorItem: tailscaleButton
+        backend: panel.tailscale
+        onAboutToShow: panel.closeOtherPopups(tailscalePopup)
     }
 
     CalendarPopup {
@@ -369,6 +377,41 @@ PanelWindow { // qmllint disable uncreatable-type
                         interactive: true
                         active: networkPopup.visible
                         onClicked: networkPopup.toggle()
+                    }
+
+                    Button {
+                        id: tailscaleButton
+
+                        visible: panel.tailscale.state.installed
+                        tooltip: panel.tailscale.tooltip
+                        tooltipEnabled: !tailscalePopup.visible
+                        interactive: true
+                        active: tailscalePopup.visible
+                        onClicked: tailscalePopup.toggle()
+
+                        indicator: Item {
+                            width: Theme.iconSize
+                            height: Theme.iconSize
+
+                            TailscaleIcon {
+                                anchors.fill: parent
+                                connected: panel.tailscale.state.connected
+                                exitNode: panel.tailscale.usingExitNode
+                                exitNodeOnline: panel.tailscale.state.exitNode?.online ?? true
+                            }
+
+                            Rectangle {
+                                visible: panel.tailscale.warning && !(panel.tailscale.usingExitNode && !panel.tailscale.state.exitNode.online)
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                width: 5
+                                height: 5
+                                radius: 2.5
+                                color: Theme.alert
+                                border.width: 1
+                                border.color: Theme.background
+                            }
+                        }
                     }
 
                     Button {

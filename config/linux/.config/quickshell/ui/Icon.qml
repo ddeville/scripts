@@ -30,6 +30,7 @@ Item {
         "close": "M6 6 L18 18 M18 6 L6 18",
         "chevron-left": "M15 6 L9 12 L15 18",
         "chevron-right": "M9 6 L15 12 L9 18",
+        "chevron-down": "M6 9 L12 15 L18 9",
         "volume": "M3 9 H7 L12 5 V19 L7 15 H3 Z",
         "headphones": "M4 13 V11 A8 8 0 0 1 20 11 V13 M4 12 H7 V21 H4 A2 2 0 0 1 2 19 V14 A2 2 0 0 1 4 12 M20 12 H17 V21 H20 A2 2 0 0 0 22 19 V14 A2 2 0 0 0 20 12",
         "speaker": "M6 3 H18 V21 H6 Z M14 7 A2 2 0 1 1 10 7 A2 2 0 1 1 14 7 M15 15 A3 3 0 1 1 9 15 A3 3 0 1 1 15 15",
