@@ -41,8 +41,8 @@ FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE='' fzf </dev/null \
   --ansi --delimiter=$'\t' --with-nth=2.. --track --id-nth=1 \
   --no-sort --layout=reverse --no-multi --no-hscroll \
   --border=rounded --border-label=' CODEX AGENTS ' \
-  --padding=1 --info=inline-right --highlight-line \
-  --color='fg:-1,bg:-1,hl:3,fg+:-1,bg+:-1,hl+:3,info:8,prompt:6,pointer:3,border:8,header:8,label:6,preview-fg:-1,preview-bg:-1' \
+  --padding=1 --info=inline-right --highlight-line --no-bold \
+  --color='base16,fg:-1,bg:-1,hl:3,fg+:-1,bg+:-1,hl+:3,query:-1,info:8,prompt:6,pointer:3,border:8,header:8,footer:-1,label:6,gutter:-1,preview-fg:-1,preview-bg:-1' \
   --prompt='All agents › ' --pointer='▌' \
   --header=$'Connecting to Codex…\nRefreshing every 2 seconds' \
   --footer=$'Enter expand · Ctrl-f attention · Ctrl-/ details\n↑↓ move · Alt-j/k scroll details · Esc close' \

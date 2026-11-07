@@ -130,7 +130,7 @@ def detail() -> None:
         )
         return
     color, label = STYLES[agent["status"]]
-    print(f"\033[1m{clean(agent['title'])}\033[0m\n")
+    print(f"{clean(agent['title'])}\n")
     print(f"\033[{color}m● {label}\033[0m\n")
     print(f"\033[90mPROJECT\033[0m  {clean(agent['project'])}")
     print(f"\033[90mPATH\033[0m     {clean(agent['cwd'])}")
