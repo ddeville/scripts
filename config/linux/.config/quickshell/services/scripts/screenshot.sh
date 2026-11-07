@@ -31,7 +31,7 @@ capture)
   require_command grim
   if [ "$mode" = region ]; then
     require_command slurp
-    if ! geometry=$(slurp 2>"$errors"); then
+    if ! geometry=$(slurp </dev/null 2>"$errors"); then
       message=$(<"$errors")
       [[ -z $message || ${message,,} == *cancel* ]] && exit 2
       cat "$errors" >&2
