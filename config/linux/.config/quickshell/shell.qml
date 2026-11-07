@@ -1,3 +1,5 @@
+//@ pragma UseQApplication
+
 pragma ComponentBehavior: Bound
 
 import QtQuick
