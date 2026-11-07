@@ -3,4 +3,4 @@
 set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
-exec uv run --quiet --locked --project "$script_dir/../lib/codex-status" codex-status "$@"
+exec uv run --quiet --locked --project "$script_dir/../lib/codex-status" python -m codex_status "$@"

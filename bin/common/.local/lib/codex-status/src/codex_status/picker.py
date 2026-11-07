@@ -4,7 +4,6 @@ import os
 import shlex
 import signal
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 from types import FrameType
@@ -19,7 +18,7 @@ def terminate(signum: int, frame: FrameType | None) -> NoReturn:
 def run(client: str) -> None:
     """Keep a status snapshot fresh while fzf displays and selects conversations."""
     signal.signal(signal.SIGTERM, terminate)
-    command = [sys.executable, "-m", "codex_status"]
+    command = ["codex-status"]
     with tempfile.TemporaryDirectory(prefix="codex-status-") as temporary:
         runtime = Path(temporary)
         snapshot = runtime / "state.json"
