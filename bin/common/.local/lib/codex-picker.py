@@ -87,7 +87,7 @@ def header(path: Path) -> None:
     """Print status counts and the last refresh time."""
     data, error = load_snapshot(path)
     if data is None:
-        print(f"{error}\nRetrying every 2 seconds")
+        print(f"{error}\nRetrying every 2 seconds\n ")
         return
     counts = data["counts"]
     stamp = time.strftime("%I:%M:%S %p", time.localtime(data["generated_at"])).lstrip(
@@ -96,7 +96,7 @@ def header(path: Path) -> None:
     print(
         f"{counts['attention']} attention · {counts['working']} working · {counts['idle']} idle"
     )
-    print(f"{counts['total']} loaded conversations · updated {stamp}")
+    print(f"{counts['total']} loaded conversations · updated {stamp}\n ")
 
 
 def state_message(path: Path) -> None:
