@@ -50,7 +50,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
-          args: --check config/common/.config/nvim
+          args: --check config/common/.config/nvim config/common/.config/rex
 
   luals:
     # This runs `luals`: https://github.com/mrcjkb/lua-typecheck-action
