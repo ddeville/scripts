@@ -1,7 +1,3 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = ["websockets==15.0.1"]
-# ///
 """Open the Codex picker, render fzf content, or export status as JSON."""
 
 import argparse
@@ -9,7 +5,7 @@ import sys
 from pathlib import Path
 
 
-def main() -> None:
+def run() -> None:
     """Dispatch the picker, fzf rendering, or JSON status output."""
     parser = argparse.ArgumentParser(prog="codex-status", description=__doc__)
     parser.add_argument("--json", action="store_true", help="Print one status snapshot")
@@ -41,7 +37,7 @@ def main() -> None:
     if args.detail and args.watch:
         parser.error("--detail cannot be combined with --watch")
     if args.command == "render":
-        import render
+        from . import render
 
         if args.mode != "detail" and args.snapshot is None:
             renderer.error("--snapshot is required")
@@ -49,24 +45,30 @@ def main() -> None:
             renderer.error("--thread is required")
         render.run(args.mode, args.snapshot, args.thread, args.client)
     elif args.json or args.watch or args.output or args.detail:
-        import status
         from websockets.exceptions import WebSocketException
+
+        from . import status
 
         try:
             status.run(args.watch, args.interval, args.output, args.detail)
         except (WebSocketException, status.RpcError) as exc:
             parser.exit(1, f"codex-status: {exc}\n")
     else:
-        import picker
+        from . import picker
 
         picker.run(args.client)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Run the command and report errors."""
     try:
-        main()
+        run()
     except (KeyboardInterrupt, BrokenPipeError):
         pass
     except (OSError, ValueError) as exc:
         print(f"codex-status: {exc}", file=sys.stderr)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

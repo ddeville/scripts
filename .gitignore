@@ -2,3 +2,4 @@
 /config/linux/.config/gtk-3.0/bookmarks
 /config/linux/.config/gtk-3.0/servers
 /.codex
+.venv/

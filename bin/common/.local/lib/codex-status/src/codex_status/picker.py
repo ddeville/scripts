@@ -19,8 +19,7 @@ def terminate(signum: int, frame: FrameType | None) -> NoReturn:
 def run(client: str) -> None:
     """Keep a status snapshot fresh while fzf displays and selects conversations."""
     signal.signal(signal.SIGTERM, terminate)
-    directory = Path(__file__).resolve().parent
-    command = [sys.executable, str(directory / "main.py")]
+    command = [sys.executable, "-m", "codex_status"]
     with tempfile.TemporaryDirectory(prefix="codex-status-") as temporary:
         runtime = Path(temporary)
         snapshot = runtime / "state.json"

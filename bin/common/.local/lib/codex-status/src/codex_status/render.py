@@ -105,7 +105,7 @@ def state_message(path: Path) -> None:
 
 def open_thread(path: Path, thread_id: str, client: str) -> None:
     """Emit an fzf action to switch panes or explain why navigation is unavailable."""
-    from tmux import pane_matches
+    from .tmux import pane_matches
 
     if not os.environ.get("TMUX"):
         print("change-footer(Open the picker inside tmux to switch panes)")
