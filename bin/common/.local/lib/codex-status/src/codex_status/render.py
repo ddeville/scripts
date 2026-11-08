@@ -32,7 +32,7 @@ def clean(value: object, multiline: bool = False) -> str:
 
 
 def load_snapshot(path: Path) -> tuple[JsonObject | None, str | None]:
-    """Read a fresh snapshot or return a displayable error."""
+    """Read fresh conversations with tmux panes or return a displayable error."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -48,6 +48,7 @@ def load_snapshot(path: Path) -> tuple[JsonObject | None, str | None]:
         return None, "Status snapshot is stale"
     if data["connection"]["status"] != "connected":
         return None, "Codex unavailable: " + clean(data["connection"]["error"])
+    data["agents"] = [agent for agent in data["agents"] if agent["tmux_panes"]]
     return data, None
 
 
@@ -64,7 +65,7 @@ def rows(path: Path, attention: bool) -> None:
         label = (
             "No agents need attention"
             if attention
-            else "No conversations loaded in Codex"
+            else "No Codex conversations open in this tmux server"
         )
         print(f"-\t\033[90m{label}\033[0m")
     for agent in agents:
@@ -85,14 +86,15 @@ def header(path: Path) -> None:
     if data is None:
         print(f"{error}\nRetrying every 2 seconds\n ")
         return
-    counts = data["counts"]
+    agents = data["agents"]
+    attention = sum(agent["needs_attention"] for agent in agents)
+    working = sum(agent["status"] == "working" for agent in agents)
+    idle = sum(agent["status"] == "idle" for agent in agents)
     stamp = time.strftime("%I:%M:%S %p", time.localtime(data["generated_at"])).lstrip(
         "0"
     )
-    print(
-        f"{counts['attention']} attention · {counts['working']} working · {counts['idle']} idle"
-    )
-    print(f"{counts['total']} loaded conversations · updated {stamp}\n ")
+    print(f"{attention} attention · {working} working · {idle} idle")
+    print(f"{len(agents)} conversations in tmux · updated {stamp}\n ")
 
 
 def state_message(path: Path) -> None:
