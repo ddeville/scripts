@@ -269,6 +269,17 @@ class Picker(App[list[str] | None]):
         self.expanded = not self.expanded
         self.action_focus_pane("details" if self.expanded else "tasks")
 
+    def finish(self, command: list[str] | None = None) -> None:
+        """Let tmux restore the popup immediately, or clean up a standalone terminal."""
+        if self.client:
+            command = command or ["tmux", "display-popup", "-C", "-c", self.client]
+            os.execvp(command[0], command)
+        self.exit(command)
+
+    async def action_quit(self) -> None:
+        """Close the picker without waiting for input polling inside a popup."""
+        self.finish()
+
     @work(group="open", exclusive=True)
     async def action_open_thread(self) -> None:
         """Verify the selected pane before leaving the popup."""
@@ -286,7 +297,7 @@ class Picker(App[list[str] | None]):
             self.notice = view.clean(exc)
             self.update_footer()
         else:
-            self.exit(command)
+            self.finish(command)
 
 
 def run(client: str) -> None:
