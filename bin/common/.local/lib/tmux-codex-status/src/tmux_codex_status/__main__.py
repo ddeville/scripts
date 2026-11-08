@@ -7,7 +7,7 @@ from pathlib import Path
 
 def run() -> None:
     """Dispatch the picker, fzf rendering, or JSON status output."""
-    parser = argparse.ArgumentParser(prog="codex-status", description=__doc__)
+    parser = argparse.ArgumentParser(prog="tmux-codex-status", description=__doc__)
     parser.add_argument("--json", action="store_true", help="Print one status snapshot")
     parser.add_argument("--watch", action="store_true", help="Stream status snapshots")
     parser.add_argument(
@@ -52,7 +52,7 @@ def run() -> None:
         try:
             status.run(args.watch, args.interval, args.output, args.detail)
         except (WebSocketException, status.RpcError) as exc:
-            parser.exit(1, f"codex-status: {exc}\n")
+            parser.exit(1, f"tmux-codex-status: {exc}\n")
     else:
         from . import picker
 
@@ -66,7 +66,7 @@ def main() -> None:
     except (KeyboardInterrupt, BrokenPipeError):
         pass
     except (OSError, ValueError) as exc:
-        print(f"codex-status: {exc}", file=sys.stderr)
+        print(f"tmux-codex-status: {exc}", file=sys.stderr)
         sys.exit(1)
 
 

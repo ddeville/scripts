@@ -51,7 +51,7 @@ class CodexClient:
             self.call(
                 "initialize",
                 {
-                    "clientInfo": {"name": "codex_status", "version": "1.0.0"},
+                    "clientInfo": {"name": "tmux_codex_status", "version": "1.0.0"},
                     "capabilities": {"experimentalApi": True},
                 },
             )
