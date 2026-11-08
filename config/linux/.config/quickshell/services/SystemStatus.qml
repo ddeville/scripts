@@ -41,34 +41,43 @@ Scope {
         }
     }
 
-    CommandPoll {
-        command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "stats"]
-        interval: 1000
-        onOutputChanged: {
-            if (output === "")
-                return ;
+    Process {
+        id: statsProcess
 
-            const next = JSON.parse(output);
-            if (root.previousCpu && next.cpu[0] > root.previousCpu[0])
-                root.cpu = Math.round(100 * (1 - (next.cpu[1] - root.previousCpu[1]) / (next.cpu[0] - root.previousCpu[0])));
+        command: ["python3", Quickshell.shellPath("services/scripts/system-stats.py")]
+        running: true
 
-            root.previousCpu = next.cpu;
-            const elapsed = next.uptime - (root.stats.uptime ?? next.uptime);
-            let received = 0;
-            let sent = 0;
-            if (elapsed > 0 && elapsed < 10) {
-                for (const device in next.network) {
-                    const previous = root.stats.network?.[device];
-                    if (previous) {
-                        received += Math.max(0, next.network[device][0] - previous[0]) / elapsed;
-                        sent += Math.max(0, next.network[device][1] - previous[1]) / elapsed;
+        stdout: SplitParser {
+            onRead: data => {
+                const next = JSON.parse(data);
+                if (root.previousCpu && next.cpu[0] > root.previousCpu[0])
+                    root.cpu = Math.round(100 * (1 - (next.cpu[1] - root.previousCpu[1]) / (next.cpu[0] - root.previousCpu[0])));
+
+                root.previousCpu = next.cpu;
+                const elapsed = next.uptime - (root.stats.uptime ?? next.uptime);
+                let received = 0;
+                let sent = 0;
+                if (elapsed > 0 && elapsed < 10) {
+                    for (const device in next.network) {
+                        const previous = root.stats.network?.[device];
+                        if (previous) {
+                            received += Math.max(0, next.network[device][0] - previous[0]) / elapsed;
+                            sent += Math.max(0, next.network[device][1] - previous[1]) / elapsed;
+                        }
                     }
                 }
+                root.downloadRate = received;
+                root.uploadRate = sent;
+                root.stats = next;
             }
-            root.downloadRate = received;
-            root.uploadRate = sent;
-            root.stats = next;
         }
+    }
+
+    Timer {
+        interval: 1000
+        running: !statsProcess.running
+        repeat: true
+        onTriggered: statsProcess.running = true
     }
 
     CommandPoll {

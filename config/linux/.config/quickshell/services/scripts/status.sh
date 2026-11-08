@@ -4,56 +4,6 @@ set -eu -o pipefail
 export LC_ALL=C
 
 case "${1:-}" in
-stats)
-  cpu=$(awk '/^cpu / {total=0; for(i=2;i<=9;i++) total+=$i; printf "%.0f %.0f\n", total, $5+$6; exit}' /proc/stat)
-  memory=$(awk '/^MemTotal:/ {total=$2} /^MemAvailable:/ {available=$2} END {printf "%.0f", 100*(total-available)/total}' /proc/meminfo)
-  temperature=null
-  for sensor in /sys/class/hwmon/hwmon*/temp*_label; do
-    [ -r "$sensor" ] || continue
-    if [ "$(<"$sensor")" = Tctl ] || [ "$(<"$sensor")" = 'Package id 0' ]; then
-      temperature=$(awk '{printf "%.0f", $1/1000*9/5+32}' "${sensor%_label}_input")
-      break
-    fi
-  done
-  backlight=null
-  for device in /sys/class/backlight/*; do
-    [ -r "$device/brightness" ] || continue
-    backlight=$((100 * $(<"$device/brightness") / $(<"$device/max_brightness")))
-    break
-  done
-  battery=null
-  battery_status=""
-  plugged=false
-  for device in /sys/class/power_supply/*; do
-    if [ -r "$device/online" ] && [ "$(<"$device/online")" = 1 ]; then
-      plugged=true
-      break
-    fi
-  done
-  for device in /sys/class/power_supply/*; do
-    [ -r "$device/type" ] && [ "$(<"$device/type")" = Battery ] || continue
-    [ -r "$device/capacity" ] || continue
-    battery=$(<"$device/capacity")
-    battery_status=$(<"$device/status")
-    break
-  done
-  network='{}'
-  for device in /sys/class/net/*; do
-    # Count physical links once, excluding VPNs and virtual bridges.
-    [ -e "$device/device" ] || continue
-    [ "$(<"$device/operstate")" = up ] || continue
-    network=$(jq -c --arg interface "${device##*/}" \
-      --argjson rx "$(<"$device/statistics/rx_bytes")" --argjson tx "$(<"$device/statistics/tx_bytes")" \
-      '. + {($interface): [$rx, $tx]}' <<<"$network")
-  done
-  read -r uptime _ </proc/uptime
-  jq -cn --arg cpu "$cpu" --argjson memory "$memory" --argjson temperature "$temperature" \
-    --argjson backlight "$backlight" --argjson battery "$battery" --arg batteryStatus "$battery_status" --argjson plugged "$plugged" \
-    --argjson network "$network" --argjson uptime "$uptime" \
-    '{cpu: ($cpu | split(" ") | map(tonumber)), memory: $memory, temperature: $temperature,
-        backlight: $backlight, battery: $battery, batteryStatus: $batteryStatus, plugged: $plugged,
-        network: $network, uptime: $uptime}'
-  ;;
 updates)
   # checkupdates uses exit code 2 for an empty update list.
   if official=$(timeout 90 checkupdates 2>/dev/null); then
@@ -98,7 +48,7 @@ github)
   fi
   ;;
 *)
-  echo "Usage: $0 {stats|updates|email|github}" >&2
+  echo "Usage: $0 {updates|email|github}" >&2
   exit 1
   ;;
 esac
