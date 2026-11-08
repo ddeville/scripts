@@ -1,5 +1,5 @@
 [project]
-name = "tmux-codex-status"
+name = "tmux_codex_status"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = ["websockets==15.0.1"]
