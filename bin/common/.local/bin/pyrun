@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
-source "$script_dir/../lib/python-toolchain.bash"
+source "$script_dir/../lib/python_toolchain.bash"
 
 if [ $# -eq 0 ]; then
   echo "Usage: pyrun <command> [args...]"
