@@ -66,9 +66,7 @@ class CodexClient:
         assert self.connection is not None
         self.request_id += 1
         request_id = self.request_id
-        self.connection.send(
-            json.dumps({"id": request_id, "method": method, "params": params})
-        )
+        self.connection.send(json.dumps({"id": request_id, "method": method, "params": params}))
         while True:
             remaining = min(3, self.deadline - time.monotonic())
             if remaining <= 0:
@@ -124,9 +122,7 @@ def agent_record(thread: JsonObject, read_state: JsonObject | None) -> JsonObjec
         "project": Path(cwd).name if cwd else "",
         "status": status,
         "needs_attention": status in ATTENTION,
-        "unread": None
-        if read_state is None
-        else read_state.get("firstUnread") is not None,
+        "unread": None if read_state is None else read_state.get("firstUnread") is not None,
         "active_flags": thread.get("status", {}).get("activeFlags", []),
         "parent_id": thread.get("parentThreadId"),
         "model": thread.get("model"),
@@ -143,9 +139,7 @@ def snapshot(client: CodexClient) -> JsonObject:
         client.connect()
         for thread_id in client.loaded_ids():
             try:
-                result = client.call(
-                    "thread/read", {"threadId": thread_id, "includeTurns": False}
-                )
+                result = client.call("thread/read", {"threadId": thread_id, "includeTurns": False})
                 thread = result["thread"]
                 # A thread can unload between the enumeration and metadata read.
                 if thread.get("status", {}).get("type") != "notLoaded":
@@ -169,9 +163,7 @@ def snapshot(client: CodexClient) -> JsonObject:
             agent["id"],
         )
     )
-    counts = {
-        state: sum(agent["status"] == state for agent in agents) for state in STATES
-    }
+    counts = {state: sum(agent["status"] == state for agent in agents) for state in STATES}
     counts["total"] = len(agents)
     counts["attention"] = sum(agent["needs_attention"] for agent in agents)
     return {

@@ -26,9 +26,7 @@ def clean(value: object, multiline: bool = False) -> str:
     text = str(value or "")
     if multiline:
         return "\n".join(clean(line) for line in text.splitlines())
-    return " ".join(
-        "".join(char for char in text if char.isprintable() or char.isspace()).split()
-    )
+    return " ".join("".join(char for char in text if char.isprintable() or char.isspace()).split())
 
 
 def load_snapshot(path: Path) -> tuple[JsonObject | None, str | None]:
@@ -58,9 +56,7 @@ def rows(path: Path, attention: bool) -> None:
     if data is None:
         print(f"-\t\033[90m{error}\033[0m")
         return
-    agents = [
-        agent for agent in data["agents"] if not attention or agent["needs_attention"]
-    ]
+    agents = [agent for agent in data["agents"] if not attention or agent["needs_attention"]]
     if not agents:
         label = (
             "No agents need attention"
@@ -75,8 +71,7 @@ def rows(path: Path, attention: bool) -> None:
         if agent["parent_id"]:
             title = "↳ " + title
         print(
-            f"{agent['id']}\t\033[{color}m● {label:8s}\033[0m  "
-            f"\033[90m{project:14s}\033[0m {title}"
+            f"{agent['id']}\t\033[{color}m● {label:8s}\033[0m  \033[90m{project:14s}\033[0m {title}"
         )
 
 
@@ -90,9 +85,7 @@ def header(path: Path) -> None:
     attention = sum(agent["needs_attention"] for agent in agents)
     working = sum(agent["status"] == "working" for agent in agents)
     idle = sum(agent["status"] == "idle" for agent in agents)
-    stamp = time.strftime("%I:%M:%S %p", time.localtime(data["generated_at"])).lstrip(
-        "0"
-    )
+    stamp = time.strftime("%I:%M:%S %p", time.localtime(data["generated_at"])).lstrip("0")
     print(f"{attention} attention · {working} working · {idle} idle")
     print(f"{len(agents)} conversations in tmux · updated {stamp}\n ")
 
@@ -122,9 +115,7 @@ def open_thread(path: Path, thread_id: str, client: str) -> None:
         print("change-footer(No matching tmux pane · Alt-Enter expand · Esc close)")
         return
     if len(panes) > 1:
-        print(
-            "change-footer(Thread is open in multiple panes · Alt-Enter expand · Esc close)"
-        )
+        print("change-footer(Thread is open in multiple panes · Alt-Enter expand · Esc close)")
         return
     command = ["tmux", "switch-client", "-t", panes[0]]
     if client:
@@ -139,9 +130,7 @@ def item_text(item: JsonObject) -> tuple[str, str] | tuple[None, None]:
         return "CODEX", item.get("text", "")
     if kind == "userMessage":
         return "PROMPT", "\n".join(
-            part.get("text", "")
-            for part in item.get("content", [])
-            if part.get("type") == "text"
+            part.get("text", "") for part in item.get("content", []) if part.get("type") == "text"
         )
     if kind == "commandExecution":
         return "COMMAND", item.get("command", "")
@@ -155,9 +144,7 @@ def detail() -> None:
     try:
         agent = json.load(sys.stdin)
     except ValueError:
-        print(
-            "Details unavailable. The conversation may have closed; retrying on refresh."
-        )
+        print("Details unavailable. The conversation may have closed; retrying on refresh.")
         return
     color, label = STYLES[agent["status"]]
     print(f"{clean(agent['title'])}\n")

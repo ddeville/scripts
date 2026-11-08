@@ -37,9 +37,7 @@ def pane_matches(thread_ids: list[str]) -> dict[str, list[str]]:
         if command != "codex" or not TITLE_ID.fullmatch(suffix):
             continue
         prefix = suffix.removesuffix("...")
-        candidates = [
-            thread_id for thread_id in thread_ids if thread_id.startswith(prefix)
-        ]
+        candidates = [thread_id for thread_id in thread_ids if thread_id.startswith(prefix)]
         if len(candidates) == 1:
             matches.setdefault(candidates[0], []).append(pane)
     return matches
