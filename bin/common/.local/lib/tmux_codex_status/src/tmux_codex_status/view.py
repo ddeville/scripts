@@ -1,6 +1,6 @@
 """Format conversation data with the terminal's palette."""
 
-from itertools import groupby, islice
+from itertools import groupby
 from pathlib import Path
 
 from rich.table import Table
@@ -28,7 +28,9 @@ def clean(value: object) -> str:
 def path_label(path: str) -> str:
     """Abbreviate the home directory in project headings."""
     home = str(Path.home())
-    return clean("~" + path[len(home) :] if path == home or path.startswith(home + "/") else path)
+    if path == home or path.startswith(home + "/"):
+        path = "~" + path[len(home) :]
+    return clean(path)
 
 
 def task_options(agents: list[JsonObject]) -> list[Option]:
@@ -36,7 +38,8 @@ def task_options(agents: list[JsonObject]) -> list[Option]:
     options: list[Option] = []
     for cwd, entries in groupby(agents, key=lambda agent: agent["cwd"]):
         group = list(entries)
-        heading = Text(f"{'\n' if options else ''}{path_label(cwd)}  {len(group)}", "bright_black")
+        separator = "\n" if options else ""
+        heading = Text(f"{separator}{path_label(cwd)}  {len(group)}", "bright_black")
         options.append(Option(heading, id=f"project:{cwd}", disabled=True))
         for agent in group:
             color, label = STYLES[agent["status"]]
@@ -44,9 +47,9 @@ def task_options(agents: list[JsonObject]) -> list[Option]:
             row.add_column(width=1)
             row.add_column(ratio=1, no_wrap=True, overflow="ellipsis")
             row.add_column(width=11, no_wrap=True)
-            title = ("↳ " if agent.get("parent_id") else "") + " ".join(
-                clean(agent["title"]).split()
-            )
+            title = " ".join(clean(agent["title"]).split())
+            if agent.get("parent_id"):
+                title = "↳ " + title
             row.add_row(
                 Text("○" if agent["status"] == "idle" else "●", color),
                 Text(title),
@@ -96,8 +99,13 @@ def detail_text(agent: JsonObject | None, details: JsonObject) -> Text:
     entries = details.get("recent_items") or [
         {"item": item} for item in reversed(latest.get("items", []))
     ]
-    messages = (item_text(entry.get("item", {})) for entry in entries)
-    messages = list(islice(((label, body) for label, body in messages if body), 3))
+    messages: list[tuple[str, str]] = []
+    for entry in entries:
+        label, body = item_text(entry.get("item", {}))
+        if body:
+            messages.append((label, body))
+        if len(messages) == 3:
+            break
     if not messages:
         messages = [("Prompt", details.get("initial_prompt") or "No messages yet.")]
     for label, body in messages:

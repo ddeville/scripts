@@ -46,7 +46,7 @@ def status_command(watch: bool, interval: float, output: Path | None, detail: st
     if detail and watch:
         raise click.UsageError("--detail cannot be combined with --watch")
     try:
-        asyncio.run(status.run(watch, interval, output, detail))
+        asyncio.run(status.run(watch=watch, interval=interval, output=output, thread_id=detail))
     except BrokenPipeError:
         return
     except (OSError, ValueError, WebSocketException, status.RpcError) as exc:

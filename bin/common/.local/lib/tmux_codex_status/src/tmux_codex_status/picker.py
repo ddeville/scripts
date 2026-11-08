@@ -47,9 +47,7 @@ class Picker(App[list[str] | None]):
     }
     OptionList, #details { border-top: solid ansi_bright_black; border-title-color: ansi_bright_black; }
     OptionList:focus, #details:focus { border-title-color: ansi_yellow; background-tint: transparent; }
-    OptionList > .option-list--option-highlighted {
-        background: #3a3a3a; color: ansi_default; text-style: none;
-    }
+    OptionList > .option-list--option-highlighted,
     OptionList:focus > .option-list--option-highlighted {
         background: #3a3a3a; color: ansi_default; text-style: none;
     }
@@ -80,10 +78,10 @@ class Picker(App[list[str] | None]):
         super().__init__(ansi_color=True)
         self.theme = "ansi-dark"
         self.animation_level = "none"
-        self.client = client
+        self.tmux_client = client
         self.agents: list[JsonObject] = []
-        self.thread_ids: list[str] = []
-        self.selected: str | None = None
+        self.loaded_thread_ids: list[str] = []
+        self.selected_id: str | None = None
         self.details_data: JsonObject = {}
         self.received_at = 0.0
         self.error = "Connecting to Codex…"
@@ -115,12 +113,11 @@ class Picker(App[list[str] | None]):
 
     def filtered(self, key: str) -> list[JsonObject]:
         """Select the conversations belonging to a status tab."""
-        return [
-            agent
-            for agent in self.agents
-            if key == "all"
-            or (agent["needs_attention"] if key == "attention" else agent["status"] == key)
-        ]
+        if key == "all":
+            return self.agents
+        if key == "attention":
+            return [agent for agent in self.agents if agent["needs_attention"]]
+        return [agent for agent in self.agents if agent["status"] == key]
 
     @work
     async def poll_status(self) -> None:
@@ -131,7 +128,7 @@ class Picker(App[list[str] | None]):
                 self.error = data["connection"]["error"] or ""
                 if not self.error:
                     self.received_at = time.monotonic()
-                    self.thread_ids = [agent["id"] for agent in data["agents"]]
+                    self.loaded_thread_ids = [agent["id"] for agent in data["agents"]]
                     self.agents = sorted(
                         (agent for agent in data["agents"] if agent["tmux_panes"]),
                         key=lambda agent: (agent["cwd"].casefold(), agent["cwd"]),
@@ -146,9 +143,8 @@ class Picker(App[list[str] | None]):
                         )
                     )
                     for key, label in FILTERS.items():
-                        self.tabs.query_one(
-                            f"#{key}", Tab
-                        ).label = f"{label} {len(self.filtered(key))}"
+                        tab = self.tabs.query_one(f"#{key}", Tab)
+                        tab.label = f"{label} {len(self.filtered(key))}"
                 self.update_list()
                 self.update_footer()
                 await asyncio.sleep(2)
@@ -162,19 +158,20 @@ class Picker(App[list[str] | None]):
                 disabled=True,
             )
         ]
-        selected = (
-            self.selected
-            if any(agent["id"] == self.selected for agent in agents)
-            else next((agent["id"] for agent in agents), None)
-        )
+        visible_ids = [agent["id"] for agent in agents]
+        selected_id = self.selected_id
+        if selected_id not in visible_ids:
+            selected_id = visible_ids[0] if visible_ids else None
         with self.prevent(OptionList.OptionHighlighted):
             if [option.id for option in options] == [option.id for option in self.tasks.options]:
                 for index, option in enumerate(options):
                     self.tasks.replace_option_prompt_at_index(index, option.prompt)
             else:
                 self.tasks.set_options(options)
-            self.tasks.highlighted = self.tasks.get_option_index(selected) if selected else None
-        self.select_thread(selected)
+            self.tasks.highlighted = (
+                self.tasks.get_option_index(selected_id) if selected_id else None
+            )
+        self.select_thread(selected_id)
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         """Apply the selected status filter."""
@@ -186,8 +183,8 @@ class Picker(App[list[str] | None]):
 
     def select_thread(self, thread_id: str | None) -> None:
         """Keep details fresh while preserving scroll on ordinary status updates."""
-        if thread_id != self.selected:
-            self.selected = thread_id
+        if thread_id != self.selected_id:
+            self.selected_id = thread_id
             self.notice = ""
             self.details_data = {}
             self.details_scroll.scroll_home(animate=False)
@@ -211,20 +208,14 @@ class Picker(App[list[str] | None]):
 
     def show_details(self) -> None:
         """Render history with the most recent status metadata."""
-        agent = next((agent for agent in self.agents if agent["id"] == self.selected), None)
+        agent = next((agent for agent in self.agents if agent["id"] == self.selected_id), None)
         self.details.update(view.detail_text(agent, self.details_data))
 
     def update_footer(self) -> None:
         """Show connection errors and stale data alongside normal keyboard hints."""
-        message = (
-            self.notice
-            or self.error
-            or (
-                "Status is stale; waiting for Codex"
-                if time.monotonic() - self.received_at > 10
-                else ""
-            )
-        )
+        message = self.notice or self.error
+        if not message and time.monotonic() - self.received_at > 10:
+            message = "Status is stale; waiting for Codex"
         self.footer.update(Text(message or HINTS, "magenta" if message else "bright_black"))
 
     def on_resize(self, event: Resize) -> None:
@@ -271,8 +262,8 @@ class Picker(App[list[str] | None]):
 
     def finish(self, command: list[str] | None = None) -> None:
         """Let tmux restore the popup immediately, or clean up a standalone terminal."""
-        if self.client:
-            command = command or ["tmux", "display-popup", "-C", "-c", self.client]
+        if self.tmux_client:
+            command = command or ["tmux", "display-popup", "-C", "-c", self.tmux_client]
             os.execvp(command[0], command)
         self.exit(command)
 
@@ -283,7 +274,7 @@ class Picker(App[list[str] | None]):
     @work(group="open", exclusive=True)
     async def action_open_thread(self) -> None:
         """Verify the selected pane before leaving the popup."""
-        if not self.selected:
+        if not self.selected_id:
             return
         if self.error or time.monotonic() - self.received_at > 10:
             self.notice = "Status unavailable; wait for a fresh update"
@@ -291,7 +282,7 @@ class Picker(App[list[str] | None]):
             return
         try:
             command = await asyncio.to_thread(
-                tmux.switch_command, self.selected, self.thread_ids, self.client
+                tmux.switch_command, self.selected_id, self.loaded_thread_ids, self.tmux_client
             )
         except (OSError, ValueError) as exc:
             self.notice = view.clean(exc)

@@ -32,7 +32,7 @@ def pane_matches(thread_ids: list[str]) -> dict[str, list[str]]:
 
     matches: dict[str, list[str]] = {}
     for line in result.stdout.splitlines():
-        pane, _, remainder = line.partition("\t")
+        pane_id, _, remainder = line.partition("\t")
         command, _, title = remainder.partition("\t")
         suffix = title.rsplit(" | ", 1)[-1]
         if command != "codex" or not TITLE_ID.fullmatch(suffix):
@@ -40,7 +40,7 @@ def pane_matches(thread_ids: list[str]) -> dict[str, list[str]]:
         prefix = suffix.removesuffix("...")
         candidates = [thread_id for thread_id in thread_ids if thread_id.startswith(prefix)]
         if len(candidates) == 1:
-            matches.setdefault(candidates[0], []).append(pane)
+            matches.setdefault(candidates[0], []).append(pane_id)
     return matches
 
 

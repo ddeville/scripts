@@ -55,21 +55,22 @@ class CodexClient:
     async def connect(self) -> None:
         """Open a connection if needed and reset the request deadline."""
         self.deadline = time.monotonic() + 8
-        if self.connection is None:
-            self.connection = await unix_connect(
-                self.socket_path,
-                open_timeout=2,
-                close_timeout=0.2,
-                max_size=16 * 1024 * 1024,
-            )
-            await self.call(
-                "initialize",
-                {
-                    "clientInfo": {"name": "tmux_codex_status", "version": "1.0.0"},
-                    "capabilities": {"experimentalApi": True},
-                },
-            )
-            await self.connection.send(json.dumps({"method": "initialized"}))
+        if self.connection is not None:
+            return
+        self.connection = await unix_connect(
+            self.socket_path,
+            open_timeout=2,
+            close_timeout=0.2,
+            max_size=16 * 1024 * 1024,
+        )
+        await self.call(
+            "initialize",
+            {
+                "clientInfo": {"name": "tmux_codex_status", "version": "1.0.0"},
+                "capabilities": {"experimentalApi": True},
+            },
+        )
+        await self.connection.send(json.dumps({"method": "initialized"}))
 
     async def call(self, method: str, params: JsonObject) -> JsonObject:
         """Send an RPC request and wait for its response."""
@@ -157,12 +158,13 @@ async def snapshot(client: CodexClient) -> JsonObject:
                 )
                 thread = result["thread"]
                 # A thread can unload between the enumeration and metadata read.
-                if thread.get("status", {}).get("type") != "notLoaded":
-                    agents.append(agent_record(thread, result.get("readState")))
+                if thread.get("status", {}).get("type") == "notLoaded":
+                    continue
+                record = agent_record(thread, result.get("readState"))
             except RpcError as exc:
                 record = agent_record({"id": thread_id, "name": thread_id}, None)
                 record["error"] = str(exc)
-                agents.append(record)
+            agents.append(record)
     except (OSError, WebSocketException, RpcError, ValueError) as exc:
         await client.aclose()
         agents = []
@@ -219,7 +221,7 @@ async def detail(client: CodexClient, thread_id: str) -> JsonObject:
             },
         )
         turn_data: list[JsonObject] = turns["data"]
-        latest_turn = next(iter(turn_data), None)
+        latest_turn = turn_data[0] if turn_data else None
         record["latest_turn"] = latest_turn
         if latest_turn:
             items = await client.call(
@@ -268,7 +270,10 @@ async def run(
     async with aclosing(CodexClient()) as client:
         while True:
             started = time.monotonic()
-            data = await detail(client, thread_id) if thread_id else await snapshot(client)
+            if thread_id:
+                data = await detail(client, thread_id)
+            else:
+                data = await snapshot(client)
             if output:
                 write_snapshot(output, data)
             else:
