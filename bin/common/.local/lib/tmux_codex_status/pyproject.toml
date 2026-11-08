@@ -2,11 +2,14 @@
 name = "tmux_codex_status"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["websockets==15.0.1"]
+dependencies = [
+    "click>=8.5.1",
+    "websockets>=17.4",
+]
 
 [project.scripts]
 tmux_codex_status = "tmux_codex_status.main:main"
 
 [build-system]
-requires = ["uv_build>=0.13.7,<0.14"]
+requires = ["uv_build>=0.13.7"]
 build-backend = "uv_build"
