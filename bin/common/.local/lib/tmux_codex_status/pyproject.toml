@@ -13,3 +13,6 @@ tmux_codex_status = "tmux_codex_status.cli:cli"
 [build-system]
 requires = ["uv_build>=0.13.7"]
 build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
