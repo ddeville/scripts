@@ -1,5 +1,6 @@
 """Open the Codex picker or export status as JSON."""
 
+import asyncio
 from pathlib import Path
 
 import click
@@ -45,7 +46,7 @@ def status_command(watch: bool, interval: float, output: Path | None, detail: st
     if detail and watch:
         raise click.UsageError("--detail cannot be combined with --watch")
     try:
-        status.run(watch, interval, output, detail)
+        asyncio.run(status.run(watch, interval, output, detail))
     except BrokenPipeError:
         return
     except (OSError, ValueError, WebSocketException, status.RpcError) as exc:

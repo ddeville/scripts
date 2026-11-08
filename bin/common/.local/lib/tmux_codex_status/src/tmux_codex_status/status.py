@@ -1,15 +1,16 @@
 """Read local Codex state without subscribing to or resuming conversations."""
 
+import asyncio
 import json
 import os
 import tempfile
 import time
-from contextlib import ExitStack, closing
+from contextlib import aclosing
 from pathlib import Path
 from typing import Any, Literal
 
+from websockets.asyncio.client import ClientConnection, unix_connect
 from websockets.exceptions import WebSocketException
-from websockets.sync.client import ClientConnection, unix_connect
 
 from tmux_codex_status.tmux import pane_matches
 
@@ -33,7 +34,7 @@ class RpcError(Exception):
 
 
 class CodexClient:
-    """A synchronous client for the local Codex app server."""
+    """An async client for the local Codex app server."""
 
     def __init__(self, socket_path: str | None = None) -> None:
         """Set up a client for the local Codex socket."""
@@ -42,60 +43,60 @@ class CodexClient:
             / "app-server-control/app-server-control.sock"
         )
         self.connection: ClientConnection | None = None
-        self.connection_context = ExitStack()
         self.request_id = 0
         self.deadline = 0.0
 
-    def close(self) -> None:
+    async def aclose(self) -> None:
         """Close the connection if one is open."""
         if self.connection is not None:
-            self.connection_context.close()
+            await self.connection.close()
             self.connection = None
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         """Open a connection if needed and reset the request deadline."""
         self.deadline = time.monotonic() + 8
         if self.connection is None:
-            self.connection = self.connection_context.enter_context(
-                unix_connect(
-                    self.socket_path,
-                    open_timeout=2,
-                    close_timeout=0.2,
-                    max_size=16 * 1024 * 1024,
-                )
+            self.connection = await unix_connect(
+                self.socket_path,
+                open_timeout=2,
+                close_timeout=0.2,
+                max_size=16 * 1024 * 1024,
             )
-            self.call(
+            await self.call(
                 "initialize",
                 {
                     "clientInfo": {"name": "tmux_codex_status", "version": "1.0.0"},
                     "capabilities": {"experimentalApi": True},
                 },
             )
-            self.connection.send(json.dumps({"method": "initialized"}))
+            await self.connection.send(json.dumps({"method": "initialized"}))
 
-    def call(self, method: str, params: JsonObject) -> JsonObject:
+    async def call(self, method: str, params: JsonObject) -> JsonObject:
         """Send an RPC request and wait for its response."""
         assert self.connection is not None
         self.request_id += 1
         request_id = self.request_id
-        self.connection.send(json.dumps({"id": request_id, "method": method, "params": params}))
+        await self.connection.send(
+            json.dumps({"id": request_id, "method": method, "params": params})
+        )
         while True:
             remaining = min(3, self.deadline - time.monotonic())
             if remaining <= 0:
                 raise TimeoutError("Timed out reading Codex state")
-            message = json.loads(self.connection.recv(timeout=remaining))
+            async with asyncio.timeout(remaining):
+                message = json.loads(await self.connection.recv())
             if message.get("id") != request_id:
                 continue
             if "error" in message:
                 raise RpcError(message["error"]["message"])
             return message["result"]
 
-    def loaded_ids(self) -> list[str]:
+    async def loaded_ids(self) -> list[str]:
         """List unique conversation IDs currently loaded by Codex."""
         ids: list[str] = []
         cursor = None
         while True:
-            page = self.call("thread/loaded/list", {"cursor": cursor, "limit": 100})
+            page = await self.call("thread/loaded/list", {"cursor": cursor, "limit": 100})
             ids.extend(page["data"])
             cursor = page.get("nextCursor")
             if not cursor:
@@ -143,15 +144,17 @@ def agent_record(thread: JsonObject, read_state: JsonObject | None) -> JsonObjec
     }
 
 
-def snapshot(client: CodexClient) -> JsonObject:
+async def snapshot(client: CodexClient) -> JsonObject:
     """Collect current conversations, status counts, and connection health."""
     agents: list[JsonObject] = []
     error = None
     try:
-        client.connect()
-        for thread_id in client.loaded_ids():
+        await client.connect()
+        for thread_id in await client.loaded_ids():
             try:
-                result = client.call("thread/read", {"threadId": thread_id, "includeTurns": False})
+                result = await client.call(
+                    "thread/read", {"threadId": thread_id, "includeTurns": False}
+                )
                 thread = result["thread"]
                 # A thread can unload between the enumeration and metadata read.
                 if thread.get("status", {}).get("type") != "notLoaded":
@@ -161,10 +164,10 @@ def snapshot(client: CodexClient) -> JsonObject:
                 record["error"] = str(exc)
                 agents.append(record)
     except (OSError, WebSocketException, RpcError, ValueError) as exc:
-        client.close()
+        await client.aclose()
         agents = []
         error = str(exc) or type(exc).__name__
-    panes = pane_matches([agent["id"] for agent in agents])
+    panes = await asyncio.to_thread(pane_matches, [agent["id"] for agent in agents])
     for agent in agents:
         agent["tmux_panes"] = panes.get(agent["id"], [])
     agents.sort(
@@ -194,10 +197,10 @@ def snapshot(client: CodexClient) -> JsonObject:
     }
 
 
-def detail(client: CodexClient, thread_id: str) -> JsonObject:
+async def detail(client: CodexClient, thread_id: str) -> JsonObject:
     """Fetch a conversation's metadata and recent activity."""
-    client.connect()
-    result = client.call("thread/read", {"threadId": thread_id, "includeTurns": False})
+    await client.connect()
+    result = await client.call("thread/read", {"threadId": thread_id, "includeTurns": False})
     record = {
         **agent_record(result["thread"], result.get("readState")),
         "initial_prompt": result["thread"].get("preview", ""),
@@ -206,7 +209,7 @@ def detail(client: CodexClient, thread_id: str) -> JsonObject:
         "history_error": None,
     }
     try:
-        turns = client.call(
+        turns = await client.call(
             "thread/turns/list",
             {
                 "threadId": thread_id,
@@ -219,7 +222,7 @@ def detail(client: CodexClient, thread_id: str) -> JsonObject:
         latest_turn = next(iter(turn_data), None)
         record["latest_turn"] = latest_turn
         if latest_turn:
-            items = client.call(
+            items = await client.call(
                 "thread/items/list",
                 {
                     "threadId": thread_id,
@@ -255,21 +258,21 @@ def write_snapshot(path: Path, data: JsonObject) -> None:
             temporary.unlink(missing_ok=True)
 
 
-def run(
+async def run(
     watch: bool,
     interval: float,
     output: Path | None,
     thread_id: str | None,
 ) -> None:
     """Write one snapshot or keep publishing updates."""
-    with closing(CodexClient()) as client:
+    async with aclosing(CodexClient()) as client:
         while True:
             started = time.monotonic()
-            data = detail(client, thread_id) if thread_id else snapshot(client)
+            data = await detail(client, thread_id) if thread_id else await snapshot(client)
             if output:
                 write_snapshot(output, data)
             else:
                 print(json.dumps(data, ensure_ascii=False), flush=True)
             if not watch:
                 return
-            time.sleep(max(0, interval - (time.monotonic() - started)))
+            await asyncio.sleep(max(0, interval - (time.monotonic() - started)))

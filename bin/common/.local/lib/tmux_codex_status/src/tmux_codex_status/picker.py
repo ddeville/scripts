@@ -1,88 +1,120 @@
-"""Browse live Codex conversations in a tmux popup."""
+"""Browse live Codex conversations using Textual's navigation and layout."""
 
 import asyncio
 import os
 import time
-from contextlib import closing
-from queue import Empty, Queue
-from threading import Event, Thread
+from contextlib import aclosing
 
-from prompt_toolkit.application import Application
-from prompt_toolkit.data_structures import Point
-from prompt_toolkit.formatted_text import StyleAndTextTuples, fragment_list_width
-from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
-from prompt_toolkit.layout import Layout, Window
-from prompt_toolkit.layout.controls import UIContent, UIControl
-from prompt_toolkit.output import ColorDepth
+from rich.text import Text
+from textual import work
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Horizontal, VerticalScroll
+from textual.events import Resize
+from textual.widgets import OptionList, Static, Tab, Tabs
+from textual.widgets.option_list import Option
 from websockets.exceptions import WebSocketException
 
 from tmux_codex_status import status, tmux, view
 from tmux_codex_status.status import JsonObject
 
-FILTERS = (
-    ("All", "all"),
-    ("Needs you", "attention"),
-    ("Working", "working"),
-    ("Ready", "ready"),
-    ("Idle", "idle"),
-)
-STALE_AFTER = 10
+FILTERS = {
+    "all": "All",
+    "attention": "Needs you",
+    "working": "Working",
+    "ready": "Ready",
+    "idle": "Idle",
+}
+HINTS = "j/k move · h/l focus · Tab filter · Ctrl-f needs you · e expand · Enter open · Esc close"
 
 
-class Picker(UIControl):
-    """Keep selection, filters, and details independent of background reads."""
+class Picker(App[list[str] | None]):
+    """Coordinate status reads and a pair of standard scrolling widgets."""
+
+    ENABLE_COMMAND_PALETTE = False
+    CSS = """
+    Screen { padding: 1 2 0 2; background: ansi_default; color: ansi_default; }
+    #heading { height: 1; }
+    Tabs { height: 2; }
+    Tabs Underline { display: none; }
+    Tab { color: ansi_bright_black; text-style: none; }
+    Tab.-active { color: ansi_yellow; background: #3a3a3a; text-style: none; }
+    Horizontal { height: 1fr; }
+    OptionList { width: 3fr; height: 1fr; padding: 0; border: none; }
+    #details {
+        width: 2fr; padding: 0 1; border-left: solid ansi_bright_black;
+        scrollbar-size: 0 0;
+    }
+    OptionList, #details { border-top: solid ansi_bright_black; border-title-color: ansi_bright_black; }
+    OptionList:focus, #details:focus { border-title-color: ansi_yellow; background-tint: transparent; }
+    OptionList > .option-list--option-highlighted {
+        background: #3a3a3a; color: ansi_default; text-style: none;
+    }
+    OptionList:focus > .option-list--option-highlighted {
+        background: #3a3a3a; color: ansi_default; text-style: none;
+    }
+    OptionList > .option-list--option-disabled { color: ansi_bright_black; text-style: none; }
+    OptionList > .option-list--option-hover { background: transparent; }
+    #footer { height: 2; border-top: solid ansi_bright_black; color: ansi_bright_black; }
+    .narrow #details { display: none; }
+    .narrow.details-focus #tasks, .expanded #tasks { display: none; }
+    .narrow.details-focus #details, .expanded #details { display: block; border-left: none; }
+    """
+    BINDINGS = [
+        Binding("escape,q,ctrl+c", "quit", show=False, priority=True),
+        Binding("tab", "cycle_filter(1)", show=False, priority=True),
+        Binding("shift+tab", "cycle_filter(-1)", show=False, priority=True),
+        Binding("ctrl+f", "attention", show=False),
+        Binding("h,left", "focus_pane('tasks')", show=False, priority=True),
+        Binding("l,right", "focus_pane('details')", show=False, priority=True),
+        Binding("j", "navigate('down')", show=False),
+        Binding("k", "navigate('up')", show=False),
+        Binding("ctrl+d", "navigate('down', True)", show=False),
+        Binding("ctrl+u", "navigate('up', True)", show=False),
+        Binding("e", "expand", show=False),
+        Binding("enter", "open_thread", show=False, priority=True),
+    ]
 
     def __init__(self, client: str) -> None:
-        """Create the dashboard and its background work queues."""
+        """Create the widgets and the small amount of application state."""
+        super().__init__(ansi_color=True)
+        self.theme = "ansi-dark"
+        self.animation_level = "none"
         self.client = client
         self.agents: list[JsonObject] = []
         self.thread_ids: list[str] = []
         self.selected: str | None = None
-        self.details: JsonObject = {}
-        self.filter_index = 0
-        self.details_focused = False
-        self.expanded = False
-        self.list_scroll = 0
-        self.detail_scroll = 0
-        self.body_height = 1
-        self.detail_height = 0
-        self.updated_at = 0.0
-        self.received_at: float | None = None
-        self.connection_error = "Connecting to Codex…"
+        self.details_data: JsonObject = {}
+        self.received_at = 0.0
+        self.error = "Connecting to Codex…"
         self.notice = ""
-        self.opening = False
-        self.stopped = Event()
-        self.updates: Queue[tuple[str | None, JsonObject]] = Queue()
-        self.detail_requests: Queue[str | None] = Queue()
-        self.app: Application[list[str] | None] = Application(
-            layout=Layout(Window(self)),
-            key_bindings=self.bindings(),
-            style=view.STYLE,
-            color_depth=ColorDepth.DEPTH_8_BIT,
-            full_screen=True,
-            before_render=self.apply_updates,
-            refresh_interval=1,
-        )
-        self.app.ttimeoutlen = 0.05
-        self.app.timeoutlen = 0.05
+        self.expanded = False
+        self.heading = Static(Text("Codex agents", "yellow"), id="heading")
+        self.tabs = Tabs(*(Tab(label, id=key) for key, label in FILTERS.items()), active="all")
+        self.tasks = OptionList(id="tasks")
+        self.details = Static()
+        self.details_scroll = VerticalScroll(self.details, id="details")
+        self.footer = Static(id="footer")
 
-    def is_focusable(self) -> bool:
-        """Receive keyboard input without a text entry field."""
-        return True
+    def compose(self) -> ComposeResult:
+        """Let Textual lay out the header, list, details, and footer."""
+        yield self.heading
+        yield self.tabs
+        with Horizontal():
+            yield self.tasks
+            yield self.details_scroll
+        yield self.footer
 
-    def create_content(self, width: int, height: int) -> UIContent:
-        """Build the visible screen, keeping scrolling inside each pane."""
-        lines = self.screen(width, height)
-        return UIContent(
-            get_line=lambda index: lines[index],
-            line_count=len(lines),
-            cursor_position=Point(0, 0),
-            show_cursor=False,
-        )
+    def on_mount(self) -> None:
+        """Start polling and focus the task list."""
+        self.tasks.border_title = "Tasks"
+        self.details_scroll.border_title = "Task details"
+        self.tasks.focus()
+        self.poll_status()
+        self.set_interval(1, self.update_footer)
 
-    def filtered(self, filter_index: int | None = None) -> list[JsonObject]:
-        """Return threads matching a tab, in project order."""
-        key = FILTERS[self.filter_index if filter_index is None else filter_index][1]
+    def filtered(self, key: str) -> list[JsonObject]:
+        """Select the conversations belonging to a status tab."""
         return [
             agent
             for agent in self.agents
@@ -90,284 +122,174 @@ class Picker(UIControl):
             or (agent["needs_attention"] if key == "attention" else agent["status"] == key)
         ]
 
-    def select(self, thread_id: str | None) -> None:
-        """Select a thread and request its details without blocking input."""
+    @work
+    async def poll_status(self) -> None:
+        """Read status until Textual cancels the worker on exit."""
+        async with aclosing(status.CodexClient()) as client:
+            while True:
+                data = await status.snapshot(client)
+                self.error = data["connection"]["error"] or ""
+                if not self.error:
+                    self.received_at = time.monotonic()
+                    self.thread_ids = [agent["id"] for agent in data["agents"]]
+                    self.agents = sorted(
+                        (agent for agent in data["agents"] if agent["tmux_panes"]),
+                        key=lambda agent: (agent["cwd"].casefold(), agent["cwd"]),
+                    )
+                    stamp = time.strftime(
+                        "%I:%M:%S %p", time.localtime(data["generated_at"])
+                    ).lstrip("0")
+                    self.heading.update(
+                        Text.assemble(
+                            ("Codex agents", "yellow"),
+                            (f"  tmux · updated {stamp}", "bright_black"),
+                        )
+                    )
+                    for key, label in FILTERS.items():
+                        self.tabs.query_one(
+                            f"#{key}", Tab
+                        ).label = f"{label} {len(self.filtered(key))}"
+                self.update_list()
+                self.update_footer()
+                await asyncio.sleep(2)
+
+    def update_list(self) -> None:
+        """Refresh rows without resetting selection or scrolling."""
+        agents = self.filtered(self.tabs.active)
+        options = view.task_options(agents) or [
+            Option(
+                Text(self.error or "No conversations match this filter", "bright_black"),
+                disabled=True,
+            )
+        ]
+        selected = (
+            self.selected
+            if any(agent["id"] == self.selected for agent in agents)
+            else next((agent["id"] for agent in agents), None)
+        )
+        with self.prevent(OptionList.OptionHighlighted):
+            if [option.id for option in options] == [option.id for option in self.tasks.options]:
+                for index, option in enumerate(options):
+                    self.tasks.replace_option_prompt_at_index(index, option.prompt)
+            else:
+                self.tasks.set_options(options)
+            self.tasks.highlighted = self.tasks.get_option_index(selected) if selected else None
+        self.select_thread(selected)
+
+    def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
+        """Apply the selected status filter."""
+        self.update_list()
+
+    def on_option_list_option_highlighted(self, event: OptionList.OptionHighlighted) -> None:
+        """Load details for the highlighted conversation."""
+        self.select_thread(event.option_id)
+
+    def select_thread(self, thread_id: str | None) -> None:
+        """Keep details fresh while preserving scroll on ordinary status updates."""
         if thread_id != self.selected:
             self.selected = thread_id
-            self.details = {}
-            self.detail_scroll = 0
             self.notice = ""
-        if thread_id is not None:
-            self.detail_requests.put(thread_id)
+            self.details_data = {}
+            self.details_scroll.scroll_home(animate=False)
+            self.workers.cancel_group(self, "details")
+            if thread_id:
+                self.poll_details(thread_id)
+        self.show_details()
 
-    def reconcile_selection(self) -> None:
-        """Keep the same thread selected whenever it remains visible."""
-        ids = [agent["id"] for agent in self.filtered()]
-        self.select(self.selected if self.selected in ids else next(iter(ids), None))
-
-    def publish(self, thread_id: str | None, data: JsonObject) -> None:
-        """Queue thread details, or a status snapshot when no thread ID is given."""
-        if not self.stopped.is_set():
-            self.updates.put((thread_id, data))
-            self.app.invalidate()
-
-    def collect_status(self) -> None:
-        """Poll Codex and tmux using a connection owned by this worker."""
-        with closing(status.CodexClient()) as client:
-            while not self.stopped.is_set():
-                self.publish(None, status.snapshot(client))
-                self.stopped.wait(2)
-
-    def collect_details(self) -> None:
-        """Fetch only the newest requested selection on a separate connection."""
-        with closing(status.CodexClient()) as client:
-            while not self.stopped.is_set():
-                thread_id = self.detail_requests.get()
+    @work(group="details", exclusive=True)
+    async def poll_details(self, thread_id: str) -> None:
+        """Poll the selected thread; changing selection cancels this worker."""
+        async with aclosing(status.CodexClient()) as client:
+            while True:
                 try:
-                    while thread_id is not None:
-                        thread_id = self.detail_requests.get_nowait()
-                except Empty:
-                    pass
-                if thread_id is None:
-                    return
-                try:
-                    data = status.detail(client, thread_id)
+                    self.details_data = await status.detail(client, thread_id)
                 except (OSError, ValueError, WebSocketException, status.RpcError) as exc:
-                    client.close()
-                    data = {"history_error": str(exc) or type(exc).__name__}
-                self.publish(thread_id, data)
+                    await client.aclose()
+                    self.details_data = {"history_error": str(exc) or type(exc).__name__}
+                self.show_details()
+                await asyncio.sleep(2)
 
-    def start(self) -> None:
-        """Start daemon workers so slow server reads cannot delay closing the UI."""
-        Thread(target=self.collect_status, daemon=True, name="codex-status").start()
-        Thread(target=self.collect_details, daemon=True, name="codex-details").start()
+    def show_details(self) -> None:
+        """Render history with the most recent status metadata."""
+        agent = next((agent for agent in self.agents if agent["id"] == self.selected), None)
+        self.details.update(view.detail_text(agent, self.details_data))
 
-    def stop(self) -> None:
-        """Stop polling and wake the details worker for cleanup."""
-        self.stopped.set()
-        self.detail_requests.put(None)
-
-    def apply_updates(self, app: Application[list[str] | None]) -> None:
-        """Apply background results immediately before the next redraw."""
-        while True:
-            try:
-                thread_id, data = self.updates.get_nowait()
-            except Empty:
-                return
-            if thread_id is not None:
-                if thread_id == self.selected:
-                    self.details = data
-                continue
-            if data["connection"]["status"] != "connected":
-                self.connection_error = view.clean(data["connection"]["error"])
-                continue
-            self.connection_error = ""
-            self.updated_at = data["generated_at"]
-            self.received_at = time.monotonic()
-            self.thread_ids = [agent["id"] for agent in data["agents"]]
-            self.agents = sorted(
-                (agent for agent in data["agents"] if agent.get("tmux_panes")),
-                key=lambda agent: (agent["cwd"].casefold(), agent["cwd"]),
+    def update_footer(self) -> None:
+        """Show connection errors and stale data alongside normal keyboard hints."""
+        message = (
+            self.notice
+            or self.error
+            or (
+                "Status is stale; waiting for Codex"
+                if time.monotonic() - self.received_at > 10
+                else ""
             )
-            self.reconcile_selection()
+        )
+        self.footer.update(Text(message or HINTS, "magenta" if message else "bright_black"))
 
-    def move(self, amount: int) -> None:
-        """Move through tasks or scroll the focused details pane."""
-        if self.details_focused:
-            self.detail_scroll = max(
-                0, min(self.detail_scroll + amount, max(0, self.detail_height - self.body_height))
+    def on_resize(self, event: Resize) -> None:
+        """Show one pane at a time on narrow terminals."""
+        self.screen.set_class(event.size.width < 96, "narrow")
+
+    def on_descendant_focus(self) -> None:
+        """Keep the focused pane visible after mouse or keyboard navigation."""
+        self.screen.set_class(self.details_scroll.has_focus, "details-focus")
+
+    def action_cycle_filter(self, direction: int) -> None:
+        """Cycle status tabs without changing keyboard focus."""
+        keys = list(FILTERS)
+        self.tabs.active = keys[(keys.index(self.tabs.active) + direction) % len(keys)]
+
+    def action_attention(self) -> None:
+        """Toggle between all conversations and those needing attention."""
+        self.tabs.active = "all" if self.tabs.active == "attention" else "attention"
+
+    def action_focus_pane(self, pane: str) -> None:
+        """Focus the list or its details."""
+        if pane == "tasks":
+            self.expanded = False
+        self.screen.set_class(self.expanded, "expanded")
+        self.screen.set_class(pane == "details", "details-focus")
+        self.set_focus(self.tasks if pane == "tasks" else self.details_scroll)
+
+    async def action_navigate(self, direction: str, half_page: bool = False) -> None:
+        """Reuse widget navigation actions for Vim keys."""
+        widget = self.tasks if self.focused is self.tasks else self.details_scroll
+        amount = max(1, widget.size.height // 2) if half_page else 1
+        if widget is self.tasks:
+            for _ in range(amount):
+                await widget.run_action(f"cursor_{direction}")
+        else:
+            widget.scroll_relative(
+                y=amount if direction == "down" else -amount, animate=False, immediate=True
             )
+
+    def action_expand(self) -> None:
+        """Expand or restore the details pane."""
+        self.expanded = not self.expanded
+        self.action_focus_pane("details" if self.expanded else "tasks")
+
+    @work(group="open", exclusive=True)
+    async def action_open_thread(self) -> None:
+        """Verify the selected pane before leaving the popup."""
+        if not self.selected:
             return
-        ids = [agent["id"] for agent in self.filtered()]
-        if ids:
-            index = ids.index(self.selected) if self.selected in ids else 0
-            self.select(ids[max(0, min(index + amount, len(ids) - 1))])
-
-    def set_filter(self, index: int) -> None:
-        """Change the visible status category and preserve selection when possible."""
-        self.filter_index = index % len(FILTERS)
-        self.list_scroll = 0
-        self.notice = ""
-        self.reconcile_selection()
-
-    def is_stale(self) -> bool:
-        """Measure snapshot age independently of wall-clock adjustments."""
-        return self.received_at is None or time.monotonic() - self.received_at > STALE_AFTER
-
-    async def open_selected(self) -> None:
-        """Recheck the pane mapping before leaving the popup."""
-        if self.selected is None or self.opening:
-            return
-        if self.connection_error or self.is_stale():
+        if self.error or time.monotonic() - self.received_at > 10:
             self.notice = "Status unavailable; wait for a fresh update"
+            self.update_footer()
             return
-        self.opening = True
         try:
             command = await asyncio.to_thread(
                 tmux.switch_command, self.selected, self.thread_ids, self.client
             )
-            if not self.app.is_done:
-                self.app.exit(result=command)
         except (OSError, ValueError) as exc:
             self.notice = view.clean(exc)
-        finally:
-            self.opening = False
-            self.app.invalidate()
-
-    def bindings(self) -> KeyBindings:
-        """Define navigation keys without any text-filtering mode."""
-        keys = KeyBindings()
-
-        @keys.add("j")
-        @keys.add("down")
-        @keys.add("k")
-        @keys.add("up")
-        def move(event: KeyPressEvent) -> None:
-            """Move one row in the focused pane."""
-            self.move(1 if event.key_sequence[0].key in ("j", "down") else -1)
-
-        @keys.add("h")
-        @keys.add("left")
-        @keys.add("l")
-        @keys.add("right")
-        def focus(event: KeyPressEvent) -> None:
-            """Move focus between the task list and details."""
-            self.details_focused = event.key_sequence[0].key in ("l", "right")
-            if not self.details_focused:
-                self.expanded = False
-
-        @keys.add("tab")
-        @keys.add("s-tab")
-        def cycle_filter(event: KeyPressEvent) -> None:
-            """Cycle status filters in either direction."""
-            self.set_filter(self.filter_index + (1 if event.key_sequence[0].key == "c-i" else -1))
-
-        @keys.add("c-f")
-        def attention(event: KeyPressEvent) -> None:
-            """Toggle between all threads and those needing attention."""
-            self.set_filter(0 if self.filter_index == 1 else 1)
-
-        @keys.add("pagedown")
-        @keys.add("pageup")
-        @keys.add("c-d")
-        @keys.add("c-u")
-        def page(event: KeyPressEvent) -> None:
-            """Move by a page, or half a page with Ctrl-d and Ctrl-u."""
-            key = event.key_sequence[0].key
-            amount = max(1, self.body_height // (2 if key in ("c-d", "c-u") else 1))
-            self.move(amount if key in ("pagedown", "c-d") else -amount)
-
-        @keys.add("escape", "enter")
-        def expand(event: KeyPressEvent) -> None:
-            """Expand or restore the details pane."""
-            self.expanded = not self.expanded
-            self.details_focused = self.expanded
-
-        @keys.add("enter")
-        def open_thread(event: KeyPressEvent) -> None:
-            """Resolve and open the selected conversation's tmux pane."""
-            self.app.create_background_task(self.open_selected())
-
-        @keys.add("escape")
-        @keys.add("q")
-        @keys.add("c-c")
-        def close(event: KeyPressEvent) -> None:
-            """Close the popup without switching panes."""
-            self.app.exit()
-
-        return keys
-
-    def screen(self, width: int, height: int) -> list[StyleAndTextTuples]:
-        """Lay out tabs, grouped tasks, details, and keyboard hints."""
-        if width < 20 or height < 8:
-            message: StyleAndTextTuples = [("class:muted", view.fit("Terminal too small", width))]
-            return [message][:height]
-        inner = max(1, width - 4)
-        self.body_height = max(1, height - 7)
-        stamp = time.strftime("%I:%M:%S %p", time.localtime(self.updated_at)).lstrip("0")
-        subtitle = f"tmux · updated {stamp}" if self.updated_at else "tmux"
-        lines: list[StyleAndTextTuples] = [
-            [("class:title", "Codex agents"), ("class:muted", "  " + subtitle)],
-            [],
-        ]
-        for index, (label, _) in enumerate(FILTERS):
-            text = f" {label} {len(self.filtered(index))} "
-            lines[1].extend(
-                [("class:tab" if index == self.filter_index else "class:muted", text), ("", " ")]
-            )
-        if fragment_list_width(lines[1]) > inner:
-            label = FILTERS[self.filter_index][0]
-            lines[1] = [
-                ("class:tab", f" {label} {len(self.filtered())} "),
-                ("class:muted", "  Tab / Shift-Tab filter"),
-            ]
-        lines.append([("class:muted", "─" * inner)])
-        split = inner >= 90 and not self.expanded
-        only_details = self.expanded or (not split and self.details_focused)
-        left_width = inner * 3 // 5 if split else inner
-        right_width = inner - left_width - 3 if split else inner
-        agents = self.filtered()
-        rows: list[StyleAndTextTuples]
-        rows, cursor = view.task_lines(agents, self.selected, left_width)
-        if not rows:
-            message = self.connection_error or (
-                "No conversations open in this tmux server"
-                if not self.agents
-                else "No conversations match this filter"
-            )
-            rows = [[("class:muted", view.fit(message, left_width))]]
-        self.list_scroll = max(0, min(self.list_scroll, cursor, len(rows) - self.body_height))
-        if cursor >= self.list_scroll + self.body_height:
-            self.list_scroll = cursor - self.body_height + 1
-        selected = next((agent for agent in agents if agent["id"] == self.selected), None)
-        details = view.detail_lines(selected, self.details, right_width)
-        self.detail_height = len(details)
-        self.detail_scroll = min(self.detail_scroll, max(0, len(details) - self.body_height))
-        task_style = "class:muted" if self.details_focused else "class:title"
-        detail_style = "class:title" if self.details_focused else "class:muted"
-        heading: StyleAndTextTuples = (
-            [(detail_style, "Task details")]
-            if only_details
-            else [(task_style, view.fit("Tasks", left_width))]
-        )
-        if split:
-            heading += [("class:muted", " │ "), (detail_style, "Task details")]
-        lines.append(heading)
-        for index in range(self.body_height):
-            task_row: StyleAndTextTuples = (
-                rows[self.list_scroll + index] if self.list_scroll + index < len(rows) else []
-            )
-            detail_row = (
-                details[self.detail_scroll + index]
-                if self.detail_scroll + index < len(details)
-                else []
-            )
-            if only_details:
-                lines.append(detail_row)
-            elif split:
-                padding = max(0, left_width - fragment_list_width(task_row))
-                lines.append(task_row + [("", " " * padding), ("class:muted", " │ ")] + detail_row)
-            else:
-                lines.append(task_row)
-        lines.append([("class:muted", "─" * inner)])
-        message = self.notice or self.connection_error
-        if not message and self.updated_at and self.is_stale():
-            message = "Status is stale; waiting for Codex"
-        footer = (
-            message
-            or "j/k move · h/l focus · Tab filter · Ctrl-f needs you · Enter open · Esc close"
-        )
-        lines.append([("class:error" if message else "class:muted", view.fit(footer, inner))])
-        lines.insert(0, [])
-        return [[("", "  ")] + view.clip_line(line, inner) for line in lines]
+            self.update_footer()
+        else:
+            self.exit(command)
 
 
 def run(client: str) -> None:
-    """Run the dashboard, then switch the invoking tmux client when requested."""
-    picker = Picker(client)
-    try:
-        command = picker.app.run(pre_run=picker.start)
-    finally:
-        picker.stop()
-    if command:
+    """Run the picker, then switch the invoking tmux client."""
+    if command := Picker(client).run():
         os.execvp(command[0], command)
