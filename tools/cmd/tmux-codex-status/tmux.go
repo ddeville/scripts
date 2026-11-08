@@ -1,0 +1,58 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"os/exec"
+	"regexp"
+	"strings"
+)
+
+var titleID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-(?:[0-9a-f]{12}|[0-9a-f]{5}\.\.\.)$`)
+
+// Match against all loaded IDs so truncated titles cannot resolve ambiguously.
+func paneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
+	output, err := exec.CommandContext(ctx, "tmux", "list-panes", "-a", "-F",
+		"#{pane_id}\t#{pane_current_command}\t#{pane_title}").Output()
+	if err != nil {
+		return nil, fmt.Errorf("read tmux panes: %w", err)
+	}
+	matches := map[string][]string{}
+	for line := range strings.SplitSeq(strings.TrimSpace(string(output)), "\n") {
+		fields := strings.SplitN(line, "\t", 3)
+		if len(fields) != 3 || fields[1] != "codex" {
+			continue
+		}
+		title := fields[2]
+		if i := strings.LastIndex(title, " | "); i >= 0 {
+			title = title[i+3:]
+		}
+		if !titleID.MatchString(title) {
+			continue
+		}
+		prefix := strings.TrimSuffix(title, "...")
+		var candidates []string
+		for _, id := range ids {
+			if strings.HasPrefix(id, prefix) {
+				candidates = append(candidates, id)
+			}
+		}
+		if len(candidates) == 1 {
+			id := candidates[0]
+			matches[id] = append(matches[id], fields[0])
+		}
+	}
+	return matches, nil
+}
+
+func switchPane(ctx context.Context, pane, client string) error {
+	args := []string{"switch-client", "-t", pane}
+	if client != "" {
+		args = append(args, "-c", client)
+	}
+	output, err := exec.CommandContext(ctx, "tmux", args...).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("switch tmux pane: %w: %s", err, strings.TrimSpace(string(output)))
+	}
+	return nil
+}
