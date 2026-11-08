@@ -22,10 +22,12 @@ FILTERS = {
     "all": "All",
     "attention": "Needs you",
     "working": "Working",
-    "ready": "Ready",
+    "ready": "Unread",
     "idle": "Idle",
 }
-HINTS = "j/k move · h/l focus · Tab filter · Ctrl-f needs you · e expand · Enter open · Esc close"
+JUMP_KEYS = "1234567890"
+HINTS = "1–9/0 jump · j/k move · Enter open · q close"
+DETAIL_HINTS = "Tab filter · Ctrl-f needs you · h/l details · e expand"
 
 
 class Picker(App[list[str] | None]):
@@ -35,12 +37,17 @@ class Picker(App[list[str] | None]):
     CSS = """
     Screen { padding: 1 2 0 2; background: ansi_default; color: ansi_default; }
     #heading { height: 1; }
+    #summary { height: auto; min-height: 1; }
     Tabs { height: 2; }
     Tabs Underline { display: none; }
     Tab { color: ansi_bright_black; text-style: none; }
     Tab.-active { color: ansi_yellow; background: #3a3a3a; text-style: none; }
+    Tab#attention.has-attention { color: ansi_red; }
     Horizontal { height: 1fr; }
-    OptionList { width: 3fr; height: 1fr; padding: 0; border: none; }
+    OptionList {
+        width: 3fr; height: 1fr; padding: 0; border: none; scrollbar-size: 1 1;
+        scrollbar-color: ansi_bright_black;
+    }
     #details {
         width: 2fr; padding: 0 1; border-left: solid ansi_bright_black;
         scrollbar-size: 0 0;
@@ -53,7 +60,7 @@ class Picker(App[list[str] | None]):
     }
     OptionList > .option-list--option-disabled { color: ansi_bright_black; text-style: none; }
     OptionList > .option-list--option-hover { background: transparent; }
-    #footer { height: 2; border-top: solid ansi_bright_black; color: ansi_bright_black; }
+    #footer { height: 3; border-top: solid ansi_bright_black; color: ansi_bright_black; }
     .narrow #details { display: none; }
     .narrow.details-focus #tasks, .expanded #tasks { display: none; }
     .narrow.details-focus #details, .expanded #details { display: block; border-left: none; }
@@ -71,6 +78,7 @@ class Picker(App[list[str] | None]):
         Binding("ctrl+u", "navigate('up', True)", show=False),
         Binding("e", "expand", show=False),
         Binding("enter", "open_thread", show=False, priority=True),
+        *[Binding(key, f"open_shortcut('{key}')", show=False, priority=True) for key in JUMP_KEYS],
     ]
 
     def __init__(self, client: str) -> None:
@@ -80,6 +88,7 @@ class Picker(App[list[str] | None]):
         self.animation_level = "none"
         self.tmux_client = client
         self.agents: list[JsonObject] = []
+        self.positions: dict[str, int] = {}
         self.loaded_thread_ids: list[str] = []
         self.selected_id: str | None = None
         self.details_data: JsonObject = {}
@@ -88,6 +97,7 @@ class Picker(App[list[str] | None]):
         self.notice = ""
         self.expanded = False
         self.heading = Static(Text("Codex agents", "yellow"), id="heading")
+        self.summary = Static(Text("Connecting to Codex…", "bright_black"), id="summary")
         self.tabs = Tabs(*(Tab(label, id=key) for key, label in FILTERS.items()), active="all")
         self.tasks = OptionList(id="tasks")
         self.details = Static()
@@ -97,6 +107,7 @@ class Picker(App[list[str] | None]):
     def compose(self) -> ComposeResult:
         """Let Textual lay out the header, list, details, and footer."""
         yield self.heading
+        yield self.summary
         yield self.tabs
         with Horizontal():
             yield self.tasks
@@ -105,8 +116,8 @@ class Picker(App[list[str] | None]):
 
     def on_mount(self) -> None:
         """Start polling and focus the task list."""
-        self.tasks.border_title = "Tasks"
-        self.details_scroll.border_title = "Task details"
+        self.tasks.border_title = "Agents · press a number to open"
+        self.details_scroll.border_title = "Selected agent"
         self.tasks.focus()
         self.poll_status()
         self.set_interval(1, self.update_footer)
@@ -119,6 +130,22 @@ class Picker(App[list[str] | None]):
             return [agent for agent in self.agents if agent["needs_attention"]]
         return [agent for agent in self.agents if agent["status"] == key]
 
+    def update_agents(self, agents: list[JsonObject]) -> None:
+        """Prioritize new agents while keeping existing rows and jump keys stable."""
+        self.loaded_thread_ids = [agent["id"] for agent in agents]
+        self.agents = sorted(
+            (agent for agent in agents if agent["tmux_panes"]),
+            key=lambda agent: (
+                self.positions.get(agent["id"], len(self.positions)),
+                status.STATES.index(agent["status"]),
+                agent["cwd"].casefold(),
+                agent["title"].casefold(),
+                agent["id"],
+            ),
+        )
+        for agent in self.agents:
+            self.positions.setdefault(agent["id"], len(self.positions))
+
     @work
     async def poll_status(self) -> None:
         """Read status until Textual cancels the worker on exit."""
@@ -128,11 +155,8 @@ class Picker(App[list[str] | None]):
                 self.error = data["connection"]["error"] or ""
                 if not self.error:
                     self.received_at = time.monotonic()
-                    self.loaded_thread_ids = [agent["id"] for agent in data["agents"]]
-                    self.agents = sorted(
-                        (agent for agent in data["agents"] if agent["tmux_panes"]),
-                        key=lambda agent: (agent["cwd"].casefold(), agent["cwd"]),
-                    )
+                    self.update_agents(data["agents"])
+                    self.summary.update(view.attention_summary(self.agents))
                     stamp = time.strftime(
                         "%I:%M:%S %p", time.localtime(data["generated_at"])
                     ).lstrip("0")
@@ -145,6 +169,9 @@ class Picker(App[list[str] | None]):
                     for key, label in FILTERS.items():
                         tab = self.tabs.query_one(f"#{key}", Tab)
                         tab.label = f"{label} {len(self.filtered(key))}"
+                    self.tabs.query_one("#attention", Tab).set_class(
+                        bool(self.filtered("attention")), "has-attention"
+                    )
                 self.update_list()
                 self.update_footer()
                 await asyncio.sleep(2)
@@ -152,7 +179,7 @@ class Picker(App[list[str] | None]):
     def update_list(self) -> None:
         """Refresh rows without resetting selection or scrolling."""
         agents = self.filtered(self.tabs.active)
-        options = view.task_options(agents) or [
+        options = view.task_options(agents, self.positions) or [
             Option(
                 Text(self.error or "No conversations match this filter", "bright_black"),
                 disabled=True,
@@ -216,7 +243,9 @@ class Picker(App[list[str] | None]):
         message = self.notice or self.error
         if not message and time.monotonic() - self.received_at > 10:
             message = "Status is stale; waiting for Codex"
-        self.footer.update(Text(message or HINTS, "magenta" if message else "bright_black"))
+        footer = Text(HINTS + "\n", "bright_black")
+        footer.append(message or DETAIL_HINTS, "magenta" if message else "bright_black")
+        self.footer.update(footer)
 
     def on_resize(self, event: Resize) -> None:
         """Show one pane at a time on narrow terminals."""
@@ -271,10 +300,19 @@ class Picker(App[list[str] | None]):
         """Close the picker without waiting for input polling inside a popup."""
         self.finish()
 
+    def action_open_shortcut(self, key: str) -> None:
+        """Open a numbered agent without changing numbers when filtering."""
+        position = JUMP_KEYS.index(key)
+        for agent in self.filtered(self.tabs.active):
+            if self.positions[agent["id"]] == position:
+                self.action_open_thread(agent["id"])
+                return
+
     @work(group="open", exclusive=True)
-    async def action_open_thread(self) -> None:
+    async def action_open_thread(self, thread_id: str | None = None) -> None:
         """Verify the selected pane before leaving the popup."""
-        if not self.selected_id:
+        thread_id = thread_id or self.selected_id
+        if not thread_id:
             return
         if self.error or time.monotonic() - self.received_at > 10:
             self.notice = "Status unavailable; wait for a fresh update"
@@ -282,7 +320,7 @@ class Picker(App[list[str] | None]):
             return
         try:
             command = await asyncio.to_thread(
-                tmux.switch_command, self.selected_id, self.loaded_thread_ids, self.tmux_client
+                tmux.switch_command, thread_id, self.loaded_thread_ids, self.tmux_client
             )
         except (OSError, ValueError) as exc:
             self.notice = view.clean(exc)
