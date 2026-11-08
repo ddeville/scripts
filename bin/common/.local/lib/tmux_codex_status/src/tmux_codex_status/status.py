@@ -4,9 +4,9 @@ import json
 import os
 import tempfile
 import time
-from contextlib import ExitStack
+from contextlib import ExitStack, closing
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from websockets.exceptions import WebSocketException
 from websockets.sync.client import ClientConnection, unix_connect
@@ -14,8 +14,17 @@ from websockets.sync.client import ClientConnection, unix_connect
 from tmux_codex_status.tmux import pane_matches
 
 type JsonObject = dict[str, Any]
+type AgentState = Literal["approval", "input", "error", "ready", "working", "idle", "unknown"]
 
-STATES = ("approval", "input", "error", "ready", "working", "idle", "unknown")
+STATES: tuple[AgentState, ...] = (
+    "approval",
+    "input",
+    "error",
+    "ready",
+    "working",
+    "idle",
+    "unknown",
+)
 ATTENTION = {"approval", "input", "error", "ready"}
 
 
@@ -26,9 +35,12 @@ class RpcError(Exception):
 class CodexClient:
     """A synchronous client for the local Codex app server."""
 
-    def __init__(self, socket_path: str) -> None:
+    def __init__(self, socket_path: str | None = None) -> None:
         """Set up a client for the local Codex socket."""
-        self.socket_path = socket_path
+        self.socket_path = socket_path or str(
+            Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser()
+            / "app-server-control/app-server-control.sock"
+        )
         self.connection: ClientConnection | None = None
         self.connection_context = ExitStack()
         self.request_id = 0
@@ -90,7 +102,7 @@ class CodexClient:
                 return list(dict.fromkeys(ids))
 
 
-def classify(status: JsonObject, read_state: JsonObject | None) -> str:
+def classify(status: JsonObject, read_state: JsonObject | None) -> AgentState:
     """Map Codex status and unread state to a dashboard status."""
     kind = status.get("type")
     flags = status.get("activeFlags", [])
@@ -163,7 +175,9 @@ def snapshot(client: CodexClient) -> JsonObject:
             agent["id"],
         )
     )
-    counts = {state: sum(agent["status"] == state for agent in agents) for state in STATES}
+    counts: dict[str, int] = {
+        state: sum(agent["status"] == state for agent in agents) for state in STATES
+    }
     counts["total"] = len(agents)
     counts["attention"] = sum(agent["needs_attention"] for agent in agents)
     return {
@@ -184,11 +198,13 @@ def detail(client: CodexClient, thread_id: str) -> JsonObject:
     """Fetch a conversation's metadata and recent activity."""
     client.connect()
     result = client.call("thread/read", {"threadId": thread_id, "includeTurns": False})
-    record = agent_record(result["thread"], result.get("readState"))
-    record["initial_prompt"] = result["thread"].get("preview", "")
-    record["latest_turn"] = None
-    record["recent_items"] = []
-    record["history_error"] = None
+    record = {
+        **agent_record(result["thread"], result.get("readState")),
+        "initial_prompt": result["thread"].get("preview", ""),
+        "latest_turn": None,
+        "recent_items": [],
+        "history_error": None,
+    }
     try:
         turns = client.call(
             "thread/turns/list",
@@ -199,13 +215,15 @@ def detail(client: CodexClient, thread_id: str) -> JsonObject:
                 "itemsView": "summary",
             },
         )
-        record["latest_turn"] = next(iter(turns["data"]), None)
-        if record["latest_turn"]:
+        turn_data: list[JsonObject] = turns["data"]
+        latest_turn = next(iter(turn_data), None)
+        record["latest_turn"] = latest_turn
+        if latest_turn:
             items = client.call(
                 "thread/items/list",
                 {
                     "threadId": thread_id,
-                    "turnId": record["latest_turn"]["id"],
+                    "turnId": latest_turn["id"],
                     "limit": 6,
                     "sortDirection": "desc",
                 },
@@ -244,12 +262,7 @@ def run(
     thread_id: str | None,
 ) -> None:
     """Write one snapshot or keep publishing updates."""
-    socket_path = (
-        Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser()
-        / "app-server-control/app-server-control.sock"
-    )
-    client = CodexClient(str(socket_path))
-    try:
+    with closing(CodexClient()) as client:
         while True:
             started = time.monotonic()
             data = detail(client, thread_id) if thread_id else snapshot(client)
@@ -260,5 +273,3 @@ def run(
             if not watch:
                 return
             time.sleep(max(0, interval - (time.monotonic() - started)))
-    finally:
-        client.close()

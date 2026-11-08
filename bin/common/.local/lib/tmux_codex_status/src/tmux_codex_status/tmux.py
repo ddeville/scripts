@@ -1,5 +1,6 @@
 """Match Codex conversations to their current tmux panes."""
 
+import os
 import re
 import subprocess
 
@@ -41,3 +42,18 @@ def pane_matches(thread_ids: list[str]) -> dict[str, list[str]]:
         if len(candidates) == 1:
             matches.setdefault(candidates[0], []).append(pane)
     return matches
+
+
+def switch_command(thread_id: str, thread_ids: list[str], client: str) -> list[str]:
+    """Find a unique live pane and build the command to open it."""
+    if not os.environ.get("TMUX"):
+        raise ValueError("Open the picker inside tmux to switch panes")
+    panes = pane_matches(thread_ids).get(thread_id, [])
+    if not panes:
+        raise ValueError("No matching tmux pane; the conversation may have closed")
+    if len(panes) > 1:
+        raise ValueError("This conversation is open in multiple panes")
+    command = ["tmux", "switch-client", "-t", panes[0]]
+    if client:
+        command.extend(["-c", client])
+    return command
