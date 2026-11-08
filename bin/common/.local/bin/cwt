@@ -10,7 +10,7 @@ print_help() {
     "Create a linked worktree for a feature branch." \
     "" \
     "Usage:" \
-    "  cwt [--[no-]tmux] [--[no-]codex] [--[no-]branch] [--base <branch>] [--] <feature>" \
+    "  cwt [--[no-]tmux] [--[no-]codex] [--[no-]branch] [--base <branch>] [--fork <thread-id> | --fork-current] [--] <feature>" \
     "" \
     "Arguments:" \
     "  <feature>        Feature/worktree name" \
@@ -20,6 +20,8 @@ print_help() {
     "  --[no-]codex     Start a Codex window/session; default: on" \
     "  --[no-]branch    Create a branch for the worktree; default: on" \
     "  --base <branch>  Base branch to use" \
+    "  --fork <id>      Fork this Codex thread instead of opening the picker" \
+    "  --fork-current   Fork CODEX_THREAD_ID supplied by the running Codex session" \
     "  -h, --help       Show this help text"
 }
 
@@ -35,6 +37,7 @@ parse_cwt_args() {
   use_codex="on"
   use_branch="on"
   base_ref=""
+  fork_session=""
   feature_name=""
 
   while [ $# -gt 0 ]; do
@@ -56,6 +59,22 @@ parse_cwt_args() {
       ;;
     --no-branch)
       use_branch="off"
+      ;;
+    --fork)
+      shift
+      [ $# -gt 0 ] && [ -n "$1" ] && [[ $1 != --* ]] || die "Missing value for --fork."
+      [ -z "$fork_session" ] || die "Specify only one of --fork and --fork-current."
+      fork_session="$1"
+      ;;
+    --fork=*)
+      [ -z "$fork_session" ] || die "Specify only one of --fork and --fork-current."
+      fork_session="${1#--fork=}"
+      [ -n "$fork_session" ] || die "Missing value for --fork."
+      ;;
+    --fork-current)
+      [ -z "$fork_session" ] || die "Specify only one of --fork and --fork-current."
+      fork_session="${CODEX_THREAD_ID-}"
+      [ -n "$fork_session" ] || die "CODEX_THREAD_ID is not set. Run this from Codex, or use --fork <thread-id>."
       ;;
     --base)
       shift
@@ -97,6 +116,10 @@ parse_cwt_args() {
 
   if [ -z "$feature_name" ]; then
     die "Missing required argument: <feature>."
+  fi
+
+  if [ -n "$fork_session" ] && { [ "$use_tmux" = off ] || [ "$use_codex" = off ]; }; then
+    die "--fork and --fork-current require tmux and Codex to be enabled."
   fi
 }
 
@@ -195,7 +218,11 @@ else
 fi
 
 if [ "$use_tmux" = on ]; then
-  printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+  if [ -n "$fork_session" ]; then
+    printf -v codex_command 'codex fork --cd %q -- %q' "$worktree_path" "$fork_session"
+  else
+    printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+  fi
 
   tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
   tmux set-option -t "$session_name" @display_name "$feature_name"
