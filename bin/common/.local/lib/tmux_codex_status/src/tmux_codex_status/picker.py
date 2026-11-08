@@ -132,9 +132,8 @@ class Picker(App[list[str] | None]):
 
     def update_agents(self, agents: list[JsonObject]) -> None:
         """Prioritize new agents while keeping existing rows and jump keys stable."""
-        self.loaded_thread_ids = [agent["id"] for agent in agents]
         self.agents = sorted(
-            (agent for agent in agents if agent["tmux_panes"]),
+            agents,
             key=lambda agent: (
                 self.positions.get(agent["id"], len(self.positions)),
                 status.STATES.index(agent["status"]),
@@ -155,6 +154,7 @@ class Picker(App[list[str] | None]):
                 self.error = data["connection"]["error"] or ""
                 if not self.error:
                     self.received_at = time.monotonic()
+                    self.loaded_thread_ids = data["loaded_thread_ids"]
                     self.update_agents(data["agents"])
                     self.summary.update(view.attention_summary(self.agents))
                     stamp = time.strftime(

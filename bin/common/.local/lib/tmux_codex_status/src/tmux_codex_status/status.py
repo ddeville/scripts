@@ -146,12 +146,15 @@ def agent_record(thread: JsonObject, read_state: JsonObject | None) -> JsonObjec
 
 
 async def snapshot(client: CodexClient) -> JsonObject:
-    """Collect current conversations, status counts, and connection health."""
+    """Collect loaded conversations in this tmux server and their status."""
     agents: list[JsonObject] = []
+    thread_ids: list[str] = []
     error = None
     try:
         await client.connect()
-        for thread_id in await client.loaded_ids():
+        thread_ids = await client.loaded_ids()
+        panes = await asyncio.to_thread(pane_matches, thread_ids)
+        for thread_id, thread_panes in panes.items():
             try:
                 result = await client.call(
                     "thread/read", {"threadId": thread_id, "includeTurns": False}
@@ -164,14 +167,12 @@ async def snapshot(client: CodexClient) -> JsonObject:
             except RpcError as exc:
                 record = agent_record({"id": thread_id, "name": thread_id}, None)
                 record["error"] = str(exc)
+            record["tmux_panes"] = thread_panes
             agents.append(record)
     except (OSError, WebSocketException, RpcError, ValueError) as exc:
         await client.aclose()
         agents = []
         error = str(exc) or type(exc).__name__
-    panes = await asyncio.to_thread(pane_matches, [agent["id"] for agent in agents])
-    for agent in agents:
-        agent["tmux_panes"] = panes.get(agent["id"], [])
     agents.sort(
         key=lambda agent: (
             STATES.index(agent["status"]),
@@ -189,7 +190,8 @@ async def snapshot(client: CodexClient) -> JsonObject:
         "schema_version": 1,
         "generated_at": time.time(),
         "source": "codex",
-        "scope": "loaded",
+        "scope": "tmux",
+        "loaded_thread_ids": thread_ids,
         "connection": {
             "status": "unavailable" if error else "connected",
             "error": error,
