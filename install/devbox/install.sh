@@ -142,7 +142,8 @@ export RUSTUP_HOME="$XDG_TOOLCHAINS_HOME/rust/rustup"
 # golang
 mkdir -p "$XDG_TOOLCHAINS_HOME/go"
 export GO_TOOLCHAIN_BIN="$XDG_TOOLCHAINS_HOME/go/current/bin"
-export GOBIN="$XDG_TOOLCHAINS_HOME/go/user/bin"
+export GOPATH="$XDG_TOOLCHAINS_HOME/go/user"
+export GOBIN="$GOPATH/bin"
 "$HOME/scripts/bin/common/.local/bin/goswitch" latest
 
 # nodejs
@@ -172,6 +173,7 @@ fi
 
 # Run stow to put all the configs and bins in the right place.
 "$HOME/scripts/bin/common/.local/bin/stow-config"
+"$HOME/scripts/bin/common/.local/bin/install-scripts-tools"
 
 # Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"

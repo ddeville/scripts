@@ -13,6 +13,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
+export GOPATH="$XDG_TOOLCHAINS_HOME/go/user"
 
 # Make fish the default shell
 if [ "$SHELL" != "/usr/bin/fish" ]; then
@@ -51,6 +52,7 @@ fi
 # configs that might have been created and that would prevent stow from completing successfully)
 rm -f .bashrc .profile
 scripts/bin/common/.local/bin/stow-config
+scripts/bin/common/.local/bin/install-scripts-tools
 
 # Setup the shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"

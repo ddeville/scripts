@@ -28,6 +28,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
+export GOPATH="$XDG_TOOLCHAINS_HOME/go/user"
 
 install_command_line_tools() {
   local clt_label clt_placeholder
@@ -104,6 +105,7 @@ export PATH="$brew_path":$PATH
 # configs that might have been created and that would prevent stow from completing successfully)
 rm -f "$HOME/.bashrc" "$HOME/.profile"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
+"$HOME/scripts/bin/common/.local/bin/install-scripts-tools"
 
 # Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"

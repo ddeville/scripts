@@ -2,6 +2,11 @@
 
 set -eu -o pipefail
 
+if ! command -v go >/dev/null 2>&1; then
+  echo "Go must be installed and available on PATH to build the repository tools." >&2
+  exit 1
+fi
+
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
 cd "$script_dir/../../../../tools"
 
