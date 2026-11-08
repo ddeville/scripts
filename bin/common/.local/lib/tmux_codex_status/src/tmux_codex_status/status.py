@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 import time
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Any
 
@@ -29,24 +30,27 @@ class CodexClient:
         """Set up a client for the local Codex socket."""
         self.socket_path = socket_path
         self.connection: ClientConnection | None = None
+        self.connection_context = ExitStack()
         self.request_id = 0
         self.deadline = 0.0
 
     def close(self) -> None:
         """Close the connection if one is open."""
         if self.connection is not None:
-            self.connection.close()
+            self.connection_context.close()
             self.connection = None
 
     def connect(self) -> None:
         """Open a connection if needed and reset the request deadline."""
         self.deadline = time.monotonic() + 8
         if self.connection is None:
-            self.connection = unix_connect(
-                self.socket_path,
-                open_timeout=2,
-                close_timeout=0.2,
-                max_size=16 * 1024 * 1024,
+            self.connection = self.connection_context.enter_context(
+                unix_connect(
+                    self.socket_path,
+                    open_timeout=2,
+                    close_timeout=0.2,
+                    max_size=16 * 1024 * 1024,
+                )
             )
             self.call(
                 "initialize",
