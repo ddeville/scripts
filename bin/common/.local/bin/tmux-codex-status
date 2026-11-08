@@ -3,4 +3,4 @@
 set -eu -o pipefail
 
 script_dir="$(cd -- "$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")" && pwd)"
-exec uv run --quiet --locked --project "$script_dir/../lib/tmux_codex_status" python -m tmux_codex_status "$@"
+exec uv run --quiet --locked --project "$script_dir/../lib/tmux_codex_status" tmux_codex_status "$@"

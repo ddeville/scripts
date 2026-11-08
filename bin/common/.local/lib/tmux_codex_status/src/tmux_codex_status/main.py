@@ -68,7 +68,3 @@ def main() -> None:
     except (OSError, ValueError) as exc:
         print(f"tmux-codex-status: {exc}", file=sys.stderr)
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
