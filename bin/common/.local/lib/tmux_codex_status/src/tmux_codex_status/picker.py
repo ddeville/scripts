@@ -23,7 +23,7 @@ def run(client: str) -> None:
         runtime = Path(temporary)
         snapshot = runtime / "state.json"
         render = shlex.join([*command, "render", "--snapshot", str(snapshot)])
-        status = shlex.join(command)
+        status = shlex.join([*command, "status"])
         preview = (
             f"if [[ {{1}} == - ]]; then {render} message; "
             f"else {status} --detail {{1}} 2>/dev/null | {render} detail; fi"
@@ -69,7 +69,7 @@ fi"""
         ]
         with (runtime / "collector.log").open("w", encoding="utf-8") as log:
             collector = subprocess.Popen(
-                [*command, "--watch", "--output", str(snapshot)],
+                [*command, "status", "--watch", "--output", str(snapshot)],
                 stdout=log,
                 stderr=subprocess.STDOUT,
             )
