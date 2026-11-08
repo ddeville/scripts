@@ -11,7 +11,7 @@ from typing import Any
 from websockets.exceptions import WebSocketException
 from websockets.sync.client import ClientConnection, unix_connect
 
-from .tmux import pane_matches
+from tmux_codex_status.tmux import pane_matches
 
 type JsonObject = dict[str, Any]
 
