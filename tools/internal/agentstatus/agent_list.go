@@ -3,6 +3,7 @@ package agentstatus
 import (
 	"cmp"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
@@ -51,6 +52,7 @@ func (l *agentList) render() {
 	var lines []string
 
 	top, bottom := 0, 0
+	numberWidth := len(strconv.Itoa(len(l.items) - 1))
 
 	for i, item := range l.items {
 		section := i == 0 || item.Cwd != l.items[i-1].Cwd
@@ -72,7 +74,7 @@ func (l *agentList) render() {
 			}
 		}
 
-		lines = append(lines, strings.Split(item.render(l.view.Width(), i == l.index), "\n")...)
+		lines = append(lines, strings.Split(item.render(l.view.Width(), numberWidth, i == l.index), "\n")...)
 	}
 
 	l.view.SetContentLines(lines)
@@ -92,15 +94,15 @@ type agentItem struct {
 	position int
 }
 
-func (a agentItem) render(width int, selected bool) string {
+func (a agentItem) render(width, numberWidth int, selected bool) string {
 	width = max(0, width-1)
 	style, label, _ := stateStyle(a.State)
 
-	base, keyStyle, pathStyle := lipgloss.NewStyle(), yellow, muted
+	base, keyStyle, subtitleStyle := lipgloss.NewStyle(), yellow, muted
 	if selected {
 		base = base.Background(selectedBackground)
 		keyStyle = keyStyle.Background(selectedBackground)
-		pathStyle = pathStyle.Background(selectedBackground)
+		subtitleStyle = subtitleStyle.Background(selectedBackground)
 		style = style.Background(selectedBackground)
 	}
 
@@ -109,24 +111,19 @@ func (a agentItem) render(width int, selected bool) string {
 		dot = "○"
 	}
 
-	number := " "
-	if a.position < 10 {
-		number = string("0123456789"[a.position])
-	}
-
-	titleWidth := max(1, width-21)
+	prefixWidth := numberWidth + 4
+	titleWidth := max(1, width-prefixWidth-16)
 
 	title := singleLine(a.Title)
 	if a.ParentID != nil {
 		title = "↳ " + title
 	}
 
-	prefix := keyStyle.Render(" "+number+" ") + style.Render(dot+" ")
+	prefix := keyStyle.Render(fmt.Sprintf(" %*d ", numberWidth, a.position)) + style.Render(dot+" ")
 	name := style.Render(pad(title, titleWidth) + "  ")
 	status := style.Render(pad(label, 14))
-	metadata := a.Type.label() + " · " + shortPath(a.Cwd)
-	project := base.Render("     ") + pathStyle.Render(pad(metadata, width-5))
+	subtitle := base.Render(strings.Repeat(" ", prefixWidth)) + subtitleStyle.Render(pad(singleLine(a.Preview), width-prefixWidth))
 	padding := base.Render(" ")
 
-	return fmt.Sprint(fit(prefix+name+status, width), padding, "\n", fit(project, width), padding)
+	return fmt.Sprint(fit(prefix+name+status, width), padding, "\n", fit(subtitle, width), padding)
 }

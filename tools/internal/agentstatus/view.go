@@ -24,17 +24,6 @@ var (
 	selectedBackground = lipgloss.Color("237")
 )
 
-func (t AgentType) label() string {
-	switch t {
-	case AgentTypeCodex:
-		return "Codex"
-	case AgentTypeClaude:
-		return "Claude"
-	default:
-		return "Unknown"
-	}
-}
-
 func stateStyle(state string) (lipgloss.Style, string, string) {
 	switch state {
 	case "approval":
@@ -198,7 +187,7 @@ func (m model) panelsView() string {
 	list := m.listView()
 
 	if right == 0 {
-		title := "Agents · press a number to open"
+		title := "Agents · press 0–9 to open"
 		if m.detailsFocus {
 			title, list = "Selected agent", m.details.View()
 		}
@@ -207,7 +196,7 @@ func (m model) panelsView() string {
 	}
 
 	return lipgloss.JoinHorizontal(lipgloss.Top,
-		panel("Agents · press a number to open", list, left, rows, !m.detailsFocus),
+		panel("Agents · press 0–9 to open", list, left, rows, !m.detailsFocus),
 		" ",
 		panel("Selected agent", m.details.View(), right, rows, m.detailsFocus),
 	)

@@ -26,7 +26,7 @@ type (
 type model struct {
 	ctx                context.Context //nolint:containedctx // Bubble Tea callbacks have no context parameter.
 	data               snapshot
-	positions          map[string]int
+	order              map[string]int
 	selected           string
 	initialPane        string
 	filter             int
@@ -141,8 +141,8 @@ func (m *model) updateAgents() tea.Cmd {
 	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
 	m.agents.items = make([]agentItem, 0, len(agents))
-	for _, a := range agents {
-		m.agents.items = append(m.agents.items, agentItem{agent: a, position: m.positions[a.ID]})
+	for i, a := range agents {
+		m.agents.items = append(m.agents.items, agentItem{agent: a, position: i})
 	}
 
 	index := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
@@ -226,13 +226,13 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 		}
 
 		for _, a := range msg.Agents {
-			if _, ok := m.positions[a.ID]; !ok {
-				m.positions[a.ID] = len(m.positions)
+			if _, ok := m.order[a.ID]; !ok {
+				m.order[a.ID] = len(m.order)
 			}
 		}
 
 		slices.SortFunc(msg.Agents, func(a, b agent) int {
-			return cmp.Compare(m.positions[a.ID], m.positions[b.ID])
+			return cmp.Compare(m.order[a.ID], m.order[b.ID])
 		})
 		m.data = msg
 
@@ -300,10 +300,8 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		return m.open(m.selected)
 	case key.Matches(msg, keys.jump):
 		position := int(msg.String()[0] - '0')
-		for _, a := range m.filtered(m.filter) {
-			if m.positions[a.ID] == position {
-				return m.open(a.ID)
-			}
+		if position < len(m.agents.items) {
+			return m.open(m.agents.items[position].ID)
 		}
 
 		return nil
@@ -338,7 +336,7 @@ func RunPicker(ctx context.Context, client, pane string) error {
 	defer cancel()
 
 	initial := model{
-		ctx: uiCtx, positions: map[string]int{}, width: 100, height: 30,
+		ctx: uiCtx, order: map[string]int{}, width: 100, height: 30,
 		agents: newAgentList(), details: viewport.New(), initialPane: pane,
 	}
 	initial.details.KeyMap = viewport.KeyMap{Up: keys.up, Down: keys.down}
