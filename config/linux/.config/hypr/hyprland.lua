@@ -24,6 +24,7 @@ hl.config({
     blur = { enabled = true, size = 8, passes = 3 },
   },
   animations = { enabled = false },
+  cursor = { no_warps = true },
   input = {
     repeat_delay = 180,
     repeat_rate = 50,
