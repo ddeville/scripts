@@ -50,7 +50,7 @@ func stateStyle(state string) (lipgloss.Style, string, string) {
 	case "working":
 		return lipgloss.NewStyle().Foreground(lipgloss.Cyan), "Working", "Working. Open the agent to follow progress or steer it."
 	case "idle":
-		return muted, "Idle", "Idle. Open the agent to continue the conversation."
+		return lipgloss.NewStyle(), "Idle", "Idle. Open the agent to continue the conversation."
 	default:
 		return muted, "Check status", "Status is unknown. Open the agent to check."
 	}
