@@ -130,7 +130,7 @@ func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.
 		return
 	}
 
-	width := model.Width()
+	width := max(0, model.Width()-1)
 	style, label, _ := stateStyle(a.State)
 
 	base, keyStyle, pathStyle := lipgloss.NewStyle(), yellow, muted
@@ -151,19 +151,20 @@ func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.
 		number = string("0123456789"[a.position])
 	}
 
-	titleWidth := max(1, width-20)
+	titleWidth := max(1, width-21)
 
 	title := singleLine(a.Title)
 	if a.ParentID != nil {
 		title = "↳ " + title
 	}
 
-	prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
+	prefix := keyStyle.Render(" "+number+" ") + style.Render(dot+" ")
 	name := style.Render(pad(title, titleWidth) + "  ")
 	status := style.Render(pad(label, 14))
 	metadata := a.Type.label() + " · " + shortPath(a.Cwd)
-	project := base.Render("    ") + pathStyle.Render(pad(metadata, width-4))
-	_, _ = fmt.Fprint(w, fit(prefix+name+status, width), "\n", fit(project, width))
+	project := base.Render("     ") + pathStyle.Render(pad(metadata, width-5))
+	padding := base.Render(" ")
+	_, _ = fmt.Fprint(w, fit(prefix+name+status, width), padding, "\n", fit(project, width), padding)
 }
 
 func (m model) listView() string {
