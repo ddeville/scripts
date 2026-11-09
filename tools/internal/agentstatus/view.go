@@ -20,6 +20,8 @@ import (
 var (
 	muted              = lipgloss.NewStyle().Foreground(lipgloss.BrightBlack)
 	yellow             = lipgloss.NewStyle().Foreground(lipgloss.Yellow)
+	blue               = lipgloss.NewStyle().Foreground(lipgloss.Blue)
+	cyan               = lipgloss.NewStyle().Foreground(lipgloss.Cyan)
 	magenta            = lipgloss.NewStyle().Foreground(lipgloss.Magenta)
 	selectedBackground = lipgloss.Color("237")
 )
@@ -191,11 +193,11 @@ func (m model) detailContent(width int) string {
 	style, _, hint := stateStyle(a.State)
 
 	lines := []string{
-		CleanText(a.Title),
-		muted.Render(shortPath(a.Cwd)),
+		yellow.Bold(true).Render(CleanText(a.Title)),
+		blue.Render(shortPath(a.Cwd)),
 		"",
 		style.Render(hint),
-		muted.Render("Enter to open"),
+		yellow.Render("Enter") + muted.Render(" to open"),
 	}
 
 	if a.Error != nil {
@@ -217,11 +219,26 @@ func (m model) detailContent(width int) string {
 			text = text[:6000]
 		}
 
-		lines = append(lines, "", yellow.Render(e.Label),
+		lines = append(lines, "", entryStyle(e.Label).Bold(true).Render(e.Label),
 			strings.ReplaceAll(CleanText(string(text)), "\t", "    "))
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
+}
+
+func entryStyle(label string) lipgloss.Style {
+	switch label {
+	case "Prompt":
+		return blue
+	case "Agent":
+		return cyan
+	case "Command", "Tool":
+		return yellow
+	case "Error":
+		return magenta
+	default:
+		return muted
+	}
 }
 
 // Panel widths include borders and padding; rows is the content height.
