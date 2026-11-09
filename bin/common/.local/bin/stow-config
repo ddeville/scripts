@@ -2,6 +2,11 @@
 
 set -eu -o pipefail
 
+if ! command -v go >/dev/null 2>&1; then
+  echo "Go must be installed and available on PATH to build the repository tools." >&2
+  exit 1
+fi
+
 if ! git -C "$HOME/scripts" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "ERROR: $HOME/scripts must be a git repository before running stow-config"
   exit 1
@@ -39,3 +44,7 @@ stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/config" --target "$
 stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOME" --verbose
 
 uv run --quiet --script "$HOME/.codex/bin/update-config.py"
+
+cd "$HOME/scripts/tools"
+export GOBIN="$HOME/.local/bin"
+exec go install ./cmd/...

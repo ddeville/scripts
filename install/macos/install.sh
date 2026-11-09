@@ -105,7 +105,6 @@ export PATH="$brew_path":$PATH
 # configs that might have been created and that would prevent stow from completing successfully)
 rm -f "$HOME/.bashrc" "$HOME/.profile"
 "$HOME/scripts/bin/common/.local/bin/stow-config"
-"$HOME/scripts/bin/common/.local/bin/install-scripts-tools"
 
 # Install shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"

@@ -1,4 +1,4 @@
-.PHONY: install packages system-config stow tools shell-plugins
+.PHONY: install packages system-config stow shell-plugins
 
 UNAME_S := $(shell uname -s)
 
@@ -25,9 +25,6 @@ endif
 
 stow:
 	@../bin/common/.local/bin/stow-config
-
-tools:
-	@../bin/common/.local/bin/install-scripts-tools
 
 shell-plugins:
 	@../bin/common/.local/bin/update-shell-plugins

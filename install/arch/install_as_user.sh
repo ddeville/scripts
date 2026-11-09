@@ -52,7 +52,6 @@ fi
 # configs that might have been created and that would prevent stow from completing successfully)
 rm -f .bashrc .profile
 scripts/bin/common/.local/bin/stow-config
-scripts/bin/common/.local/bin/install-scripts-tools
 
 # Setup the shell plugins
 export TMUX_PLUGIN_MANAGER_PATH="$XDG_DATA_HOME/tmux/plugins"

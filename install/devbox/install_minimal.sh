@@ -12,6 +12,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export XDG_CONFIG_HOME="$HOME/.config" && mkdir -p "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$HOME/.local/share" && mkdir -p "$XDG_DATA_HOME"
 export XDG_STATE_HOME="$HOME/.local/state" && mkdir -p "$XDG_STATE_HOME"
+export XDG_TOOLCHAINS_HOME="$HOME/.local/toolchains"
+export GOPATH="$XDG_TOOLCHAINS_HOME/go/user"
 
 INSTALL_TMPDIR="$(mktemp -d)"
 cd "$INSTALL_TMPDIR" || exit
@@ -38,6 +40,7 @@ sudo apt-get install --yes \
   curl \
   file \
   git \
+  golang-go \
   jq \
   rsync \
   stow \
