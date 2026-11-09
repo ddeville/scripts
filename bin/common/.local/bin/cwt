@@ -219,9 +219,9 @@ fi
 
 if [ "$use_tmux" = on ]; then
   if [ -n "$fork_session" ]; then
-    printf -v codex_command 'codex fork --cd %q -- %q' "$worktree_path" "$fork_session"
+    printf -v codex_command 'exec codex fork --cd %q -- %q' "$worktree_path" "$fork_session"
   else
-    printf -v codex_command 'codex fork --all --cd %q' "$worktree_path"
+    printf -v codex_command 'exec codex fork --all --cd %q' "$worktree_path"
   fi
 
   tmux new-session -s "$session_name" -n repo -d -c "$worktree_path"
