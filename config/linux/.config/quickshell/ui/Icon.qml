@@ -10,7 +10,7 @@ Item {
     property bool muted: false
     property bool plugged: false
     readonly property var paths: ({
-        "agent": "M8 7 H16 A4 4 0 0 1 20 11 V16 A4 4 0 0 1 16 20 H8 A4 4 0 0 1 4 16 V11 A4 4 0 0 1 8 7 Z M12 3 V7 M8.5 12 V15 M15.5 12 V15 M1.5 12 V15 M22.5 12 V15",
+        "agent": "M8 7 H16 A4 4 0 0 1 20 11 V16 A4 4 0 0 1 16 20 H8 A4 4 0 0 1 4 16 V11 A4 4 0 0 1 8 7 Z M12 3 V7 M8.2 12 H8.8 V15 H8.2 Z M15.2 12 H15.8 V15 H15.2 Z M1.5 12 V15 M22.5 12 V15",
         "cpu": "M6 6 H18 V18 H6 Z M9 9 H15 V15 H9 Z M9 3 V6 M15 3 V6 M9 18 V21 M15 18 V21 M3 9 H6 M3 15 H6 M18 9 H21 M18 15 H21",
         "memory": "M3 6 H21 V17 H3 Z M6 9 H9 V13 H6 Z M12 9 H15 V13 H12 Z M18 9 V13 M6 17 V20 M10 17 V20 M14 17 V20 M18 17 V20",
         "temperature": "M10 14 V5 A2 2 0 0 1 14 5 V14 A4 4 0 1 1 10 14 M12 8 V17 M17 6 H20 M17 10 H19",
