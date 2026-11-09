@@ -31,7 +31,7 @@ func SingleClient(ctx context.Context) (string, error) {
 
 // PaneMatches checks all loaded IDs so truncated titles cannot resolve ambiguously.
 func PaneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
-	output, err := exec.CommandContext(ctx, "tmux", "list-panes", "-a", "-F",
+	output, err := exec.CommandContext(ctx, "tmux", "-u", "list-panes", "-a", "-F",
 		"#{pane_id}\t#{pane_current_command}\t#{pane_title}").Output()
 	if err != nil {
 		return nil, fmt.Errorf("read tmux panes: %w", err)
