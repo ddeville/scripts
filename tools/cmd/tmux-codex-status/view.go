@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -78,13 +79,7 @@ func (m model) listView(width, height int) string {
 	agents := m.filtered(m.filter)
 	lines := []string{}
 
-	selected := 0
-	for i, a := range agents {
-		if a.ID == m.selected {
-			selected = i
-		}
-	}
-
+	selected := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
 	capacity := max(1, height/2)
 
 	start := max(0, selected-capacity+1)
@@ -144,34 +139,24 @@ func (m model) listView(width, height int) string {
 }
 
 func (m model) detailLines(width int) []string {
-	var current *agent
-
-	for _, a := range m.data.Agents {
-		if a.ID == m.selected {
-			current = &a
-			break
-		}
-	}
-
-	if current == nil {
+	index := slices.IndexFunc(m.data.Agents, func(a agent) bool { return a.ID == m.selected })
+	if index < 0 {
 		return []string{muted.Render("No conversation selected")}
 	}
 
-	a := *current
+	a := m.data.Agents[index]
 	style, _, hint := stateStyle(a.State)
 
-	var content strings.Builder
-	content.WriteString(clean(a.Title))
-	content.WriteByte('\n')
-	content.WriteString(muted.Render(shortPath(a.Cwd)))
-	content.WriteString("\n\n")
-	content.WriteString(style.Render(hint))
-	content.WriteByte('\n')
-	content.WriteString(muted.Render("Enter to open"))
+	lines := []string{
+		clean(a.Title),
+		muted.Render(shortPath(a.Cwd)),
+		"",
+		style.Render(hint),
+		muted.Render("Enter to open"),
+	}
 
 	if a.Error != nil {
-		content.WriteString("\n\n")
-		content.WriteString(magenta.Render(clean(*a.Error)))
+		lines = append(lines, "", magenta.Render(clean(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -180,8 +165,7 @@ func (m model) detailLines(width int) []string {
 	}
 
 	if m.activity.Err != nil {
-		content.WriteString("\n\n")
-		content.WriteString(magenta.Render(clean(m.activity.Err.Error())))
+		lines = append(lines, "", magenta.Render(clean(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -190,13 +174,11 @@ func (m model) detailLines(width int) []string {
 			text = text[:6000]
 		}
 
-		content.WriteString("\n\n")
-		content.WriteString(yellow.Render(e.Label))
-		content.WriteByte('\n')
-		content.WriteString(strings.ReplaceAll(clean(string(text)), "\t", "    "))
+		lines = append(lines, "", yellow.Render(e.Label),
+			strings.ReplaceAll(clean(string(text)), "\t", "    "))
 	}
 
-	return strings.Split(ansi.Wrap(content.String(), width, ""), "\n")
+	return strings.Split(ansi.Wrap(strings.Join(lines, "\n"), width, ""), "\n")
 }
 
 func (m model) detailView(width, height int) string {
@@ -282,7 +264,7 @@ func (m model) View() tea.View {
 
 	footer := muted.Render("0–9 jump · j/k move · Enter open · q close")
 
-	help := "Tab filter · Ctrl-f needs you · h/l details · e expand · Ctrl-d/u scroll"
+	help := "Tab filter · Ctrl-f needs you · h/l details · e expand"
 	if m.opening {
 		help = "Opening agent…"
 	}

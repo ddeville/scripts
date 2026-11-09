@@ -132,10 +132,8 @@ func (m *model) selectAgent(id string) tea.Cmd {
 
 func (m *model) keepSelection() tea.Cmd {
 	agents := m.filtered(m.filter)
-	for _, a := range agents {
-		if a.ID == m.selected {
-			return nil
-		}
+	if slices.ContainsFunc(agents, func(a agent) bool { return a.ID == m.selected }) {
+		return nil
 	}
 
 	if len(agents) == 0 {
@@ -253,7 +251,7 @@ func (m model) handleKey(key string) (model, tea.Cmd) {
 	case "e":
 		m.expanded = !m.expanded
 		m.detailsFocus = m.expanded
-	case "j", "down", "k", "up", "ctrl+d", "ctrl+u", "g", "G":
+	case "j", "down", "k", "up", "g", "G":
 		return m.navigate(key)
 	case "enter":
 		cmd := m.open(m.selected)
@@ -276,12 +274,8 @@ func (m model) handleKey(key string) (model, tea.Cmd) {
 
 func (m model) navigate(key string) (model, tea.Cmd) {
 	delta := 1
-	if key == "k" || key == "up" || key == "ctrl+u" {
+	if key == "k" || key == "up" {
 		delta = -1
-	}
-
-	if key == "ctrl+d" || key == "ctrl+u" {
-		delta *= max(1, (m.height-10)/4)
 	}
 
 	if m.detailsFocus {
