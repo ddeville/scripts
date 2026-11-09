@@ -21,6 +21,7 @@ PanelWindow { // qmllint disable uncreatable-type
     required property Network network
     required property Tailscale tailscale
     required property Notifications notifications
+    required property Agents agents
     required property AudioOutputs audioOutputs
     required property date date
     property var audio: null
@@ -39,7 +40,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
     function closeOtherPopups(openingPopup) {
         let closed = false;
-        for (const popup of [sessionPopup, devicePopup, networkPopup, tailscalePopup, calendarPopup, notificationPopup, launcherPopup, screenshotPopup, trayPopup]) {
+        for (const popup of [sessionPopup, devicePopup, networkPopup, tailscalePopup, calendarPopup, notificationPopup, agentsPopup, launcherPopup, screenshotPopup, trayPopup]) {
             if (popup !== openingPopup && popup.visible) {
                 closed = true;
                 popup.close();
@@ -172,6 +173,13 @@ PanelWindow { // qmllint disable uncreatable-type
         anchorItem: notificationButton
         onAboutToShow: panel.closeOtherPopups(notificationPopup)
         backend: panel.notifications
+    }
+
+    AgentsPopup {
+        id: agentsPopup
+        anchorItem: agentsButton
+        backend: panel.agents
+        onAboutToShow: panel.closeOtherPopups(agentsPopup)
     }
 
     TrayPopup {
@@ -328,6 +336,19 @@ PanelWindow { // qmllint disable uncreatable-type
                     id: accountStatus
 
                     visible: panel.width >= 1000
+
+                    Button {
+                        id: agentsButton
+
+                        symbol: "agent"
+                        text: panel.agents.attention > 0 ? String(panel.agents.attention) : ""
+                        foreground: ["working", "idle"].includes(panel.agents.indicatorState) ? Theme.foreground : panel.agents.color(panel.agents.indicatorState)
+                        tooltip: panel.agents.tooltip
+                        tooltipEnabled: !agentsPopup.visible
+                        active: agentsPopup.visible
+                        interactive: true
+                        onClicked: agentsPopup.toggle()
+                    }
 
                     Button {
                         visible: panel.status.github !== ""

@@ -46,6 +46,10 @@ ShellRoot {
         id: notificationService
     }
 
+    Agents {
+        id: agentsService
+    }
+
     AudioOutputs {
         id: outputService
     }
@@ -99,6 +103,7 @@ ShellRoot {
             network: networkService
             tailscale: tailscaleService
             notifications: notificationService
+            agents: agentsService
             audioOutputs: outputService
             audio: root.sink ? root.sink.audio : null
         }

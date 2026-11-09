@@ -1,4 +1,5 @@
 CalendarPopup 1.0 CalendarPopup.qml
+AgentsPopup 1.0 AgentsPopup.qml
 NetworkPopup 1.0 NetworkPopup.qml
 NotificationPopup 1.0 NotificationPopup.qml
 QuickControlsPopup 1.0 QuickControlsPopup.qml
