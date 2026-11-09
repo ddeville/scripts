@@ -1,4 +1,4 @@
-// Command tmux-codex-status displays and navigates local Codex agents in tmux.
+// Command tmux-agent-status displays and navigates local agents in tmux.
 package main
 
 import (
@@ -24,15 +24,15 @@ func main() {
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-codex-status:", codexstatus.CleanText(err.Error()))
+		fmt.Fprintln(os.Stderr, "tmux-agent-status:", codexstatus.CleanText(err.Error()))
 		os.Exit(1)
 	}
 }
 
 func command() *cobra.Command {
 	root := &cobra.Command{
-		Use:           "tmux-codex-status",
-		Short:         "Navigate Codex agents in the current tmux server",
+		Use:           "tmux-agent-status",
+		Short:         "Navigate agents in the current tmux server",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

@@ -89,7 +89,7 @@ Scope {
             return;
         }
         terminal = terminals[0];
-        action.command = ["tmux-codex-status", "open", threadId];
+        action.command = ["tmux-agent-status", "open", threadId];
         action.running = true;
     }
 
@@ -100,7 +100,7 @@ Scope {
     Process {
         id: watcher
 
-        command: ["tmux-codex-status", "status", "--watch", "--interval", "1"]
+        command: ["tmux-agent-status", "status", "--watch", "--interval", "1"]
         running: true
         onExited: {
             root.available = false;
