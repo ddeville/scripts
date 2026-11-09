@@ -17,31 +17,40 @@ func paneMatches(ctx context.Context, ids []string) (map[string][]string, error)
 	if err != nil {
 		return nil, fmt.Errorf("read tmux panes: %w", err)
 	}
+
 	matches := map[string][]string{}
+
 	for line := range strings.SplitSeq(strings.TrimSpace(string(output)), "\n") {
 		fields := strings.SplitN(line, "\t", 3)
 		if len(fields) != 3 || fields[1] != "codex" {
 			continue
 		}
+
 		title := fields[2]
 		if i := strings.LastIndex(title, " | "); i >= 0 {
 			title = title[i+3:]
 		}
+
 		if !titleID.MatchString(title) {
 			continue
 		}
+
 		prefix := strings.TrimSuffix(title, "...")
+
 		var candidates []string
+
 		for _, id := range ids {
 			if strings.HasPrefix(id, prefix) {
 				candidates = append(candidates, id)
 			}
 		}
+
 		if len(candidates) == 1 {
 			id := candidates[0]
 			matches[id] = append(matches[id], fields[0])
 		}
 	}
+
 	return matches, nil
 }
 
@@ -50,9 +59,11 @@ func switchPane(ctx context.Context, pane, client string) error {
 	if client != "" {
 		args = append(args, "-c", client)
 	}
-	output, err := exec.CommandContext(ctx, "tmux", args...).CombinedOutput()
+
+	output, err := exec.CommandContext(ctx, "tmux", args...).CombinedOutput() //nolint:gosec // Fixed executable; pane and client are separate arguments, never shell input.
 	if err != nil {
 		return fmt.Errorf("switch tmux pane: %w: %s", err, strings.TrimSpace(string(output)))
 	}
+
 	return nil
 }

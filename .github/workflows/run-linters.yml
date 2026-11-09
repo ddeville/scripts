@@ -25,12 +25,20 @@ jobs:
         with:
           go-version-file: tools/go.mod
           cache-dependency-path: tools/go.sum
-      - name: Check Go tools
+      - name: Lint Go tools
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.15.0
+          working-directory: tools
+      - name: Check formatting
         working-directory: tools
-        run: |
-          test -z "$(gofmt -l .)"
-          go vet ./...
-          go build ./...
+        run: golangci-lint fmt --diff
+      - name: Check vulnerabilities
+        working-directory: tools
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+      - name: Build Go tools
+        working-directory: tools
+        run: go build ./...
 
   qmllint:
     name: QML Lint

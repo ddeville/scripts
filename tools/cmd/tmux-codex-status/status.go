@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -70,6 +71,7 @@ func classify(result readResult) string {
 		if state := result.ReadState; state != nil && state.FirstUnread != nil && state.FirstUnread.Type == "turn" {
 			return "ready"
 		}
+
 		return "idle"
 	default:
 		return "unknown"
@@ -78,12 +80,15 @@ func classify(result readResult) string {
 
 func agentRecord(result readResult) agent {
 	t := result.Thread
+
 	title := cmp.Or(t.Name, t.AgentNickname)
 	if title == "" {
 		preview := []rune(strings.Join(strings.Fields(t.Preview), " "))
 		title = cmp.Or(string(preview[:min(100, len(preview))]), "New conversation")
 	}
+
 	state := classify(result)
+
 	record := agent{
 		ID: t.ID, Title: title, Cwd: t.Cwd, State: state, Preview: t.Preview,
 		ParentID: t.ParentThreadID, Model: t.Model, UpdatedAt: t.UpdatedAt,
@@ -93,10 +98,12 @@ func agentRecord(result readResult) agent {
 	if t.Cwd != "" {
 		record.Project = filepath.Base(t.Cwd)
 	}
+
 	if result.ReadState != nil {
 		unread := result.ReadState.FirstUnread != nil
 		record.Unread = &unread
 	}
+
 	return record
 }
 
@@ -108,15 +115,18 @@ func collect(ctx context.Context) (data snapshot) {
 	}
 	defer func() {
 		data.At = time.Now()
+
 		data.GeneratedAt = float64(data.At.UnixMilli()) / 1000
 		if data.Err != nil {
 			message := data.Err.Error()
 			data.Connection = connection{Status: "unavailable", Error: &message}
 			data.Agents = []agent{}
 		}
+
 		for _, state := range states {
 			data.Counts[state] = 0
 		}
+
 		data.Counts["total"], data.Counts["attention"] = len(data.Agents), 0
 		for _, a := range data.Agents {
 			data.Counts[a.State]++
@@ -125,46 +135,57 @@ func collect(ctx context.Context) (data snapshot) {
 			}
 		}
 	}()
+
 	client, err := connect(ctx)
 	if err != nil {
 		data.Err = err
-		return
+		return data
 	}
-	defer client.conn.CloseNow()
+	defer func() { _ = client.conn.CloseNow() }()
+
 	ids, err := client.loadedIDs(ctx)
 	if err != nil {
 		data.Err = err
-		return
+		return data
 	}
+
 	data.IDs = ids
+
 	panes, err := paneMatches(ctx, ids)
 	if err != nil {
 		data.Err = err
-		return
+		return data
 	}
+
 	for _, id := range ids {
 		if len(panes[id]) == 0 {
 			continue
 		}
+
 		result, err := client.readThread(ctx, id)
 		if err != nil {
 			var rpcErr *rpcError
 			if !errors.As(err, &rpcErr) {
 				data.Err = err
-				return
+				return data
 			}
+
 			record := agentRecord(readResult{Thread: thread{ID: id, Name: id}})
 			record.Error, record.Panes = &rpcErr.Message, panes[id]
 			data.Agents = append(data.Agents, record)
+
 			continue
 		}
+
 		if result.Thread.Status.Type == "notLoaded" {
 			continue
 		}
+
 		record := agentRecord(result)
 		record.Panes = panes[id]
 		data.Agents = append(data.Agents, record)
 	}
+
 	slices.SortFunc(data.Agents, func(a, b agent) int {
 		return cmp.Or(
 			cmp.Compare(rank(a.State), rank(b.State)),
@@ -173,11 +194,13 @@ func collect(ctx context.Context) (data snapshot) {
 			strings.Compare(a.ID, b.ID),
 		)
 	})
-	return
+
+	return data
 }
 
 type threadDetails struct {
 	agent
+
 	InitialPrompt string            `json:"initial_prompt"`
 	LatestTurn    json.RawMessage   `json:"latest_turn"`
 	RecentItems   []json.RawMessage `json:"recent_items"`
@@ -186,45 +209,58 @@ type threadDetails struct {
 
 func detail(ctx context.Context, id string) (threadDetails, error) {
 	data := threadDetails{RecentItems: []json.RawMessage{}}
+
 	client, err := connect(ctx)
 	if err != nil {
 		return data, err
 	}
-	defer client.conn.CloseNow()
+	defer func() { _ = client.conn.CloseNow() }()
+
 	result, err := client.readThread(ctx, id)
 	if err != nil {
 		return data, err
 	}
+
 	data.agent, data.InitialPrompt = agentRecord(result), result.Thread.Preview
 	if err := readHistory(ctx, client, id, &data); err != nil {
 		var rpcErr *rpcError
 		if !errors.As(err, &rpcErr) {
 			return data, err
 		}
+
 		data.HistoryError = &rpcErr.Message
 	}
+
 	return data, nil
 }
 
 func readHistory(ctx context.Context, client *codexClient, id string, data *threadDetails) error {
 	var turns struct{ Data []json.RawMessage }
+
 	err := client.call(ctx, "thread/turns/list", map[string]any{
 		"threadId": id, "limit": 1, "sortDirection": "desc", "itemsView": "summary",
 	}, &turns)
 	if err != nil || len(turns.Data) == 0 {
 		return err
 	}
+
 	data.LatestTurn = turns.Data[0]
-	var turn struct{ ID string }
-	if err := json.Unmarshal(data.LatestTurn, &turn); err != nil {
-		return err
+
+	var turn struct {
+		ID string `json:"id"`
 	}
+	if err := json.Unmarshal(data.LatestTurn, &turn); err != nil {
+		return fmt.Errorf("decode latest turn: %w", err)
+	}
+
 	var items struct{ Data []json.RawMessage }
+
 	err = client.call(ctx, "thread/items/list", map[string]any{
 		"threadId": id, "turnId": turn.ID, "limit": 6, "sortDirection": "desc",
 	}, &items)
 	if err == nil && items.Data != nil {
 		data.RecentItems = items.Data
 	}
+
 	return err
 }

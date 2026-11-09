@@ -1,0 +1,44 @@
+version: "2"
+
+linters:
+  default: all
+  disable:
+    # Deprecated duplicates.
+    - exhaustruct
+    - gomodguard
+    - wsl
+    # No project dependency allowlist; govulncheck scans for known vulnerabilities.
+    - depguard
+    # Zero values, shared styles, named results, and inline errors are intentional Go patterns.
+    - exhaustruct_v5
+    - gochecknoglobals
+    - nonamedreturns
+    - noinlineerr
+    # Prefer readable UI/state-machine code over arbitrary size and naming limits.
+    - cyclop
+    - funlen
+    - gocognit
+    - gocyclo
+    - goconst
+    - lll
+    - mnd
+    - nestif
+    - varnamelen
+    # Declaration order is not significant; wsl_v5 handles whitespace consistently.
+    - funcorder
+    - nlreturn
+    # Public status JSON uses snake_case; Codex RPC uses camelCase.
+    - tagliatelle
+  settings:
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
