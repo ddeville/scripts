@@ -29,6 +29,7 @@ type model struct {
 	data               snapshot
 	positions          map[string]int
 	selected           string
+	initialPane        string
 	filter             int
 	width, height      int
 	detailsFocus       bool
@@ -145,7 +146,15 @@ func (m *model) updateAgents() tea.Cmd {
 	}
 
 	m.agents.SetItems(items)
+
 	index := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
+	if m.initialPane != "" && !m.data.At.IsZero() {
+		index = slices.IndexFunc(agents, func(a agent) bool {
+			return slices.Contains(a.Panes, m.initialPane)
+		})
+		m.initialPane = ""
+	}
+
 	m.agents.Select(max(0, index))
 	cmd := m.selectAgent(m.selectedAgentID())
 	m.updateDetails()
@@ -326,13 +335,13 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 }
 
 // RunPicker opens the agent picker and switches to the selected pane.
-func RunPicker(ctx context.Context, client string) error {
+func RunPicker(ctx context.Context, client, pane string) error {
 	uiCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	initial := model{
 		ctx: uiCtx, positions: map[string]int{}, width: 100, height: 30,
-		agents: newAgentList(), details: viewport.New(),
+		agents: newAgentList(), details: viewport.New(), initialPane: pane,
 	}
 	initial.details.KeyMap = viewport.KeyMap{Up: keys.up, Down: keys.down}
 	initial.details.MouseWheelEnabled = false

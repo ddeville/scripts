@@ -37,17 +37,18 @@ func command() *cobra.Command {
 		SilenceUsage:  true,
 	}
 
-	var client string
+	var client, pane string
 
 	picker := &cobra.Command{
 		Use:   "picker",
 		Short: "Open the interactive agent picker",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return codexstatus.RunPicker(cmd.Context(), client)
+			return codexstatus.RunPicker(cmd.Context(), client, pane)
 		},
 	}
 	picker.Flags().StringVar(&client, "client", "", "tmux client to switch")
+	picker.Flags().StringVar(&pane, "pane", os.Getenv("TMUX_PANE"), "tmux pane to initially select")
 
 	var (
 		watch            bool
