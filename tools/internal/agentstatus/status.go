@@ -21,8 +21,12 @@ var states = []string{"approval", "input", "error", "ready", "working", "idle", 
 // AgentType identifies the program running an agent.
 type AgentType string
 
-// AgentTypeCodex identifies a Codex agent.
-const AgentTypeCodex AgentType = "codex"
+const (
+	// AgentTypeCodex identifies a Codex agent.
+	AgentTypeCodex AgentType = "codex"
+	// AgentTypeClaude identifies a Claude agent.
+	AgentTypeClaude AgentType = "claude"
+)
 
 type agent struct {
 	ID             string    `json:"id"`
