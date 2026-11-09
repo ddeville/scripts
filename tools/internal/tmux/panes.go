@@ -3,6 +3,7 @@ package tmux
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -10,6 +11,23 @@ import (
 )
 
 var titleID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-(?:[0-9a-f]{12}|[0-9a-f]{5}\.\.\.)$`)
+
+var errClientCount = errors.New("opening from the bar requires exactly one attached tmux client")
+
+// SingleClient returns the only attached client, refusing an ambiguous choice.
+func SingleClient(ctx context.Context) (string, error) {
+	output, err := exec.CommandContext(ctx, "tmux", "list-clients", "-F", "#{client_name}").Output()
+	if err != nil {
+		return "", fmt.Errorf("read tmux clients: %w", err)
+	}
+
+	clients := strings.Fields(string(output))
+	if len(clients) != 1 {
+		return "", fmt.Errorf("%w (found %d)", errClientCount, len(clients))
+	}
+
+	return clients[0], nil
+}
 
 // PaneMatches checks all loaded IDs so truncated titles cannot resolve ambiguously.
 func PaneMatches(ctx context.Context, ids []string) (map[string][]string, error) {

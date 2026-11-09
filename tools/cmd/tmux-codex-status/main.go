@@ -74,7 +74,16 @@ func command() *cobra.Command {
 	status.Flags().StringVar(&output, "output", "", "atomically write JSON to this file")
 	status.Flags().StringVar(&detailID, "detail", "", "read a conversation's recent activity")
 	status.MarkFlagsMutuallyExclusive("watch", "detail")
-	root.AddCommand(picker, status)
+
+	open := &cobra.Command{
+		Use:   "open THREAD_ID",
+		Short: "Open an agent in the only attached tmux client",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return codexstatus.OpenThread(cmd.Context(), args[0])
+		},
+	}
+	root.AddCommand(picker, status, open)
 
 	return root
 }
