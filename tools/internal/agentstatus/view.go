@@ -185,9 +185,9 @@ func panel(title, content string, width, rows int, focused bool) string {
 func (m model) panelsView() string {
 	left, right, rows := m.panelDimensions()
 	list := m.listView()
+	title := fmt.Sprintf("Threads · %d", len(m.agents.items))
 
 	if right == 0 {
-		title := "Agents · press 0–9 to open"
 		if m.detailsFocus {
 			title, list = "Selected agent", m.details.View()
 		}
@@ -196,7 +196,7 @@ func (m model) panelsView() string {
 	}
 
 	return lipgloss.JoinHorizontal(lipgloss.Top,
-		panel("Agents · press 0–9 to open", list, left, rows, !m.detailsFocus),
+		panel(title, list, left, rows, !m.detailsFocus),
 		" ",
 		panel("Selected agent", m.details.View(), right, rows, m.detailsFocus),
 	)
