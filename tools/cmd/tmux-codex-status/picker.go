@@ -282,7 +282,7 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 
 			return m, cmd
 		default:
-			if position := strings.Index("1234567890", key); len(key) == 1 && position >= 0 {
+			if position := strings.Index("0123456789", key); len(key) == 1 && position >= 0 {
 				for _, a := range m.filtered(m.filter) {
 					if m.positions[a.ID] == position {
 						cmd := m.open(a.ID)

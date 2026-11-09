@@ -101,7 +101,7 @@ func (m model) listView(width, height int) string {
 
 		number := " "
 		if position := m.positions[a.ID]; position < 10 {
-			number = string("1234567890"[position])
+			number = string("0123456789"[position])
 		}
 
 		titleWidth := max(1, width-20)
@@ -265,7 +265,7 @@ func (m model) View() tea.View {
 		tabs = append(tabs, tab)
 	}
 
-	footer := muted.Render("1–9/0 jump · j/k move · Enter open · q close")
+	footer := muted.Render("0–9 jump · j/k move · Enter open · q close")
 
 	help := "Tab filter · Ctrl-f needs you · h/l details · e expand · Ctrl-d/u scroll"
 	if m.opening {
