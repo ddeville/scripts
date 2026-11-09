@@ -91,7 +91,7 @@ func (m *model) refreshActivity() tea.Cmd {
 	}
 }
 
-func tick() tea.Cmd { return tea.Tick(2*time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
+func tick() tea.Cmd { return tea.Tick(time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
 
 func (m model) Init() tea.Cmd { return fetch(m.ctx) }
 
