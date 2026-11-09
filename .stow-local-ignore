@@ -4,4 +4,5 @@
 .vim-bookmarks
 \.ssh/ssh_auth_sock$
 __pycache__
+\.ruff_cache
 \.venv
