@@ -24,6 +24,17 @@ var (
 	selectedBackground = lipgloss.Color("237")
 )
 
+func (t AgentType) label() string {
+	switch t {
+	case AgentTypeCodex:
+		return "Codex"
+	case AgentTypeClaude:
+		return "Claude"
+	default:
+		return "Unknown"
+	}
+}
+
 func stateStyle(state string) (lipgloss.Style, string, string) {
 	switch state {
 	case "approval":
@@ -148,7 +159,8 @@ func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.
 	prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
 	name := base.Render(pad(title, titleWidth) + "  ")
 	status := style.Render(pad(label, 14))
-	project := base.Render("    ") + pathStyle.Render(pad(shortPath(a.Cwd), width-4))
+	metadata := a.Type.label() + " · " + shortPath(a.Cwd)
+	project := base.Render("    ") + pathStyle.Render(pad(metadata, width-4))
 	_, _ = fmt.Fprint(w, fit(prefix+name+status, width), "\n", fit(project, width))
 }
 

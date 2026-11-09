@@ -126,6 +126,7 @@ ShellPopup {
 
                 required property int index
                 required property string threadId
+                required property string agentType
                 required property string title
                 required property string project
                 required property string path
@@ -169,7 +170,10 @@ ShellPopup {
                         }
                         Text {
                             width: parent.width
-                            text: agent.project
+                            text: (({
+                                        codex: "Codex",
+                                        claude: "Claude"
+                                    })[agent.agentType] || "Unknown") + " · " + agent.project
                             textFormat: Text.PlainText
                             elide: Text.ElideRight
                             color: Theme.muted
