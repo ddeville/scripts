@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"charm.land/bubbles/v2/key"
-	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/ddeville/scripts/tools/internal/tmux"
@@ -34,7 +33,7 @@ type model struct {
 	width, height      int
 	detailsFocus       bool
 	expanded           bool
-	agents             list.Model
+	agents             agentList
 	details            viewport.Model
 	activity           activity
 	activityGeneration uint64
@@ -139,13 +138,12 @@ func (m *model) selectAgent(id string) tea.Cmd {
 
 func (m *model) updateAgents() tea.Cmd {
 	agents := m.filtered(m.filter)
+	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
-	items := make([]list.Item, 0, len(agents))
+	m.agents.items = make([]agentItem, 0, len(agents))
 	for _, a := range agents {
-		items = append(items, agentItem{agent: a, position: m.positions[a.ID]})
+		m.agents.items = append(m.agents.items, agentItem{agent: a, position: m.positions[a.ID]})
 	}
-
-	m.agents.SetItems(items)
 
 	index := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
 	if m.initialPane != "" && !m.data.At.IsZero() {
@@ -155,7 +153,7 @@ func (m *model) updateAgents() tea.Cmd {
 		m.initialPane = ""
 	}
 
-	m.agents.Select(max(0, index))
+	m.agents.selectIndex(max(0, index))
 	cmd := m.selectAgent(m.selectedAgentID())
 	m.updateDetails()
 
@@ -163,8 +161,8 @@ func (m *model) updateAgents() tea.Cmd {
 }
 
 func (m model) selectedAgentID() string {
-	if item, ok := m.agents.SelectedItem().(agentItem); ok {
-		return item.ID
+	if len(m.agents.items) > 0 {
+		return m.agents.items[m.agents.index].ID
 	}
 
 	return ""
@@ -172,7 +170,7 @@ func (m model) selectedAgentID() string {
 
 func (m *model) updatePanels() {
 	left, right, rows := m.panelDimensions()
-	m.agents.SetSize(left-4, rows)
+	m.agents.setSize(left-4, rows)
 
 	width := left - 4
 	if right > 0 {
@@ -322,8 +320,8 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 				m.details, cmd = m.details.Update(msg)
 			}
 		} else {
-			m.agents, cmd = m.agents.Update(msg)
-			cmd = tea.Batch(cmd, m.selectAgent(m.selectedAgentID()))
+			m.agents.move(msg)
+			cmd = m.selectAgent(m.selectedAgentID())
 		}
 
 		return cmd

@@ -3,7 +3,6 @@ package agentstatus
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"slices"
 	"strings"
@@ -11,7 +10,6 @@ import (
 
 	"charm.land/bubbles/v2/help"
 	"charm.land/bubbles/v2/key"
-	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
@@ -92,83 +90,8 @@ func (m model) summary() string {
 	return "Needs you:  " + strings.Join(parts, muted.Render("  ·  "))
 }
 
-type agentItem struct {
-	agent
-
-	position int
-}
-
-func (a agentItem) FilterValue() string { return a.Title }
-
-type agentDelegate struct{}
-
-func (agentDelegate) Height() int { return 2 }
-
-func (agentDelegate) Spacing() int { return 0 }
-
-func (agentDelegate) Update(tea.Msg, *list.Model) tea.Cmd { return nil }
-
-func newAgentList() list.Model {
-	agents := list.New(nil, agentDelegate{}, 0, 0)
-	agents.SetShowTitle(false)
-	agents.SetShowStatusBar(false)
-	agents.SetShowHelp(false)
-	agents.SetShowPagination(false)
-	agents.SetFilteringEnabled(false)
-	agents.InfiniteScrolling = true
-	agents.KeyMap = list.KeyMap{
-		CursorUp: keys.up, CursorDown: keys.down,
-		GoToStart: keys.first, GoToEnd: keys.last,
-	}
-
-	return agents
-}
-
-func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.Item) {
-	a, ok := item.(agentItem)
-	if !ok {
-		return
-	}
-
-	width := max(0, model.Width()-1)
-	style, label, _ := stateStyle(a.State)
-
-	base, keyStyle, pathStyle := lipgloss.NewStyle(), yellow, muted
-	if index == model.Index() {
-		base = base.Background(selectedBackground)
-		keyStyle = keyStyle.Background(selectedBackground)
-		pathStyle = pathStyle.Background(selectedBackground)
-		style = style.Background(selectedBackground)
-	}
-
-	dot := "●"
-	if a.State == "idle" {
-		dot = "○"
-	}
-
-	number := " "
-	if a.position < 10 {
-		number = string("0123456789"[a.position])
-	}
-
-	titleWidth := max(1, width-21)
-
-	title := singleLine(a.Title)
-	if a.ParentID != nil {
-		title = "↳ " + title
-	}
-
-	prefix := keyStyle.Render(" "+number+" ") + style.Render(dot+" ")
-	name := style.Render(pad(title, titleWidth) + "  ")
-	status := style.Render(pad(label, 14))
-	metadata := a.Type.label() + " · " + shortPath(a.Cwd)
-	project := base.Render("     ") + pathStyle.Render(pad(metadata, width-5))
-	padding := base.Render(" ")
-	_, _ = fmt.Fprint(w, fit(prefix+name+status, width), padding, "\n", fit(project, width), padding)
-}
-
 func (m model) listView() string {
-	if len(m.agents.Items()) == 0 {
+	if len(m.agents.items) == 0 {
 		message := "No conversations match this filter"
 		if m.data.At.IsZero() {
 			message = "Loading agents…"
@@ -178,10 +101,10 @@ func (m model) listView() string {
 			message = "Could not read agent status"
 		}
 
-		return muted.Render(fit(message, m.agents.Width()))
+		return muted.Render(fit(message, m.agents.view.Width()))
 	}
 
-	return m.agents.View()
+	return m.agents.view.View()
 }
 
 func (m model) detailContent(width int) string {
