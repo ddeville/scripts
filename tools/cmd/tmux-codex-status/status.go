@@ -170,9 +170,10 @@ func collect(ctx context.Context) (data snapshot) {
 				return data
 			}
 
-			record := agentRecord(readResult{Thread: thread{ID: id, Name: id}})
-			record.Error, record.Panes = &rpcErr.Message, panes[id]
-			data.Agents = append(data.Agents, record)
+			data.Agents = append(data.Agents, agent{
+				ID: id, Title: id, State: "error", NeedsAttention: true,
+				Error: &rpcErr.Message, Panes: panes[id], ActiveFlags: []string{},
+			})
 
 			continue
 		}

@@ -245,7 +245,7 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 	case openMsg:
 		m.opening = false
 		if msg.err != nil {
-			m.notice = clean(msg.err.Error())
+			m.notice = singleLine(msg.err.Error())
 			return m, nil
 		}
 

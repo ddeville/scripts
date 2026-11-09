@@ -26,7 +26,7 @@ func main() {
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-codex-status:", err)
+		fmt.Fprintln(os.Stderr, "tmux-codex-status:", clean(err.Error()))
 		os.Exit(1)
 	}
 }

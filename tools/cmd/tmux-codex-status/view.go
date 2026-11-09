@@ -140,7 +140,7 @@ func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.
 
 	titleWidth := max(1, width-20)
 
-	title := strings.Join(strings.Fields(clean(a.Title)), " ")
+	title := singleLine(a.Title)
 	if a.ParentID != nil {
 		title = "↳ " + title
 	}
@@ -302,7 +302,7 @@ func (m model) View() tea.View {
 	}
 
 	if m.data.Err != nil {
-		help = "Status unavailable: " + clean(m.data.Err.Error())
+		help = "Status unavailable: " + singleLine(m.data.Err.Error())
 	}
 
 	content := strings.Join([]string{
@@ -404,6 +404,8 @@ func clean(s string) string {
 	}, s)
 }
 
+func singleLine(s string) string { return strings.Join(strings.Fields(clean(s)), " ") }
+
 func shortPath(path string) string {
 	home, _ := os.UserHomeDir()
 	if path == home {
@@ -414,5 +416,5 @@ func shortPath(path string) string {
 		path = "~" + strings.TrimPrefix(path, home)
 	}
 
-	return strings.Join(strings.Fields(clean(path)), " ")
+	return singleLine(path)
 }
