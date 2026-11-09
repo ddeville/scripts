@@ -1,10 +1,11 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -21,20 +22,30 @@ type (
 
 //nolint:recvcheck // Bubble Tea uses value updates; pointer helpers mutate the current update's copy.
 type model struct {
-	ctx           context.Context //nolint:containedctx // Bubble Tea callbacks have no context parameter.
-	data          snapshot
-	positions     map[string]int
-	selected      string
-	filter        int
-	width, height int
-	detailsFocus  bool
-	expanded      bool
-	scroll        int
-	activity      activity
-	notice        string
-	opening       bool
-	target        string
+	ctx                context.Context //nolint:containedctx // Bubble Tea callbacks have no context parameter.
+	data               snapshot
+	positions          map[string]int
+	selected           string
+	filter             int
+	width, height      int
+	detailsFocus       bool
+	expanded           bool
+	scroll             int
+	activity           activity
+	activityGeneration uint64
+	activityCancel     context.CancelFunc
+	notice             string
+	opening            bool
+	target             string
 }
+
+const (
+	filterAll = iota
+	filterAttention
+	filterWorking
+	filterUnread
+	filterIdle
+)
 
 var filters = []string{"All", "Needs you", "Working", "Unread", "Idle"}
 
@@ -52,14 +63,27 @@ func fetch(ctx context.Context) tea.Cmd {
 	}
 }
 
-func fetchActivity(ctx context.Context, id string) tea.Cmd {
+func (m *model) refreshActivity() tea.Cmd {
+	if m.activityCancel != nil {
+		m.activityCancel()
+		m.activityCancel = nil
+	}
+
+	m.activityGeneration++
+	if m.selected == "" {
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(m.ctx, 3*time.Second)
+	m.activityCancel = cancel
+	id, generation := m.selected, m.activityGeneration
+
 	return func() tea.Msg {
-		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 		defer cancel()
 
 		data, err := detail(ctx, id)
 
-		return activity{ID: id, Entries: activityEntries(data), Err: err}
+		return activity{ID: id, generation: generation, Entries: activityEntries(data), Err: err}
 	}
 }
 
@@ -74,15 +98,15 @@ func (m model) filtered(filter int) []agent {
 		match := false
 
 		switch filter {
-		case 0:
+		case filterAll:
 			match = true
-		case 1:
+		case filterAttention:
 			match = a.NeedsAttention
-		case 2:
+		case filterWorking:
 			match = a.State == "working"
-		case 3:
+		case filterUnread:
 			match = a.State == "ready"
-		case 4:
+		case filterIdle:
 			match = a.State == "idle"
 		}
 
@@ -102,11 +126,8 @@ func (m *model) selectAgent(id string) tea.Cmd {
 	m.selected, m.scroll, m.notice = id, 0, ""
 
 	m.activity = activity{ID: id}
-	if id == "" {
-		return nil
-	}
 
-	return fetchActivity(m.ctx, id)
+	return m.refreshActivity()
 }
 
 func (m *model) keepSelection() tea.Cmd {
@@ -124,10 +145,12 @@ func (m *model) keepSelection() tea.Cmd {
 	return m.selectAgent(agents[0].ID)
 }
 
-func (m model) open(id string) tea.Cmd {
+func (m *model) open(id string) tea.Cmd {
 	if id == "" || m.opening {
 		return nil
 	}
+
+	m.opening = true
 
 	return func() tea.Msg {
 		if m.data.Err != nil || time.Since(m.data.At) > 10*time.Second {
@@ -166,20 +189,23 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 			}
 		}
 
-		sort.Slice(msg.Agents, func(i, j int) bool { return m.positions[msg.Agents[i].ID] < m.positions[msg.Agents[j].ID] })
+		slices.SortFunc(msg.Agents, func(a, b agent) int {
+			return cmp.Compare(m.positions[a.ID], m.positions[b.ID])
+		})
 		m.data = msg
 
 		detailCmd := m.keepSelection()
-		if detailCmd == nil && m.selected != "" {
-			detailCmd = fetchActivity(m.ctx, m.selected)
+		if detailCmd == nil && m.selected != "" && m.activityCancel == nil {
+			detailCmd = m.refreshActivity()
 		}
 
 		return m, tea.Batch(tick(), detailCmd)
 	case tickMsg:
 		return m, fetch(m.ctx)
 	case activity:
-		if msg.ID == m.selected {
+		if msg.ID == m.selected && msg.generation == m.activityGeneration {
 			m.activity = msg
+			m.activityCancel = nil
 		}
 	case openMsg:
 		m.opening = false
@@ -192,110 +218,113 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 
 		return m, tea.Quit
 	case tea.KeyPressMsg:
-		key := msg.String()
+		return m.handleKey(msg.String())
+	}
+
+	return m, nil
+}
+
+func (m model) handleKey(key string) (model, tea.Cmd) {
+	switch key {
+	case "q", "esc", "ctrl+c":
+		return m, tea.Quit
+	case "tab", "shift+tab", "ctrl+f":
 		switch key {
-		case "q", "esc", "ctrl+c":
-			return m, tea.Quit
-		case "tab", "shift+tab", "ctrl+f":
-			switch key {
-			case "ctrl+f":
-				if m.filter == 1 {
-					m.filter = 0
-				} else {
-					m.filter = 1
-				}
-			case "shift+tab":
-				m.filter = (m.filter + len(filters) - 1) % len(filters)
-			default:
-				m.filter = (m.filter + 1) % len(filters)
-			}
-
-			cmd := m.keepSelection()
-
-			return m, cmd
-		case "h", "left":
-			m.detailsFocus = false
-			m.expanded = false
-		case "l", "right":
-			m.detailsFocus = true
-		case "e":
-			m.expanded = !m.expanded
-			m.detailsFocus = m.expanded
-		case "j", "down", "k", "up", "ctrl+d", "ctrl+u", "g", "G":
-			delta := 1
-			if key == "k" || key == "up" || key == "ctrl+u" {
-				delta = -1
-			}
-
-			if key == "ctrl+d" || key == "ctrl+u" {
-				delta *= max(1, (m.height-10)/4)
-			}
-
-			if m.detailsFocus {
-				left, right, rows := m.panelDimensions()
-
-				width := left - 4
-				if right > 0 {
-					width = right - 4
-				}
-
-				limit := max(0, len(m.detailLines(width))-rows)
-
-				m.scroll = max(0, min(limit, min(m.scroll, limit)+delta))
-				if key == "g" {
-					m.scroll = 0
-				}
-
-				if key == "G" {
-					m.scroll = limit
-				}
+		case "ctrl+f":
+			if m.filter == filterAttention {
+				m.filter = filterAll
 			} else {
-				agents := m.filtered(m.filter)
-				if len(agents) == 0 {
-					break
-				}
-
-				index := 0
-
-				for i, a := range agents {
-					if a.ID == m.selected {
-						index = i
-					}
-				}
-
-				index = ((index+delta)%len(agents) + len(agents)) % len(agents)
-				if key == "g" {
-					index = 0
-				}
-
-				if key == "G" {
-					index = len(agents) - 1
-				}
-
-				cmd := m.selectAgent(agents[index].ID)
-
-				return m, cmd
+				m.filter = filterAttention
 			}
-		case "enter":
-			cmd := m.open(m.selected)
-			m.opening = cmd != nil
-
-			return m, cmd
+		case "shift+tab":
+			m.filter = (m.filter + len(filters) - 1) % len(filters)
 		default:
-			if position := strings.Index("0123456789", key); len(key) == 1 && position >= 0 {
-				for _, a := range m.filtered(m.filter) {
-					if m.positions[a.ID] == position {
-						cmd := m.open(a.ID)
-						m.opening = cmd != nil
+			m.filter = (m.filter + 1) % len(filters)
+		}
 
-						return m, cmd
-					}
+		cmd := m.keepSelection()
+
+		return m, cmd
+	case "h", "left":
+		m.detailsFocus = false
+		m.expanded = false
+	case "l", "right":
+		m.detailsFocus = true
+	case "e":
+		m.expanded = !m.expanded
+		m.detailsFocus = m.expanded
+	case "j", "down", "k", "up", "ctrl+d", "ctrl+u", "g", "G":
+		return m.navigate(key)
+	case "enter":
+		cmd := m.open(m.selected)
+
+		return m, cmd
+	default:
+		if position := strings.Index("0123456789", key); len(key) == 1 && position >= 0 {
+			for _, a := range m.filtered(m.filter) {
+				if m.positions[a.ID] == position {
+					cmd := m.open(a.ID)
+
+					return m, cmd
 				}
 			}
 		}
 	}
 
 	return m, nil
+}
+
+func (m model) navigate(key string) (model, tea.Cmd) {
+	delta := 1
+	if key == "k" || key == "up" || key == "ctrl+u" {
+		delta = -1
+	}
+
+	if key == "ctrl+d" || key == "ctrl+u" {
+		delta *= max(1, (m.height-10)/4)
+	}
+
+	if m.detailsFocus {
+		left, right, rows := m.panelDimensions()
+
+		width := left - 4
+		if right > 0 {
+			width = right - 4
+		}
+
+		limit := max(0, len(m.detailLines(width))-rows)
+
+		switch key {
+		case "g":
+			m.scroll = 0
+		case "G":
+			m.scroll = limit
+		default:
+			m.scroll = max(0, min(limit, min(m.scroll, limit)+delta))
+		}
+
+		return m, nil
+	}
+
+	agents := m.filtered(m.filter)
+	if len(agents) == 0 {
+		return m, nil
+	}
+
+	index := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
+
+	switch key {
+	case "g":
+		index = 0
+	case "G":
+		index = len(agents) - 1
+	default:
+		index = ((max(0, index)+delta)%len(agents) + len(agents)) % len(agents)
+	}
+
+	cmd := m.selectAgent(agents[index].ID)
+
+	return m, cmd
 }
 
 func runPicker(ctx context.Context, client string) error {

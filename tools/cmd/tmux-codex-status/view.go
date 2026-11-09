@@ -45,20 +45,25 @@ func pad(s string, width int) string {
 	return s + strings.Repeat(" ", max(0, width-ansi.StringWidth(s)))
 }
 
-func line(s string, width int) string { return pad(s, width) }
-
 func (m model) summary() string {
-	counts := map[string]int{}
-	for _, a := range m.data.Agents {
-		counts[a.State]++
+	if m.data.Err != nil {
+		if m.data.At.IsZero() {
+			return magenta.Render("Codex unavailable")
+		}
+
+		return magenta.Render("Status unavailable · showing last known data")
+	}
+
+	if m.data.At.IsZero() {
+		return muted.Render("Connecting to Codex…")
 	}
 
 	var parts []string
 
 	for _, state := range []string{"approval", "input", "error", "ready"} {
-		if counts[state] > 0 {
+		if count := m.data.Counts[state]; count > 0 {
 			style, label, _ := stateStyle(state)
-			parts = append(parts, style.Render(fmt.Sprintf("%s %d", label, counts[state])))
+			parts = append(parts, style.Render(fmt.Sprintf("%s %d", label, count)))
 		}
 	}
 
@@ -111,9 +116,11 @@ func (m model) listView(width, height int) string {
 			title = "↳ " + title
 		}
 
-		row := keyStyle.Render(number+" ") + style.Render(dot+" ") + base.Render(pad(title, titleWidth)+"  ") + style.Render(pad(label, 14))
+		prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
+		name := base.Render(pad(title, titleWidth) + "  ")
+		status := style.Render(pad(label, 14))
 		project := base.Render("    ") + pathStyle.Render(pad(shortPath(a.Cwd), width-4))
-		lines = append(lines, row, project)
+		lines = append(lines, prefix+name+status, project)
 	}
 
 	if len(agents) == 0 {
@@ -154,10 +161,17 @@ func (m model) detailLines(width int) []string {
 	style, _, hint := stateStyle(a.State)
 
 	var content strings.Builder
-	content.WriteString(clean(a.Title) + "\n" + muted.Render(shortPath(a.Cwd)) + "\n\n" + style.Render(hint) + "\n" + muted.Render("Enter to open"))
+	content.WriteString(clean(a.Title))
+	content.WriteByte('\n')
+	content.WriteString(muted.Render(shortPath(a.Cwd)))
+	content.WriteString("\n\n")
+	content.WriteString(style.Render(hint))
+	content.WriteByte('\n')
+	content.WriteString(muted.Render("Enter to open"))
 
 	if a.Error != nil {
-		content.WriteString("\n\n" + magenta.Render(clean(*a.Error)))
+		content.WriteString("\n\n")
+		content.WriteString(magenta.Render(clean(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -166,7 +180,8 @@ func (m model) detailLines(width int) []string {
 	}
 
 	if m.activity.Err != nil {
-		content.WriteString("\n\n" + magenta.Render(clean(m.activity.Err.Error())))
+		content.WriteString("\n\n")
+		content.WriteString(magenta.Render(clean(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -175,7 +190,10 @@ func (m model) detailLines(width int) []string {
 			text = text[:6000]
 		}
 
-		content.WriteString("\n\n" + yellow.Render(e.Label) + "\n" + strings.ReplaceAll(clean(string(text)), "\t", "    "))
+		content.WriteString("\n\n")
+		content.WriteString(yellow.Render(e.Label))
+		content.WriteByte('\n')
+		content.WriteString(strings.ReplaceAll(clean(string(text)), "\t", "    "))
 	}
 
 	return strings.Split(ansi.Wrap(content.String(), width, ""), "\n")
@@ -248,9 +266,6 @@ func (m model) View() tea.View {
 	heading := title + muted.Render(stamp)
 
 	summary := m.summary()
-	if m.data.At.IsZero() {
-		summary = muted.Render("Connecting to Codex…")
-	}
 
 	tabs := make([]string, 0, len(filters))
 
@@ -272,15 +287,23 @@ func (m model) View() tea.View {
 		help = "Opening agent…"
 	}
 
-	if m.data.Err != nil {
-		help = "Status unavailable: " + clean(m.data.Err.Error())
-	}
-
 	if m.notice != "" {
 		help = m.notice
 	}
 
-	content := line(heading, width) + "\n" + line(summary, width) + "\n\n" + line(strings.Join(tabs, " "), width) + "\n" + m.panelsView() + "\n" + line(footer, width) + "\n" + line(muted.Render(help), width)
+	if m.data.Err != nil {
+		help = "Status unavailable: " + clean(m.data.Err.Error())
+	}
+
+	content := strings.Join([]string{
+		pad(heading, width),
+		pad(summary, width),
+		"",
+		pad(strings.Join(tabs, " "), width),
+		m.panelsView(),
+		pad(footer, width),
+		pad(muted.Render(help), width),
+	}, "\n")
 	view := tea.NewView(lipgloss.NewStyle().Padding(1, 1, 0, 1).Render(content))
 	view.AltScreen = true
 
@@ -288,9 +311,10 @@ func (m model) View() tea.View {
 }
 
 type activity struct {
-	ID      string
-	Entries []entry
-	Err     error
+	ID         string
+	generation uint64
+	Entries    []entry
+	Err        error
 }
 
 type entry struct{ Label, Text string }

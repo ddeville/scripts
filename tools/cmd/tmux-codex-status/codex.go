@@ -37,9 +37,11 @@ func connect(ctx context.Context) (*codexClient, error) {
 	}
 
 	socket := filepath.Join(home, "app-server-control", "app-server-control.sock")
+
 	transport := &http.Transport{DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
 		return (&net.Dialer{}).DialContext(ctx, "unix", socket)
 	}}
+	defer transport.CloseIdleConnections()
 
 	dialCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
