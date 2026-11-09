@@ -63,8 +63,10 @@ func fetchActivity(ctx context.Context, id string) tea.Cmd {
 	}
 }
 
-func tick() tea.Cmd           { return tea.Tick(2*time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
+func tick() tea.Cmd { return tea.Tick(2*time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
+
 func (m model) Init() tea.Cmd { return fetch(m.ctx) }
+
 func (m model) filtered(filter int) []agent {
 	var result []agent
 

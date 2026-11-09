@@ -37,11 +37,14 @@ func stateStyle(state string) (lipgloss.Style, string, string) {
 		return muted, "Check status", "Status is unknown. Open the agent to check."
 	}
 }
+
 func fit(s string, width int) string { return ansi.Truncate(s, max(0, width), "…") }
+
 func pad(s string, width int) string {
 	s = fit(s, width)
 	return s + strings.Repeat(" ", max(0, width-ansi.StringWidth(s)))
 }
+
 func line(s string, width int) string { return pad(s, width) }
 
 func (m model) summary() string {
