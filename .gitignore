@@ -3,3 +3,4 @@
 /config/linux/.config/gtk-3.0/servers
 /.codex
 .venv/
+.ruff_cache/
