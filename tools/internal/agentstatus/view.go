@@ -159,7 +159,7 @@ func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.
 	}
 
 	prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
-	name := base.Render(pad(title, titleWidth) + "  ")
+	name := style.Render(pad(title, titleWidth) + "  ")
 	status := style.Render(pad(label, 14))
 	metadata := a.Type.label() + " · " + shortPath(a.Cwd)
 	project := base.Render("    ") + pathStyle.Render(pad(metadata, width-4))
