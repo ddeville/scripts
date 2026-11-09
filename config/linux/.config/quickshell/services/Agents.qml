@@ -9,7 +9,7 @@ Scope {
 
     property bool available: false
     property var counts: ({})
-    property string statusError: "Connecting to Codex…"
+    property string statusError: "Loading agents…"
     property string actionError: ""
     property Toplevel terminal: null
     property alias agents: agentModel
@@ -61,6 +61,7 @@ Scope {
                 ++existing;
             const row = {
                 threadId: agent.id,
+                agentType: agent.agent_type,
                 title: agent.title,
                 project: agent.project || agent.cwd,
                 path: agent.cwd,
@@ -106,7 +107,7 @@ Scope {
             root.available = false;
             root.counts = {};
             root.syncAgents([]);
-            root.statusError = watchErrors.text.trim() || "Codex status stopped. Retrying…";
+            root.statusError = watchErrors.text.trim() || "Agent status stopped. Retrying…";
         }
 
         stdout: SplitParser {
@@ -115,13 +116,13 @@ Scope {
                     const next = JSON.parse(data);
                     root.available = next.connection.status === "connected";
                     root.counts = root.available ? next.counts : {};
-                    root.statusError = root.available ? "" : next.connection.error || "Codex status unavailable";
+                    root.statusError = root.available ? "" : next.connection.error || "Agent status unavailable";
                     root.syncAgents(root.available ? next.agents : []);
                 } catch (error) {
                     root.available = false;
                     root.counts = {};
                     root.syncAgents([]);
-                    root.statusError = "Could not read Codex status.";
+                    root.statusError = "Could not read agent status.";
                 }
             }
         }

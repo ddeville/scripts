@@ -61,7 +61,7 @@ func Connect(ctx context.Context) (*Client, error) {
 	client := &Client{conn: conn}
 
 	err = client.call(ctx, "initialize", map[string]any{
-		"clientInfo":   map[string]string{"name": "tmux_codex_status", "version": "1.0.0"},
+		"clientInfo":   map[string]string{"name": "tmux_agent_status", "version": "1.0.0"},
 		"capabilities": map[string]bool{"experimentalApi": true},
 	}, nil)
 	if err == nil {

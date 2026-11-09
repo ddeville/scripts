@@ -1,4 +1,4 @@
-package codexstatus
+package agentstatus
 
 import (
 	"context"

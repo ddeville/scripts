@@ -1,5 +1,5 @@
-// Package codexstatus collects agent status and presents it as a picker or JSON.
-package codexstatus
+// Package agentstatus collects agent status and presents it as a picker or JSON.
+package agentstatus
 
 import (
 	"cmp"
@@ -18,21 +18,28 @@ import (
 
 var states = []string{"approval", "input", "error", "ready", "working", "idle", "unknown"}
 
+// AgentType identifies the program running an agent.
+type AgentType string
+
+// AgentTypeCodex identifies a Codex agent.
+const AgentTypeCodex AgentType = "codex"
+
 type agent struct {
-	ID             string   `json:"id"`
-	Title          string   `json:"title"`
-	Cwd            string   `json:"cwd"`
-	Project        string   `json:"project"`
-	State          string   `json:"status"`
-	NeedsAttention bool     `json:"needs_attention"`
-	Unread         *bool    `json:"unread"`
-	ActiveFlags    []string `json:"active_flags"`
-	ParentID       *string  `json:"parent_id"`
-	Model          *string  `json:"model"`
-	UpdatedAt      *int64   `json:"updated_at"`
-	Error          *string  `json:"error"`
-	Panes          []string `json:"tmux_panes,omitempty"`
-	Preview        string   `json:"-"`
+	ID             string    `json:"id"`
+	Type           AgentType `json:"agent_type"`
+	Title          string    `json:"title"`
+	Cwd            string    `json:"cwd"`
+	Project        string    `json:"project"`
+	State          string    `json:"status"`
+	NeedsAttention bool      `json:"needs_attention"`
+	Unread         *bool     `json:"unread"`
+	ActiveFlags    []string  `json:"active_flags"`
+	ParentID       *string   `json:"parent_id"`
+	Model          *string   `json:"model"`
+	UpdatedAt      *int64    `json:"updated_at"`
+	Error          *string   `json:"error"`
+	Panes          []string  `json:"tmux_panes,omitempty"`
+	Preview        string    `json:"-"`
 }
 
 type snapshot struct {
@@ -94,7 +101,7 @@ func agentRecord(result codex.ReadResult) agent {
 	state := classify(result)
 
 	record := agent{
-		ID: t.ID, Title: title, Cwd: t.Cwd, State: state, Preview: t.Preview,
+		ID: t.ID, Type: AgentTypeCodex, Title: title, Cwd: t.Cwd, State: state, Preview: t.Preview,
 		ParentID: t.ParentThreadID, Model: t.Model, UpdatedAt: t.UpdatedAt,
 		ActiveFlags:    append([]string{}, t.Status.ActiveFlags...),
 		NeedsAttention: rank(state) <= rank("ready"),
@@ -175,7 +182,7 @@ func collect(ctx context.Context) (data snapshot) {
 			}
 
 			data.Agents = append(data.Agents, agent{
-				ID: id, Title: id, State: "error", NeedsAttention: true,
+				ID: id, Type: AgentTypeCodex, Title: id, State: "error", NeedsAttention: true,
 				Error: &rpcErr.Message, Panes: panes[id], ActiveFlags: []string{},
 			})
 

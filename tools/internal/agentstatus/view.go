@@ -1,4 +1,4 @@
-package codexstatus
+package agentstatus
 
 import (
 	"encoding/json"
@@ -53,14 +53,14 @@ func pad(s string, width int) string {
 func (m model) summary() string {
 	if m.data.Err != nil {
 		if m.data.At.IsZero() {
-			return magenta.Render("Codex unavailable")
+			return magenta.Render("Agent status unavailable")
 		}
 
 		return magenta.Render("Status unavailable · showing last known data")
 	}
 
 	if m.data.At.IsZero() {
-		return muted.Render("Connecting to Codex…")
+		return muted.Render("Loading agents…")
 	}
 
 	var parts []string
@@ -156,11 +156,11 @@ func (m model) listView() string {
 	if len(m.agents.Items()) == 0 {
 		message := "No conversations match this filter"
 		if m.data.At.IsZero() {
-			message = "Connecting to Codex…"
+			message = "Loading agents…"
 		}
 
 		if m.data.Err != nil {
-			message = "Could not read Codex status"
+			message = "Could not read agent status"
 		}
 
 		return muted.Render(fit(message, m.agents.Width()))
@@ -262,7 +262,7 @@ func (m model) panelsView() string {
 
 func (m model) View() tea.View {
 	width := max(12, m.width-2)
-	title := yellow.Render("Codex agents")
+	title := yellow.Render("Agents")
 
 	stamp := "  tmux"
 	if !m.data.At.IsZero() {
@@ -367,7 +367,7 @@ func activityEntries(data threadDetails) []entry {
 
 		switch item.Type {
 		case "agentMessage":
-			e = entry{"Codex", item.Text}
+			e = entry{"Agent", item.Text}
 		case "userMessage":
 			e.Label = "Prompt"
 
