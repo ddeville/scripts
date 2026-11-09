@@ -341,7 +341,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         id: agentsButton
 
                         symbol: "agent"
-                        text: panel.agents.attention > 0 ? String(panel.agents.attention) : ""
                         foreground: ["working", "idle"].includes(panel.agents.indicatorState) ? Theme.foreground : panel.agents.color(panel.agents.indicatorState)
                         tooltip: panel.agents.tooltip
                         tooltipEnabled: !agentsPopup.visible
