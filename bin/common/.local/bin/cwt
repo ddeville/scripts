@@ -210,7 +210,7 @@ fi
 mkdir -p "$repo_worktree_dir"
 
 if [ "$use_branch" = on ]; then
-  git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
+  git worktree add --no-track -b "$branch_name" "$worktree_path" "$base_ref"
   branch_display="$branch_name"
 else
   git worktree add --detach "$worktree_path" "$base_ref"
