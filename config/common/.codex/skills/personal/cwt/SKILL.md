@@ -1,6 +1,6 @@
 ---
 name: cwt
-description: Fork the current Codex conversation into a user-managed Git worktree and tmux session using cwt. Use when the user asks to fork this conversation into a new worktree or invokes $cwt with a feature name.
+description: Create a user-managed Git worktree and tmux session using cwt, forking the current Codex thread by default. Use when the user asks to use cwt, create a named cwt session, or fork this conversation into a worktree.
 ---
 
 # Fork into a worktree
@@ -9,10 +9,20 @@ Use the installed `cwt` helper to create the worktree, branch, and tmux session.
 It owns the paths and naming conventions; do not recreate that logic or use
 Codex-managed worktrees.
 
+**Fork the current thread by default.** A request to create a named `cwt` session
+or worktree implies `--fork-current`, even when the user does not say "fork".
+Omitting the flag opens a thread picker; use that only when explicitly requested.
+
 For a request such as `$cwt my-feature`, run this from the current repository:
 
 ```sh
 cwt --fork-current --base HEAD -- my-feature
+```
+
+For "create a new session named bootstrap off master":
+
+```sh
+cwt --fork-current --base master -- bootstrap
 ```
 
 - Use the supplied feature name. If none is provided and the intended name is
