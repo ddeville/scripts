@@ -3,11 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"slices"
 	"strings"
 	"unicode"
 
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
@@ -75,50 +79,81 @@ func (m model) summary() string {
 	return "Needs you:  " + strings.Join(parts, muted.Render("  ·  "))
 }
 
-func (m model) listView(width, height int) string {
-	agents := m.filtered(m.filter)
-	lines := []string{}
+type agentItem struct {
+	agent
 
-	selected := slices.IndexFunc(agents, func(a agent) bool { return a.ID == m.selected })
-	capacity := max(1, height/2)
+	position int
+}
 
-	start := max(0, selected-capacity+1)
-	for _, a := range agents[start:min(len(agents), start+capacity)] {
-		style, label, _ := stateStyle(a.State)
+func (a agentItem) FilterValue() string { return a.Title }
 
-		base, keyStyle, pathStyle := lipgloss.NewStyle(), yellow, muted
-		if a.ID == m.selected {
-			base = base.Background(selectedBackground)
-			keyStyle = keyStyle.Background(selectedBackground)
-			pathStyle = pathStyle.Background(selectedBackground)
-			style = style.Background(selectedBackground)
-		}
+type agentDelegate struct{}
 
-		dot := "●"
-		if a.State == "idle" {
-			dot = "○"
-		}
+func (agentDelegate) Height() int { return 2 }
 
-		number := " "
-		if position := m.positions[a.ID]; position < 10 {
-			number = string("0123456789"[position])
-		}
+func (agentDelegate) Spacing() int { return 0 }
 
-		titleWidth := max(1, width-20)
+func (agentDelegate) Update(tea.Msg, *list.Model) tea.Cmd { return nil }
 
-		title := strings.Join(strings.Fields(clean(a.Title)), " ")
-		if a.ParentID != nil {
-			title = "↳ " + title
-		}
-
-		prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
-		name := base.Render(pad(title, titleWidth) + "  ")
-		status := style.Render(pad(label, 14))
-		project := base.Render("    ") + pathStyle.Render(pad(shortPath(a.Cwd), width-4))
-		lines = append(lines, prefix+name+status, project)
+func newAgentList() list.Model {
+	agents := list.New(nil, agentDelegate{}, 0, 0)
+	agents.SetShowTitle(false)
+	agents.SetShowStatusBar(false)
+	agents.SetShowHelp(false)
+	agents.SetShowPagination(false)
+	agents.SetFilteringEnabled(false)
+	agents.InfiniteScrolling = true
+	agents.KeyMap = list.KeyMap{
+		CursorUp: keys.up, CursorDown: keys.down,
+		GoToStart: keys.first, GoToEnd: keys.last,
 	}
 
-	if len(agents) == 0 {
+	return agents
+}
+
+func (agentDelegate) Render(w io.Writer, model list.Model, index int, item list.Item) {
+	a, ok := item.(agentItem)
+	if !ok {
+		return
+	}
+
+	width := model.Width()
+	style, label, _ := stateStyle(a.State)
+
+	base, keyStyle, pathStyle := lipgloss.NewStyle(), yellow, muted
+	if index == model.Index() {
+		base = base.Background(selectedBackground)
+		keyStyle = keyStyle.Background(selectedBackground)
+		pathStyle = pathStyle.Background(selectedBackground)
+		style = style.Background(selectedBackground)
+	}
+
+	dot := "●"
+	if a.State == "idle" {
+		dot = "○"
+	}
+
+	number := " "
+	if a.position < 10 {
+		number = string("0123456789"[a.position])
+	}
+
+	titleWidth := max(1, width-20)
+
+	title := strings.Join(strings.Fields(clean(a.Title)), " ")
+	if a.ParentID != nil {
+		title = "↳ " + title
+	}
+
+	prefix := keyStyle.Render(number+" ") + style.Render(dot+" ")
+	name := base.Render(pad(title, titleWidth) + "  ")
+	status := style.Render(pad(label, 14))
+	project := base.Render("    ") + pathStyle.Render(pad(shortPath(a.Cwd), width-4))
+	_, _ = fmt.Fprint(w, fit(prefix+name+status, width), "\n", fit(project, width))
+}
+
+func (m model) listView() string {
+	if len(m.agents.Items()) == 0 {
 		message := "No conversations match this filter"
 		if m.data.At.IsZero() {
 			message = "Connecting to Codex…"
@@ -128,20 +163,16 @@ func (m model) listView(width, height int) string {
 			message = "Could not read Codex status"
 		}
 
-		lines = append(lines, muted.Render(fit(message, width)))
+		return muted.Render(fit(message, m.agents.Width()))
 	}
 
-	for len(lines) < height {
-		lines = append(lines, "")
-	}
-
-	return lipgloss.NewStyle().Width(width).Height(height).MaxHeight(height).Render(strings.Join(lines, "\n"))
+	return m.agents.View()
 }
 
-func (m model) detailLines(width int) []string {
+func (m model) detailContent(width int) string {
 	index := slices.IndexFunc(m.data.Agents, func(a agent) bool { return a.ID == m.selected })
 	if index < 0 {
-		return []string{muted.Render("No conversation selected")}
+		return muted.Render("No conversation selected")
 	}
 
 	a := m.data.Agents[index]
@@ -178,14 +209,7 @@ func (m model) detailLines(width int) []string {
 			strings.ReplaceAll(clean(string(text)), "\t", "    "))
 	}
 
-	return strings.Split(ansi.Wrap(strings.Join(lines, "\n"), width, ""), "\n")
-}
-
-func (m model) detailView(width, height int) string {
-	lines := m.detailLines(width)
-	offset := min(m.scroll, max(0, len(lines)-height))
-
-	return strings.Join(lines[offset:min(len(lines), offset+height)], "\n")
+	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
 }
 
 // Panel widths include borders and padding; rows is the content height.
@@ -218,12 +242,12 @@ func panel(title, content string, width, rows int, focused bool) string {
 
 func (m model) panelsView() string {
 	left, right, rows := m.panelDimensions()
-	list := m.listView(left-4, rows)
+	list := m.listView()
 
 	if right == 0 {
 		title := "Agents · press a number to open"
 		if m.detailsFocus {
-			title, list = "Selected agent", m.detailView(left-4, rows)
+			title, list = "Selected agent", m.details.View()
 		}
 
 		return panel(title, list, left, rows, true)
@@ -232,7 +256,7 @@ func (m model) panelsView() string {
 	return lipgloss.JoinHorizontal(lipgloss.Top,
 		panel("Agents · press a number to open", list, left, rows, !m.detailsFocus),
 		" ",
-		panel("Selected agent", m.detailView(right-4, rows), right, rows, m.detailsFocus),
+		panel("Selected agent", m.details.View(), right, rows, m.detailsFocus),
 	)
 }
 
@@ -262,9 +286,13 @@ func (m model) View() tea.View {
 		tabs = append(tabs, tab)
 	}
 
-	footer := muted.Render("0–9 jump · j/k move · Enter open · q close")
+	helpView := help.New()
+	helpView.SetWidth(width)
+	helpView.ShortSeparator = " · "
+	helpView.Styles = help.Styles{ShortKey: muted, ShortDesc: muted, ShortSeparator: muted, Ellipsis: muted}
+	footer := helpView.ShortHelpView([]key.Binding{keys.jump, keys.up, keys.down, keys.open, keys.quit})
 
-	help := "Tab filter · Ctrl-f needs you · h/l details · e expand"
+	help := helpView.ShortHelpView([]key.Binding{keys.nextFilter, keys.attention, keys.list, keys.details, keys.expand})
 	if m.opening {
 		help = "Opening agent…"
 	}

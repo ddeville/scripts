@@ -3,6 +3,7 @@ module github.com/ddeville/scripts/tools
 go 1.27.3
 
 require (
+	charm.land/bubbles/v2 v2.2.1
 	charm.land/bubbletea/v2 v2.1.1
 	charm.land/lipgloss/v2 v2.0.6
 	github.com/charmbracelet/x/ansi v0.11.9
@@ -11,6 +12,7 @@ require (
 )
 
 require (
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20261023060817-a45b7c86333f // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -23,6 +25,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.31 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/sahilm/fuzzy v0.1.3 // indirect
 	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/xo/terminfo v1.3.1 // indirect
 	golang.org/x/sync v0.24.0 // indirect
