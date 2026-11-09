@@ -1,4 +1,4 @@
-package main
+package codexstatus
 
 import (
 	"cmp"
@@ -12,6 +12,7 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
+	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
 type (
@@ -193,7 +194,7 @@ func (m *model) open(id string) tea.Cmd {
 		ctx, cancel := context.WithTimeout(m.ctx, time.Second)
 		defer cancel()
 
-		panes, err := paneMatches(ctx, m.data.IDs)
+		panes, err := tmux.PaneMatches(ctx, m.data.IDs)
 		if err != nil {
 			return openMsg{err: err}
 		}
@@ -324,7 +325,8 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-func runPicker(ctx context.Context, client string) error {
+// RunPicker opens the agent picker and switches to the selected pane.
+func RunPicker(ctx context.Context, client string) error {
 	uiCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -344,7 +346,9 @@ func runPicker(ctx context.Context, client string) error {
 	}
 
 	if final, ok := result.(model); ok && final.target != "" {
-		return switchPane(ctx, final.target, client)
+		if err := tmux.SwitchPane(ctx, final.target, client); err != nil {
+			return fmt.Errorf("open selected agent: %w", err)
+		}
 	}
 
 	return nil

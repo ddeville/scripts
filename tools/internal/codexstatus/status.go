@@ -1,4 +1,5 @@
-package main
+// Package codexstatus collects agent status and presents it as a picker or JSON.
+package codexstatus
 
 import (
 	"cmp"
@@ -10,6 +11,9 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/ddeville/scripts/tools/internal/codex"
+	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
 var states = []string{"approval", "input", "error", "ready", "working", "idle", "unknown"}
@@ -51,7 +55,7 @@ type connection struct {
 
 func rank(state string) int { return slices.Index(states, state) }
 
-func classify(result readResult) string {
+func classify(result codex.ReadResult) string {
 	switch result.Thread.Status.Type {
 	case "active":
 		flags := result.Thread.Status.ActiveFlags
@@ -78,7 +82,7 @@ func classify(result readResult) string {
 	}
 }
 
-func agentRecord(result readResult) agent {
+func agentRecord(result codex.ReadResult) agent {
 	t := result.Thread
 
 	title := cmp.Or(t.Name, t.AgentNickname)
@@ -136,14 +140,14 @@ func collect(ctx context.Context) (data snapshot) {
 		}
 	}()
 
-	client, err := connect(ctx)
+	client, err := codex.Connect(ctx)
 	if err != nil {
 		data.Err = err
 		return data
 	}
-	defer func() { _ = client.conn.CloseNow() }()
+	defer client.Close()
 
-	ids, err := client.loadedIDs(ctx)
+	ids, err := client.LoadedIDs(ctx)
 	if err != nil {
 		data.Err = err
 		return data
@@ -151,7 +155,7 @@ func collect(ctx context.Context) (data snapshot) {
 
 	data.IDs = ids
 
-	panes, err := paneMatches(ctx, ids)
+	panes, err := tmux.PaneMatches(ctx, ids)
 	if err != nil {
 		data.Err = err
 		return data
@@ -162,9 +166,9 @@ func collect(ctx context.Context) (data snapshot) {
 			continue
 		}
 
-		result, err := client.readThread(ctx, id)
+		result, err := client.ReadThread(ctx, id)
 		if err != nil {
-			var rpcErr *rpcError
+			var rpcErr *codex.RPCError
 			if !errors.As(err, &rpcErr) {
 				data.Err = err
 				return data
@@ -201,67 +205,37 @@ func collect(ctx context.Context) (data snapshot) {
 
 type threadDetails struct {
 	agent
+	codex.History
 
-	InitialPrompt string            `json:"initial_prompt"`
-	LatestTurn    json.RawMessage   `json:"latest_turn"`
-	RecentItems   []json.RawMessage `json:"recent_items"`
-	HistoryError  *string           `json:"history_error"`
+	InitialPrompt string  `json:"initial_prompt"`
+	HistoryError  *string `json:"history_error"`
 }
 
 func detail(ctx context.Context, id string) (threadDetails, error) {
 	data := threadDetails{RecentItems: []json.RawMessage{}}
 
-	client, err := connect(ctx)
+	client, err := codex.Connect(ctx)
 	if err != nil {
-		return data, err
+		return data, fmt.Errorf("read details for %s: %w", id, err)
 	}
-	defer func() { _ = client.conn.CloseNow() }()
+	defer client.Close()
 
-	result, err := client.readThread(ctx, id)
+	result, err := client.ReadThread(ctx, id)
 	if err != nil {
-		return data, err
+		return data, fmt.Errorf("read details for %s: %w", id, err)
 	}
 
 	data.agent, data.InitialPrompt = agentRecord(result), result.Thread.Preview
-	if err := readHistory(ctx, client, id, &data); err != nil {
-		var rpcErr *rpcError
+
+	data.History, err = client.ReadHistory(ctx, id)
+	if err != nil {
+		var rpcErr *codex.RPCError
 		if !errors.As(err, &rpcErr) {
-			return data, err
+			return data, fmt.Errorf("read details for %s: %w", id, err)
 		}
 
 		data.HistoryError = &rpcErr.Message
 	}
 
 	return data, nil
-}
-
-func readHistory(ctx context.Context, client *codexClient, id string, data *threadDetails) error {
-	var turns struct{ Data []json.RawMessage }
-
-	err := client.call(ctx, "thread/turns/list", map[string]any{
-		"threadId": id, "limit": 1, "sortDirection": "desc", "itemsView": "summary",
-	}, &turns)
-	if err != nil || len(turns.Data) == 0 {
-		return err
-	}
-
-	data.LatestTurn = turns.Data[0]
-
-	var turn struct {
-		ID string `json:"id"`
-	}
-	if err := json.Unmarshal(data.LatestTurn, &turn); err != nil {
-		return fmt.Errorf("decode latest turn: %w", err)
-	}
-
-	var items struct{ Data []json.RawMessage }
-
-	err = client.call(ctx, "thread/items/list", map[string]any{
-		"threadId": id, "turnId": turn.ID, "limit": 6, "sortDirection": "desc",
-	}, &items)
-	if err == nil && items.Data != nil {
-		data.RecentItems = items.Data
-	}
-
-	return err
 }

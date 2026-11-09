@@ -1,4 +1,4 @@
-package main
+package codexstatus
 
 import (
 	"encoding/json"
@@ -179,7 +179,7 @@ func (m model) detailContent(width int) string {
 	style, _, hint := stateStyle(a.State)
 
 	lines := []string{
-		clean(a.Title),
+		CleanText(a.Title),
 		muted.Render(shortPath(a.Cwd)),
 		"",
 		style.Render(hint),
@@ -187,7 +187,7 @@ func (m model) detailContent(width int) string {
 	}
 
 	if a.Error != nil {
-		lines = append(lines, "", magenta.Render(clean(*a.Error)))
+		lines = append(lines, "", magenta.Render(CleanText(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -196,7 +196,7 @@ func (m model) detailContent(width int) string {
 	}
 
 	if m.activity.Err != nil {
-		lines = append(lines, "", magenta.Render(clean(m.activity.Err.Error())))
+		lines = append(lines, "", magenta.Render(CleanText(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -206,7 +206,7 @@ func (m model) detailContent(width int) string {
 		}
 
 		lines = append(lines, "", yellow.Render(e.Label),
-			strings.ReplaceAll(clean(string(text)), "\t", "    "))
+			strings.ReplaceAll(CleanText(string(text)), "\t", "    "))
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
@@ -394,7 +394,8 @@ func activityEntries(data threadDetails) []entry {
 	return entries
 }
 
-func clean(s string) string {
+// CleanText removes terminal controls while preserving newlines and tabs.
+func CleanText(s string) string {
 	return strings.Map(func(r rune) rune {
 		if unicode.IsControl(r) && r != '\n' && r != '\t' {
 			return -1
@@ -404,7 +405,7 @@ func clean(s string) string {
 	}, s)
 }
 
-func singleLine(s string) string { return strings.Join(strings.Fields(clean(s)), " ") }
+func singleLine(s string) string { return strings.Join(strings.Fields(CleanText(s)), " ") }
 
 func shortPath(path string) string {
 	home, _ := os.UserHomeDir()

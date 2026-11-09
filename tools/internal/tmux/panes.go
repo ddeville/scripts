@@ -1,4 +1,5 @@
-package main
+// Package tmux locates Codex panes and switches clients to them.
+package tmux
 
 import (
 	"context"
@@ -10,8 +11,8 @@ import (
 
 var titleID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-(?:[0-9a-f]{12}|[0-9a-f]{5}\.\.\.)$`)
 
-// Match against all loaded IDs so truncated titles cannot resolve ambiguously.
-func paneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
+// PaneMatches checks all loaded IDs so truncated titles cannot resolve ambiguously.
+func PaneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
 	output, err := exec.CommandContext(ctx, "tmux", "list-panes", "-a", "-F",
 		"#{pane_id}\t#{pane_current_command}\t#{pane_title}").Output()
 	if err != nil {
@@ -54,7 +55,8 @@ func paneMatches(ctx context.Context, ids []string) (map[string][]string, error)
 	return matches, nil
 }
 
-func switchPane(ctx context.Context, pane, client string) error {
+// SwitchPane selects a pane for the given client, or the current client if empty.
+func SwitchPane(ctx context.Context, pane, client string) error {
 	args := []string{"switch-client", "-t", pane}
 	if client != "" {
 		args = append(args, "-c", client)

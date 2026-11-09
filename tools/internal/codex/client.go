@@ -1,4 +1,5 @@
-package main
+// Package codex provides a client for the local Codex app server.
+package codex
 
 import (
 	"context"
@@ -14,18 +15,21 @@ import (
 	"github.com/coder/websocket/wsjson"
 )
 
-type rpcError struct {
+// RPCError is an error returned by the app server.
+type RPCError struct {
 	Message string
 }
 
-func (e *rpcError) Error() string { return e.Message }
+func (e *RPCError) Error() string { return e.Message }
 
-type codexClient struct {
+// Client sends sequential requests over a local app-server connection.
+type Client struct {
 	conn *websocket.Conn
 	id   int
 }
 
-func connect(ctx context.Context) (*codexClient, error) {
+// Connect opens and initializes an app-server connection.
+func Connect(ctx context.Context) (*Client, error) {
 	home := os.Getenv("CODEX_HOME")
 	if home == "" {
 		userHome, err := os.UserHomeDir()
@@ -54,7 +58,7 @@ func connect(ctx context.Context) (*codexClient, error) {
 	}
 
 	conn.SetReadLimit(16 << 20)
-	client := &codexClient{conn: conn}
+	client := &Client{conn: conn}
 
 	err = client.call(ctx, "initialize", map[string]any{
 		"clientInfo":   map[string]string{"name": "tmux_codex_status", "version": "1.0.0"},
@@ -72,7 +76,10 @@ func connect(ctx context.Context) (*codexClient, error) {
 	return client, nil
 }
 
-func (c *codexClient) call(ctx context.Context, method string, params any, result any) error {
+// Close releases the connection without waiting for a closing handshake.
+func (c *Client) Close() { _ = c.conn.CloseNow() }
+
+func (c *Client) call(ctx context.Context, method string, params any, result any) error {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
@@ -87,7 +94,7 @@ func (c *codexClient) call(ctx context.Context, method string, params any, resul
 		var response struct {
 			ID     int
 			Result json.RawMessage
-			Error  *rpcError
+			Error  *RPCError
 		}
 		if err := wsjson.Read(ctx, c.conn, &response); err != nil {
 			return fmt.Errorf("receive %s: %w", method, err)
@@ -113,7 +120,8 @@ func (c *codexClient) call(ctx context.Context, method string, params any, resul
 	}
 }
 
-func (c *codexClient) loadedIDs(ctx context.Context) ([]string, error) {
+// LoadedIDs lists the threads currently loaded by the app server.
+func (c *Client) LoadedIDs(ctx context.Context) ([]string, error) {
 	ids := []string{}
 	seen := map[string]bool{}
 
@@ -144,7 +152,8 @@ func (c *codexClient) loadedIDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-type thread struct {
+// Thread contains the metadata used to describe an agent.
+type Thread struct {
 	ID, Name, AgentNickname, Cwd, Preview string
 	ParentThreadID, Model                 *string
 	UpdatedAt                             *int64
@@ -154,17 +163,59 @@ type thread struct {
 	}
 }
 
-type readResult struct {
-	Thread    thread
+// ReadResult includes thread metadata and unread state.
+type ReadResult struct {
+	Thread    Thread
 	ReadState *struct {
 		FirstUnread *struct{ Type string }
 	}
 }
 
-func (c *codexClient) readThread(ctx context.Context, id string) (readResult, error) {
-	var result readResult
+// ReadThread reads metadata without loading the full conversation history.
+func (c *Client) ReadThread(ctx context.Context, id string) (ReadResult, error) {
+	var result ReadResult
 
 	err := c.call(ctx, "thread/read", map[string]any{"threadId": id, "includeTurns": false}, &result)
 
 	return result, err
+}
+
+// History contains the latest turn and its most recent items.
+type History struct {
+	LatestTurn  json.RawMessage   `json:"latest_turn"`
+	RecentItems []json.RawMessage `json:"recent_items"`
+}
+
+// ReadHistory reads recent activity, retaining the latest turn if its items cannot be read.
+func (c *Client) ReadHistory(ctx context.Context, id string) (History, error) {
+	data := History{RecentItems: []json.RawMessage{}}
+
+	var turns struct{ Data []json.RawMessage }
+
+	err := c.call(ctx, "thread/turns/list", map[string]any{
+		"threadId": id, "limit": 1, "sortDirection": "desc", "itemsView": "summary",
+	}, &turns)
+	if err != nil || len(turns.Data) == 0 {
+		return data, err
+	}
+
+	data.LatestTurn = turns.Data[0]
+
+	var turn struct {
+		ID string `json:"id"`
+	}
+	if err := json.Unmarshal(data.LatestTurn, &turn); err != nil {
+		return data, fmt.Errorf("decode latest turn: %w", err)
+	}
+
+	var items struct{ Data []json.RawMessage }
+
+	err = c.call(ctx, "thread/items/list", map[string]any{
+		"threadId": id, "turnId": turn.ID, "limit": 6, "sortDirection": "desc",
+	}, &items)
+	if err == nil && items.Data != nil {
+		data.RecentItems = items.Data
+	}
+
+	return data, err
 }
