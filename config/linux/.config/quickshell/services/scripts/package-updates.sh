@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -eu -o pipefail
+
 export LC_ALL=C
 
 # checkupdates uses exit code 2 for an empty update list.

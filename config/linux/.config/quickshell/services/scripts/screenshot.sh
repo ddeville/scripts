@@ -1,5 +1,7 @@
 #!/bin/bash
+
 set -eu -o pipefail
+
 umask 077
 export LC_ALL=C
 

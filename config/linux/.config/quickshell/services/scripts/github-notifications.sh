@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -eu -o pipefail
+
 export LC_ALL=C
 
 token_file="${XDG_CONFIG_HOME:-$HOME/.config}/github/notifications.token"
