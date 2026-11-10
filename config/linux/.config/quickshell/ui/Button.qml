@@ -155,9 +155,9 @@ Controls.Control {
             }
         }
         onWheel: (event) => {
-            if (root.interactive)
+            event.accepted = root.interactive && root.wheelEnabled;
+            if (event.accepted)
                 root.scrolled(event.angleDelta.y);
-
         }
     }
 

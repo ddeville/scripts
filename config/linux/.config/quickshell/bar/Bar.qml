@@ -457,6 +457,7 @@ PanelWindow { // qmllint disable uncreatable-type
                         interactive: true
                         active: devicePopup.visible && devicePopup.activeSection === "brightness"
                         onClicked: devicePopup.toggleSection("brightness")
+                        wheelEnabled: true
                         onScrolled: (delta) => {
                             if (delta !== 0)
                                 panel.command(["brightnessctl", "set", delta > 0 ? "+5%" : "5%-"]);
@@ -481,6 +482,7 @@ PanelWindow { // qmllint disable uncreatable-type
                             else if (button === Qt.LeftButton)
                                 devicePopup.toggleSection("volume");
                         }
+                        wheelEnabled: true
                         onScrolled: (delta) => {
                             if (panel.audio && delta !== 0)
                                 panel.audio.volume = Math.max(0, Math.min(1.5, panel.audio.volume + (delta > 0 ? 0.01 : -0.01)));

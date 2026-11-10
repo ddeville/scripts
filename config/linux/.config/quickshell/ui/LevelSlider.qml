@@ -8,16 +8,18 @@ Controls.Slider {
     property color accent: Theme.selected
     property real markerValue: -1
 
+    function syncValue() {
+        if (!pressed)
+            value = reportedValue;
+    }
+
     implicitHeight: 28
     padding: 6
     hoverEnabled: true
     snapMode: Controls.Slider.SnapAlways
-    Component.onCompleted: value = reportedValue
-    onReportedValueChanged: {
-        if (!pressed)
-            value = reportedValue;
-
-    }
+    Component.onCompleted: syncValue()
+    onReportedValueChanged: syncValue()
+    onPressedChanged: syncValue()
 
     background: Rectangle {
         x: root.leftPadding

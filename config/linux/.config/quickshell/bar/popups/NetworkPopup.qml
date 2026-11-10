@@ -230,6 +230,8 @@ ShellPopup {
         }
 
         Controls.ScrollView {
+            id: networkList
+
             visible: root.canScan && root.wifiNetworks.length > 0
             width: parent.width
             implicitHeight: Math.min(networks.implicitHeight, 200)
@@ -273,6 +275,12 @@ ShellPopup {
                         onClicked: root.backend.connectNetwork(modelData)
                         Keys.onReturnPressed: clicked()
                         Keys.onEnterPressed: clicked()
+                        onActiveFocusChanged: {
+                            if (activeFocus) {
+                                const view = networkList.contentItem as Flickable;
+                                view.contentY = Math.max(0, Math.min(y, Math.max(view.contentY, y + height - view.height)));
+                            }
+                        }
 
                         contentItem: Item {
                             Icon {

@@ -118,21 +118,25 @@ ShellPopup {
             highlightMoveDuration: 0
             Controls.ScrollBar.vertical: Controls.ScrollBar {}
 
-            delegate: Rectangle {
+            delegate: Controls.ItemDelegate {
                 id: result
 
                 required property var modelData
                 required property int index
-                readonly property bool selected: ListView.isCurrentItem
 
                 width: results.width
                 height: 44
-                radius: 6
-                color: selected ? Theme.selectionSurface : mouse.containsMouse ? Theme.hover : "transparent"
+                padding: 7
+                highlighted: ListView.isCurrentItem
+                hoverEnabled: true
+                focusPolicy: Qt.NoFocus
+                Accessible.name: modelData.name
+                onClicked: {
+                    results.currentIndex = index;
+                    root.backend.launch(modelData);
+                }
 
-                Row {
-                    anchors.fill: parent
-                    anchors.margins: 7
+                contentItem: Row {
                     spacing: 12
 
                     Image {
@@ -165,7 +169,7 @@ ShellPopup {
                             text: result.modelData.name
                             textFormat: Text.PlainText
                             elide: Text.ElideRight
-                            color: result.selected ? Theme.selected : Theme.foreground
+                            color: result.highlighted ? Theme.selected : Theme.foreground
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
                         }
@@ -183,14 +187,13 @@ ShellPopup {
                     }
                 }
 
-                MouseArea {
-                    id: mouse
-
-                    anchors.fill: parent
-                    hoverEnabled: true
+                HoverHandler {
                     cursorShape: Qt.PointingHandCursor
-                    onPositionChanged: results.currentIndex = result.index
-                    onClicked: root.backend.launch(result.modelData)
+                }
+
+                background: Rectangle {
+                    radius: 6
+                    color: result.highlighted ? Theme.selectionSurface : result.hovered ? Theme.hover : "transparent"
                 }
             }
 

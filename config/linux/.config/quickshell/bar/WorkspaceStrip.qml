@@ -73,6 +73,7 @@ Row {
                     root.backend.focus(desktopId);
 
             }
+            wheelEnabled: true
             onScrolled: (delta) => {
                 return root.backend.cycle(root.monitor, delta);
             }

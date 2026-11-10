@@ -90,6 +90,7 @@ ShellPopup {
                         else
                             modelData.activate();
                     }
+                    wheelEnabled: true
                     onScrolled: delta => modelData.scroll(delta, false)
                     onActiveFocusChanged: {
                         if (activeFocus) {
