@@ -11,9 +11,8 @@ ShellPopup {
     property bool escapePressed: false
 
     implicitWidth: Math.min(560, anchorItem.width - 32)
-    implicitHeight: body.implicitHeight + 32
-    popupX: (anchorItem.width - width) / 2
-    popupY: anchorItem.height - (screenHeight + height) / 2
+    popupX: (anchorItem.width - implicitWidth) / 2
+    popupY: anchorItem.height - (screenHeight + implicitHeight) / 2
     padding: 16
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {
@@ -34,8 +33,6 @@ ShellPopup {
     }
 
     contentItem: Column {
-        id: body
-
         spacing: 12
         Keys.onEscapePressed: root.escapePressed = true
         Keys.onReleased: event => {
@@ -70,7 +67,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close preview"
                 foreground: Theme.muted
-                interactive: true
                 onClicked: root.close()
             }
         }
@@ -106,7 +102,7 @@ ShellPopup {
                 text: "Copy"
                 tooltip: "Copy image · Ctrl+C"
                 foreground: Theme.selected
-                interactive: !root.backend.busy
+                enabled: !root.backend.busy
                 onClicked: root.backend.perform("copy")
             }
 
@@ -116,7 +112,7 @@ ShellPopup {
                 text: root.backend.savedPath ? "Saved" : "Save"
                 tooltip: "Save to screenshots folder · Ctrl+S"
                 foreground: root.backend.savedPath ? Theme.muted : Theme.foreground
-                interactive: !root.backend.busy && root.backend.savedPath === ""
+                enabled: !root.backend.busy && root.backend.savedPath === ""
                 onClicked: root.backend.perform("save")
             }
 
@@ -125,7 +121,7 @@ ShellPopup {
                 height: 34
                 text: "Open"
                 tooltip: root.backend.savedPath ? "Open saved screenshot" : "Save and open in image viewer"
-                interactive: !root.backend.busy
+                enabled: !root.backend.busy
                 onClicked: root.backend.perform("open")
             }
         }
@@ -146,7 +142,7 @@ ShellPopup {
 
             visible: root.backend.imagePath === "" && root.backend.error !== ""
             text: "Try again"
-            interactive: !root.backend.busy
+            enabled: !root.backend.busy
             onClicked: root.backend.capture(root.backend.mode)
         }
     }

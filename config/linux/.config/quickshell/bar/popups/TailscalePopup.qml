@@ -23,7 +23,6 @@ ShellPopup {
     }
 
     implicitWidth: 340
-    implicitHeight: Math.min(body.implicitHeight + 24, 520)
     padding: 12
     onOpened: {
         backend.refresh();
@@ -50,7 +49,6 @@ ShellPopup {
         width: parent.width
         height: 32
         textWidth: width - (symbol !== "" ? 38 : 12)
-        interactive: true
         onActiveFocusChanged: {
             if (activeFocus) {
                 const view = scroll.contentItem as Flickable;
@@ -68,6 +66,7 @@ ShellPopup {
 
     contentItem: Controls.ScrollView {
         id: scroll
+        implicitHeight: Math.min(body.implicitHeight, 520 - root.topPadding - root.bottomPadding)
         contentWidth: availableWidth
         clip: true
         Controls.ScrollBar.horizontal.policy: Controls.ScrollBar.AlwaysOff
@@ -93,7 +92,6 @@ ShellPopup {
                     symbol: "close"
                     tooltip: "Close Tailscale"
                     foreground: Theme.muted
-                    interactive: true
                     onClicked: root.close()
                 }
             }
@@ -176,7 +174,7 @@ ShellPopup {
                     visible: root.state.device !== ""
                     text: root.state.device + (root.state.address ? " · " + root.state.address : "")
                     tooltip: root.copiedAddress === root.state.address && root.state.address ? "Copied" : "Copy device IP address"
-                    interactive: root.state.address !== ""
+                    enabled: root.state.address !== ""
                     foreground: root.copiedAddress === root.state.address && root.state.address ? Theme.selected : Theme.foreground
                     onClicked: root.copyAddress(root.state.address)
                 }
@@ -199,7 +197,7 @@ ShellPopup {
                     symbol: root.exitNodesExpanded ? "chevron-down" : "chevron-right"
                     text: root.state.exitNode ? root.state.exitNode.name + (root.state.exitNode.online ? "" : " · offline") : "None · Direct internet"
                     tooltip: root.state.exitNode ? root.state.exitNode.name : "Route internet traffic through another device"
-                    interactive: root.state.connected && !root.backend.busy
+                    enabled: root.state.connected && !root.backend.busy
                     foreground: root.state.connected ? Theme.foreground : Theme.muted
                     onClicked: root.exitNodesExpanded = !root.exitNodesExpanded
                 }
@@ -237,7 +235,7 @@ ShellPopup {
                     MenuButton {
                         text: "None · Direct internet"
                         selected: !root.state.exitNode
-                        interactive: !root.backend.busy
+                        enabled: !root.backend.busy
                         onClicked: {
                             root.backend.selectExitNode("");
                             root.exitNodesExpanded = false;
@@ -253,7 +251,7 @@ ShellPopup {
                             selected: root.state.exitNode?.id === modelData.id
                             foreground: modelData.online ? Theme.foreground : Theme.muted
                             tooltip: modelData.name + "\n" + modelData.address
-                            interactive: modelData.online && !!modelData.address && !root.backend.busy
+                            enabled: modelData.online && !!modelData.address && !root.backend.busy
                             onClicked: {
                                 root.backend.selectExitNode(modelData.address);
                                 root.exitNodesExpanded = false;
@@ -279,7 +277,7 @@ ShellPopup {
                 MenuButton {
                     text: "Accounts · " + root.state.profiles.length
                     symbol: root.accountsExpanded ? "chevron-down" : "chevron-right"
-                    interactive: root.state.profiles.length > 0
+                    enabled: root.state.profiles.length > 0
                     onClicked: root.accountsExpanded = !root.accountsExpanded
                 }
 
@@ -291,7 +289,7 @@ ShellPopup {
                         text: (modelData.nickname || modelData.account) + " · " + modelData.tailnet
                         tooltip: modelData.account + "\n" + modelData.tailnet
                         selected: modelData.selected
-                        interactive: !modelData.selected && !root.backend.busy
+                        enabled: !modelData.selected && !root.backend.busy
                         onClicked: {
                             root.backend.switchAccount(modelData.id);
                             root.accountsExpanded = false;
@@ -302,7 +300,7 @@ ShellPopup {
                 MenuButton {
                     text: "Devices · " + root.state.peers.filter(peer => peer.online).length + " online"
                     symbol: root.devicesExpanded ? "chevron-down" : "chevron-right"
-                    interactive: root.state.connected
+                    enabled: root.state.connected
                     onClicked: root.devicesExpanded = !root.devicesExpanded
                 }
 
@@ -314,7 +312,7 @@ ShellPopup {
                         text: modelData.name + (modelData.online ? "" : " · offline")
                         tooltip: (root.copiedAddress === modelData.address ? "Copied: " : "Copy: ") + modelData.address
                         foreground: root.copiedAddress === modelData.address ? Theme.selected : modelData.online ? Theme.foreground : Theme.muted
-                        interactive: !!modelData.address
+                        enabled: !!modelData.address
                         onClicked: root.copyAddress(modelData.address)
                     }
                 }

@@ -11,17 +11,11 @@ ShellPopup {
     required property Notifications backend
 
     implicitWidth: 280
-    implicitHeight: body.implicitHeight + 24
-    padding: 0
+    padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: closeButton.forceActiveFocus(Qt.PopupFocusReason)
 
-    Column {
-        id: body
-
-        x: 12
-        y: 12
-        width: root.width - 24
+    contentItem: Column {
         spacing: 10
 
         Row {
@@ -42,7 +36,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close notifications"
                 foreground: Theme.muted
-                interactive: true
                 onClicked: root.close()
             }
 
@@ -63,7 +56,7 @@ ShellPopup {
             height: 30
             text: "Resume now"
             symbol: "bell"
-            interactive: root.backend.available && !root.backend.busy
+            enabled: root.backend.available && !root.backend.busy
             onClicked: root.backend.run(["resume"])
         }
 
@@ -106,7 +99,7 @@ ShellPopup {
                     width: parent.width
                     height: 30
                     text: modelData.label
-                    interactive: root.backend.available && !root.backend.busy
+                    enabled: root.backend.available && !root.backend.busy
                     onClicked: root.backend.run(["pause", String(modelData.seconds)])
                 }
 

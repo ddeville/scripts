@@ -13,15 +13,8 @@ Scope {
     readonly property bool loading: query.running && !available
     readonly property string defaultSinkName: Pipewire.defaultAudioSink ? Pipewire.defaultAudioSink.name : ""
     property alias items: outputs
-    readonly property var currentOutput: {
-        for (let i = 0; i < outputs.count; ++i) {
-            const output = outputs.get(i);
-            if (output.sinkName === defaultSinkName && output.activePort)
-                return output;
-
-        }
-        return null;
-    }
+    property var outputData: []
+    readonly property var currentOutput: outputData.find(output => output.sinkName === defaultSinkName && output.activePort) ?? null
 
     function refresh() {
         if (!query.running && !selection.running)
@@ -40,6 +33,7 @@ Scope {
 
     function sync(sinks) {
         const rows = OutputData.rowsForSinks(sinks);
+        outputData = rows;
         for (let i = 0; i < rows.length; ++i) {
             if (i >= outputs.count) {
                 outputs.append(rows[i]);
@@ -68,7 +62,7 @@ Scope {
         onExited: (code, status) => {
             root.available = code === 0 && status === 0;
             if (!root.available)
-                outputs.clear();
+                root.sync([]);
 
         }
 

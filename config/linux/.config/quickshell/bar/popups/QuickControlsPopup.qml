@@ -33,8 +33,7 @@ ShellPopup {
     }
 
     implicitWidth: 280
-    implicitHeight: body.implicitHeight + 24
-    padding: 0
+    padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
         outputs.refresh();
@@ -44,12 +43,9 @@ ShellPopup {
         activeSection = "";
     }
 
-    Column {
+    contentItem: Column {
         id: body
 
-        x: 12
-        y: 12
-        width: root.width - 24
         spacing: 10
 
         Row {
@@ -71,7 +67,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close quick controls"
                 foreground: Theme.muted
-                interactive: true
                 onClicked: root.close()
             }
 
@@ -86,6 +81,7 @@ ShellPopup {
 
                 Button {
                     symbol: "battery"
+                    enabled: false
                     level: root.battery / 100
                     plugged: root.plugged
                     foreground: root.battery <= 10 ? Theme.alert : Theme.foreground
@@ -141,6 +137,7 @@ ShellPopup {
 
                 Button {
                     symbol: "sun"
+                    enabled: false
                 }
 
                 Text {
@@ -199,7 +196,7 @@ ShellPopup {
                     level: root.audio ? root.audio.volume : 0
                     muted: !root.audio || root.audio.muted
                     foreground: root.audio && root.audio.muted ? Theme.muted : Theme.foreground
-                    interactive: root.audio !== null
+                    enabled: root.audio !== null
                     onClicked: root.audio.muted = !root.audio.muted
                 }
 
@@ -400,7 +397,6 @@ ShellPopup {
         Button {
             text: "Sound settings…"
             foreground: Theme.muted
-            interactive: true
             onClicked: {
                 root.close();
                 root.mixerRequested();

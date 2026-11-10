@@ -10,8 +10,8 @@ Controls.Popup {
     id: root
 
     required property Item anchorItem
-    property real popupX: anchorItem.width - width
-    property real popupY: -height - 8
+    property real popupX: anchorItem.width - implicitWidth
+    property real popupY: -implicitHeight - 8
     readonly property var anchorWindow: anchorItem.QsWindow.window
     property point anchorPosition: Qt.point(0, 0)
 

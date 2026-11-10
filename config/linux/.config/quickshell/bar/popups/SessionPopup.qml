@@ -28,8 +28,7 @@ ShellPopup {
     }
 
     implicitWidth: 250
-    implicitHeight: body.implicitHeight + 24
-    padding: 0
+    padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onVisibleChanged: {
         pendingAction = null;
@@ -38,20 +37,14 @@ ShellPopup {
 
     }
 
-    FocusScope {
-        anchors.fill: parent
+    contentItem: FocusScope {
+        implicitHeight: body.implicitHeight
         focus: true
-        Keys.onEscapePressed: (event) => {
-            root.visible = false;
-            event.accepted = true;
-        }
 
         Column {
             id: body
 
-            x: 12
-            y: 12
-            width: root.width - 24
+            width: parent.width
             spacing: 8
 
             Item {

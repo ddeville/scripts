@@ -17,8 +17,7 @@ ShellPopup {
     signal settingsRequested()
 
     implicitWidth: 300
-    implicitHeight: body.implicitHeight + 24
-    padding: 0
+    padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: closeButton.forceActiveFocus(Qt.PopupFocusReason)
 
@@ -37,12 +36,7 @@ ShellPopup {
         when: root.visible && root.canScan
     }
 
-    Column {
-        id: body
-
-        x: 12
-        y: 12
-        width: root.width - 24
+    contentItem: Column {
         spacing: 10
 
         Row {
@@ -64,7 +58,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close network"
                 foreground: Theme.muted
-                interactive: true
                 onClicked: root.close()
             }
         }
@@ -205,7 +198,7 @@ ShellPopup {
                 visible: !!root.backend.current
                 text: "Disconnect"
                 foreground: Theme.muted
-                interactive: !root.backend.busy
+                enabled: !root.backend.busy
                 onClicked: root.backend.disconnectNetwork()
             }
 
@@ -396,7 +389,6 @@ ShellPopup {
         Button {
             text: "Network settings…"
             foreground: Theme.muted
-            interactive: true
             onClicked: {
                 root.close();
                 root.settingsRequested();

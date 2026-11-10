@@ -65,14 +65,9 @@ Row {
             required property bool urgent
 
             text: label
-            interactive: true
             foreground: urgent ? Theme.alert : focused ? Theme.selected : occupied ? Theme.foreground : Theme.emptyDesktop
             selected: focused
-            onClicked: (button) => {
-                if (button === Qt.LeftButton)
-                    root.backend.focus(desktopId);
-
-            }
+            onClicked: root.backend.focus(desktopId)
             wheelEnabled: true
             onScrolled: (delta) => {
                 return root.backend.cycle(root.monitor, delta);

@@ -12,7 +12,6 @@ ShellPopup {
     signal menuRequested(var item)
 
     implicitWidth: 240
-    implicitHeight: list.implicitHeight + 24
     padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onOpened: {
@@ -70,9 +69,8 @@ ShellPopup {
                     text: modelData.title || modelData.tooltipTitle || "Application"
                     textWidth: Math.max(0, width - 40)
                     tooltip: [modelData.tooltipTitle || modelData.title, modelData.tooltipDescription].filter(part => !!part).join("\n")
-                    interactive: true
 
-                    indicator: Image {
+                    leadingContent: Image {
                         width: Theme.iconSize
                         height: Theme.iconSize
                         sourceSize.width: width * Screen.devicePixelRatio
@@ -81,7 +79,7 @@ ShellPopup {
                         fillMode: Image.PreserveAspectFit
                     }
 
-                    onClicked: button => {
+                    function activateItem(button) {
                         root.close();
                         if (button === Qt.RightButton || modelData.onlyMenu)
                             root.menuRequested(modelData);
@@ -90,6 +88,8 @@ ShellPopup {
                         else
                             modelData.activate();
                     }
+                    onClicked: activateItem(Qt.LeftButton)
+                    onSecondaryClicked: button => activateItem(button)
                     wheelEnabled: true
                     onScrolled: delta => modelData.scroll(delta, false)
                     onActiveFocusChanged: {
@@ -100,7 +100,7 @@ ShellPopup {
                     }
                     Keys.onPressed: event => {
                         if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier))) {
-                            clicked(Qt.RightButton);
+                            activateItem(Qt.RightButton);
                             event.accepted = true;
                         } else {
                             event.accepted = false;

@@ -32,8 +32,8 @@ ShellPopup {
 
     implicitWidth: Math.min(540, anchorItem.width - 32)
     implicitHeight: Math.min(500, screenHeight - 80)
-    popupX: (anchorItem.width - width) / 2
-    popupY: anchorItem.height - (screenHeight + height) / 2
+    popupX: (anchorItem.width - implicitWidth) / 2
+    popupY: anchorItem.height - (screenHeight + implicitHeight) / 2
     padding: 16
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutside
     onOpened: {

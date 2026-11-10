@@ -11,7 +11,7 @@ ShellPopup {
     required property Agents backend
 
     implicitWidth: 420
-    implicitHeight: body.implicitHeight + 24
+    padding: 12
     onOpened: {
         backend.actionError = "";
         agents.forceActiveFocus(Qt.PopupFocusReason);
@@ -24,12 +24,7 @@ ShellPopup {
         }
     }
 
-    Column {
-        id: body
-
-        x: 12
-        y: 12
-        width: root.width - 24
+    contentItem: Column {
         spacing: 10
 
         Row {
@@ -57,7 +52,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close agents"
                 foreground: Theme.muted
-                interactive: true
                 onClicked: root.close()
             }
         }

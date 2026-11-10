@@ -222,7 +222,6 @@ PanelWindow { // qmllint disable uncreatable-type
                 caption: Qt.formatDateTime(panel.date, "ddd d MMM").toUpperCase()
                 text: Qt.formatDateTime(panel.date, "h:mm AP")
                 textWidth: 60
-                interactive: true
                 active: calendarPopup.visible
                 onClicked: calendarPopup.toggle()
             }
@@ -275,9 +274,10 @@ PanelWindow { // qmllint disable uncreatable-type
                         id: networkStatus
 
                         caption: "NET"
+                        enabled: false
                         stacked: true
                         tooltip: "Download: " + (panel.status.downloadRate / 1024).toFixed(1) + " KiB/s\nUpload: " + (panel.status.uploadRate / 1024).toFixed(1) + " KiB/s\n" + (Object.keys(panel.status.stats.network ?? {}).join(", ") || "No active physical link")
-                        indicator: Row {
+                        leadingContent: Row {
                             spacing: 8
 
                             Repeater {
@@ -306,6 +306,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
                     Button {
                         caption: "CPU"
+                        enabled: false
                         stacked: true
                         text: panel.status.cpu + "%"
                         textWidth: 30
@@ -313,6 +314,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
                     Button {
                         caption: "MEM"
+                        enabled: false
                         stacked: true
                         text: (panel.status.stats.memory ?? 0) + "%"
                         textWidth: 30
@@ -321,6 +323,7 @@ PanelWindow { // qmllint disable uncreatable-type
                     Button {
                         visible: typeof panel.status.stats.temperature === "number"
                         caption: "TEMP"
+                        enabled: false
                         stacked: true
                         text: panel.status.stats.temperature + "°F"
                         textWidth: 38
@@ -347,7 +350,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         tooltip: panel.agents.tooltip
                         tooltipEnabled: !agentsPopup.visible
                         active: agentsPopup.visible
-                        interactive: true
                         onClicked: agentsPopup.toggle()
                     }
 
@@ -357,7 +359,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         glyphSize: 14
                         tooltip: panel.status.github === "offline" ? "GitHub check unavailable" : "GitHub: " + panel.status.github + " unread notifications"
                         foreground: panel.status.github === "offline" ? Theme.alert : Number.parseInt(panel.status.github) > 0 ? Theme.selected : Theme.foreground
-                        interactive: true
                         onClicked: Applications.launch(["xdg-open", "https://github.com/notifications"])
                     }
 
@@ -366,7 +367,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         symbol: "mail"
                         tooltip: panel.status.email === "offline" ? "Email check unavailable" : "Mail: " + panel.status.email + " unread messages"
                         foreground: panel.status.email === "offline" ? Theme.alert : Number.parseInt(panel.status.email) > 0 ? Theme.selected : Theme.foreground
-                        interactive: true
                         onClicked: Applications.launch(["xdg-open", "https://app.fastmail.com/"])
                     }
 
@@ -374,7 +374,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         symbol: "updates"
                         tooltip: panel.status.updates === "unavailable" ? "Package check failed · click to retry" : panel.status.updates === "" ? "Checking for updates…" : panel.status.updates + " package updates · click to refresh"
                         foreground: panel.status.updates === "unavailable" ? Theme.alert : Number.parseInt(panel.status.updates) > 0 ? Theme.selected : Theme.foreground
-                        interactive: true
                         onClicked: panel.status.refreshUpdates()
                     }
 
@@ -394,11 +393,10 @@ PanelWindow { // qmllint disable uncreatable-type
                         visible: panel.tailscale.state.installed
                         tooltip: panel.tailscale.tooltip
                         tooltipEnabled: !tailscalePopup.visible
-                        interactive: true
                         active: tailscalePopup.visible
                         onClicked: tailscalePopup.toggle()
 
-                        indicator: Item {
+                        leadingContent: Item {
                             width: Theme.iconSize
                             height: Theme.iconSize
 
@@ -431,7 +429,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         foreground: panel.network.error !== "" || Net.Networking.backend === Net.NetworkBackendType.None ? Theme.alert : panel.network.wiredConnection || panel.network.current ? Theme.foreground : Theme.muted
                         tooltip: panel.network.message || (Net.Networking.backend === Net.NetworkBackendType.None ? "NetworkManager unavailable" : panel.network.wiredConnection ? "Ethernet · " + panel.network.wiredConnection.name : !Net.Networking.wifiEnabled ? "Wi-Fi off" : panel.network.current ? panel.network.current.name + " · " + Math.round(panel.network.current.signalStrength * 100) + "% signal" : "Wi-Fi · Not connected")
                         tooltipEnabled: !networkPopup.visible
-                        interactive: true
                         active: networkPopup.visible
                         onClicked: networkPopup.toggle()
                     }
@@ -444,7 +441,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         tooltip: "Battery: " + Math.round(UPower.displayDevice.percentage * 100) + "% · " + (UPower.onBattery ? "On battery" : "Plugged in")
                         tooltipEnabled: !devicePopup.visible
                         foreground: UPower.displayDevice.percentage <= 0.1 ? Theme.alert : Theme.foreground
-                        interactive: true
                         active: devicePopup.visible && devicePopup.activeSection === "battery"
                         onClicked: devicePopup.toggleSection("battery")
                     }
@@ -454,7 +450,6 @@ PanelWindow { // qmllint disable uncreatable-type
                         symbol: "sun"
                         tooltip: "Brightness: " + panel.status.stats.backlight + "%"
                         tooltipEnabled: !devicePopup.visible
-                        interactive: true
                         active: devicePopup.visible && devicePopup.activeSection === "brightness"
                         onClicked: devicePopup.toggleSection("brightness")
                         wheelEnabled: true
@@ -472,15 +467,13 @@ PanelWindow { // qmllint disable uncreatable-type
                         tooltip: !panel.audio ? "No audio output" : (panel.audioOutputs.currentOutput ? panel.audioOutputs.currentOutput.label : "Volume") + ": " + Math.round(panel.audio.volume * 100) + "%" + (panel.audio.muted ? " · Muted" : "")
                         tooltipEnabled: !devicePopup.visible
                         foreground: panel.audio && panel.audio.muted ? Theme.muted : panel.audio && panel.audio.volume > 1 ? Theme.alert : Theme.foreground
-                        interactive: true
                         active: devicePopup.visible && devicePopup.activeSection === "volume"
-                        onClicked: (button) => {
+                        onClicked: devicePopup.toggleSection("volume")
+                        onSecondaryClicked: button => {
                             if (button === Qt.RightButton)
                                 Applications.launch(["pavucontrol"]);
                             else if (button === Qt.MiddleButton && panel.audio)
                                 panel.audio.muted = !panel.audio.muted;
-                            else if (button === Qt.LeftButton)
-                                devicePopup.toggleSection("volume");
                         }
                         wheelEnabled: true
                         onScrolled: (delta) => {
@@ -503,12 +496,8 @@ PanelWindow { // qmllint disable uncreatable-type
                         symbol: "apps"
                         tooltip: "Application tray"
                         tooltipEnabled: !trayPopup.visible
-                        interactive: true
                         active: trayPopup.visible
-                        onClicked: button => {
-                            if (button === Qt.LeftButton)
-                                trayPopup.toggle();
-                        }
+                        onClicked: trayPopup.toggle()
                     }
 
                     Button {
@@ -518,12 +507,7 @@ PanelWindow { // qmllint disable uncreatable-type
                         tooltip: panel.notifications.summary + " · Click to manage"
                         tooltipEnabled: !notificationPopup.visible
                         active: notificationPopup.visible
-                        interactive: true
-                        onClicked: (button) => {
-                            if (button === Qt.LeftButton)
-                                notificationPopup.toggle();
-
-                        }
+                        onClicked: notificationPopup.toggle()
                     }
 
                     Button {
@@ -533,12 +517,7 @@ PanelWindow { // qmllint disable uncreatable-type
                         tooltip: "Session controls"
                         tooltipEnabled: !sessionPopup.visible
                         active: sessionPopup.visible
-                        interactive: true
-                        onClicked: (button) => {
-                            if (button === Qt.LeftButton)
-                                sessionPopup.toggle();
-
-                        }
+                        onClicked: sessionPopup.toggle()
                     }
 
                 }

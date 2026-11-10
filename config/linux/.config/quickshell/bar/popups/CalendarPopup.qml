@@ -19,19 +19,13 @@ ShellPopup {
     }
 
     implicitWidth: 300
-    implicitHeight: body.implicitHeight + 24
     popupX: 0
-    padding: 0
+    padding: 12
     closePolicy: Controls.Popup.CloseOnEscape | Controls.Popup.CloseOnPressOutsideParent
     onAboutToShow: showToday()
     onOpened: previousButton.forceActiveFocus(Qt.PopupFocusReason)
 
-    Column {
-        id: body
-
-        x: 12
-        y: 12
-        width: root.width - 24
+    contentItem: Column {
         spacing: 10
 
         Row {
@@ -53,7 +47,6 @@ ShellPopup {
 
                 symbol: "chevron-left"
                 tooltip: "Previous month"
-                interactive: true
                 Accessible.name: "Previous month"
                 onClicked: root.moveMonth(-1)
             }
@@ -61,7 +54,6 @@ ShellPopup {
             Button {
                 symbol: "chevron-right"
                 tooltip: "Next month"
-                interactive: true
                 Accessible.name: "Next month"
                 onClicked: root.moveMonth(1)
             }
@@ -70,7 +62,6 @@ ShellPopup {
                 symbol: "close"
                 tooltip: "Close calendar"
                 foreground: Theme.muted
-                interactive: true
                 Accessible.name: "Close calendar"
                 onClicked: root.close()
             }
@@ -162,7 +153,6 @@ ShellPopup {
 
                 text: "Today"
                 foreground: Theme.selected
-                interactive: true
                 onClicked: root.showToday()
             }
 
