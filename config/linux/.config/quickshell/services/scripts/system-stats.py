@@ -32,23 +32,6 @@ def read_stats(procfs=Path("/proc"), sysfs=Path("/sys")):
             )
             break
 
-    supplies = sorted((sysfs / "class/power_supply").glob("*"))
-    plugged = any(
-        (device / "online").exists() and (device / "online").read_text().strip() == "1"
-        for device in supplies
-    )
-    battery = None
-    battery_status = ""
-    for device in supplies:
-        if (
-            (device / "type").exists()
-            and (device / "type").read_text().strip() == "Battery"
-            and (device / "capacity").exists()
-        ):
-            battery = int((device / "capacity").read_text())
-            battery_status = (device / "status").read_text().strip()
-            break
-
     network = {}
     for device in sorted((sysfs / "class/net").glob("*")):
         # Count physical links once, excluding VPNs and virtual bridges.
@@ -68,9 +51,6 @@ def read_stats(procfs=Path("/proc"), sysfs=Path("/sys")):
         ),
         "temperature": temperature,
         "backlight": backlight,
-        "battery": battery,
-        "batteryStatus": battery_status,
-        "plugged": plugged,
         "network": network,
         "uptime": float((procfs / "uptime").read_text().split()[0]),
     }

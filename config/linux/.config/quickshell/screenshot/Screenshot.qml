@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../services"
 
@@ -16,7 +17,7 @@ Scope {
     // A closing popup may still refer to the capture being replaced.
     property int captureId: 0
     property bool discardAfterAction: false
-    readonly property bool busy: captureDelay.running || captureProcess.running || action.running || monitorQuery.running
+    readonly property bool busy: captureDelay.running || captureProcess.running || action.running
     readonly property string helper: Quickshell.shellPath("services/scripts/screenshot.sh")
 
     signal prepareCapture()
@@ -107,11 +108,10 @@ Scope {
                 return;
             if (code !== 0 || status !== 0 || captureOutput.text.trim() === "") {
                 root.error = captureErrors.text.trim() || "Could not capture screenshot.";
-                monitorQuery.running = true;
-                return;
+            } else {
+                root.imagePath = captureOutput.text.trim();
             }
-            root.imagePath = captureOutput.text.trim();
-            monitorQuery.running = true;
+            root.showRequested(Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name ?? "");
         }
 
         stdout: StdioCollector { id: captureOutput }
@@ -144,9 +144,4 @@ Scope {
         stderr: StdioCollector { id: actionErrors }
     }
 
-    FocusedMonitor {
-        id: monitorQuery
-
-        onResolved: name => root.showRequested(name)
-    }
 }

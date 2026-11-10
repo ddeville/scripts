@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Networking as Net
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import "../ui"
 import "../services"
 import "../launcher"
@@ -136,9 +137,9 @@ PanelWindow { // qmllint disable uncreatable-type
         audio: panel.audio
         outputs: panel.audioOutputs
         brightness: panel.status.stats.backlight ?? -1
-        battery: panel.status.stats.battery ?? -1
-        plugged: panel.status.stats.plugged ?? false
-        batteryStatus: panel.status.stats.batteryStatus ?? ""
+        battery: UPower.displayDevice.ready && UPower.displayDevice.isPresent ? Math.round(UPower.displayDevice.percentage * 100) : -1
+        plugged: !UPower.onBattery
+        batteryStatus: UPowerDeviceState.toString(UPower.displayDevice.state)
         onBrightnessRequested: percent => panel.status.setBrightness(percent)
         onMixerRequested: Applications.launch(["pavucontrol"])
     }
@@ -436,13 +437,13 @@ PanelWindow { // qmllint disable uncreatable-type
                     }
 
                     Button {
-                        visible: typeof panel.status.stats.battery === "number"
+                        visible: UPower.displayDevice.ready && UPower.displayDevice.isPresent
                         symbol: "battery"
-                        level: (panel.status.stats.battery ?? 0) / 100
-                        plugged: panel.status.stats.plugged ?? false
-                        tooltip: "Battery: " + panel.status.stats.battery + "% · " + (panel.status.stats.plugged ? "Plugged in" : "On battery")
+                        level: UPower.displayDevice.percentage
+                        plugged: !UPower.onBattery
+                        tooltip: "Battery: " + Math.round(UPower.displayDevice.percentage * 100) + "% · " + (UPower.onBattery ? "On battery" : "Plugged in")
                         tooltipEnabled: !devicePopup.visible
-                        foreground: panel.status.stats.battery <= 10 ? Theme.alert : Theme.foreground
+                        foreground: UPower.displayDevice.percentage <= 0.1 ? Theme.alert : Theme.foreground
                         interactive: true
                         active: devicePopup.visible && devicePopup.activeSection === "battery"
                         onClicked: devicePopup.toggleSection("battery")

@@ -288,7 +288,7 @@ ShellPopup {
                 Repeater {
                     model: root.outputs.items
 
-                    delegate: Button {
+                    delegate: Controls.ItemDelegate {
                         id: outputButton
 
                         required property var model
@@ -296,11 +296,14 @@ ShellPopup {
 
                         width: outputRows.width
                         height: model.detail ? 42 : 32
-                        tooltip: model.description + (current ? " · Current output" : " · Use this output")
-                        active: current && root.outputs.items.count > 1
-                        foreground: active ? Theme.selected : Theme.foreground
-                        interactive: root.outputs.available && !root.outputs.busy && (root.outputs.items.count > 1 || !current)
+                        padding: 6
+                        highlighted: current && root.outputs.items.count > 1
+                        enabled: root.outputs.available && !root.outputs.busy && (root.outputs.items.count > 1 || !current)
+                        hoverEnabled: true
+                        Accessible.name: model.description + (current ? " · Current output" : " · Use this output")
                         onClicked: root.outputs.select(model.sinkName, model.portName)
+                        Keys.onReturnPressed: clicked()
+                        Keys.onEnterPressed: clicked()
                         onActiveFocusChanged: {
                             if (activeFocus) {
                                 const view = outputList.contentItem as Flickable;
@@ -308,17 +311,18 @@ ShellPopup {
                             }
                         }
 
-                        indicator: Row {
+                        contentItem: Row {
                             spacing: 5
 
                             Icon {
                                 name: outputButton.model.symbol
-                                color: outputButton.foreground
+                                color: outputButton.highlighted ? Theme.selected : Theme.foreground
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Column {
-                                width: outputButton.width - 33
+                                width: parent.width - Theme.iconSize - parent.spacing
+                                anchors.verticalCenter: parent.verticalCenter
                                 spacing: 2
 
                                 Text {
@@ -326,7 +330,7 @@ ShellPopup {
                                     text: outputButton.model.label
                                     textFormat: Text.PlainText
                                     elide: Text.ElideRight
-                                    color: outputButton.foreground
+                                    color: outputButton.highlighted ? Theme.selected : Theme.foreground
                                     font.family: Theme.font
                                     font.pixelSize: Theme.fontSize
                                 }
@@ -344,6 +348,28 @@ ShellPopup {
 
                             }
 
+                        }
+
+                        HoverHandler {
+                            enabled: outputButton.enabled
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
+                        Controls.ToolTip {
+                            visible: outputButton.hovered && !outputButton.down
+                            delay: 500
+                            text: outputButton.Accessible.name
+                            font.family: Theme.font
+                            font.pixelSize: 11
+                            palette.toolTipBase: Theme.background
+                            palette.toolTipText: Theme.foreground
+                        }
+
+                        background: Rectangle {
+                            radius: 5
+                            color: outputButton.highlighted ? Theme.selectionSurface : outputButton.hovered || outputButton.visualFocus ? Theme.hover : "transparent"
+                            border.width: outputButton.visualFocus ? 1 : 0
+                            border.color: Theme.selected
                         }
 
                     }

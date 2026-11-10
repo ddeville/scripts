@@ -169,6 +169,7 @@ gpac
 gst-libav
 libnotify
 quickshell
+upower
 
 # ============= Wayland =============
 

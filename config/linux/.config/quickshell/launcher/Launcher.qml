@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../services"
 import "LauncherSearch.js" as Search
@@ -19,8 +20,8 @@ Scope {
     function toggle() {
         if (opened) {
             closeRequested();
-        } else if (!focusedMonitor.running) {
-            focusedMonitor.running = true;
+        } else {
+            showRequested(Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name ?? "");
         }
     }
 
@@ -39,12 +40,6 @@ Scope {
         function toggle(): void {
             root.toggle();
         }
-    }
-
-    FocusedMonitor {
-        id: focusedMonitor
-
-        onResolved: name => root.showRequested(name)
     }
 
     Process {

@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
-import "../services"
 
 Scope {
     id: root
@@ -21,10 +21,9 @@ Scope {
 
     function show(nextKind) {
         kind = nextKind;
-        if (visible)
-            hideTimer.restart();
-        if (!monitorQuery.running)
-            monitorQuery.running = true;
+        monitorName = Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name ?? "";
+        visible = true;
+        hideTimer.restart();
     }
 
     IpcHandler {
@@ -42,16 +41,6 @@ Scope {
                 root.brightnessPending = true;
             else
                 brightnessQuery.running = true;
-        }
-    }
-
-    FocusedMonitor {
-        id: monitorQuery
-
-        onResolved: name => {
-            root.monitorName = name;
-            root.visible = true;
-            hideTimer.restart();
         }
     }
 
