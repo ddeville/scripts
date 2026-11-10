@@ -39,6 +39,14 @@ jobs:
       - name: Build Go tools
         working-directory: tools
         run: go build ./...
+      - name: Build macOS tools
+        working-directory: tools
+        env:
+          GOOS: darwin
+          CGO_ENABLED: "0"
+        run: |
+          GOARCH=arm64 go build ./...
+          GOARCH=amd64 go build ./...
 
   qmllint:
     name: QML Lint
