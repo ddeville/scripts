@@ -1,3 +1,5 @@
+//go:build linux
+
 // Command tailscale-status reports local Tailscale state as JSON.
 package main
 
