@@ -43,7 +43,7 @@ type agent struct {
 	UpdatedAt      *int64    `json:"updated_at"`
 	Error          *string   `json:"error"`
 	Panes          []string  `json:"tmux_panes,omitempty"`
-	Preview        string    `json:"-"`
+	Preview        string    `json:"preview"`
 }
 
 type snapshot struct {
