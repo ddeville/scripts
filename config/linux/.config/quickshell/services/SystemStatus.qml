@@ -83,21 +83,21 @@ Scope {
     CommandPoll {
         id: updatesPoll
 
-        command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "updates"]
+        command: ["bash", Quickshell.shellPath("services/scripts/package-updates.sh")]
         interval: 300000
     }
 
     CommandPoll {
         id: emailPoll
 
-        command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "email"]
+        command: ["bash", Quickshell.shellPath("services/scripts/fastmail-unread.sh")]
         interval: 60000
     }
 
     CommandPoll {
         id: githubPoll
 
-        command: ["bash", Quickshell.shellPath("services/scripts/status.sh"), "github"]
+        command: ["bash", Quickshell.shellPath("services/scripts/github-notifications.sh")]
         interval: 60000
     }
 
