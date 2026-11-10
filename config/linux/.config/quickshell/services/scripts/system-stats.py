@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Read bar statistics directly from procfs and sysfs without subprocesses."""
 
 import json

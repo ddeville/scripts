@@ -44,7 +44,7 @@ Scope {
     Process {
         id: statsProcess
 
-        command: ["python3", Quickshell.shellPath("services/scripts/system-stats.py")]
+        command: [Quickshell.shellPath("services/scripts/system-stats.py")]
         running: true
 
         stdout: SplitParser {

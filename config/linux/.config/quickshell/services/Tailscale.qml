@@ -81,7 +81,7 @@ Scope {
     CommandPoll {
         id: poll
 
-        command: ["python3", Quickshell.shellPath("services/scripts/tailscale-status.py")]
+        command: [Quickshell.shellPath("services/scripts/tailscale-status.py")]
         interval: 5000
         onOutputChanged: {
             if (output !== "")

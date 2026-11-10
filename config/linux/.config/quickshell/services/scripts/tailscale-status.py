@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Read Tailscale's local state without changing connectivity or preferences."""
 
 import json
