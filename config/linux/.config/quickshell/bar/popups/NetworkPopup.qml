@@ -246,7 +246,7 @@ ShellPopup {
                 Repeater {
                     model: root.wifiNetworks
 
-                    Controls.Control {
+                    Controls.ItemDelegate {
                         id: networkRow
 
                         required property Net.WifiNetwork modelData
@@ -264,71 +264,63 @@ ShellPopup {
                             ].filter(part => part !== "").join(" · ");
                         }
 
-                        function connectNetwork() {
-                            root.backend.connectNetwork(modelData);
-                        }
-
                         width: networks.width
                         height: 40
-                        activeFocusOnTab: (!root.backend.busy && !connected) || activeFocus
-                        Accessible.role: Accessible.Button
+                        padding: 0
+                        enabled: !root.backend.busy && !connected
+                        hoverEnabled: true
                         Accessible.name: networkName + " · " + description + (connected ? "" : " · Connect")
-                        Accessible.onPressAction: connectNetwork()
-                        Keys.onReturnPressed: connectNetwork()
-                        Keys.onEnterPressed: connectNetwork()
-                        Keys.onSpacePressed: connectNetwork()
+                        onClicked: root.backend.connectNetwork(modelData)
+                        Keys.onReturnPressed: clicked()
+                        Keys.onEnterPressed: clicked()
 
-                        Icon {
-                            x: 6
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "wifi"
-                            level: networkRow.signalStrength
-                            color: networkRow.connected ? Theme.selected : Theme.foreground
-                        }
-
-                        Column {
-                            x: 32
-                            width: parent.width - x - 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
-
-                            Text {
-                                width: parent.width
-                                text: networkRow.networkName
-                                textFormat: Text.PlainText
-                                elide: Text.ElideRight
+                        contentItem: Item {
+                            Icon {
+                                x: 6
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: "wifi"
+                                level: networkRow.signalStrength
                                 color: networkRow.connected ? Theme.selected : Theme.foreground
-                                font.family: Theme.font
-                                font.pixelSize: 11
-                                renderType: Text.QtRendering
                             }
 
-                            Text {
-                                width: parent.width
-                                text: networkRow.description
-                                textFormat: Text.PlainText
-                                elide: Text.ElideRight
-                                color: Theme.muted
-                                font.family: Theme.font
-                                font.pixelSize: 8
-                                renderType: Text.QtRendering
-                            }
+                            Column {
+                                x: 32
+                                width: parent.width - x - 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
 
+                                Text {
+                                    width: parent.width
+                                    text: networkRow.networkName
+                                    textFormat: Text.PlainText
+                                    elide: Text.ElideRight
+                                    color: networkRow.connected ? Theme.selected : Theme.foreground
+                                    font.family: Theme.font
+                                    font.pixelSize: 11
+                                    renderType: Text.QtRendering
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: networkRow.description
+                                    textFormat: Text.PlainText
+                                    elide: Text.ElideRight
+                                    color: Theme.muted
+                                    font.family: Theme.font
+                                    font.pixelSize: 8
+                                    renderType: Text.QtRendering
+                                }
+                            }
                         }
 
-                        MouseArea {
-                            id: networkMouse
-
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            enabled: !root.backend.busy && !networkRow.connected
+                        HoverHandler {
+                            enabled: networkRow.enabled
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: networkRow.connectNetwork()
                         }
 
                         background: Rectangle {
                             radius: 5
-                            color: networkMouse.containsMouse || networkRow.visualFocus ? Theme.hover : networkRow.connected ? Theme.surface : "transparent"
+                            color: networkRow.hovered || networkRow.visualFocus ? Theme.hover : networkRow.connected ? Theme.surface : "transparent"
                             border.width: networkRow.visualFocus ? 1 : 0
                             border.color: Theme.selected
                         }
