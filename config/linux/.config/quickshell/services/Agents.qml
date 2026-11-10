@@ -63,11 +63,13 @@ Scope {
                 threadId: agent.id,
                 agentType: agent.agent_type,
                 title: agent.title,
+                preview: (agent.preview || "").replace(/\s+/g, " ").trim(),
+                isChild: !!agent.parent_id,
                 project: agent.project || agent.cwd,
                 path: agent.cwd,
                 status: agent.status,
                 error: agent.error || "",
-                section: agent.needs_attention ? "Needs you" : "Other agents"
+                needsAttention: agent.needs_attention
             };
             if (existing === agentModel.count)
                 agentModel.insert(i, row);
