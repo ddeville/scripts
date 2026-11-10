@@ -10,8 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ddeville/scripts/tools/internal/agentstatus"
 	"github.com/spf13/cobra"
+
+	"github.com/ddeville/scripts/tools/internal/agentstatus"
 )
 
 var errInvalidInterval = errors.New("interval must be a positive number of seconds")
