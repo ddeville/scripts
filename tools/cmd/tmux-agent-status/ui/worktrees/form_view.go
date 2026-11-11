@@ -1,4 +1,4 @@
-package ui
+package worktrees
 
 import (
 	"errors"
@@ -7,28 +7,13 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
 	"github.com/ddeville/scripts/tools/internal/git"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
-func clippedLines(text string, height, width int) string {
-	lines := strings.Split(text, "\n")
-	if len(lines) > height {
-		lines = lines[:height]
-		if height > 1 {
-			lines[height-1] = tui.Muted.Render("…")
-		}
-	}
-
-	for i := range lines {
-		lines[i] = tui.Fit(lines[i], width)
-	}
-
-	return strings.Join(lines, "\n")
-}
-
-func (m *model) createView(width, rows int) string {
+func (m *Model) createView(width, rows int) string {
 	form := m.create
 	if form.picking {
 		return form.choices.View()
@@ -99,10 +84,10 @@ func (m *model) createView(width, rows int) string {
 	lines = append(lines, tui.Muted.Render("Root    ")+tui.ShortPath(m.root))
 	start := max(0, focusLine-max(1, rows-1)+1)
 
-	return clippedLines(strings.Join(lines[start:], "\n"), rows, width)
+	return panel.ClipLines(strings.Join(lines[start:], "\n"), rows, width)
 }
 
-func (m *model) removalContent(width int) string {
+func (m *Model) removalContent(width int) string {
 	form := m.remove
 	lines := []string{tui.Title.Render(tui.CleanLine(form.item.Repo + " / " + form.item.Name)), tui.Muted.Render(ansi.Wrap(tui.ShortPath(form.item.Path), width, "")), ""}
 
@@ -141,9 +126,61 @@ func (m *model) removalContent(width int) string {
 		lines = append(lines, tui.Red.Render(ansi.Wrap(tui.CleanLine(message), width, "")))
 	}
 
-	if m.busy {
+	if m.Busy() {
 		lines = append(lines, "", "Removing worktree…")
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
+}
+
+// FormView contains a modal form's content for the shared app frame.
+type FormView struct{ Summary, Toolbar, Body, Footer, Help string }
+
+// Form renders the active creation, conversation, or removal form.
+func (m *Model) Form() (FormView, bool) {
+	if !m.Modal() {
+		return FormView{}, false
+	}
+
+	width, rows := m.width, m.rows
+
+	var summary, toolbar, body, footer, help string
+	if m.create != nil {
+		summary = "Create from a committed base; local changes stay in the source."
+		toolbar = "New worktree"
+		title := "New worktree"
+		footer = "Enter create · Esc cancel · Tab ↑/↓ fields · Space toggle"
+
+		help = tui.Muted.Render(tui.CleanLine(m.create.message))
+		if m.create.picking {
+			summary = "Choose a conversation to fork into the new worktree."
+			toolbar = "Running conversations, grouped by repository"
+			title = "Conversation"
+			footer = "j/k ↑/↓ move · Enter choose · Esc back"
+			help = tui.Muted.Render("Choose in Codex also lets you browse saved conversations.")
+		}
+
+		body = panel.Render(title, m.createView(width-4, rows), width, rows, true)
+	} else if m.remove != nil {
+		summary = "Review the checkout, branch, and tmux sessions below."
+		toolbar = "Remove worktree"
+
+		footer = "y remove · Esc cancel · k keep branch · ↑/↓ scroll"
+		if m.remove.keepBranch {
+			footer = "y remove · Esc cancel · k delete branch · ↑/↓ scroll"
+		}
+
+		help = ""
+		if m.remove.checking {
+			help = tui.Muted.Render("Checking Git and tmux…")
+		}
+
+		if m.remove.err != nil || m.remove.checking {
+			footer = "k keep/delete branch · ↑/↓ scroll · Esc cancel"
+		}
+
+		body = panel.Render("Remove worktree", m.remove.view.View(), width, rows, true)
+	}
+
+	return FormView{Summary: summary, Toolbar: toolbar, Body: body, Footer: footer, Help: help}, true
 }

@@ -2,20 +2,19 @@
 package ui
 
 import (
-	"cmp"
 	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
-	"slices"
-	"strings"
 	"time"
 
 	"charm.land/bubbles/v2/key"
-	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
+	agentui "github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/agents"
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/worktrees"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
@@ -37,281 +36,113 @@ type Options struct {
 	Area                          Area
 }
 
-type areaState struct {
-	list                   tui.List
-	details                viewport.Model
-	detailsFocus, expanded bool
-}
-
-func newAreaState() areaState {
-	state := areaState{list: tui.NewList(), details: viewport.New()}
-	state.details.KeyMap = viewport.KeyMap{Up: keys.up, Down: keys.down}
-	state.details.MouseWheelEnabled = false
-
-	return state
-}
-
-type (
-	tickMsg struct{}
-	openMsg struct {
-		pane, session string
-		err           error
-	}
-)
-
 type model struct {
-	ctx                     context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
-	area                    Area
-	agentView, worktreeView areaState
-	width, height           int
-
-	data                                            agents.Snapshot
-	selected, initialPane, originPane, originThread string
-	filter                                          int
-	activity                                        activity
-	activityGeneration                              uint64
-	activityCancel                                  context.CancelFunc
-
-	trees                  []worktree.Info
-	changes                map[string]string
-	treeGeneration         uint64
-	nextStatus             int
-	sessionsReady, loading bool
-	treeError              string
-	root, source           string
-
+	ctx                       context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
+	area, returnArea          Area
+	agents                    agentui.Model
+	worktrees                 worktrees.Model
+	width, height             int
+	hasOrigin                 bool
 	notice                    string
-	busy, quitting            bool
+	quitting                  bool
 	operationCancel           context.CancelFunc
 	targetPane, targetSession string
-	create                    *createForm
-	remove                    *removeForm
-	planVersion               uint64
+}
+
+type openMsg struct {
+	pane, session string
+	err           error
 }
 
 var errStaleStatus = errors.New("status is stale; wait for a fresh update")
 
-func fetch(ctx context.Context) tea.Cmd {
-	return func() tea.Msg {
-		ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
-		defer cancel()
+func (m *model) Init() tea.Cmd { return tea.Batch(m.agents.Init(m.ctx), m.worktrees.Init(m.ctx)) }
 
-		return agents.Collect(ctx)
-	}
-}
-
-func tick() tea.Cmd { return tea.Tick(time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
-
-func (m *model) Init() tea.Cmd { return tea.Batch(fetch(m.ctx), m.loadTreeStatus()) }
-
-func (m *model) activeView() *areaState {
+func (m *model) activePanel() *panel.Model {
 	if m.area == WorktreesArea {
-		return &m.worktreeView
+		return &m.worktrees.Panel
 	}
 
-	return &m.agentView
+	return &m.agents.Panel
 }
 
-func (m *model) beginOperation() context.Context {
-	ctx, cancel := context.WithCancel(m.ctx)
-	m.busy, m.operationCancel = true, cancel
+func (m *model) busy() bool { return m.operationCancel != nil || m.worktrees.Busy() }
 
-	return ctx
+func (m *model) updatePanels() {
+	width, rows := max(12, m.width-2), max(1, m.height-12)
+	m.agents.SetSize(width, rows)
+	m.worktrees.SetSize(width, rows)
 }
 
-func (m *model) finishOperation() bool {
-	m.operationCancel()
-	m.operationCancel = nil
-	m.busy = false
+func (m *model) beginCreate() tea.Cmd {
+	source := m.worktrees.Source()
 
-	return m.quitting
-}
-
-func (m *model) refreshActivity() tea.Cmd {
-	if m.activityCancel != nil {
-		m.activityCancel()
-		m.activityCancel = nil
+	id := m.agents.OriginID()
+	if m.area == AgentsArea {
+		id = m.agents.Panel.List.SelectedID()
+	} else if selected, ok := m.worktrees.Selected(); ok {
+		source = selected.Path
 	}
 
-	m.activityGeneration++
-	if m.selected == "" {
-		return nil
+	data := m.agents.Snapshot()
+	pending := m.area == WorktreesArea && m.hasOrigin && data.At.IsZero() && data.Err == nil
+
+	cmd := m.worktrees.BeginCreate(source, id, pending)
+	if m.worktrees.Creating() {
+		m.returnArea, m.area = m.area, WorktreesArea
+		m.notice = ""
 	}
-
-	ctx, cancel := context.WithTimeout(m.ctx, 3*time.Second)
-	m.activityCancel = cancel
-	id, generation := m.selected, m.activityGeneration
-
-	return func() tea.Msg {
-		defer cancel()
-
-		data, err := agents.ReadDetails(ctx, id)
-
-		return activity{ID: id, generation: generation, Entries: activityEntries(data), Err: err}
-	}
-}
-
-func (m *model) filtered(filter int) []agents.Agent {
-	var result []agents.Agent
-
-	for _, a := range m.data.Agents {
-		match := false
-
-		switch filter {
-		case filterAll:
-			match = true
-		case filterAttention:
-			match = a.NeedsAttention
-		case filterWorking:
-			match = a.State == "working"
-		case filterUnread:
-			match = a.State == "ready"
-		case filterIdle:
-			match = a.State == "idle"
-		}
-
-		if match {
-			result = append(result, a)
-		}
-	}
-
-	return result
-}
-
-const (
-	filterAll = iota
-	filterAttention
-	filterWorking
-	filterUnread
-	filterIdle
-)
-
-var filters = []string{"All", "Needs you", "Working", "Unread", "Idle"}
-
-func agentRow(a agents.Agent) tui.ListItem {
-	style, label, _ := stateStyle(a.State)
-
-	indicator := "●"
-	if a.State == "idle" {
-		indicator = "○"
-	}
-
-	title := a.Title
-	if a.ParentID != nil {
-		title = "↳ " + title
-	}
-
-	return tui.ListItem{ID: a.ID, Group: cmp.Or(tui.ShortPath(a.Cwd), "Unknown location"), Title: title, Subtitle: a.Preview, Status: label, Indicator: indicator, StatusStyle: style}
-}
-
-func (m *model) selectAgent(id string) tea.Cmd {
-	if m.selected == id {
-		return nil
-	}
-
-	m.selected, m.notice = id, ""
-	m.agentView.details.GotoTop()
-	m.activity = activity{ID: id}
-	m.updateAgentDetails()
-
-	return m.refreshActivity()
-}
-
-func (m *model) updateAgents() tea.Cmd {
-	filtered := m.filtered(m.filter)
-
-	items := make([]tui.ListItem, 0, len(filtered))
-	for _, a := range filtered {
-		items = append(items, agentRow(a))
-	}
-
-	selected := m.selected
-	if m.initialPane != "" {
-		for _, a := range filtered {
-			if slices.Contains(a.Panes, m.initialPane) {
-				selected = a.ID
-				break
-			}
-		}
-
-		m.initialPane = ""
-	}
-
-	m.agentView.list.SetItems(items, selected)
-	cmd := m.selectAgent(m.agentView.list.SelectedID())
-	m.updateAgentDetails()
 
 	return cmd
 }
 
-func (m *model) updatePanels() {
-	for _, which := range []Area{AgentsArea, WorktreesArea} {
-		view := &m.agentView
-		if which == WorktreesArea {
-			view = &m.worktreeView
-		}
-
-		left, right, rows := m.panelDimensions(which)
-		view.list.SetSize(left-4, rows)
-
-		width := left - 4
-		if right > 0 {
-			width = right - 4
-		}
-
-		view.details.SetWidth(max(1, width))
-		view.details.SetHeight(rows)
-	}
-
-	m.updateAgentDetails()
-	m.updateWorktreeDetails()
-	m.updateRemovalDetails()
-
-	if m.create != nil {
-		m.create.setWidth(m.width)
-		m.updateThreadChoices()
-	}
-}
-
-func (m *model) updateAgentDetails() {
-	m.agentView.details.SetContent(m.detailContent(m.agentView.details.Width()))
-}
-
-func (m *model) openAgent(id string) tea.Cmd {
-	if id == "" || m.busy {
+func (m *model) openItem(id string) tea.Cmd {
+	if id == "" || m.busy() {
 		return nil
 	}
 
-	operationCtx := m.beginOperation()
-	data := m.data
+	ctx, cancel := context.WithCancel(m.ctx)
+
+	m.operationCancel = cancel
+	if m.area == AgentsArea {
+		data := m.agents.Snapshot()
+
+		return func() tea.Msg {
+			if data.Err != nil || time.Since(data.At) > 10*time.Second {
+				return openMsg{err: errStaleStatus}
+			}
+
+			ctx, stop := context.WithTimeout(ctx, time.Second)
+			defer stop()
+
+			panes, err := agents.MatchPanes(ctx, data.IDs)
+			if err != nil {
+				return openMsg{err: err}
+			}
+
+			if len(panes[id]) != 1 {
+				return openMsg{err: fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes[id]))}
+			}
+
+			return openMsg{pane: panes[id][0]}
+		}
+	}
+
+	item, ok := m.worktrees.Find(id)
+	if !ok {
+		cancel()
+
+		m.operationCancel = nil
+
+		return nil
+	}
+
+	m.notice = "Opening " + item.Name + "…"
 
 	return func() tea.Msg {
-		if data.Err != nil || time.Since(data.At) > 10*time.Second {
-			return openMsg{err: errStaleStatus}
-		}
-
-		ctx, cancel := context.WithTimeout(operationCtx, time.Second)
-		defer cancel()
-
-		panes, err := agents.MatchPanes(ctx, data.IDs)
-		if err != nil {
-			return openMsg{err: err}
-		}
-
-		if len(panes[id]) != 1 {
-			return openMsg{err: fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes[id]))}
-		}
-
-		return openMsg{pane: panes[id][0]}
+		session, err := worktree.Open(ctx, item)
+		return openMsg{session: session, err: err}
 	}
-}
-
-func (m *model) openItem(id string) tea.Cmd {
-	if m.area == AgentsArea {
-		return m.openAgent(id)
-	}
-
-	return m.openWorktree(id)
 }
 
 func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn // Signature required by tea.Model.
@@ -319,42 +150,13 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.updatePanels()
-	case agents.Snapshot:
-		if msg.Err != nil {
-			m.data.Err = msg.Err
-			if m.create != nil {
-				m.create.originPending = false
-			}
-
-			return m, tick()
-		}
-
-		for _, a := range msg.Agents {
-			if m.originThread == "" && slices.Contains(a.Panes, m.originPane) {
-				m.originThread = a.ID
-			}
-		}
-
-		m.data = msg
-
-		cmd := m.updateAgents()
-		if cmd == nil && m.selected != "" && m.activityCancel == nil {
-			cmd = m.refreshActivity()
-		}
-
-		m.updateThreadChoices()
-
-		return m, tea.Batch(tick(), cmd)
-	case tickMsg:
-		return m, fetch(m.ctx)
-	case activity:
-		if msg.ID == m.selected && msg.generation == m.activityGeneration {
-			m.activity = msg
-			m.activityCancel = nil
-			m.updateAgentDetails()
-		}
+	case tea.KeyPressMsg:
+		return m, m.handleKey(msg)
 	case openMsg:
-		if m.finishOperation() {
+		m.operationCancel()
+
+		m.operationCancel = nil
+		if m.quitting {
 			return m, tea.Quit
 		}
 
@@ -366,31 +168,26 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 		m.targetPane, m.targetSession = msg.pane, msg.session
 
 		return m, tea.Quit
-	case treeLoadedMsg, treeStatusMsg, treeSessionsMsg:
-		return m, m.updateWorktrees(msg)
-	case createdMsg:
-		if m.finishOperation() {
-			return m, tea.Quit
-		}
-
-		return m, m.created(msg)
-	case plannedMsg:
-		if m.remove != nil && msg.version == m.planVersion {
-			m.remove.plan, m.remove.err, m.remove.checking = msg.plan, msg.err, false
-			m.updateRemovalDetails()
-		}
-	case removedMsg:
-		if m.finishOperation() {
-			return m, tea.Quit
-		}
-
-		return m, m.removed(msg)
-	case tea.KeyPressMsg:
-		return m, m.handleKey(msg)
+	case worktrees.OpenSessionMsg:
+		m.targetSession = msg.ID
+		return m, tea.Quit
 	default:
-		if m.create != nil && !m.create.picking {
-			return m, m.create.updateInput(msg)
+		selected := m.agents.Panel.List.SelectedID()
+
+		cmd := tea.Batch(m.agents.Update(m.ctx, msg), m.worktrees.Update(m.ctx, msg))
+		if selected != m.agents.Panel.List.SelectedID() {
+			m.notice = ""
 		}
+
+		if _, ok := msg.(agents.Snapshot); ok {
+			m.worktrees.SetAgents(m.agents.Snapshot(), m.agents.OriginID())
+		}
+
+		if m.quitting && !m.busy() {
+			return m, tea.Quit
+		}
+
+		return m, cmd
 	}
 
 	return m, nil
@@ -398,9 +195,13 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 
 func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	if msg.String() == "ctrl+c" {
-		if m.busy {
+		if m.busy() {
 			m.quitting = true
-			m.operationCancel()
+			if m.operationCancel != nil {
+				m.operationCancel()
+			}
+
+			m.worktrees.Cancel()
 
 			return nil
 		}
@@ -408,95 +209,69 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		return tea.Quit
 	}
 
-	if m.busy {
+	if m.busy() {
 		return nil
 	}
 
-	if m.create != nil {
-		return m.createKey(msg)
+	if m.worktrees.Modal() {
+		creating := m.worktrees.Creating()
+
+		cmd := m.worktrees.Update(m.ctx, msg)
+		if creating && !m.worktrees.Creating() {
+			m.area = m.returnArea
+		}
+
+		return cmd
 	}
 
-	if m.remove != nil {
-		return m.removeKey(msg)
-	}
-
-	view := m.activeView()
 	switch {
 	case key.Matches(msg, keys.quit):
 		return tea.Quit
 	case key.Matches(msg, keys.agents):
 		m.area = AgentsArea
 		m.notice = ""
+		m.worktrees.ClearNotice()
 	case key.Matches(msg, keys.worktrees):
 		m.area = WorktreesArea
 		m.notice = ""
+		m.worktrees.ClearNotice()
 	case key.Matches(msg, keys.create):
 		return m.beginCreate()
 	case key.Matches(msg, keys.remove) && m.area == WorktreesArea:
-		return m.beginRemove()
+		m.notice = ""
+		return m.worktrees.BeginRemove(m.ctx)
 	case key.Matches(msg, keys.refresh) && m.area == WorktreesArea:
-		return m.reloadWorktrees(m.worktreeView.list.SelectedID())
-	case key.Matches(msg, keys.nextFilter, keys.previousFilter, keys.attention) && m.area == AgentsArea:
-		switch {
-		case key.Matches(msg, keys.attention):
-			if m.filter == filterAttention {
-				m.filter = filterAll
-			} else {
-				m.filter = filterAttention
-			}
-		case key.Matches(msg, keys.previousFilter):
-			m.filter = (m.filter + len(filters) - 1) % len(filters)
-		default:
-			m.filter = (m.filter + 1) % len(filters)
+		return m.worktrees.Reload(m.worktrees.Panel.List.SelectedID())
+	case key.Matches(msg, agentui.Keys.NextFilter, agentui.Keys.PreviousFilter, agentui.Keys.Attention) && m.area == AgentsArea:
+		before := m.agents.Panel.List.SelectedID()
+
+		cmd := m.agents.Filter(m.ctx, msg)
+		if before != m.agents.Panel.List.SelectedID() {
+			m.notice = ""
 		}
 
-		return m.updateAgents()
-	case key.Matches(msg, keys.list):
-		view.detailsFocus = false
-		view.expanded = false
-	case key.Matches(msg, keys.details):
-		view.detailsFocus = true
-	case key.Matches(msg, keys.expand):
-		view.expanded = !view.expanded
-		view.detailsFocus = view.expanded
+		return cmd
 	case key.Matches(msg, keys.open):
-		return m.openItem(view.list.SelectedID())
+		return m.openItem(m.activePanel().List.SelectedID())
 	case key.Matches(msg, keys.jump):
 		position := int(msg.String()[0] - '0')
-		if item, ok := view.list.Item(position); ok {
+		if item, ok := m.activePanel().List.Item(position); ok {
 			return m.openItem(item.ID)
 		}
 	default:
-		if view.detailsFocus {
-			var cmd tea.Cmd
+		if m.area == AgentsArea {
+			before := m.agents.Panel.List.SelectedID()
 
-			switch {
-			case key.Matches(msg, keys.first):
-				view.details.GotoTop()
-			case key.Matches(msg, keys.last):
-				view.details.GotoBottom()
-			default:
-				view.details, cmd = view.details.Update(msg)
+			cmd := m.agents.Navigate(m.ctx, msg)
+			if before != m.agents.Panel.List.SelectedID() {
+				m.notice = ""
 			}
 
 			return cmd
 		}
 
-		before := view.list.SelectedID()
-		view.list.Move(msg)
-
-		if m.area == AgentsArea {
-			return m.selectAgent(view.list.SelectedID())
-		}
-
-		if before != view.list.SelectedID() {
-			view.details.GotoTop()
-		}
-
-		m.updateWorktreeDetails()
+		return m.worktrees.Navigate(msg)
 	}
-
-	m.updatePanels()
 
 	return nil
 }
@@ -512,24 +287,8 @@ func Run(ctx context.Context, options Options) error {
 	}
 
 	initial := &model{
-		ctx: uiCtx, area: options.Area, root: options.Root, source: source,
-		width: 100, height: 30, changes: map[string]string{},
-		agentView: newAreaState(), worktreeView: newAreaState(), initialPane: options.Pane, originPane: options.Pane,
-	}
-
-	items, err := worktree.Discover(options.Root)
-	if err != nil {
-		initial.treeError = err.Error()
-	}
-
-	initial.trees = items
-	initial.updateTreeList("")
-
-	for _, item := range items {
-		if source == item.Path || strings.HasPrefix(source, item.Path+string(filepath.Separator)) {
-			initial.worktreeView.list.SelectID(item.Path)
-			break
-		}
+		ctx: uiCtx, area: options.Area, width: 100, height: 30, hasOrigin: options.Pane != "",
+		agents: agentui.New(options.Pane), worktrees: worktrees.New(options.Root, source),
 	}
 
 	initial.updatePanels()

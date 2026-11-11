@@ -1,7 +1,8 @@
-package ui
+package worktrees
 
 import (
 	"cmp"
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,8 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
+	agentui "github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/agents"
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
@@ -21,7 +24,6 @@ type createForm struct {
 	noTmux, picking, originPending bool
 	forkID, forkTitle, message     string
 	choices                        tui.List
-	returnArea                     Area
 }
 type removeForm struct {
 	item                 worktree.Info
@@ -47,21 +49,13 @@ type (
 	}
 )
 
-func (m *model) beginCreate() tea.Cmd {
+// BeginCreate opens the form using the source and thread chosen by the app.
+func (m *Model) BeginCreate(source, id string, pending bool) tea.Cmd {
 	if m.loading {
 		return nil
 	}
 
-	source := m.source
-
-	id := m.originThread
-	if m.area == AgentsArea {
-		id = m.selected
-	} else if selected, ok := m.selectedWorktree(); ok {
-		source = selected.Path
-	}
-
-	form := &createForm{inputs: make([]textinput.Model, 3), choices: tui.NewList(), returnArea: m.area}
+	form := &createForm{inputs: make([]textinput.Model, 3), choices: tui.NewList()}
 	for i, placeholder := range []string{"feature-name", "Repository or worktree path", "HEAD"} {
 		form.inputs[i] = textinput.New()
 		form.inputs[i].Prompt = ""
@@ -76,11 +70,11 @@ func (m *model) beginCreate() tea.Cmd {
 		}
 	}
 
-	form.originPending = m.area == WorktreesArea && m.originPane != "" && m.data.At.IsZero() && m.data.Err == nil
+	form.originPending = pending
 	form.inputs[1].SetValue(source)
 	form.inputs[2].SetValue("HEAD")
-	form.setWidth(m.width)
-	m.create, m.notice, m.area = form, "", WorktreesArea
+	form.setWidth(m.width + 2)
+	m.create, m.notice = form, ""
 	m.updateThreadChoices()
 
 	return form.inputs[0].Focus()
@@ -109,7 +103,7 @@ func (f *createForm) updateInput(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *model) updateThreadChoices() {
+func (m *Model) updateThreadChoices() {
 	form := m.create
 	if form == nil {
 		return
@@ -134,7 +128,7 @@ func (m *model) updateThreadChoices() {
 
 	for _, a := range m.data.Agents {
 		if a.Cwd != "" && a.Type == agents.Codex {
-			items = append(items, agentRow(a))
+			items = append(items, agentui.Row(a))
 		}
 	}
 
@@ -143,11 +137,10 @@ func (m *model) updateThreadChoices() {
 	})
 	form.choices.SetItems(items, selected)
 
-	_, _, rows := m.panelDimensions(WorktreesArea)
-	form.choices.SetSize(max(1, m.width-6), rows)
+	form.choices.SetSize(max(1, m.width-4), m.rows)
 }
 
-func (m *model) chooseThread() tea.Cmd {
+func (m *Model) chooseThread() tea.Cmd {
 	form := m.create
 	form.originPending = false
 
@@ -164,7 +157,7 @@ func (m *model) chooseThread() tea.Cmd {
 	return nil
 }
 
-func (m *model) threadKey(msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) threadKey(msg tea.KeyPressMsg) tea.Cmd {
 	form := m.create
 
 	switch msg.String() {
@@ -193,7 +186,7 @@ func (m *model) threadKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-func (m *model) createKey(msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) createKey(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
 	form := m.create
 	if form.picking {
 		return m.threadKey(msg)
@@ -201,7 +194,6 @@ func (m *model) createKey(msg tea.KeyPressMsg) tea.Cmd {
 
 	switch msg.String() {
 	case "esc":
-		m.area = form.returnArea
 		m.create = nil
 
 		return nil
@@ -224,7 +216,7 @@ func (m *model) createKey(msg tea.KeyPressMsg) tea.Cmd {
 			return m.chooseThread()
 		}
 
-		return m.submitCreate()
+		return m.submitCreate(ctx)
 	case "space":
 		if form.focus == len(form.inputs)+1 {
 			form.noTmux = !form.noTmux
@@ -243,7 +235,7 @@ func (m *model) createKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-func (m *model) submitCreate() tea.Cmd {
+func (m *Model) submitCreate(ctx context.Context) tea.Cmd {
 	form := m.create
 
 	options := worktree.CreateOptions{Name: form.inputs[0].Value(), Directory: form.inputs[1].Value(), Base: form.inputs[2].Value(), NoTmux: form.noTmux}
@@ -273,7 +265,7 @@ func (m *model) submitCreate() tea.Cmd {
 		options.Fork = form.forkID
 	}
 
-	ctx := m.beginOperation()
+	ctx = m.beginOperation(ctx)
 	form.message = "Creating worktree…"
 
 	return func() tea.Msg {
@@ -282,7 +274,7 @@ func (m *model) submitCreate() tea.Cmd {
 	}
 }
 
-func (m *model) created(msg createdMsg) tea.Cmd {
+func (m *Model) created(msg createdMsg) tea.Cmd {
 	if msg.err != nil && msg.item.Path == "" {
 		m.create.message = msg.err.Error()
 		return nil
@@ -294,56 +286,54 @@ func (m *model) created(msg createdMsg) tea.Cmd {
 	if msg.err != nil {
 		m.notice = msg.err.Error()
 	} else if msg.id != "" {
-		m.targetSession = msg.id
-		return tea.Quit
+		return func() tea.Msg { return OpenSessionMsg{ID: msg.id} }
 	}
 
-	return m.reloadWorktrees(msg.item.Path)
+	return m.Reload(msg.item.Path)
 }
 
-func (m *model) beginRemove() tea.Cmd {
+// BeginRemove opens the removal preview for the selected checkout.
+func (m *Model) BeginRemove(ctx context.Context) tea.Cmd {
 	if m.loading {
 		return nil
 	}
 
-	item, ok := m.selectedWorktree()
+	item, ok := m.Selected()
 	if !ok {
 		return nil
 	}
 
-	m.remove, m.notice = &removeForm{item: item, view: viewport.New()}, ""
-	m.remove.view.KeyMap = viewport.KeyMap{Up: keys.up, Down: keys.down}
-	m.remove.view.MouseWheelEnabled = false
+	m.remove, m.notice = &removeForm{item: item, view: panel.NewViewport()}, ""
 
-	return m.planRemove()
+	return m.planRemove(ctx)
 }
 
-func (m *model) planRemove() tea.Cmd {
+func (m *Model) planRemove(ctx context.Context) tea.Cmd {
 	m.planVersion++
 	m.remove.checking = true
 	m.updateRemovalDetails()
 	item, keep, version := m.remove.item, m.remove.keepBranch, m.planVersion
 
 	return func() tea.Msg {
-		plan, err := worktree.PlanRemoval(m.ctx, item, keep)
+		plan, err := worktree.PlanRemoval(ctx, item, keep)
 		return plannedMsg{plan: plan, version: version, err: err}
 	}
 }
 
-func (m *model) removeKey(msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) removeKey(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
 	switch msg.String() {
 	case "esc", "n":
 		m.remove = nil
 	case "k":
 		m.remove.keepBranch = !m.remove.keepBranch
-		return m.planRemove()
+		return m.planRemove(ctx)
 	case "y":
 		if m.remove.checking || m.remove.err != nil {
 			return nil
 		}
 
 		plan := m.remove.plan
-		ctx := m.beginOperation()
+		ctx = m.beginOperation(ctx)
 		m.updateRemovalDetails()
 
 		return func() tea.Msg { return removedMsg{plan: plan, err: worktree.Remove(ctx, plan)} }
@@ -358,19 +348,18 @@ func (m *model) removeKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-func (m *model) updateRemovalDetails() {
+func (m *Model) updateRemovalDetails() {
 	if m.remove == nil {
 		return
 	}
 
-	_, _, rows := m.panelDimensions(WorktreesArea)
-	width := max(1, m.width-6)
+	width := max(1, m.width-4)
 	m.remove.view.SetWidth(width)
-	m.remove.view.SetHeight(rows)
+	m.remove.view.SetHeight(m.rows)
 	m.remove.view.SetContent(m.removalContent(width))
 }
 
-func (m *model) removed(msg removedMsg) tea.Cmd {
+func (m *Model) removed(msg removedMsg) tea.Cmd {
 	m.remove = nil
 
 	m.notice = "Removed " + msg.plan.Worktree.Name
@@ -380,5 +369,5 @@ func (m *model) removed(msg removedMsg) tea.Cmd {
 		m.source = msg.plan.MainPath
 	}
 
-	return m.reloadWorktrees("")
+	return m.Reload("")
 }

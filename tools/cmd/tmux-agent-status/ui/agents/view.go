@@ -1,4 +1,4 @@
-package ui
+package agents
 
 import (
 	"encoding/json"
@@ -9,7 +9,8 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
-	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
+	agentdata "github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
@@ -32,7 +33,8 @@ func stateStyle(state string) (lipgloss.Style, string, string) {
 	}
 }
 
-func (m *model) summary() string {
+// Summary describes agents that need attention.
+func (m *Model) Summary() string {
 	if m.data.Err != nil {
 		if m.data.At.IsZero() {
 			return tui.Red.Render("Agent status unavailable")
@@ -61,8 +63,8 @@ func (m *model) summary() string {
 	return "Needs you:  " + strings.Join(parts, tui.Muted.Render("  ·  "))
 }
 
-func (m *model) detailContent(width int) string {
-	index := slices.IndexFunc(m.data.Agents, func(a agents.Agent) bool { return a.ID == m.selected })
+func (m *Model) detailContent(width int) string {
+	index := slices.IndexFunc(m.data.Agents, func(a agentdata.Agent) bool { return a.ID == m.selected })
 	if index < 0 {
 		return tui.Muted.Render("No conversation selected")
 	}
@@ -70,7 +72,7 @@ func (m *model) detailContent(width int) string {
 	a := m.data.Agents[index]
 	style, _, hint := stateStyle(a.State)
 
-	lines := detailHeader(a.Title, a.Cwd, style.Render(hint), "to open")
+	lines := panel.DetailHeader(a.Title, a.Cwd, style.Render(hint), "to open")
 
 	if a.Error != nil {
 		lines = append(lines, "", tui.Red.Render(tui.CleanText(*a.Error)))
@@ -111,7 +113,7 @@ type activity struct {
 
 type entry struct{ Label, Text string }
 
-func activityEntries(data agents.Details) []entry {
+func activityEntries(data agentdata.Details) []entry {
 	var entries []entry
 	if data.HistoryError != nil {
 		entries = append(entries, entry{"Error", *data.HistoryError})
@@ -174,4 +176,48 @@ func activityEntries(data agents.Details) []entry {
 	}
 
 	return entries
+}
+
+// View renders the agent list and selected conversation.
+func (m *Model) View() string {
+	empty := "No conversations match this status"
+	if m.data.At.IsZero() {
+		empty = "Loading agents…"
+	}
+
+	if m.data.Err != nil {
+		empty = "Could not read agent status"
+	}
+
+	return m.Panel.View(fmt.Sprintf("Agents · %d", m.Panel.List.Len()), "Selected agent", empty)
+}
+
+// Message provides connection errors or the current app notice for the footer.
+func (m *Model) Message(notice string) string {
+	if m.data.Err != nil {
+		return tui.Red.Render("Agent status unavailable: " + tui.SingleLine(m.data.Err.Error()))
+	}
+
+	if notice != "" {
+		return tui.Muted.Render(tui.CleanLine(notice))
+	}
+
+	return ""
+}
+
+// Toolbar renders status filters and their counts.
+func (m *Model) Toolbar() string {
+	tabs := make([]string, 0, len(filters))
+	for i, label := range filters {
+		label = fmt.Sprintf(" %s %d ", label, len(m.filtered(i)))
+
+		style := tui.Muted
+		if i == m.filter {
+			style = tui.Yellow.Background(tui.SelectedBackground)
+		}
+
+		tabs = append(tabs, style.Render(label))
+	}
+
+	return strings.Join(tabs, " ")
 }
