@@ -53,7 +53,7 @@ func fetch(ctx context.Context) tea.Cmd {
 
 func tick() tea.Cmd { return tea.Tick(time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
 
-// Update applies status and activity results, including stale-result checks.
+// Update handles section input and applies status and activity results.
 func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 	switch msg := message.(type) {
 	case agentdata.Snapshot:
@@ -84,6 +84,16 @@ func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 			m.activityCancel = nil
 			m.updateAgentDetails()
 		}
+	case tea.KeyPressMsg:
+		if key.Matches(msg, Keys.NextFilter, Keys.PreviousFilter, Keys.Attention) {
+			return m.changeFilter(ctx, msg)
+		}
+
+		cmd := m.Panel.Update(msg)
+		selected := m.selectAgent(ctx, m.Panel.List.SelectedID())
+		m.updateAgentDetails()
+
+		return tea.Batch(cmd, selected)
 	}
 
 	return nil
@@ -95,17 +105,7 @@ func (m *Model) SetSize(width, rows int) {
 	m.updateAgentDetails()
 }
 
-// Navigate updates panel focus or selection and loads newly selected activity.
-func (m *Model) Navigate(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
-	cmd := m.Panel.Update(msg)
-	selected := m.selectAgent(ctx, m.Panel.List.SelectedID())
-	m.updateAgentDetails()
-
-	return tea.Batch(cmd, selected)
-}
-
-// Filter changes the active status filter using its keyboard binding.
-func (m *Model) Filter(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) changeFilter(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, Keys.Attention):
 		if m.filter == filterAttention {

@@ -45,9 +45,12 @@ func (m *model) toolbar() string {
 func (m *model) View() tea.View {
 	width := max(12, m.width-2)
 
-	summary, body, message := m.agents.Summary(), m.agents.View(), m.agents.Message(m.notice)
+	var summary, body, message string
+
 	if m.area == WorktreesArea {
 		summary, body, message = m.worktrees.Summary(), m.worktrees.View(), m.worktrees.Message(m.notice)
+	} else {
+		summary, body, message = m.agents.Summary(), m.agents.View(), m.agents.Message(m.notice)
 	}
 
 	toolbar := m.toolbar()

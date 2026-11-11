@@ -125,19 +125,62 @@ func (m *Model) SetSize(width, rows int) {
 	}
 }
 
-// Navigate updates panel focus, selection, and detail wrapping.
-func (m *Model) Navigate(msg tea.KeyPressMsg) tea.Cmd {
-	cmd := m.Panel.Update(msg)
-	m.updateWorktreeDetails()
-
-	return cmd
-}
-
-// Update applies async discovery and form results or forwards input to active forms.
+// Update handles section input and applies discovery, status, and form results.
 func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
+	var cmd tea.Cmd
+
+	selected := m.Panel.List.SelectedID()
+
 	switch msg := message.(type) {
-	case treeLoadedMsg, treeStatusMsg, treeSessionsMsg:
-		return m.updateWorktrees(ctx, msg)
+	case treeLoadedMsg:
+		m.loading = false
+		if msg.err != nil {
+			m.treeError = msg.err.Error()
+			return nil
+		}
+
+		m.trees = msg.items
+		m.changes = map[string]string{}
+		m.treeError = ""
+		selected = msg.path
+		cmd = m.loadTreeStatus(ctx)
+	case treeStatusMsg:
+		if msg.generation != m.treeGeneration {
+			return nil
+		}
+
+		index := slices.IndexFunc(m.trees, func(item worktree.Info) bool { return item.Path == msg.path })
+		if index >= 0 {
+			item := &m.trees[index]
+			item.Status = "clean"
+
+			m.changes[msg.path] = msg.changes
+			if msg.changes != "" {
+				item.Status = "dirty"
+			}
+
+			if msg.err != nil {
+				item.Status, item.StatusError = "unknown", msg.err.Error()
+			}
+		}
+
+		if m.nextStatus < len(m.trees) {
+			cmd = m.treeStatusCommand(ctx, m.nextStatus)
+			m.nextStatus++
+		}
+	case treeSessionsMsg:
+		if msg.generation != m.treeGeneration {
+			return nil
+		}
+
+		m.sessionsReady = true
+		if msg.err != nil {
+			m.treeError = msg.err.Error()
+		} else {
+			for i := range m.trees {
+				m.trees[i].Session = worktree.MatchSession(m.trees[i], msg.sessions)
+			}
+		}
 	case createdMsg:
 		m.finishOperation()
 		return m.created(msg)
@@ -149,6 +192,8 @@ func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 			m.remove.plan, m.remove.err, m.remove.checking = msg.plan, msg.err, false
 			m.updateRemovalDetails()
 		}
+
+		return nil
 	case tea.KeyPressMsg:
 		if m.Busy() {
 			return nil
@@ -161,13 +206,22 @@ func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 		if m.remove != nil {
 			return m.removeKey(ctx, msg)
 		}
+
+		cmd := m.Panel.Update(msg)
+		m.updateWorktreeDetails()
+
+		return cmd
 	default:
 		if m.create != nil && !m.create.picking {
 			return m.create.updateInput(message)
 		}
+
+		return nil
 	}
 
-	return nil
+	m.updateTreeList(selected)
+
+	return cmd
 }
 
 type (
@@ -260,66 +314,4 @@ func (m *Model) Find(path string) (worktree.Info, bool) {
 
 func (m *Model) updateWorktreeDetails() {
 	m.Panel.Details.SetContent(m.worktreeDetails(m.Panel.Details.Width()))
-}
-
-func (m *Model) updateWorktrees(ctx context.Context, message tea.Msg) tea.Cmd {
-	var cmd tea.Cmd
-
-	selected := m.Panel.List.SelectedID()
-
-	switch msg := message.(type) {
-	case treeLoadedMsg:
-		m.loading = false
-		if msg.err != nil {
-			m.treeError = msg.err.Error()
-			return nil
-		}
-
-		m.trees = msg.items
-		m.changes = map[string]string{}
-		m.treeError = ""
-		selected = msg.path
-		cmd = m.loadTreeStatus(ctx)
-	case treeStatusMsg:
-		if msg.generation != m.treeGeneration {
-			return nil
-		}
-
-		index := slices.IndexFunc(m.trees, func(item worktree.Info) bool { return item.Path == msg.path })
-		if index >= 0 {
-			item := &m.trees[index]
-			item.Status = "clean"
-
-			m.changes[msg.path] = msg.changes
-			if msg.changes != "" {
-				item.Status = "dirty"
-			}
-
-			if msg.err != nil {
-				item.Status, item.StatusError = "unknown", msg.err.Error()
-			}
-		}
-
-		if m.nextStatus < len(m.trees) {
-			cmd = m.treeStatusCommand(ctx, m.nextStatus)
-			m.nextStatus++
-		}
-	case treeSessionsMsg:
-		if msg.generation != m.treeGeneration {
-			return nil
-		}
-
-		m.sessionsReady = true
-		if msg.err != nil {
-			m.treeError = msg.err.Error()
-		} else {
-			for i := range m.trees {
-				m.trees[i].Session = worktree.MatchSession(m.trees[i], msg.sessions)
-			}
-		}
-	}
-
-	m.updateTreeList(selected)
-
-	return cmd
 }

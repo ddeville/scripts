@@ -146,51 +146,49 @@ func (m *model) openItem(id string) tea.Cmd {
 }
 
 func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn // Signature required by tea.Model.
+	selected := m.agents.Panel.List.SelectedID()
+
+	var cmd tea.Cmd
+
 	switch msg := message.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.updatePanels()
 	case tea.KeyPressMsg:
-		return m, m.handleKey(msg)
+		cmd = m.handleKey(msg)
 	case openMsg:
 		m.operationCancel()
 
 		m.operationCancel = nil
-		if m.quitting {
-			return m, tea.Quit
-		}
 
-		if msg.err != nil {
+		switch {
+		case m.quitting:
+			cmd = tea.Quit
+		case msg.err != nil:
 			m.notice = tui.SingleLine(msg.err.Error())
-			return m, nil
+		default:
+			m.targetPane, m.targetSession = msg.pane, msg.session
+			cmd = tea.Quit
 		}
-
-		m.targetPane, m.targetSession = msg.pane, msg.session
-
-		return m, tea.Quit
 	case worktrees.OpenSessionMsg:
 		m.targetSession = msg.ID
-		return m, tea.Quit
+		cmd = tea.Quit
 	default:
-		selected := m.agents.Panel.List.SelectedID()
-
-		cmd := tea.Batch(m.agents.Update(m.ctx, msg), m.worktrees.Update(m.ctx, msg))
-		if selected != m.agents.Panel.List.SelectedID() {
-			m.notice = ""
-		}
-
+		cmd = tea.Batch(m.agents.Update(m.ctx, msg), m.worktrees.Update(m.ctx, msg))
 		if _, ok := msg.(agents.Snapshot); ok {
 			m.worktrees.SetAgents(m.agents.Snapshot(), m.agents.OriginID())
 		}
 
 		if m.quitting && !m.busy() {
-			return m, tea.Quit
+			cmd = tea.Quit
 		}
-
-		return m, cmd
 	}
 
-	return m, nil
+	if selected != m.agents.Panel.List.SelectedID() {
+		m.notice = ""
+	}
+
+	return m, cmd
 }
 
 func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
@@ -242,15 +240,6 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		return m.worktrees.BeginRemove(m.ctx)
 	case key.Matches(msg, keys.refresh) && m.area == WorktreesArea:
 		return m.worktrees.Reload(m.worktrees.Panel.List.SelectedID())
-	case key.Matches(msg, agentui.Keys.NextFilter, agentui.Keys.PreviousFilter, agentui.Keys.Attention) && m.area == AgentsArea:
-		before := m.agents.Panel.List.SelectedID()
-
-		cmd := m.agents.Filter(m.ctx, msg)
-		if before != m.agents.Panel.List.SelectedID() {
-			m.notice = ""
-		}
-
-		return cmd
 	case key.Matches(msg, keys.open):
 		return m.openItem(m.activePanel().List.SelectedID())
 	case key.Matches(msg, keys.jump):
@@ -260,17 +249,10 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		}
 	default:
 		if m.area == AgentsArea {
-			before := m.agents.Panel.List.SelectedID()
-
-			cmd := m.agents.Navigate(m.ctx, msg)
-			if before != m.agents.Panel.List.SelectedID() {
-				m.notice = ""
-			}
-
-			return cmd
+			return m.agents.Update(m.ctx, msg)
 		}
 
-		return m.worktrees.Navigate(msg)
+		return m.worktrees.Update(m.ctx, msg)
 	}
 
 	return nil
