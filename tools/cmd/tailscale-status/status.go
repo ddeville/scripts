@@ -1,5 +1,6 @@
-// Package tailscalestatus adapts the native Tailscale client for desktop status consumers.
-package tailscalestatus
+//go:build linux
+
+package main
 
 import (
 	"cmp"

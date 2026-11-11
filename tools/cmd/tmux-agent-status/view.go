@@ -1,4 +1,4 @@
-package agentstatus
+package main
 
 import (
 	"encoding/json"
@@ -106,7 +106,7 @@ func (m model) detailContent(width int) string {
 	style, _, hint := stateStyle(a.State)
 
 	lines := []string{
-		yellow.Bold(true).Render(CleanText(a.Title)),
+		yellow.Bold(true).Render(cleanText(a.Title)),
 		blue.Render(shortPath(a.Cwd)),
 		"",
 		style.Render(hint),
@@ -114,7 +114,7 @@ func (m model) detailContent(width int) string {
 	}
 
 	if a.Error != nil {
-		lines = append(lines, "", magenta.Render(CleanText(*a.Error)))
+		lines = append(lines, "", magenta.Render(cleanText(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -123,7 +123,7 @@ func (m model) detailContent(width int) string {
 	}
 
 	if m.activity.Err != nil {
-		lines = append(lines, "", magenta.Render(CleanText(m.activity.Err.Error())))
+		lines = append(lines, "", magenta.Render(cleanText(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -133,7 +133,7 @@ func (m model) detailContent(width int) string {
 		}
 
 		lines = append(lines, "", entryStyle(e.Label).Bold(true).Render(e.Label),
-			strings.ReplaceAll(CleanText(string(text)), "\t", "    "))
+			strings.ReplaceAll(cleanText(string(text)), "\t", "    "))
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
@@ -336,8 +336,8 @@ func activityEntries(data threadDetails) []entry {
 	return entries
 }
 
-// CleanText removes terminal controls while preserving newlines and tabs.
-func CleanText(s string) string {
+// cleanText removes terminal controls while preserving newlines and tabs.
+func cleanText(s string) string {
 	return strings.Map(func(r rune) rune {
 		if unicode.IsControl(r) && r != '\n' && r != '\t' {
 			return -1
@@ -347,7 +347,7 @@ func CleanText(s string) string {
 	}, s)
 }
 
-func singleLine(s string) string { return strings.Join(strings.Fields(CleanText(s)), " ") }
+func singleLine(s string) string { return strings.Join(strings.Fields(cleanText(s)), " ") }
 
 func shortPath(path string) string {
 	home, _ := os.UserHomeDir()

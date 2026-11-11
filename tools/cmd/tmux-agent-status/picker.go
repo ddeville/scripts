@@ -1,4 +1,4 @@
-package agentstatus
+package main
 
 import (
 	"cmp"
@@ -202,7 +202,7 @@ func (m *model) open(id string) tea.Cmd {
 		ctx, cancel := context.WithTimeout(m.ctx, time.Second)
 		defer cancel()
 
-		panes, err := tmux.PaneMatches(ctx, m.data.IDs)
+		panes, err := paneMatches(ctx, m.data.IDs)
 		if err != nil {
 			return openMsg{err: err}
 		}
@@ -331,8 +331,7 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-// RunPicker opens the agent picker and switches to the selected pane.
-func RunPicker(ctx context.Context, client, pane string) error {
+func runPicker(ctx context.Context, client, pane string) error {
 	uiCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

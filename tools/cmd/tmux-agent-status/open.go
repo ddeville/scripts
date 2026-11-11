@@ -1,4 +1,4 @@
-package agentstatus
+package main
 
 import (
 	"context"
@@ -12,8 +12,7 @@ import (
 
 var errThreadGone = errors.New("thread is no longer running in tmux")
 
-// OpenThread switches the only attached client to a freshly verified agent pane.
-func OpenThread(ctx context.Context, id string) error {
+func openThread(ctx context.Context, id string) error {
 	ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
 	defer cancel()
 

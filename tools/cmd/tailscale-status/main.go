@@ -13,8 +13,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"tailscale.com/client/local"
-
-	"github.com/ddeville/scripts/tools/internal/tailscalestatus"
 )
 
 func main() {
@@ -40,7 +38,7 @@ func command() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return tailscalestatus.Run(cmd.Context(), &local.Client{}, os.Stdout, watch)
+			return run(cmd.Context(), &local.Client{}, os.Stdout, watch)
 		},
 	}
 	cmd.Flags().BoolVar(&watch, "watch", false, "stream status changes until interrupted")

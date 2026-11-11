@@ -1,4 +1,4 @@
-package agentstatus
+package main
 
 import (
 	"context"
@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-// RunStatus writes JSON status or details, optionally refreshing until canceled.
-func RunStatus(ctx context.Context, watch bool, interval time.Duration, output, detailID string) error {
+func runStatus(ctx context.Context, watch bool, interval time.Duration, output, detailID string) error {
 	for {
 		started := time.Now()
 		requestCtx, cancel := context.WithTimeout(ctx, 8*time.Second)

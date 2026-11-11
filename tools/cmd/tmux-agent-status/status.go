@@ -1,5 +1,4 @@
-// Package agentstatus collects agent status and presents it as a picker or JSON.
-package agentstatus
+package main
 
 import (
 	"cmp"
@@ -13,7 +12,6 @@ import (
 	"time"
 
 	"github.com/ddeville/scripts/tools/internal/codex"
-	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
 var states = []string{"approval", "input", "error", "ready", "working", "idle", "unknown"}
@@ -166,7 +164,7 @@ func collect(ctx context.Context) (data snapshot) {
 
 	data.IDs = ids
 
-	panes, err := tmux.PaneMatches(ctx, ids)
+	panes, err := paneMatches(ctx, ids)
 	if err != nil {
 		data.Err = err
 		return data

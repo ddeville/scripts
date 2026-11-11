@@ -1,4 +1,6 @@
-package tailscalestatus
+//go:build linux
+
+package main
 
 import (
 	"context"
@@ -14,8 +16,7 @@ import (
 
 var errWriteStatus = errors.New("write status")
 
-// Run writes a snapshot, or watches the daemon and emits changed snapshots until canceled.
-func Run(ctx context.Context, client *local.Client, output io.Writer, watch bool) error {
+func run(ctx context.Context, client *local.Client, output io.Writer, watch bool) error {
 	var previous string
 
 	write := func(data snapshot) error {

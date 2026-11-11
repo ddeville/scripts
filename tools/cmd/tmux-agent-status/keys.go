@@ -1,4 +1,4 @@
-package agentstatus
+package main
 
 import "charm.land/bubbles/v2/key"
 

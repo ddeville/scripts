@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-
-	"github.com/ddeville/scripts/tools/internal/agentstatus"
 )
 
 var errInvalidInterval = errors.New("interval must be a positive number of seconds")
@@ -25,7 +23,7 @@ func main() {
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-agent-status:", agentstatus.CleanText(err.Error()))
+		fmt.Fprintln(os.Stderr, "tmux-agent-status:", cleanText(err.Error()))
 		os.Exit(1)
 	}
 }
@@ -45,7 +43,7 @@ func command() *cobra.Command {
 		Short: "Open the interactive agent picker",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return agentstatus.RunPicker(cmd.Context(), client, pane)
+			return runPicker(cmd.Context(), client, pane)
 		},
 	}
 	picker.Flags().StringVar(&client, "client", "", "tmux client to switch")
@@ -67,7 +65,7 @@ func command() *cobra.Command {
 				return errInvalidInterval
 			}
 
-			return agentstatus.RunStatus(cmd.Context(), watch, interval, output, detailID)
+			return runStatus(cmd.Context(), watch, interval, output, detailID)
 		},
 	}
 	status.Flags().BoolVar(&watch, "watch", false, "stream status snapshots")
@@ -81,7 +79,7 @@ func command() *cobra.Command {
 		Short: "Open an agent in the only attached tmux client",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return agentstatus.OpenThread(cmd.Context(), args[0])
+			return openThread(cmd.Context(), args[0])
 		},
 	}
 	root.AddCommand(picker, status, open)
