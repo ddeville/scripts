@@ -13,6 +13,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/ddeville/scripts/tools/internal/tmux"
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 type (
@@ -254,7 +255,7 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn /
 	case openMsg:
 		m.opening = false
 		if msg.err != nil {
-			m.notice = singleLine(msg.err.Error())
+			m.notice = tui.SingleLine(msg.err.Error())
 			return m, nil
 		}
 

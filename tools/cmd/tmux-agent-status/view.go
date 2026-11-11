@@ -3,64 +3,47 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
-	"unicode"
 
-	"charm.land/bubbles/v2/help"
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
-)
 
-var (
-	muted              = lipgloss.NewStyle().Foreground(lipgloss.BrightBlack)
-	yellow             = lipgloss.NewStyle().Foreground(lipgloss.Yellow)
-	blue               = lipgloss.NewStyle().Foreground(lipgloss.Blue)
-	cyan               = lipgloss.NewStyle().Foreground(lipgloss.Cyan)
-	magenta            = lipgloss.NewStyle().Foreground(lipgloss.Magenta)
-	selectedBackground = lipgloss.Color("237")
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 func stateStyle(state string) (lipgloss.Style, string, string) {
 	switch state {
 	case "approval":
-		return lipgloss.NewStyle().Foreground(lipgloss.Red), "Approve", "Waiting for approval. Open the agent to approve or reject."
+		return tui.Red, "Approve", "Waiting for approval. Open the agent to approve or reject."
 	case "input":
-		return lipgloss.NewStyle().Foreground(lipgloss.Red), "Reply", "Waiting for your answer. Open the agent to reply."
+		return tui.Red, "Reply", "Waiting for your answer. Open the agent to reply."
 	case "error":
-		return magenta, "Check error", "The agent reported an error. Open it to investigate."
+		return tui.Magenta, "Check error", "The agent reported an error. Open it to investigate."
 	case "ready":
-		return lipgloss.NewStyle().Foreground(lipgloss.Green), "Read result", "A completed result is waiting to be read."
+		return tui.Green, "Read result", "A completed result is waiting to be read."
 	case "working":
-		return lipgloss.NewStyle().Foreground(lipgloss.Cyan), "Working", "Working. Open the agent to follow progress or steer it."
+		return tui.Cyan, "Working", "Working. Open the agent to follow progress or steer it."
 	case "idle":
 		return lipgloss.NewStyle(), "Idle", "Idle. Open the agent to continue the conversation."
 	default:
-		return muted, "Check status", "Status is unknown. Open the agent to check."
+		return tui.Muted, "Check status", "Status is unknown. Open the agent to check."
 	}
-}
-
-func fit(s string, width int) string { return ansi.Truncate(s, max(0, width), "…") }
-
-func pad(s string, width int) string {
-	s = fit(s, width)
-	return s + strings.Repeat(" ", max(0, width-ansi.StringWidth(s)))
 }
 
 func (m model) summary() string {
 	if m.data.Err != nil {
 		if m.data.At.IsZero() {
-			return magenta.Render("Agent status unavailable")
+			return tui.Magenta.Render("Agent status unavailable")
 		}
 
-		return magenta.Render("Status unavailable · showing last known data")
+		return tui.Magenta.Render("Status unavailable · showing last known data")
 	}
 
 	if m.data.At.IsZero() {
-		return muted.Render("Loading agents…")
+		return tui.Muted.Render("Loading agents…")
 	}
 
 	var parts []string
@@ -73,10 +56,10 @@ func (m model) summary() string {
 	}
 
 	if len(parts) == 0 {
-		return muted.Render("Nothing needs your attention")
+		return tui.Muted.Render("Nothing needs your attention")
 	}
 
-	return "Needs you:  " + strings.Join(parts, muted.Render("  ·  "))
+	return "Needs you:  " + strings.Join(parts, tui.Muted.Render("  ·  "))
 }
 
 func (m model) listView() string {
@@ -90,7 +73,7 @@ func (m model) listView() string {
 			message = "Could not read agent status"
 		}
 
-		return muted.Render(fit(message, m.agents.view.Width()))
+		return tui.Muted.Render(tui.Fit(message, m.agents.view.Width()))
 	}
 
 	return m.agents.view.View()
@@ -99,22 +82,22 @@ func (m model) listView() string {
 func (m model) detailContent(width int) string {
 	index := slices.IndexFunc(m.data.Agents, func(a agent) bool { return a.ID == m.selected })
 	if index < 0 {
-		return muted.Render("No conversation selected")
+		return tui.Muted.Render("No conversation selected")
 	}
 
 	a := m.data.Agents[index]
 	style, _, hint := stateStyle(a.State)
 
 	lines := []string{
-		yellow.Bold(true).Render(cleanText(a.Title)),
-		blue.Render(shortPath(a.Cwd)),
+		tui.Yellow.Bold(true).Render(tui.CleanText(a.Title)),
+		tui.Blue.Render(tui.ShortPath(a.Cwd)),
 		"",
 		style.Render(hint),
-		yellow.Render("Enter") + muted.Render(" to open"),
+		tui.Yellow.Render("Enter") + tui.Muted.Render(" to open"),
 	}
 
 	if a.Error != nil {
-		lines = append(lines, "", magenta.Render(cleanText(*a.Error)))
+		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -123,7 +106,7 @@ func (m model) detailContent(width int) string {
 	}
 
 	if m.activity.Err != nil {
-		lines = append(lines, "", magenta.Render(cleanText(m.activity.Err.Error())))
+		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -133,7 +116,7 @@ func (m model) detailContent(width int) string {
 		}
 
 		lines = append(lines, "", entryStyle(e.Label).Bold(true).Render(e.Label),
-			strings.ReplaceAll(cleanText(string(text)), "\t", "    "))
+			strings.ReplaceAll(tui.CleanText(string(text)), "\t", "    "))
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
@@ -142,15 +125,15 @@ func (m model) detailContent(width int) string {
 func entryStyle(label string) lipgloss.Style {
 	switch label {
 	case "Prompt":
-		return blue
+		return tui.Blue
 	case "Agent":
-		return cyan
+		return tui.Cyan
 	case "Command", "Tool":
-		return yellow
+		return tui.Yellow
 	case "Error":
-		return magenta
+		return tui.Magenta
 	default:
-		return muted
+		return tui.Muted
 	}
 }
 
@@ -170,16 +153,16 @@ func (m model) panelDimensions() (left, right, rows int) {
 }
 
 func panel(title, content string, width, rows int, focused bool) string {
-	style := muted
+	style := tui.Muted
 	if focused {
-		style = yellow
+		style = tui.Yellow
 	}
 
 	return lipgloss.NewStyle().
 		Width(width).Height(rows+4).
 		Padding(0, 1).
 		Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.BrightBlack).
-		Render(style.Render(fit(title, width-4)) + "\n\n" + content)
+		Render(style.Render(tui.Fit(title, width-4)) + "\n\n" + content)
 }
 
 func (m model) panelsView() string {
@@ -204,14 +187,14 @@ func (m model) panelsView() string {
 
 func (m model) View() tea.View {
 	width := max(12, m.width-2)
-	title := yellow.Render("Agents")
+	title := tui.Yellow.Render("Agents")
 
 	stamp := "  tmux"
 	if !m.data.At.IsZero() {
 		stamp += " · updated " + m.data.At.Format("3:04:05 PM")
 	}
 
-	heading := title + muted.Render(stamp)
+	heading := title + tui.Muted.Render(stamp)
 
 	summary := m.summary()
 
@@ -220,18 +203,15 @@ func (m model) View() tea.View {
 	for i, label := range filters {
 		label = fmt.Sprintf(" %s %d ", label, len(m.filtered(i)))
 
-		tab := muted.Render(label)
+		tab := tui.Muted.Render(label)
 		if i == m.filter {
-			tab = yellow.Background(selectedBackground).Render(label)
+			tab = tui.Yellow.Background(tui.SelectedBackground).Render(label)
 		}
 
 		tabs = append(tabs, tab)
 	}
 
-	helpView := help.New()
-	helpView.SetWidth(width)
-	helpView.ShortSeparator = " · "
-	helpView.Styles = help.Styles{ShortKey: muted, ShortDesc: muted, ShortSeparator: muted, Ellipsis: muted}
+	helpView := tui.NewHelp(width)
 	footer := helpView.ShortHelpView([]key.Binding{keys.jump, keys.up, keys.down, keys.open, keys.quit})
 
 	help := helpView.ShortHelpView([]key.Binding{keys.nextFilter, keys.attention, keys.list, keys.details, keys.expand})
@@ -244,19 +224,19 @@ func (m model) View() tea.View {
 	}
 
 	if m.data.Err != nil {
-		help = "Status unavailable: " + singleLine(m.data.Err.Error())
+		help = "Status unavailable: " + tui.SingleLine(m.data.Err.Error())
 	}
 
 	content := strings.Join([]string{
-		pad(heading, width),
-		pad(summary, width),
+		tui.Pad(heading, width),
+		tui.Pad(summary, width),
 		"",
-		pad(strings.Join(tabs, " "), width),
+		tui.Pad(strings.Join(tabs, " "), width),
 		m.panelsView(),
-		pad(footer, width),
-		pad(muted.Render(help), width),
+		tui.Pad(footer, width),
+		tui.Pad(tui.Muted.Render(help), width),
 	}, "\n")
-	view := tea.NewView(lipgloss.NewStyle().Padding(1, 1, 0, 1).Render(content))
+	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 
 	return view
@@ -334,30 +314,4 @@ func activityEntries(data threadDetails) []entry {
 	}
 
 	return entries
-}
-
-// cleanText removes terminal controls while preserving newlines and tabs.
-func cleanText(s string) string {
-	return strings.Map(func(r rune) rune {
-		if unicode.IsControl(r) && r != '\n' && r != '\t' {
-			return -1
-		}
-
-		return r
-	}, s)
-}
-
-func singleLine(s string) string { return strings.Join(strings.Fields(cleanText(s)), " ") }
-
-func shortPath(path string) string {
-	home, _ := os.UserHomeDir()
-	if path == home {
-		return "~"
-	}
-
-	if strings.HasPrefix(path, home+"/") {
-		path = "~" + strings.TrimPrefix(path, home)
-	}
-
-	return singleLine(path)
 }

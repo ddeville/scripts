@@ -11,6 +11,8 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
+
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 type agentList struct {
@@ -139,11 +141,11 @@ func (l *agentList) render() {
 
 func locationHeading(path string, count, width int) string {
 	countText := fmt.Sprintf("  %d  ", count)
-	location := fit(cmp.Or(shortPath(path), "Unknown location"), max(0, width-len(countText)-5))
-	heading := " " + blue.Bold(true).Render(location) + muted.Render(countText)
+	location := tui.Fit(cmp.Or(tui.ShortPath(path), "Unknown location"), max(0, width-len(countText)-5))
+	heading := " " + tui.Blue.Bold(true).Render(location) + tui.Muted.Render(countText)
 	rule := strings.Repeat("─", max(0, width-ansi.StringWidth(heading)-1))
 
-	return fit(heading+muted.Render(rule), width)
+	return tui.Fit(heading+tui.Muted.Render(rule), width)
 }
 
 type agentItem struct {
@@ -156,12 +158,12 @@ func (a agentItem) render(width, numberWidth, statusWidth int, selected bool) st
 	width = max(0, width-1)
 	style, label, _ := stateStyle(a.State)
 
-	base, keyStyle, subtitleStyle := lipgloss.NewStyle(), muted, muted
+	base, keyStyle, subtitleStyle := lipgloss.NewStyle(), tui.Muted, tui.Muted
 	if selected {
-		base = base.Background(selectedBackground)
-		keyStyle = yellow.Background(selectedBackground)
-		subtitleStyle = subtitleStyle.Background(selectedBackground)
-		style = style.Background(selectedBackground)
+		base = tui.Selected
+		keyStyle = tui.Yellow.Background(tui.SelectedBackground)
+		subtitleStyle = subtitleStyle.Background(tui.SelectedBackground)
+		style = style.Background(tui.SelectedBackground)
 	}
 
 	dot := "●"
@@ -183,7 +185,7 @@ func (a agentItem) render(width, numberWidth, statusWidth int, selected bool) st
 		status = base.Render("  ") + style.Render(strings.Repeat(" ", statusWidth-ansi.StringWidth(label))+label)
 	}
 
-	title := singleLine(a.Title)
+	title := tui.SingleLine(a.Title)
 	if a.ParentID != nil {
 		title = "↳ " + title
 	}
@@ -194,9 +196,9 @@ func (a agentItem) render(width, numberWidth, statusWidth int, selected bool) st
 	}
 
 	prefix := marker + base.Render(" ") + keyStyle.Render(fmt.Sprintf("%*d ", numberWidth, a.position)) + style.Render(dot+" ")
-	name := style.Bold(selected).Render(pad(title, titleWidth))
-	subtitle := marker + base.Render(strings.Repeat(" ", prefixWidth-1)) + subtitleStyle.Render(pad(singleLine(a.Preview), width-prefixWidth))
+	name := style.Bold(selected).Render(tui.Pad(title, titleWidth))
+	subtitle := marker + base.Render(strings.Repeat(" ", prefixWidth-1)) + subtitleStyle.Render(tui.Pad(tui.SingleLine(a.Preview), width-prefixWidth))
 	padding := base.Render(" ")
 
-	return fmt.Sprint(fit(prefix+name+status, width), padding, "\n", fit(subtitle, width), padding)
+	return fmt.Sprint(tui.Fit(prefix+name+status, width), padding, "\n", tui.Fit(subtitle, width), padding)
 }

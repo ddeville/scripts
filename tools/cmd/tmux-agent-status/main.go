@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 var errInvalidInterval = errors.New("interval must be a positive number of seconds")
@@ -23,7 +25,7 @@ func main() {
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-agent-status:", cleanText(err.Error()))
+		fmt.Fprintln(os.Stderr, "tmux-agent-status:", tui.CleanText(err.Error()))
 		os.Exit(1)
 	}
 }
