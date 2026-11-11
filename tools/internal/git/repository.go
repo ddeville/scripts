@@ -47,6 +47,14 @@ func Status(ctx context.Context, path string) (string, error) {
 	return "clean", nil
 }
 
+// StatusShort returns Git's short status, including non-ignored untracked files.
+func StatusShort(ctx context.Context, path string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	return run(ctx, path, "status", "--short", "--untracked-files=normal")
+}
+
 // ResolveCommit verifies a revision and returns its commit ID.
 func ResolveCommit(ctx context.Context, path, ref string) (string, error) {
 	return run(ctx, path, "rev-parse", "--verify", "--end-of-options", ref+"^{commit}")
