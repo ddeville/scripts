@@ -38,6 +38,10 @@ formatters:
   enable:
     - gofumpt
     - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/ddeville/scripts/tools
 
 issues:
   max-issues-per-linter: 0
