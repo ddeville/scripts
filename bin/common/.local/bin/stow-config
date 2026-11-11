@@ -45,6 +45,10 @@ stow --restow --no-folding "${dirs[@]}" --dir "$HOME/scripts/bin" --target "$HOM
 
 uv run --quiet --script "$HOME/.codex/bin/update-config.py"
 
+echo "Building and installing tools..."
+
 cd "$HOME/scripts/tools"
 export GOBIN="$HOME/.local/bin"
 exec go install ./cmd/...
+
+echo "Done!"
