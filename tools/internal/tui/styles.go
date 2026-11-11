@@ -27,12 +27,12 @@ var (
 	Frame              = lipgloss.NewStyle().Padding(1, 1, 0, 1)
 )
 
-// NewHelp uses yellow keys, normal descriptions, and muted separators.
+// NewHelp uses muted shortcut hints and shared separators.
 func NewHelp(width int) help.Model {
 	model := help.New()
 	model.SetWidth(width)
 	model.ShortSeparator = " · "
-	model.Styles = help.Styles{ShortKey: Yellow, ShortDesc: lipgloss.NewStyle(), ShortSeparator: Muted, Ellipsis: Muted}
+	model.Styles = help.Styles{ShortKey: Muted, ShortDesc: Muted, ShortSeparator: Muted, Ellipsis: Muted}
 
 	return model
 }

@@ -48,7 +48,7 @@ func detailHeader(title, path, status, action string) []string {
 		tui.Title.Render(tui.CleanLine(title)),
 		tui.Muted.Render(tui.ShortPath(path)), "",
 		status,
-		tui.Yellow.Render("Enter") + " " + action,
+		tui.Muted.Render("Enter " + action),
 	}
 }
 
@@ -118,6 +118,9 @@ func (m *model) areaHeading() string {
 func (m *model) toolbar() string {
 	if m.area == worktreesArea {
 		help := tui.NewHelp(max(12, m.width-2))
+		help.Styles.ShortKey = tui.Yellow
+		help.Styles.ShortDesc = lipgloss.NewStyle()
+
 		return help.ShortHelpView([]key.Binding{keys.create, keys.remove})
 	}
 
@@ -212,7 +215,7 @@ func (m *model) View() tea.View {
 		footer = "Working…"
 	}
 
-	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(footer, width), tui.Pad(help, width)}, "\n")
+	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(tui.Muted.Render(tui.CleanLine(footer)), width), tui.Pad(help, width)}, "\n")
 	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 
