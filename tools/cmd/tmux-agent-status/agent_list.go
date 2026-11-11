@@ -84,7 +84,7 @@ func (l *agentList) render() {
 
 		section := i == 0 || item.Cwd != l.items[i-1].Cwd
 		if section {
-			lines = append(lines, locationHeading(item.Cwd, counts[item.Cwd], l.view.Width()), "")
+			lines = append(lines, tui.SectionHeading(cmp.Or(tui.ShortPath(item.Cwd), "Unknown location"), counts[item.Cwd], l.view.Width()), "")
 		}
 
 		if l.view.Height() < 4 {
@@ -133,19 +133,10 @@ func (l *agentList) render() {
 
 	if headingRows > 0 {
 		path := l.items[first].Cwd
-		visible = append(visible, locationHeading(path, counts[path], l.view.Width()), "")
+		visible = append(visible, tui.SectionHeading(cmp.Or(tui.ShortPath(path), "Unknown location"), counts[path], l.view.Width()), "")
 	}
 
 	l.view.SetContentLines(append(visible, lines[l.offset:end]...))
-}
-
-func locationHeading(path string, count, width int) string {
-	countText := fmt.Sprintf("  %d  ", count)
-	location := tui.Fit(cmp.Or(tui.ShortPath(path), "Unknown location"), max(0, width-len(countText)-5))
-	heading := " " + tui.Blue.Bold(true).Render(location) + tui.Muted.Render(countText)
-	rule := strings.Repeat("─", max(0, width-ansi.StringWidth(heading)-1))
-
-	return tui.Fit(heading+tui.Muted.Render(rule), width)
 }
 
 type agentItem struct {

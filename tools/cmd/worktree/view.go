@@ -27,6 +27,11 @@ func (m *model) columns() (left, right int) {
 func (m *model) renderList() {
 	var lines []string
 
+	counts := map[string]int{}
+	for _, item := range m.items {
+		counts[item.Repo]++
+	}
+
 	start, end := 0, 0
 
 	width := m.view.Width()
@@ -34,12 +39,7 @@ func (m *model) renderList() {
 		rowStart := len(lines)
 
 		if position == 0 || item.Repo != m.items[position-1].Repo {
-			if position > 0 {
-				lines = append(lines, "")
-			}
-
-			rowStart = len(lines)
-			lines = append(lines, tui.Blue.Bold(true).Render(tui.Fit(tui.CleanLine(item.Repo), width)))
+			lines = append(lines, "", tui.SectionHeading(item.Repo, counts[item.Repo], width))
 		}
 
 		if position == m.index {

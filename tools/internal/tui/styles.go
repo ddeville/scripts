@@ -1,8 +1,12 @@
 package tui
 
 import (
+	"fmt"
+	"strings"
+
 	"charm.land/bubbles/v2/help"
 	"charm.land/lipgloss/v2"
+	"github.com/charmbracelet/x/ansi"
 )
 
 // Shared styles use the terminal's palette. Lip Gloss style methods return modified copies.
@@ -28,4 +32,15 @@ func NewHelp(width int) help.Model {
 	model.Styles = help.Styles{ShortKey: Muted, ShortDesc: Muted, ShortSeparator: Muted, Ellipsis: Muted}
 
 	return model
+}
+
+// SectionHeading renders a label and item count followed by a horizontal rule.
+func SectionHeading(label string, count, width int) string {
+	countText := fmt.Sprintf("  %d  ", count)
+	label = Fit(CleanLine(label), max(0, width-len(countText)-5))
+
+	heading := " " + Blue.Bold(true).Render(label) + Muted.Render(countText)
+	rule := strings.Repeat("─", max(0, width-ansi.StringWidth(heading)-1))
+
+	return Fit(heading+Muted.Render(rule), width)
 }
