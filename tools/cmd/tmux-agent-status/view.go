@@ -20,7 +20,7 @@ func (m *model) panelDimensions(which area) (left, right, rows int) {
 		view = &m.worktreeView
 	}
 
-	rows = max(1, m.height-11)
+	rows = max(1, m.height-12)
 
 	if width >= 96 && !view.expanded {
 		left = (width - 1) * 3 / 5
@@ -218,7 +218,7 @@ func (m *model) View() tea.View {
 		}
 	}
 
-	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(tui.Muted.Render(tui.CleanLine(footer)), width), tui.Pad(help, width)}, "\n")
+	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), "", tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(tui.Muted.Render(tui.CleanLine(footer)), width), tui.Pad(help, width)}, "\n")
 	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 
