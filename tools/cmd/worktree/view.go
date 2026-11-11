@@ -37,9 +37,10 @@ func (m *model) renderList() {
 	width := m.view.Width()
 	for position, item := range m.items {
 		rowStart := len(lines)
+		lines = append(lines, "")
 
 		if position == 0 || item.Repo != m.items[position-1].Repo {
-			lines = append(lines, "", tui.SectionHeading(item.Repo, counts[item.Repo], width))
+			lines = append(lines, tui.SectionHeading(item.Repo, counts[item.Repo], width), "")
 		}
 
 		if position == m.index {
