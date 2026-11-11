@@ -61,23 +61,24 @@ func command() *cobra.Command {
 	}
 	cmd.SetOut(os.Stdout)
 	cmd.PersistentFlags().StringVar(&options.root, "root", options.root, "directory containing repo/worktree folders")
-	cmd.AddCommand(createCommand(options), listCommand(options), openCommand(options), removeCommand(options), pickerCommand(options))
+	cmd.AddCommand(createCommand(options), listCommand(options), openCommand(options), removeCommand(options), tuiCommand(options))
 
 	return cmd
 }
 
-func pickerCommand(options *settings) *cobra.Command {
+func tuiCommand(options *settings) *cobra.Command {
 	var client string
 
 	cmd := &cobra.Command{
-		Use:   "picker",
-		Short: "Pick a worktree in the tmux popup",
+		Use:   "tui",
+		Short: "Create, open, and remove worktrees interactively",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return runPicker(cmd.Context(), options.root, client)
+			return runTUI(cmd.Context(), options.root, options.directory, client)
 		},
 	}
 	cmd.Flags().StringVar(&client, "client", "", "tmux client to switch")
+	cmd.Flags().StringVarP(&options.directory, "directory", "C", options.directory, "initial source repository or worktree")
 
 	return cmd
 }

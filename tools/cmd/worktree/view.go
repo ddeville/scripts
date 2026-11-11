@@ -1,52 +1,71 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
+	"github.com/ddeville/scripts/tools/internal/git"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
+
+func (m *model) columns() (left, right int) {
+	width := max(1, m.width-2)
+	if width < 86 {
+		return width, 0
+	}
+
+	left = (width - 3) / 2
+
+	return left, width - left - 3
+}
 
 func (m *model) renderList() {
 	var lines []string
 
 	start, end := 0, 0
-	columns := m.columns()
 
-	for position, index := range m.visible {
-		item := m.items[index]
+	width := m.view.Width()
+	for position, item := range m.items {
 		rowStart := len(lines)
 
-		if position == 0 || item.Repo != m.items[m.visible[position-1]].Repo {
+		if position == 0 || item.Repo != m.items[position-1].Repo {
 			if position > 0 {
 				lines = append(lines, "")
 			}
 
-			heading := columns
-			heading.name += columns.number + 4
-			lines = append(lines, heading.line(tui.Blue.Bold(true).Render(tui.CleanLine(item.Repo)),
-				tui.Muted.Render("branch"), tui.Muted.Render("git"), tui.Muted.Render("tmux session")))
+			rowStart = len(lines)
+			lines = append(lines, tui.Blue.Bold(true).Render(tui.Fit(tui.CleanLine(item.Repo), width)))
 		}
 
 		if position == m.index {
-			start, end = rowStart, len(lines)+1
+			start, end = rowStart, len(lines)+min(2, m.view.Height())
 		}
 
-		lines = append(lines, m.row(item, position, position == m.index, columns))
+		state, style := statusStyle(item.Status)
+		base := lipgloss.NewStyle()
+		marker := " "
+		branchStyle := tui.Muted
+
+		if position == m.index {
+			marker, base = "▎", tui.Selected
+			style = style.Background(tui.SelectedBackground)
+			branchStyle = branchStyle.Background(tui.SelectedBackground)
+		}
+
+		prefix := fmt.Sprintf("%s %d ", marker, position)
+		nameWidth := max(0, width-ansi.StringWidth(prefix)-ansi.StringWidth(state)-2)
+		first := base.Render(prefix+tui.Pad(tui.CleanLine(item.Name), nameWidth)+"  ") + style.Render(state)
+		second := branchStyle.Render(tui.Pad("    "+tui.CleanLine(item.Branch), width))
+		lines = append(lines, tui.Fit(first, width), second)
 	}
 
 	if len(lines) == 0 {
-		message := "No worktrees match this filter"
-		if len(m.items) == 0 {
-			message = "No managed worktrees in " + tui.CleanLine(m.root)
-		}
-
-		lines = append(lines, tui.Muted.Render(tui.Fit(message, m.view.Width())))
+		lines = []string{"", "No managed worktrees yet.", "", "Press n to create your first worktree.", "", tui.ShortPath(m.root)}
 	}
 
 	offset := m.view.YOffset()
@@ -54,114 +73,237 @@ func (m *model) renderList() {
 	m.view.SetYOffset(max(end-m.view.Height(), min(offset, start)))
 }
 
-type columns struct{ number, name, branch, status, session int }
-
-func (m *model) columns() columns {
-	c := columns{number: max(2, len(strconv.Itoa(max(0, len(m.visible)-1)))), name: 8, branch: 6, status: 5}
-	for _, item := range m.items {
-		c.name = max(c.name, ansi.StringWidth(tui.CleanLine(item.Name)))
-		c.branch = max(c.branch, ansi.StringWidth(tui.CleanLine(item.Branch)))
-	}
-
-	available := max(0, m.view.Width()-c.number-4)
-	if m.view.Width() < 60 {
-		c.branch = 0
-		c.name = min(c.name, max(1, (available-c.status-4)/2))
-		c.session = max(0, available-c.name-c.status-4)
-	} else {
-		c.name = min(c.name, (available-c.status-6)/3)
-		c.branch = min(c.branch, (available-c.status-6)/3)
-		c.session = max(0, available-c.name-c.branch-c.status-6)
-	}
-
-	return c
-}
-
-func (c columns) line(name, branch, status, session string) string {
-	parts := []string{tui.Pad(name, c.name)}
-	if c.branch > 0 {
-		parts = append(parts, tui.Pad(branch, c.branch))
-	}
-
-	parts = append(parts, tui.Pad(status, c.status), tui.Pad(session, c.session))
-
-	return strings.Join(parts, "  ")
-}
-
-func (m *model) row(item worktree, position int, selected bool, columns columns) string {
-	state, stateStyle := item.Status, tui.Muted
-
-	switch item.Status {
+func statusStyle(status string) (string, lipgloss.Style) {
+	switch status {
 	case "clean":
-		stateStyle = tui.Green
+		return "clean", tui.Green
 	case "dirty":
-		stateStyle = tui.Yellow
+		return "dirty", tui.Yellow
 	case "unknown":
-		state = "error"
-		stateStyle = tui.Red
+		return "error", tui.Red
 	default:
-		state = "…"
+		return "…", tui.Muted
+	}
+}
+
+func (m *model) details(width, height int) string {
+	item, ok := m.selected()
+	if !ok {
+		return tui.Muted.Render(ansi.Wrap("Create a worktree with n.", width, ""))
 	}
 
-	sessionText := "new session"
+	state, style := statusStyle(item.Status)
+	lines := []string{
+		lipgloss.NewStyle().Bold(true).Render(tui.Fit(tui.CleanLine(item.Name), width)),
+		style.Render(state) + tui.Muted.Render(" working tree"),
+		tui.Muted.Render("Branch  ") + tui.Fit(tui.CleanLine(item.Branch), max(1, width-8)), "",
+		tui.Muted.Render("TMUX SESSION"),
+	}
+
+	session := "Enter creates repo / editor / Codex"
 	if !m.sessionsReady {
-		sessionText = "…"
+		session = "Checking sessions…"
 	} else if item.Session.ID != "" {
-		sessionText = tui.CleanLine(item.Session.Name)
+		session = tui.CleanLine(item.Session.Name)
 	}
 
-	name := tui.CleanLine(item.Name)
-	branch := tui.CleanLine(item.Branch)
+	lines = append(lines, tui.Fit(session, width), "", tui.Muted.Render("CHANGES"))
 
-	if selected {
-		line := fmt.Sprintf("▎ %*d  ", columns.number, position) + columns.line(name, branch, state, sessionText)
-		return tui.Selected.Render(tui.Pad(line, m.view.Width()))
+	changes := m.changes[item.Path]
+	switch {
+	case item.StatusError != "":
+		lines = append(lines, tui.Red.Render(ansi.Wrap(tui.CleanLine(item.StatusError), width, "")))
+	case changes == "":
+		text := "No local changes"
+		if item.Status != "clean" {
+			text = "Reading Git status…"
+		}
+
+		lines = append(lines, tui.Muted.Render(text))
+	default:
+		for line := range strings.SplitSeq(changes, "\n") {
+			lines = append(lines, tui.Fit(tui.CleanLine(line), width))
+		}
 	}
 
-	return tui.Muted.Render(fmt.Sprintf("  %*d  ", columns.number, position)) +
-		columns.line(name, tui.Muted.Render(branch), stateStyle.Render(state), tui.Muted.Render(sessionText))
+	return clippedLines(strings.Join(lines, "\n"), height, width)
+}
+
+func clippedLines(text string, height, width int) string {
+	lines := strings.Split(text, "\n")
+	if len(lines) > height {
+		lines = lines[:height]
+		if height > 1 {
+			lines[height-1] = tui.Muted.Render("…")
+		}
+	}
+
+	for i := range lines {
+		lines[i] = tui.Fit(lines[i], width)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func (m *model) browseView(width int) string {
+	_, right := m.columns()
+
+	body := m.view.View()
+	if right > 0 {
+		separator := tui.Muted.Render(strings.TrimSuffix(strings.Repeat(" │ \n", m.view.Height()), "\n"))
+		body = lipgloss.JoinHorizontal(lipgloss.Top, body, separator, m.details(right, m.view.Height()))
+	}
+
+	return clippedLines(body, m.view.Height(), width)
 }
 
 func (m *model) View() tea.View {
 	width := max(1, m.width-2)
-	heading := lipgloss.NewStyle().Bold(true).Render("Worktrees") + tui.Muted.Render(fmt.Sprintf("  %d / %d", len(m.visible), len(m.items)))
-	columns := m.columns()
-	selectedPath := ""
+	header := lipgloss.NewStyle().Bold(true).Render("Worktrees")
+	header += tui.Muted.Render(fmt.Sprintf("  %d", len(m.items)))
+	toolbar := tui.Yellow.Render("Enter") + " open   " + tui.Yellow.Render("n") + " new   " + tui.Yellow.Render("d") + " remove   " + tui.Yellow.Render("r") + " refresh"
+	body := m.browseView(width)
 
-	if len(m.visible) > 0 {
-		item := m.items[m.visible[m.index]]
-		selectedPath = tui.ShortPath(item.Path)
-
-		if columns.branch == 0 {
-			selectedPath = tui.CleanLine(item.Branch) + " · " + selectedPath
-		}
-
-		if item.StatusError != "" {
-			selectedPath += " · " + tui.CleanLine(item.StatusError)
-		}
-	}
-
-	footer := "0–9 jump · j/k/↑/↓ move · / filter · Enter open · q close"
-	if m.filter.Focused() {
-		footer = "↑/↓ move · Ctrl-U clear · Enter open · Esc navigation"
-	}
+	footer := "j/k ↑/↓ move · 0–9 open · q close"
 
 	notice := m.notice
-	if m.opening {
-		notice = "Opening worktree…"
+	if notice == "" {
+		if item, ok := m.selected(); ok {
+			notice = tui.ShortPath(item.Path)
+		}
 	}
 
-	detail := tui.Muted.Render(tui.Fit(selectedPath, width))
-	if notice != "" {
-		detail = tui.Red.Render(tui.Fit(tui.CleanLine(notice), width))
+	if m.create != nil {
+		header, toolbar = lipgloss.NewStyle().Bold(true).Render("New worktree"), "Create from a committed base; local changes stay in the source."
+		body = m.createView(width)
+		footer, notice = "Enter create · Esc cancel · Tab ↑/↓ fields · Space toggle", m.create.message
+	} else if m.remove != nil {
+		header, toolbar = tui.Red.Bold(true).Render("Remove worktree"), "Review the checkout, branch, and tmux sessions below."
+		body = m.removeView(width)
+
+		footer, notice = "y remove · Esc cancel · k keep branch · ↑/↓ scroll", ""
+		if m.remove.keepBranch {
+			footer = "y remove · Esc cancel · k delete branch · ↑/↓ scroll"
+		}
+
+		if m.remove.err != nil || m.remove.checking {
+			footer = "k keep/delete branch · ↑/↓ scroll · Esc cancel"
+		}
+
+		if m.remove.checking {
+			notice = "Checking Git and tmux…"
+		}
+	}
+
+	if m.busy {
+		footer = "Working…"
 	}
 
 	content := strings.Join([]string{
-		tui.Fit(heading+"   "+m.filter.View(), width), "", m.view.View(),
-		"", detail, tui.Muted.Render(tui.Fit(footer, width)),
+		tui.Fit(header, width), tui.Fit(toolbar, width), tui.Muted.Render(strings.Repeat("─", width)),
+		lipgloss.NewStyle().Height(m.view.Height()).Render(clippedLines(body, m.view.Height(), width)),
+		tui.Fit(tui.Yellow.Render(tui.CleanLine(notice)), width), tui.Fit(tui.Muted.Render(footer), width),
 	}, "\n")
 	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 
 	return view
+}
+
+func (m *model) createView(width int) string {
+	form := m.create
+
+	var lines []string
+
+	focusLine := 0
+
+	for i, label := range []string{"Name", "Source", "Base", "Fork thread"} {
+		style := tui.Muted
+		if i == form.focus {
+			style = tui.Yellow.Bold(true)
+			focusLine = len(lines)
+		}
+
+		lines = append(lines, style.Render(tui.Pad(label, 13))+form.inputs[i].View())
+		if m.view.Height() >= 12 {
+			lines = append(lines, "")
+		}
+	}
+
+	checked := "[x]"
+	if form.noTmux {
+		checked = "[ ]"
+	}
+
+	style := lipgloss.NewStyle()
+	if form.focus == len(form.inputs) {
+		style = tui.Yellow.Bold(true)
+		focusLine = len(lines)
+	}
+
+	lines = append(lines, style.Render(checked+" Launch tmux, editor, and Codex"), "")
+	if form.inputs[0].Value() != "" {
+		lines = append(lines, tui.Muted.Render("Branch  ")+tui.CleanLine("damien/cw/"+form.inputs[0].Value()))
+	}
+
+	lines = append(lines, tui.Muted.Render("Root    ")+tui.ShortPath(m.root))
+	if !form.noTmux {
+		lines = append(lines, tui.Muted.Render("Leave Fork thread empty to choose a conversation in Codex."))
+	}
+
+	start := max(0, focusLine-max(1, m.view.Height()-1)+1)
+
+	return clippedLines(strings.Join(lines[start:], "\n"), m.view.Height(), width)
+}
+
+func (m *model) removeView(width int) string {
+	form := m.remove
+	lines := []string{
+		lipgloss.NewStyle().Bold(true).Render(tui.CleanLine(form.item.Repo + " / " + form.item.Name)),
+		ansi.Wrap(tui.ShortPath(form.item.Path), width, ""), "",
+	}
+
+	branch := "Delete branch: " + form.item.Branch
+	if form.keepBranch {
+		branch = "Keep branch: " + form.item.Branch
+	}
+
+	if strings.HasPrefix(form.item.Branch, "detached ") {
+		branch = "Detached HEAD; no branch to delete."
+	}
+
+	lines = append(lines, tui.CleanLine(branch), "")
+
+	if !form.checking && form.err == nil {
+		if len(form.plan.Sessions) == 0 {
+			lines = append(lines, tui.Muted.Render("No tmux sessions to close."))
+		}
+
+		for _, session := range form.plan.Sessions {
+			lines = append(lines, "Close tmux session: "+tui.CleanLine(session.Name))
+		}
+
+		lines = append(lines, "", tui.Red.Render("Press y to remove this worktree."))
+	}
+
+	if form.err != nil && !form.checking {
+		message := form.err.Error()
+		switch {
+		case errors.Is(form.err, git.ErrNotMerged):
+			message = "This branch has unmerged commits. Press k to keep the branch when removing the worktree."
+		case errors.Is(form.err, errDirty):
+			message = "This worktree has local changes. Commit or move them before removing it."
+		}
+
+		lines = append(lines, tui.Red.Render(ansi.Wrap(tui.CleanLine(message), width, "")))
+	}
+
+	if m.busy {
+		lines = append(lines, "", "Removing worktree…")
+	}
+
+	content := strings.Split(strings.Join(lines, "\n"), "\n")
+	form.offset = min(form.offset, max(0, len(content)-m.view.Height()))
+
+	return clippedLines(strings.Join(content[form.offset:], "\n"), m.view.Height(), width)
 }

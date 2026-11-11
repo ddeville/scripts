@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -41,33 +42,16 @@ func createCommand(options *settings) *cobra.Command {
 				return fmt.Errorf("%w: --fork needs a thread ID", os.ErrInvalid)
 			}
 
-			if !noTmux {
-				if err := checkSessionTools(); err != nil {
-					return fmt.Errorf("check session tools: %w", err)
-				}
-			}
-
-			item, err := createWorktree(cmd.Context(), options.root, createOptions{
+			item, id, err := createWorkspace(cmd.Context(), options.root, createOptions{
 				Directory: options.directory, Name: args[0], Base: base,
-			})
+			}, fork, noTmux)
 			if err != nil {
-				return fmt.Errorf("create worktree: %w", err)
+				return err
 			}
 
 			cmd.Printf("Created worktree: %s\nBranch: %s\n", item.Path, item.Branch)
 
-			if noTmux {
-				return nil
-			}
-
-			id, err := ensureSession(cmd.Context(), item, sessionOptions{
-				Fork: fork, ForkPicker: true, SourceDir: options.directory,
-			})
-			if err != nil {
-				return fmt.Errorf("worktree created at %s, but session setup failed: %w", item.Path, err)
-			}
-
-			if noSwitch {
+			if noTmux || noSwitch {
 				return nil
 			}
 
@@ -84,4 +68,28 @@ func createCommand(options *settings) *cobra.Command {
 	cmd.MarkFlagsMutuallyExclusive("fork", "fork-current")
 
 	return cmd
+}
+
+func createWorkspace(ctx context.Context, root string, options createOptions, fork string, noTmux bool) (worktree, string, error) {
+	if !noTmux {
+		if err := checkSessionTools(); err != nil {
+			return worktree{}, "", fmt.Errorf("check session tools: %w", err)
+		}
+	}
+
+	item, err := createWorktree(ctx, root, options)
+	if err != nil {
+		return item, "", fmt.Errorf("create worktree: %w", err)
+	}
+
+	if noTmux {
+		return item, "", nil
+	}
+
+	id, err := ensureSession(ctx, item, sessionOptions{Fork: fork, ForkPicker: true, SourceDir: options.Directory})
+	if err != nil {
+		return item, "", fmt.Errorf("worktree created at %s, but session setup failed: %w", item.Path, err)
+	}
+
+	return item, id, nil
 }
