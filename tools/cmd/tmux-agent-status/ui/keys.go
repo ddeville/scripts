@@ -1,4 +1,4 @@
-package main
+package ui
 
 import "charm.land/bubbles/v2/key"
 

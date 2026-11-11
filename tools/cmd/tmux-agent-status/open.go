@@ -7,6 +7,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
@@ -21,19 +22,19 @@ func openThread(ctx context.Context, id string) error {
 		return fmt.Errorf("open agent: %w", err)
 	}
 
-	data := collect(ctx)
+	data := agents.Collect(ctx)
 	if data.Err != nil {
 		return data.Err
 	}
 
-	index := slices.IndexFunc(data.Agents, func(a agent) bool { return a.ID == id })
+	index := slices.IndexFunc(data.Agents, func(a agents.Agent) bool { return a.ID == id })
 	if index < 0 {
 		return errThreadGone
 	}
 
 	panes := data.Agents[index].Panes
 	if len(panes) != 1 {
-		return fmt.Errorf("%w, found %d", errPaneMatch, len(panes))
+		return fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes))
 	}
 
 	if err := tmux.SwitchPane(ctx, panes[0], client); err != nil {

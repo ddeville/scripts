@@ -13,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
@@ -40,7 +41,7 @@ func command() *cobra.Command {
 		SilenceUsage:  true,
 	}
 
-	options := tuiOptions{}
+	options := ui.Options{}
 
 	var initialArea string
 
@@ -49,31 +50,31 @@ func command() *cobra.Command {
 		Short: "Open the Agents and Worktrees areas",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			options.area = area(initialArea)
-			if options.area != agentsArea && options.area != worktreesArea {
+			options.Area = ui.Area(initialArea)
+			if options.Area != ui.AgentsArea && options.Area != ui.WorktreesArea {
 				return fmt.Errorf("%w: --area must be agents or worktrees", os.ErrInvalid)
 			}
 
 			var err error
 
-			options.root, err = filepath.Abs(options.root)
+			options.Root, err = filepath.Abs(options.Root)
 			if err != nil {
 				return fmt.Errorf("resolve worktree directory: %w", err)
 			}
 
-			options.directory, err = filepath.Abs(options.directory)
+			options.Directory, err = filepath.Abs(options.Directory)
 			if err != nil {
 				return fmt.Errorf("resolve source directory: %w", err)
 			}
 
-			return runTUI(cmd.Context(), options)
+			return ui.Run(cmd.Context(), options)
 		},
 	}
 	picker.Flags().StringVar(&initialArea, "area", "agents", "initial area: agents or worktrees")
-	picker.Flags().StringVar(&options.client, "client", "", "tmux client to switch")
-	picker.Flags().StringVar(&options.pane, "pane", os.Getenv("TMUX_PANE"), "originating tmux pane and default conversation")
-	picker.Flags().StringVar(&options.root, "root", worktree.DefaultRoot(), "directory containing repo/worktree folders")
-	picker.Flags().StringVarP(&options.directory, "directory", "C", ".", "initial source repository or worktree")
+	picker.Flags().StringVar(&options.Client, "client", "", "tmux client to switch")
+	picker.Flags().StringVar(&options.Pane, "pane", os.Getenv("TMUX_PANE"), "originating tmux pane and default conversation")
+	picker.Flags().StringVar(&options.Root, "root", worktree.DefaultRoot(), "directory containing repo/worktree folders")
+	picker.Flags().StringVarP(&options.Directory, "directory", "C", ".", "initial source repository or worktree")
 
 	var (
 		watch            bool

@@ -1,7 +1,8 @@
-package main
+package agents
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -11,8 +12,11 @@ import (
 
 var titleID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-(?:[0-9a-f]{12}|[0-9a-f]{5}\.\.\.)$`)
 
-// Check all loaded IDs so truncated titles cannot resolve ambiguously.
-func paneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
+// ErrPaneMatch means a conversation could not be resolved to exactly one live pane.
+var ErrPaneMatch = errors.New("expected one live pane")
+
+// MatchPanes checks all loaded IDs so truncated titles cannot resolve ambiguously.
+func MatchPanes(ctx context.Context, ids []string) (map[string][]string, error) {
 	panes, err := tmux.ListPanes(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("match agent panes: %w", err)

@@ -1,4 +1,5 @@
-package main
+// Package ui presents the unified Agents and Worktrees terminal interface.
+package ui
 
 import (
 	"cmp"
@@ -16,17 +17,27 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
-type area string
+// Area identifies the section shown when the interface opens.
+type Area string
 
 const (
-	agentsArea    area = "agents"
-	worktreesArea area = "worktrees"
+	// AgentsArea shows running conversations.
+	AgentsArea Area = "agents"
+	// WorktreesArea shows managed worktrees.
+	WorktreesArea Area = "worktrees"
 )
+
+// Options supplies the initial area, source directory, and originating tmux client.
+type Options struct {
+	Client, Pane, Root, Directory string
+	Area                          Area
+}
 
 type areaState struct {
 	list                   tui.List
@@ -43,10 +54,6 @@ func newAreaState() areaState {
 }
 
 type (
-	tuiOptions struct {
-		client, pane, root, directory string
-		area                          area
-	}
 	tickMsg struct{}
 	openMsg struct {
 		pane, session string
@@ -56,11 +63,11 @@ type (
 
 type model struct {
 	ctx                     context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
-	area                    area
+	area                    Area
 	agentView, worktreeView areaState
 	width, height           int
 
-	data                                            snapshot
+	data                                            agents.Snapshot
 	selected, initialPane, originPane, originThread string
 	filter                                          int
 	activity                                        activity
@@ -84,17 +91,14 @@ type model struct {
 	planVersion               uint64
 }
 
-var (
-	errStaleStatus = errors.New("status is stale; wait for a fresh update")
-	errPaneMatch   = errors.New("expected one live pane")
-)
+var errStaleStatus = errors.New("status is stale; wait for a fresh update")
 
 func fetch(ctx context.Context) tea.Cmd {
 	return func() tea.Msg {
 		ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
 		defer cancel()
 
-		return collect(ctx)
+		return agents.Collect(ctx)
 	}
 }
 
@@ -103,7 +107,7 @@ func tick() tea.Cmd { return tea.Tick(time.Second, func(time.Time) tea.Msg { ret
 func (m *model) Init() tea.Cmd { return tea.Batch(fetch(m.ctx), m.loadTreeStatus()) }
 
 func (m *model) activeView() *areaState {
-	if m.area == worktreesArea {
+	if m.area == WorktreesArea {
 		return &m.worktreeView
 	}
 
@@ -143,14 +147,14 @@ func (m *model) refreshActivity() tea.Cmd {
 	return func() tea.Msg {
 		defer cancel()
 
-		data, err := detail(ctx, id)
+		data, err := agents.ReadDetails(ctx, id)
 
 		return activity{ID: id, generation: generation, Entries: activityEntries(data), Err: err}
 	}
 }
 
-func (m *model) filtered(filter int) []agent {
-	var result []agent
+func (m *model) filtered(filter int) []agents.Agent {
+	var result []agents.Agent
 
 	for _, a := range m.data.Agents {
 		match := false
@@ -187,7 +191,7 @@ const (
 var filters = []string{"All", "Needs you", "Working", "Unread", "Idle"}
 
 // Pane IDs remain stable across status changes, renames, and tmux reindexing.
-func agentPaneNumber(a agent) int {
+func agentPaneNumber(a agents.Agent) int {
 	number := math.MaxInt
 
 	for _, pane := range a.Panes {
@@ -199,7 +203,7 @@ func agentPaneNumber(a agent) int {
 	return number
 }
 
-func agentRow(a agent) tui.ListItem {
+func agentRow(a agents.Agent) tui.ListItem {
 	style, label, _ := stateStyle(a.State)
 
 	indicator := "●"
@@ -229,16 +233,16 @@ func (m *model) selectAgent(id string) tea.Cmd {
 }
 
 func (m *model) updateAgents() tea.Cmd {
-	agents := m.filtered(m.filter)
+	filtered := m.filtered(m.filter)
 
-	items := make([]tui.ListItem, 0, len(agents))
-	for _, a := range agents {
+	items := make([]tui.ListItem, 0, len(filtered))
+	for _, a := range filtered {
 		items = append(items, agentRow(a))
 	}
 
 	selected := m.selected
 	if m.initialPane != "" {
-		for _, a := range agents {
+		for _, a := range filtered {
 			if slices.Contains(a.Panes, m.initialPane) {
 				selected = a.ID
 				break
@@ -256,9 +260,9 @@ func (m *model) updateAgents() tea.Cmd {
 }
 
 func (m *model) updatePanels() {
-	for _, which := range []area{agentsArea, worktreesArea} {
+	for _, which := range []Area{AgentsArea, WorktreesArea} {
 		view := &m.agentView
-		if which == worktreesArea {
+		if which == WorktreesArea {
 			view = &m.worktreeView
 		}
 
@@ -304,13 +308,13 @@ func (m *model) openAgent(id string) tea.Cmd {
 		ctx, cancel := context.WithTimeout(operationCtx, time.Second)
 		defer cancel()
 
-		panes, err := paneMatches(ctx, data.IDs)
+		panes, err := agents.MatchPanes(ctx, data.IDs)
 		if err != nil {
 			return openMsg{err: err}
 		}
 
 		if len(panes[id]) != 1 {
-			return openMsg{err: fmt.Errorf("%w, found %d", errPaneMatch, len(panes[id]))}
+			return openMsg{err: fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes[id]))}
 		}
 
 		return openMsg{pane: panes[id][0]}
@@ -318,7 +322,7 @@ func (m *model) openAgent(id string) tea.Cmd {
 }
 
 func (m *model) openItem(id string) tea.Cmd {
-	if m.area == agentsArea {
+	if m.area == AgentsArea {
 		return m.openAgent(id)
 	}
 
@@ -330,7 +334,7 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.updatePanels()
-	case snapshot:
+	case agents.Snapshot:
 		if msg.Err != nil {
 			m.data.Err = msg.Err
 			if m.create != nil {
@@ -346,7 +350,7 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 			}
 		}
 
-		slices.SortFunc(msg.Agents, func(a, b agent) int {
+		slices.SortFunc(msg.Agents, func(a, b agents.Agent) int {
 			return cmp.Or(
 				cmp.Compare(a.Cwd, b.Cwd),
 				cmp.Compare(agentPaneNumber(a), agentPaneNumber(b)),
@@ -443,18 +447,18 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	case key.Matches(msg, keys.quit):
 		return tea.Quit
 	case key.Matches(msg, keys.agents):
-		m.area = agentsArea
+		m.area = AgentsArea
 		m.notice = ""
 	case key.Matches(msg, keys.worktrees):
-		m.area = worktreesArea
+		m.area = WorktreesArea
 		m.notice = ""
 	case key.Matches(msg, keys.create):
 		return m.beginCreate()
-	case key.Matches(msg, keys.remove) && m.area == worktreesArea:
+	case key.Matches(msg, keys.remove) && m.area == WorktreesArea:
 		return m.beginRemove()
-	case key.Matches(msg, keys.refresh) && m.area == worktreesArea:
+	case key.Matches(msg, keys.refresh) && m.area == WorktreesArea:
 		return m.reloadWorktrees(m.worktreeView.list.SelectedID())
-	case key.Matches(msg, keys.nextFilter, keys.previousFilter, keys.attention) && m.area == agentsArea:
+	case key.Matches(msg, keys.nextFilter, keys.previousFilter, keys.attention) && m.area == AgentsArea:
 		switch {
 		case key.Matches(msg, keys.attention):
 			if m.filter == filterAttention {
@@ -503,7 +507,7 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		before := view.list.SelectedID()
 		view.list.Move(msg)
 
-		if m.area == agentsArea {
+		if m.area == AgentsArea {
 			return m.selectAgent(view.list.SelectedID())
 		}
 
@@ -519,22 +523,23 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	return nil
 }
 
-func runTUI(ctx context.Context, options tuiOptions) error {
+// Run opens the interface and switches to the selected tmux pane or session on exit.
+func Run(ctx context.Context, options Options) error {
 	uiCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	source := options.directory
+	source := options.Directory
 	if resolved, err := filepath.EvalSymlinks(source); err == nil {
 		source = resolved
 	}
 
 	initial := &model{
-		ctx: uiCtx, area: options.area, root: options.root, source: source,
+		ctx: uiCtx, area: options.Area, root: options.Root, source: source,
 		width: 100, height: 30, changes: map[string]string{},
-		agentView: newAreaState(), worktreeView: newAreaState(), initialPane: options.pane, originPane: options.pane,
+		agentView: newAreaState(), worktreeView: newAreaState(), initialPane: options.Pane, originPane: options.Pane,
 	}
 
-	items, err := worktree.Discover(options.root)
+	items, err := worktree.Discover(options.Root)
 	if err != nil {
 		initial.treeError = err.Error()
 	}
@@ -560,13 +565,13 @@ func runTUI(ctx context.Context, options tuiOptions) error {
 
 	if final, ok := result.(*model); ok {
 		if final.targetPane != "" {
-			if err := tmux.SwitchPane(ctx, final.targetPane, options.client); err != nil {
+			if err := tmux.SwitchPane(ctx, final.targetPane, options.Client); err != nil {
 				return fmt.Errorf("open selected agent: %w", err)
 			}
 		}
 
 		if final.targetSession != "" {
-			if err := tmux.SwitchSession(ctx, final.targetSession, options.client); err != nil {
+			if err := tmux.SwitchSession(ctx, final.targetSession, options.Client); err != nil {
 				return fmt.Errorf("open worktree session: %w", err)
 			}
 		}

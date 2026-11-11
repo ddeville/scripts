@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 )
 
 func runStatus(ctx context.Context, watch bool, interval time.Duration, output, detailID string) error {
@@ -21,9 +23,9 @@ func runStatus(ctx context.Context, watch bool, interval time.Duration, output, 
 		)
 
 		if detailID == "" {
-			data = collect(requestCtx)
+			data = agents.Collect(requestCtx)
 		} else {
-			data, err = detail(requestCtx, detailID)
+			data, err = agents.ReadDetails(requestCtx, detailID)
 		}
 
 		cancel()
@@ -33,7 +35,7 @@ func runStatus(ctx context.Context, watch bool, interval time.Duration, output, 
 		}
 
 		if err != nil {
-			return err
+			return fmt.Errorf("collect status: %w", err)
 		}
 
 		if err := writeJSON(data, output); err != nil {

@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
@@ -61,7 +62,7 @@ func (m *model) summary() string {
 }
 
 func (m *model) detailContent(width int) string {
-	index := slices.IndexFunc(m.data.Agents, func(a agent) bool { return a.ID == m.selected })
+	index := slices.IndexFunc(m.data.Agents, func(a agents.Agent) bool { return a.ID == m.selected })
 	if index < 0 {
 		return tui.Muted.Render("No conversation selected")
 	}
@@ -110,7 +111,7 @@ type activity struct {
 
 type entry struct{ Label, Text string }
 
-func activityEntries(data threadDetails) []entry {
+func activityEntries(data agents.Details) []entry {
 	var entries []entry
 	if data.HistoryError != nil {
 		entries = append(entries, entry{"Error", *data.HistoryError})

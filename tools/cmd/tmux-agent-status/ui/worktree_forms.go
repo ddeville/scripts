@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"cmp"
@@ -10,6 +10,7 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
@@ -20,7 +21,7 @@ type createForm struct {
 	noTmux, picking, originPending bool
 	forkID, forkTitle, message     string
 	choices                        tui.List
-	returnArea                     area
+	returnArea                     Area
 }
 type removeForm struct {
 	item                 worktree.Info
@@ -54,7 +55,7 @@ func (m *model) beginCreate() tea.Cmd {
 	source := m.source
 
 	id := m.originThread
-	if m.area == agentsArea {
+	if m.area == AgentsArea {
 		id = m.selected
 	} else if selected, ok := m.selectedWorktree(); ok {
 		source = selected.Path
@@ -75,11 +76,11 @@ func (m *model) beginCreate() tea.Cmd {
 		}
 	}
 
-	form.originPending = m.area == worktreesArea && m.originPane != "" && m.data.At.IsZero() && m.data.Err == nil
+	form.originPending = m.area == WorktreesArea && m.originPane != "" && m.data.At.IsZero() && m.data.Err == nil
 	form.inputs[1].SetValue(source)
 	form.inputs[2].SetValue("HEAD")
 	form.setWidth(m.width)
-	m.create, m.notice, m.area = form, "", worktreesArea
+	m.create, m.notice, m.area = form, "", WorktreesArea
 	m.updateThreadChoices()
 
 	return form.inputs[0].Focus()
@@ -132,7 +133,7 @@ func (m *model) updateThreadChoices() {
 	items := make([]tui.ListItem, 0, len(m.data.Agents)+1)
 
 	for _, a := range m.data.Agents {
-		if a.Cwd != "" && a.Type == AgentTypeCodex {
+		if a.Cwd != "" && a.Type == agents.Codex {
 			items = append(items, agentRow(a))
 		}
 	}
@@ -142,7 +143,7 @@ func (m *model) updateThreadChoices() {
 	})
 	form.choices.SetItems(items, selected)
 
-	_, _, rows := m.panelDimensions(worktreesArea)
+	_, _, rows := m.panelDimensions(WorktreesArea)
 	form.choices.SetSize(max(1, m.width-6), rows)
 }
 
@@ -362,7 +363,7 @@ func (m *model) updateRemovalDetails() {
 		return
 	}
 
-	_, _, rows := m.panelDimensions(worktreesArea)
+	_, _, rows := m.panelDimensions(WorktreesArea)
 	width := max(1, m.width-6)
 	m.remove.view.SetWidth(width)
 	m.remove.view.SetHeight(rows)

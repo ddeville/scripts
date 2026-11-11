@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"fmt"
@@ -12,11 +12,11 @@ import (
 )
 
 // Panel widths include borders and padding; rows is the content height.
-func (m *model) panelDimensions(which area) (left, right, rows int) {
+func (m *model) panelDimensions(which Area) (left, right, rows int) {
 	width := max(12, m.width-2)
 
 	view := &m.agentView
-	if which == worktreesArea {
+	if which == WorktreesArea {
 		view = &m.worktreeView
 	}
 
@@ -59,13 +59,13 @@ func (m *model) listView() string {
 	}
 
 	message := "No conversations match this status"
-	if m.area == worktreesArea {
+	if m.area == WorktreesArea {
 		message = "No managed worktrees yet.\n\nPress n to create your first worktree."
 	} else if m.data.At.IsZero() {
 		message = "Loading agents…"
 	}
 
-	if m.area == agentsArea && m.data.Err != nil {
+	if m.area == AgentsArea && m.data.Err != nil {
 		message = "Could not read agent status"
 	}
 
@@ -79,7 +79,7 @@ func (m *model) panelsView() string {
 	title := fmt.Sprintf("Agents · %d", view.list.Len())
 	detailTitle := "Selected agent"
 
-	if m.area == worktreesArea {
+	if m.area == WorktreesArea {
 		title = fmt.Sprintf("Worktrees · %d", view.list.Len())
 		detailTitle = "Selected worktree"
 	}
@@ -101,9 +101,9 @@ func (m *model) areaHeading() string {
 	tabs := make([]string, 0, 2)
 
 	for _, tab := range []struct {
-		area  area
+		area  Area
 		label string
-	}{{agentsArea, " a Agents "}, {worktreesArea, " b Worktrees "}} {
+	}{{AgentsArea, " a Agents "}, {WorktreesArea, " b Worktrees "}} {
 		style := tui.Muted
 		if m.area == tab.area {
 			style = tui.Yellow.Background(tui.SelectedBackground)
@@ -116,7 +116,7 @@ func (m *model) areaHeading() string {
 }
 
 func (m *model) toolbar() string {
-	if m.area == worktreesArea {
+	if m.area == WorktreesArea {
 		help := tui.NewHelp(max(12, m.width-2))
 		help.Styles.ShortKey = tui.Yellow
 		help.Styles.ShortDesc = lipgloss.NewStyle()
@@ -145,7 +145,7 @@ func (m *model) View() tea.View {
 	_, _, rows := m.panelDimensions(m.area)
 
 	summary := m.summary()
-	if m.area == worktreesArea {
+	if m.area == WorktreesArea {
 		summary = tui.Muted.Render(tui.ShortPath(m.root))
 	}
 
@@ -155,7 +155,7 @@ func (m *model) View() tea.View {
 	footer := helpView.ShortHelpView([]key.Binding{keys.jump, keys.up, keys.down, keys.open, keys.quit})
 
 	controls := []key.Binding{keys.list, keys.details, keys.expand, keys.create}
-	if m.area == agentsArea {
+	if m.area == AgentsArea {
 		controls = append([]key.Binding{keys.nextFilter, keys.attention}, controls...)
 	} else {
 		controls = append(controls, keys.remove, keys.refresh)
@@ -166,11 +166,11 @@ func (m *model) View() tea.View {
 		help = tui.Muted.Render(tui.CleanLine(m.notice))
 	}
 
-	if m.area == agentsArea && m.data.Err != nil {
+	if m.area == AgentsArea && m.data.Err != nil {
 		help = tui.Red.Render("Agent status unavailable: " + tui.SingleLine(m.data.Err.Error()))
 	}
 
-	if m.area == worktreesArea && m.treeError != "" {
+	if m.area == WorktreesArea && m.treeError != "" {
 		help = tui.Red.Render(tui.SingleLine(m.treeError))
 	}
 
