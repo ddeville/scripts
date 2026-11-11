@@ -51,7 +51,8 @@ func createWorktree(ctx context.Context, root string, options CreateOptions) (In
 		base = "HEAD"
 	}
 
-	if _, err := git.ResolveCommit(ctx, source, base); err != nil {
+	commit, err := git.ResolveCommit(ctx, source, base)
+	if err != nil {
 		return Info{}, fmt.Errorf("resolve base commit: %w", err)
 	}
 
@@ -69,11 +70,11 @@ func createWorktree(ctx context.Context, root string, options CreateOptions) (In
 	}
 
 	branch := "damien/cw/" + options.Name
-	if err := git.AddWorktree(ctx, source, path, branch, base); err != nil {
+	if err := git.AddWorktree(ctx, source, path, branch, commit); err != nil {
 		return Info{}, fmt.Errorf("add worktree: %w", err)
 	}
 
-	return inspect(ctx, path)
+	return Info{Repo: filepath.Base(main), Name: options.Name, Path: canonical(path), Branch: branch}, nil
 }
 
 // Resolve accepts a managed name, repo/name, path, or the current checkout.

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/ddeville/scripts/tools/internal/tui"
@@ -25,7 +26,7 @@ type createForm struct {
 type removeForm struct {
 	item                 worktree.Info
 	keepBranch, checking bool
-	offset               int
+	view                 viewport.Model
 	plan                 worktree.Removal
 	err                  error
 }
@@ -131,18 +132,18 @@ func (m *model) updateThreadChoices() {
 	agents := slices.Clone(m.data.Agents)
 	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
-	form.choices.Items = nil
+	items := make([]tui.ListItem, 0, len(agents)+1)
 
 	for _, a := range agents {
 		if a.Cwd != "" && a.Type == AgentTypeCodex {
-			form.choices.Items = append(form.choices.Items, agentRow(a))
+			items = append(items, agentRow(a))
 		}
 	}
 
-	form.choices.Items = append(form.choices.Items, tui.ListItem{
+	items = append(items, tui.ListItem{
 		ID: "codex-picker", Group: "Other conversations", Title: "Choose in Codex", Subtitle: "Browse saved conversations when the new session opens", StatusStyle: tui.Muted,
 	})
-	form.choices.SelectID(selected)
+	form.choices.SetItems(items, selected)
 
 	_, _, rows := m.panelDimensions(worktreesArea)
 	form.choices.SetSize(max(1, m.width-6), rows)
@@ -274,16 +275,16 @@ func (m *model) submitCreate() tea.Cmd {
 		options.Fork = form.forkID
 	}
 
-	m.busy, form.message = true, "Creating worktree…"
+	ctx := m.beginOperation()
+	form.message = "Creating worktree…"
 
 	return func() tea.Msg {
-		item, id, err := worktree.Create(m.ctx, m.root, options)
+		item, id, err := worktree.Create(ctx, m.root, options)
 		return createdMsg{item: item, id: id, err: err}
 	}
 }
 
 func (m *model) created(msg createdMsg) tea.Cmd {
-	m.busy = false
 	if msg.err != nil && msg.item.Path == "" {
 		m.create.message = msg.err.Error()
 		return nil
@@ -312,7 +313,9 @@ func (m *model) beginRemove() tea.Cmd {
 		return nil
 	}
 
-	m.remove, m.notice = &removeForm{item: item}, ""
+	m.remove, m.notice = &removeForm{item: item, view: viewport.New()}, ""
+	m.remove.view.KeyMap = viewport.KeyMap{Up: keys.up, Down: keys.down}
+	m.remove.view.MouseWheelEnabled = false
 
 	return m.planRemove()
 }
@@ -320,6 +323,7 @@ func (m *model) beginRemove() tea.Cmd {
 func (m *model) planRemove() tea.Cmd {
 	m.planVersion++
 	m.remove.checking = true
+	m.updateRemovalDetails()
 	item, keep, version := m.remove.item, m.remove.keepBranch, m.planVersion
 
 	return func() tea.Msg {
@@ -335,26 +339,41 @@ func (m *model) removeKey(msg tea.KeyPressMsg) tea.Cmd {
 	case "k":
 		m.remove.keepBranch = !m.remove.keepBranch
 		return m.planRemove()
-	case "down", "j":
-		m.remove.offset++
-	case "up":
-		m.remove.offset = max(0, m.remove.offset-1)
 	case "y":
 		if m.remove.checking || m.remove.err != nil {
 			return nil
 		}
 
 		plan := m.remove.plan
-		m.busy = true
+		ctx := m.beginOperation()
+		m.updateRemovalDetails()
 
-		return func() tea.Msg { return removedMsg{plan: plan, err: worktree.Remove(m.ctx, plan)} }
+		return func() tea.Msg { return removedMsg{plan: plan, err: worktree.Remove(ctx, plan)} }
+	default:
+		var cmd tea.Cmd
+
+		m.remove.view, cmd = m.remove.view.Update(msg)
+
+		return cmd
 	}
 
 	return nil
 }
 
+func (m *model) updateRemovalDetails() {
+	if m.remove == nil {
+		return
+	}
+
+	_, _, rows := m.panelDimensions(worktreesArea)
+	width := max(1, m.width-6)
+	m.remove.view.SetWidth(width)
+	m.remove.view.SetHeight(rows)
+	m.remove.view.SetContent(m.removalContent(width))
+}
+
 func (m *model) removed(msg removedMsg) tea.Cmd {
-	m.busy, m.remove = false, nil
+	m.remove = nil
 
 	m.notice = "Removed " + msg.plan.Worktree.Name
 	if msg.err != nil {

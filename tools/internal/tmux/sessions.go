@@ -36,7 +36,7 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 
 	var sessions []Session
 
-	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSuffix(output, "\n"), "\n") {
 		fields := strings.SplitN(line, "\t", 3)
 		if len(fields) != 3 {
 			continue

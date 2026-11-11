@@ -102,7 +102,7 @@ func (m *model) createView(width, rows int) string {
 	return clippedLines(strings.Join(lines[start:], "\n"), rows, width)
 }
 
-func (m *model) removeView(width, rows int) string {
+func (m *model) removalContent(width int) string {
 	form := m.remove
 	lines := []string{tui.Title.Render(tui.CleanLine(form.item.Repo + " / " + form.item.Name)), tui.Muted.Render(ansi.Wrap(tui.ShortPath(form.item.Path), width, "")), ""}
 
@@ -145,8 +145,5 @@ func (m *model) removeView(width, rows int) string {
 		lines = append(lines, "", "Removing worktree…")
 	}
 
-	content := strings.Split(strings.Join(lines, "\n"), "\n")
-	form.offset = min(form.offset, max(0, len(content)-rows))
-
-	return clippedLines(strings.Join(content[form.offset:], "\n"), rows, width)
+	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
 }

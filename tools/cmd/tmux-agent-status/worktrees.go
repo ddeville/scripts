@@ -71,15 +71,15 @@ func (m *model) reloadWorktrees(path string) tea.Cmd {
 }
 
 func (m *model) updateTreeList(path string) {
-	m.worktreeView.list.Items = make([]tui.ListItem, 0, len(m.trees))
+	items := make([]tui.ListItem, 0, len(m.trees))
 	for _, item := range m.trees {
 		style, state, _ := worktreeStateStyle(item.Status)
-		m.worktreeView.list.Items = append(m.worktreeView.list.Items, tui.ListItem{
+		items = append(items, tui.ListItem{
 			ID: item.Path, Group: item.Repo, Title: item.Name, Subtitle: item.Branch, Status: state, StatusStyle: style,
 		})
 	}
 
-	m.worktreeView.list.SelectID(path)
+	m.worktreeView.list.SetItems(items, path)
 	m.updateWorktreeDetails()
 }
 
@@ -167,10 +167,11 @@ func (m *model) openWorktree(path string) tea.Cmd {
 	}
 
 	item := m.trees[index]
-	m.busy, m.notice = true, "Opening "+item.Name+"…"
+	ctx := m.beginOperation()
+	m.notice = "Opening " + item.Name + "…"
 
 	return func() tea.Msg {
-		id, err := worktree.Open(m.ctx, item)
+		id, err := worktree.Open(ctx, item)
 		return openMsg{session: id, err: err}
 	}
 }

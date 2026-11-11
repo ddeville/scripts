@@ -101,7 +101,7 @@ func run(ctx context.Context, path string, args ...string) (string, error) {
 		return "", fmt.Errorf("git %s: %w: %s", args[0], err, strings.TrimSpace(stderr.String()))
 	}
 
-	return strings.TrimSpace(string(output)), nil
+	return strings.TrimSuffix(string(output), "\n"), nil
 }
 
 func canonical(path string) string {

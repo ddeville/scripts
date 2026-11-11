@@ -20,14 +20,32 @@ type ListItem struct {
 
 // List keeps selection, group headings, and complete rows visible while scrolling.
 type List struct {
-	Items  []ListItem
-	Index  int
+	items  []ListItem
+	index  int
 	offset int
 	view   viewport.Model
 }
 
 // NewList creates an empty grouped list.
 func NewList() List { return List{view: viewport.New()} }
+
+// SetItems replaces the rows and selects the requested ID, or the first row if absent.
+func (l *List) SetItems(items []ListItem, selectedID string) {
+	l.items = items
+	l.SelectID(selectedID)
+}
+
+// Len returns the number of rows in the list.
+func (l *List) Len() int { return len(l.items) }
+
+// Item returns the row at index when it is in range.
+func (l *List) Item(index int) (ListItem, bool) {
+	if index < 0 || index >= len(l.items) {
+		return ListItem{}, false
+	}
+
+	return l.items[index], true
+}
 
 // SetSize resizes the visible rows without changing selection.
 func (l *List) SetSize(width, height int) {
@@ -38,43 +56,43 @@ func (l *List) SetSize(width, height int) {
 
 // Select clamps the index and scrolls to the selected row.
 func (l *List) Select(index int) {
-	l.Index = max(0, min(index, len(l.Items)-1))
+	l.index = max(0, min(index, len(l.items)-1))
 	l.render()
 }
 
-// SelectID preserves selection across a refreshed or reordered item list.
+// SelectID selects the matching row, or the first row if the ID is absent.
 func (l *List) SelectID(id string) {
-	l.Select(slices.IndexFunc(l.Items, func(item ListItem) bool { return item.ID == id }))
+	l.Select(slices.IndexFunc(l.items, func(item ListItem) bool { return item.ID == id }))
 }
 
 // SelectedID returns an empty string when the list has no rows.
 func (l *List) SelectedID() string {
-	if len(l.Items) == 0 {
+	if len(l.items) == 0 {
 		return ""
 	}
 
-	return l.Items[l.Index].ID
+	return l.items[l.index].ID
 }
 
 // Move handles the shared arrow, Vim, and page navigation keys.
 func (l *List) Move(msg tea.KeyPressMsg) {
-	if len(l.Items) == 0 {
+	if len(l.items) == 0 {
 		return
 	}
 
 	switch msg.String() {
 	case "k", "up", "ctrl+p":
-		l.Select((l.Index + len(l.Items) - 1) % len(l.Items))
+		l.Select((l.index + len(l.items) - 1) % len(l.items))
 	case "j", "down", "ctrl+n":
-		l.Select((l.Index + 1) % len(l.Items))
+		l.Select((l.index + 1) % len(l.items))
 	case "g", "home":
 		l.Select(0)
 	case "G", "end":
-		l.Select(len(l.Items) - 1)
+		l.Select(len(l.items) - 1)
 	case "pgup":
-		l.Select(l.Index - max(1, l.view.Height()/3))
+		l.Select(l.index - max(1, l.view.Height()/3))
 	case "pgdown":
-		l.Select(l.Index + max(1, l.view.Height()/3))
+		l.Select(l.index + max(1, l.view.Height()/3))
 	}
 }
 
@@ -88,7 +106,7 @@ func (l *List) Width() int { return l.view.Width() }
 func (l *List) Height() int { return l.view.Height() }
 
 func (l *List) render() {
-	if len(l.Items) == 0 {
+	if len(l.items) == 0 {
 		l.offset = 0
 		l.view.SetContent("")
 
@@ -100,22 +118,22 @@ func (l *List) render() {
 		rows  []struct{ start, end int }
 	)
 
-	numberWidth := max(2, len(strconv.Itoa(len(l.Items)-1)))
+	numberWidth := max(2, len(strconv.Itoa(len(l.items)-1)))
 	counts := map[string]int{}
 	statusWidth := 0
 
-	for _, item := range l.Items {
+	for _, item := range l.items {
 		counts[item.Group]++
 		statusWidth = max(statusWidth, ansi.StringWidth(item.Status))
 	}
 
-	for i, item := range l.Items {
+	for i, item := range l.items {
 		if i > 0 {
 			lines = append(lines, "")
 		}
 
 		start := len(lines)
-		if i == 0 || item.Group != l.Items[i-1].Group {
+		if i == 0 || item.Group != l.items[i-1].Group {
 			lines = append(lines, SectionHeading(item.Group, counts[item.Group], l.view.Width()), "")
 		}
 
@@ -125,18 +143,18 @@ func (l *List) render() {
 
 		end := len(lines) + min(2, l.view.Height())
 		rows = append(rows, struct{ start, end int }{start, end})
-		lines = append(lines, strings.Split(item.render(l.view.Width(), numberWidth, statusWidth, i, i == l.Index), "\n")...)
+		lines = append(lines, strings.Split(item.render(l.view.Width(), numberWidth, statusWidth, i, i == l.index), "\n")...)
 	}
 
-	selected := rows[l.Index]
+	selected := rows[l.index]
 	offset := min(l.offset, max(0, len(lines)-l.view.Height()))
 	offset = max(selected.end-l.view.Height(), min(offset, selected.start))
-	first, headingRows := l.Index, 0
+	first, headingRows := l.index, 0
 	l.offset = selected.start
 
 	for i, row := range rows {
 		extra := 0
-		if i > 0 && l.Items[i].Group == l.Items[i-1].Group && l.view.Height() >= 4 {
+		if i > 0 && l.items[i].Group == l.items[i-1].Group && l.view.Height() >= 4 {
 			extra = 2
 		}
 
@@ -162,7 +180,7 @@ func (l *List) render() {
 	var visible []string
 
 	if headingRows > 0 {
-		group := l.Items[first].Group
+		group := l.items[first].Group
 		visible = append(visible, SectionHeading(group, counts[group], l.view.Width()), "")
 	}
 

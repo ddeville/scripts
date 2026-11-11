@@ -75,7 +75,8 @@ type model struct {
 	root, source           string
 
 	notice                    string
-	busy                      bool
+	busy, quitting            bool
+	operationCancel           context.CancelFunc
 	targetPane, targetSession string
 	create                    *createForm
 	remove                    *removeForm
@@ -106,6 +107,21 @@ func (m *model) activeView() *areaState {
 	}
 
 	return &m.agentView
+}
+
+func (m *model) beginOperation() context.Context {
+	ctx, cancel := context.WithCancel(m.ctx)
+	m.busy, m.operationCancel = true, cancel
+
+	return ctx
+}
+
+func (m *model) finishOperation() bool {
+	m.operationCancel()
+	m.operationCancel = nil
+	m.busy = false
+
+	return m.quitting
 }
 
 func (m *model) refreshActivity() tea.Cmd {
@@ -202,9 +218,9 @@ func (m *model) updateAgents() tea.Cmd {
 	agents := m.filtered(m.filter)
 	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
-	m.agentView.list.Items = make([]tui.ListItem, 0, len(agents))
+	items := make([]tui.ListItem, 0, len(agents))
 	for _, a := range agents {
-		m.agentView.list.Items = append(m.agentView.list.Items, agentRow(a))
+		items = append(items, agentRow(a))
 	}
 
 	selected := m.selected
@@ -219,7 +235,7 @@ func (m *model) updateAgents() tea.Cmd {
 		m.initialPane = ""
 	}
 
-	m.agentView.list.SelectID(selected)
+	m.agentView.list.SetItems(items, selected)
 	cmd := m.selectAgent(m.agentView.list.SelectedID())
 	m.updateAgentDetails()
 
@@ -247,6 +263,7 @@ func (m *model) updatePanels() {
 
 	m.updateAgentDetails()
 	m.updateWorktreeDetails()
+	m.updateRemovalDetails()
 
 	if m.create != nil {
 		m.create.setWidth(m.width)
@@ -263,7 +280,7 @@ func (m *model) openAgent(id string) tea.Cmd {
 		return nil
 	}
 
-	m.busy = true
+	operationCtx := m.beginOperation()
 	data := m.data
 
 	return func() tea.Msg {
@@ -271,7 +288,7 @@ func (m *model) openAgent(id string) tea.Cmd {
 			return openMsg{err: errStaleStatus}
 		}
 
-		ctx, cancel := context.WithTimeout(m.ctx, time.Second)
+		ctx, cancel := context.WithTimeout(operationCtx, time.Second)
 		defer cancel()
 
 		panes, err := paneMatches(ctx, data.IDs)
@@ -340,7 +357,10 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 			m.updateAgentDetails()
 		}
 	case openMsg:
-		m.busy = false
+		if m.finishOperation() {
+			return m, tea.Quit
+		}
+
 		if msg.err != nil {
 			m.notice = tui.SingleLine(msg.err.Error())
 			return m, nil
@@ -352,12 +372,21 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 	case treeLoadedMsg, treeStatusMsg, treeSessionsMsg:
 		return m, m.updateWorktrees(msg)
 	case createdMsg:
+		if m.finishOperation() {
+			return m, tea.Quit
+		}
+
 		return m, m.created(msg)
 	case plannedMsg:
 		if m.remove != nil && msg.version == m.planVersion {
 			m.remove.plan, m.remove.err, m.remove.checking = msg.plan, msg.err, false
+			m.updateRemovalDetails()
 		}
 	case removedMsg:
+		if m.finishOperation() {
+			return m, tea.Quit
+		}
+
 		return m, m.removed(msg)
 	case tea.KeyPressMsg:
 		return m, m.handleKey(msg)
@@ -371,12 +400,19 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 }
 
 func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
-	if m.busy {
-		return nil
+	if msg.String() == "ctrl+c" {
+		if m.busy {
+			m.quitting = true
+			m.operationCancel()
+
+			return nil
+		}
+
+		return tea.Quit
 	}
 
-	if msg.String() == "ctrl+c" {
-		return tea.Quit
+	if m.busy {
+		return nil
 	}
 
 	if m.create != nil {
@@ -430,8 +466,8 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 		return m.openItem(view.list.SelectedID())
 	case key.Matches(msg, keys.jump):
 		position := int(msg.String()[0] - '0')
-		if position < len(view.list.Items) {
-			return m.openItem(view.list.Items[position].ID)
+		if item, ok := view.list.Item(position); ok {
+			return m.openItem(item.ID)
 		}
 	default:
 		if view.detailsFocus {

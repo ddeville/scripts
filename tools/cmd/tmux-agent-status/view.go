@@ -54,7 +54,7 @@ func detailHeader(title, path, status, action string) []string {
 
 func (m *model) listView() string {
 	view := m.activeView()
-	if len(view.list.Items) > 0 {
+	if view.list.Len() > 0 {
 		return view.list.View()
 	}
 
@@ -76,11 +76,11 @@ func (m *model) panelsView() string {
 	left, right, rows := m.panelDimensions(m.area)
 	view := m.activeView()
 	list := m.listView()
-	title := fmt.Sprintf("Agents · %d", len(view.list.Items))
+	title := fmt.Sprintf("Agents · %d", view.list.Len())
 	detailTitle := "Selected agent"
 
 	if m.area == worktreesArea {
-		title = fmt.Sprintf("Worktrees · %d", len(view.list.Items))
+		title = fmt.Sprintf("Worktrees · %d", view.list.Len())
 		detailTitle = "Selected worktree"
 	}
 
@@ -208,11 +208,14 @@ func (m *model) View() tea.View {
 			footer = "k keep/delete branch · ↑/↓ scroll · Esc cancel"
 		}
 
-		body = panel("Remove worktree", m.removeView(width-4, rows), width, rows, true)
+		body = panel("Remove worktree", m.remove.view.View(), width, rows, true)
 	}
 
 	if m.busy {
 		footer = "Working…"
+		if m.quitting {
+			footer = "Cancelling…"
+		}
 	}
 
 	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(tui.Muted.Render(tui.CleanLine(footer)), width), tui.Pad(help, width)}, "\n")
