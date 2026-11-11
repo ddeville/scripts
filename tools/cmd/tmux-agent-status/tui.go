@@ -5,8 +5,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,7 +61,6 @@ type model struct {
 	width, height           int
 
 	data                                            snapshot
-	order                                           map[string]int
 	selected, initialPane, originPane, originThread string
 	filter                                          int
 	activity                                        activity
@@ -185,6 +186,19 @@ const (
 
 var filters = []string{"All", "Needs you", "Working", "Unread", "Idle"}
 
+// Pane IDs remain stable across status changes, renames, and tmux reindexing.
+func agentPaneNumber(a agent) int {
+	number := math.MaxInt
+
+	for _, pane := range a.Panes {
+		if n, err := strconv.Atoi(strings.TrimPrefix(pane, "%")); err == nil {
+			number = min(number, n)
+		}
+	}
+
+	return number
+}
+
 func agentRow(a agent) tui.ListItem {
 	style, label, _ := stateStyle(a.State)
 
@@ -216,7 +230,6 @@ func (m *model) selectAgent(id string) tea.Cmd {
 
 func (m *model) updateAgents() tea.Cmd {
 	agents := m.filtered(m.filter)
-	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
 	items := make([]tui.ListItem, 0, len(agents))
 	for _, a := range agents {
@@ -328,16 +341,18 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 		}
 
 		for _, a := range msg.Agents {
-			if _, ok := m.order[a.ID]; !ok {
-				m.order[a.ID] = len(m.order)
-			}
-
 			if m.originThread == "" && slices.Contains(a.Panes, m.originPane) {
 				m.originThread = a.ID
 			}
 		}
 
-		slices.SortFunc(msg.Agents, func(a, b agent) int { return cmp.Compare(m.order[a.ID], m.order[b.ID]) })
+		slices.SortFunc(msg.Agents, func(a, b agent) int {
+			return cmp.Or(
+				cmp.Compare(a.Cwd, b.Cwd),
+				cmp.Compare(agentPaneNumber(a), agentPaneNumber(b)),
+				cmp.Compare(a.ID, b.ID),
+			)
+		})
 		m.data = msg
 
 		cmd := m.updateAgents()
@@ -515,7 +530,7 @@ func runTUI(ctx context.Context, options tuiOptions) error {
 
 	initial := &model{
 		ctx: uiCtx, area: options.area, root: options.root, source: source,
-		order: map[string]int{}, width: 100, height: 30, changes: map[string]string{},
+		width: 100, height: 30, changes: map[string]string{},
 		agentView: newAreaState(), worktreeView: newAreaState(), initialPane: options.pane, originPane: options.pane,
 	}
 

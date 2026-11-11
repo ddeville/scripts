@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"charm.land/bubbles/v2/textinput"
@@ -129,12 +128,10 @@ func (m *model) updateThreadChoices() {
 	}
 
 	selected := form.choices.SelectedID()
-	agents := slices.Clone(m.data.Agents)
-	slices.SortStableFunc(agents, func(a, b agent) int { return cmp.Compare(a.Cwd, b.Cwd) })
 
-	items := make([]tui.ListItem, 0, len(agents)+1)
+	items := make([]tui.ListItem, 0, len(m.data.Agents)+1)
 
-	for _, a := range agents {
+	for _, a := range m.data.Agents {
 		if a.Cwd != "" && a.Type == AgentTypeCodex {
 			items = append(items, agentRow(a))
 		}
