@@ -1,11 +1,10 @@
-// Package tmux locates Codex panes and switches clients to them.
+// Package tmux manages sessions, windows, panes, and clients.
 package tmux
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -16,12 +15,12 @@ var errClientCount = errors.New("opening from the bar requires exactly one attac
 
 // SingleClient returns the only attached client, refusing an ambiguous choice.
 func SingleClient(ctx context.Context) (string, error) {
-	output, err := exec.CommandContext(ctx, "tmux", "list-clients", "-F", "#{client_name}").Output()
+	output, err := run(ctx, "list-clients", "-F", "#{client_name}")
 	if err != nil {
 		return "", fmt.Errorf("read tmux clients: %w", err)
 	}
 
-	clients := strings.Fields(string(output))
+	clients := strings.Fields(output)
 	if len(clients) != 1 {
 		return "", fmt.Errorf("%w (found %d)", errClientCount, len(clients))
 	}
@@ -31,15 +30,14 @@ func SingleClient(ctx context.Context) (string, error) {
 
 // PaneMatches checks all loaded IDs so truncated titles cannot resolve ambiguously.
 func PaneMatches(ctx context.Context, ids []string) (map[string][]string, error) {
-	output, err := exec.CommandContext(ctx, "tmux", "-u", "list-panes", "-a", "-F",
-		"#{pane_id}\t#{pane_current_command}\t#{pane_title}").Output()
+	output, err := run(ctx, "-u", "list-panes", "-a", "-F", "#{pane_id}\t#{pane_current_command}\t#{pane_title}")
 	if err != nil {
 		return nil, fmt.Errorf("read tmux panes: %w", err)
 	}
 
 	matches := map[string][]string{}
 
-	for line := range strings.SplitSeq(strings.TrimSpace(string(output)), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
 		fields := strings.SplitN(line, "\t", 3)
 		if len(fields) != 3 || fields[1] != "codex" {
 			continue
@@ -75,15 +73,5 @@ func PaneMatches(ctx context.Context, ids []string) (map[string][]string, error)
 
 // SwitchPane selects a pane for the given client, or the current client if empty.
 func SwitchPane(ctx context.Context, pane, client string) error {
-	args := []string{"switch-client", "-t", pane}
-	if client != "" {
-		args = append(args, "-c", client)
-	}
-
-	output, err := exec.CommandContext(ctx, "tmux", args...).CombinedOutput() //nolint:gosec // Fixed executable; pane and client are separate arguments, never shell input.
-	if err != nil {
-		return fmt.Errorf("switch tmux pane: %w: %s", err, strings.TrimSpace(string(output)))
-	}
-
-	return nil
+	return switchClient(ctx, pane, client)
 }
