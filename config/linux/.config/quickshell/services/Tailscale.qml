@@ -5,8 +5,7 @@ import Quickshell.Io
 Scope {
     id: root
 
-    property var state: ({
-            "installed": false,
+    readonly property var emptyState: ({
             "available": false,
             "backend": "NoState",
             "connected": false,
@@ -22,6 +21,7 @@ Scope {
             "health": [],
             "error": ""
         })
+    property var state: emptyState
     property string message: ""
     property string loginUrl: ""
     property bool failed: false
@@ -46,7 +46,14 @@ Scope {
     readonly property string tooltip: ["Tailscale · " + statusText, state.tailnet, usingExitNode ? state.exitNode.name : "", message || state.error].filter(part => !!part).join("\n")
 
     function refresh() {
-        poll.refresh();
+        watcher.running = true;
+    }
+
+    function unavailable(message) {
+        state = Object.assign({}, emptyState, {
+            backend: "Unavailable",
+            error: message
+        });
     }
 
     function run(args, description) {
@@ -78,21 +85,32 @@ Scope {
             Applications.launch(["xdg-open", url]);
     }
 
-    CommandPoll {
-        id: poll
+    Process {
+        id: watcher
 
-        command: [Quickshell.shellPath("services/scripts/tailscale-status.py")]
-        interval: 5000
-        onOutputChanged: {
-            if (output !== "")
-                root.state = JSON.parse(output);
-            else
-                root.state = Object.assign({}, root.state, {
-                    available: false,
-                    connected: false,
-                    error: "Could not read Tailscale status"
-                });
+        command: ["tailscale-status", "--watch"]
+        running: true
+        onExited: root.unavailable(watchErrors.text.trim() || "Tailscale status stopped. Retrying…")
+
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    root.state = JSON.parse(data);
+                } catch (error) {
+                    root.unavailable("Could not read Tailscale status.");
+                }
+            }
         }
+        stderr: StdioCollector {
+            id: watchErrors
+        }
+    }
+
+    Timer {
+        interval: 2000
+        running: !watcher.running
+        repeat: true
+        onTriggered: watcher.running = true
     }
 
     Process {
@@ -101,7 +119,7 @@ Scope {
         onExited: (code, status) => {
             root.failed = code !== 0 || status !== 0;
             root.message = code === 124 ? "Tailscale timed out. Check the connection status and try again." : root.failed ? (errors.text.trim() || "Tailscale action failed") : "";
-            poll.refresh();
+            root.refresh();
         }
 
         stdout: StdioCollector {}

@@ -390,7 +390,6 @@ PanelWindow { // qmllint disable uncreatable-type
                     Button {
                         id: tailscaleButton
 
-                        visible: panel.tailscale.state.installed
                         tooltip: panel.tailscale.tooltip
                         tooltipEnabled: !tailscalePopup.visible
                         active: tailscalePopup.visible
