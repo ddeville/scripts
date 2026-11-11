@@ -49,6 +49,6 @@ echo "Building and installing tools..."
 
 cd "$HOME/scripts/tools"
 export GOBIN="$HOME/.local/bin"
-exec go install ./cmd/...
+go install ./cmd/...
 
 echo "Done!"
