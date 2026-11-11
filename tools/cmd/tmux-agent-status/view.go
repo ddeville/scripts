@@ -1,148 +1,28 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"slices"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
-	"github.com/charmbracelet/x/ansi"
 
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
-func stateStyle(state string) (lipgloss.Style, string, string) {
-	switch state {
-	case "approval":
-		return tui.Red, "Approve", "Waiting for approval. Open the agent to approve or reject."
-	case "input":
-		return tui.Red, "Reply", "Waiting for your answer. Open the agent to reply."
-	case "error":
-		return tui.Magenta, "Check error", "The agent reported an error. Open it to investigate."
-	case "ready":
-		return tui.Green, "Read result", "A completed result is waiting to be read."
-	case "working":
-		return tui.Cyan, "Working", "Working. Open the agent to follow progress or steer it."
-	case "idle":
-		return lipgloss.NewStyle(), "Idle", "Idle. Open the agent to continue the conversation."
-	default:
-		return tui.Muted, "Check status", "Status is unknown. Open the agent to check."
-	}
-}
-
-func (m model) summary() string {
-	if m.data.Err != nil {
-		if m.data.At.IsZero() {
-			return tui.Magenta.Render("Agent status unavailable")
-		}
-
-		return tui.Magenta.Render("Status unavailable · showing last known data")
-	}
-
-	if m.data.At.IsZero() {
-		return tui.Muted.Render("Loading agents…")
-	}
-
-	var parts []string
-
-	for _, state := range []string{"approval", "input", "error", "ready"} {
-		if count := m.data.Counts[state]; count > 0 {
-			style, label, _ := stateStyle(state)
-			parts = append(parts, style.Render(fmt.Sprintf("%s %d", label, count)))
-		}
-	}
-
-	if len(parts) == 0 {
-		return tui.Muted.Render("Nothing needs your attention")
-	}
-
-	return "Needs you:  " + strings.Join(parts, tui.Muted.Render("  ·  "))
-}
-
-func (m model) listView() string {
-	if len(m.agents.items) == 0 {
-		message := "No conversations match this filter"
-		if m.data.At.IsZero() {
-			message = "Loading agents…"
-		}
-
-		if m.data.Err != nil {
-			message = "Could not read agent status"
-		}
-
-		return tui.Muted.Render(tui.Fit(message, m.agents.view.Width()))
-	}
-
-	return m.agents.view.View()
-}
-
-func (m model) detailContent(width int) string {
-	index := slices.IndexFunc(m.data.Agents, func(a agent) bool { return a.ID == m.selected })
-	if index < 0 {
-		return tui.Muted.Render("No conversation selected")
-	}
-
-	a := m.data.Agents[index]
-	style, _, hint := stateStyle(a.State)
-
-	lines := []string{
-		tui.Yellow.Bold(true).Render(tui.CleanText(a.Title)),
-		tui.Blue.Render(tui.ShortPath(a.Cwd)),
-		"",
-		style.Render(hint),
-		tui.Yellow.Render("Enter") + tui.Muted.Render(" to open"),
-	}
-
-	if a.Error != nil {
-		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(*a.Error)))
-	}
-
-	entries := m.activity.Entries
-	if len(entries) == 0 {
-		entries = []entry{{"Prompt", a.Preview}}
-	}
-
-	if m.activity.Err != nil {
-		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(m.activity.Err.Error())))
-	}
-
-	for _, e := range entries {
-		text := []rune(e.Text)
-		if len(text) > 6000 {
-			text = text[:6000]
-		}
-
-		lines = append(lines, "", entryStyle(e.Label).Bold(true).Render(e.Label),
-			strings.ReplaceAll(tui.CleanText(string(text)), "\t", "    "))
-	}
-
-	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
-}
-
-func entryStyle(label string) lipgloss.Style {
-	switch label {
-	case "Prompt":
-		return tui.Blue
-	case "Agent":
-		return tui.Cyan
-	case "Command", "Tool":
-		return tui.Yellow
-	case "Error":
-		return tui.Magenta
-	default:
-		return tui.Muted
-	}
-}
-
 // Panel widths include borders and padding; rows is the content height.
-func (m model) panelDimensions() (left, right, rows int) {
+func (m *model) panelDimensions(which area) (left, right, rows int) {
 	width := max(12, m.width-2)
 
+	view := &m.agentView
+	if which == worktreesArea {
+		view = &m.worktreeView
+	}
+
 	rows = max(1, m.height-11)
-	if width >= 96 && !m.expanded {
+
+	if width >= 96 && !view.expanded {
 		left = (width - 1) * 3 / 5
 		right = width - 1 - left
 	} else {
@@ -158,160 +38,173 @@ func panel(title, content string, width, rows int, focused bool) string {
 		style = tui.Yellow
 	}
 
-	return lipgloss.NewStyle().
-		Width(width).Height(rows+4).
-		Padding(0, 1).
+	return lipgloss.NewStyle().Width(width).Height(rows+4).Padding(0, 1).
 		Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.BrightBlack).
 		Render(style.Render(tui.Fit(title, width-4)) + "\n\n" + content)
 }
 
-func (m model) panelsView() string {
-	left, right, rows := m.panelDimensions()
+func (m *model) listView() string {
+	view := m.activeView()
+	if len(view.list.Items) > 0 {
+		return view.list.View()
+	}
+
+	message := "No conversations match this status"
+	if m.area == worktreesArea {
+		message = "No managed worktrees yet.\n\nPress n to create your first worktree."
+	} else if m.data.At.IsZero() {
+		message = "Loading agents…"
+	}
+
+	if m.area == agentsArea && m.data.Err != nil {
+		message = "Could not read agent status"
+	}
+
+	return tui.Muted.Render(clippedLines(message, view.list.Height(), view.list.Width()))
+}
+
+func (m *model) panelsView() string {
+	left, right, rows := m.panelDimensions(m.area)
+	view := m.activeView()
 	list := m.listView()
-	title := fmt.Sprintf("Threads · %d", len(m.agents.items))
+	title := fmt.Sprintf("Threads · %d", len(view.list.Items))
+	detailTitle := "Selected agent"
+
+	if m.area == worktreesArea {
+		title = fmt.Sprintf("Worktrees · %d", len(view.list.Items))
+		detailTitle = "Selected worktree"
+	}
 
 	if right == 0 {
-		if m.detailsFocus {
-			title, list = "Selected agent", m.details.View()
+		if view.detailsFocus {
+			title, list = detailTitle, view.details.View()
 		}
 
 		return panel(title, list, left, rows, true)
 	}
 
 	return lipgloss.JoinHorizontal(lipgloss.Top,
-		panel(title, list, left, rows, !m.detailsFocus),
-		" ",
-		panel("Selected agent", m.details.View(), right, rows, m.detailsFocus),
-	)
+		panel(title, list, left, rows, !view.detailsFocus), " ",
+		panel(detailTitle, view.details.View(), right, rows, view.detailsFocus))
 }
 
-func (m model) View() tea.View {
-	width := max(12, m.width-2)
-	title := tui.Yellow.Render("Agents")
+func (m *model) areaHeading() string {
+	tabs := make([]string, 0, 2)
 
-	stamp := "  tmux"
-	if !m.data.At.IsZero() {
-		stamp += " · updated " + m.data.At.Format("3:04:05 PM")
+	for _, tab := range []struct {
+		area  area
+		label string
+	}{{agentsArea, " a Agents "}, {worktreesArea, " b Worktrees "}} {
+		style := tui.Muted
+		if m.area == tab.area {
+			style = tui.Yellow.Background(tui.SelectedBackground)
+		}
+
+		tabs = append(tabs, style.Render(tab.label))
 	}
 
-	heading := title + tui.Muted.Render(stamp)
+	return strings.Join(tabs, "  ")
+}
 
-	summary := m.summary()
+func (m *model) toolbar() string {
+	if m.area == worktreesArea {
+		return tui.Yellow.Render("n") + " new   " + tui.Yellow.Render("d") + " remove   " + tui.Yellow.Render("r") + " refresh"
+	}
 
-	tabs := make([]string, 0, len(filters))
+	var tabs []string
 
 	for i, label := range filters {
 		label = fmt.Sprintf(" %s %d ", label, len(m.filtered(i)))
 
-		tab := tui.Muted.Render(label)
+		style := tui.Muted
 		if i == m.filter {
-			tab = tui.Yellow.Background(tui.SelectedBackground).Render(label)
+			style = tui.Yellow.Background(tui.SelectedBackground)
 		}
 
-		tabs = append(tabs, tab)
+		tabs = append(tabs, style.Render(label))
 	}
 
+	return strings.Join(tabs, " ")
+}
+
+func (m *model) View() tea.View {
+	width := max(12, m.width-2)
+	_, _, rows := m.panelDimensions(m.area)
+
+	summary := m.summary()
+	if m.area == worktreesArea {
+		summary = tui.Blue.Render(tui.ShortPath(m.root))
+	}
+
+	toolbar := m.toolbar()
+	body := m.panelsView()
 	helpView := tui.NewHelp(width)
 	footer := helpView.ShortHelpView([]key.Binding{keys.jump, keys.up, keys.down, keys.open, keys.quit})
 
-	help := helpView.ShortHelpView([]key.Binding{keys.nextFilter, keys.attention, keys.list, keys.details, keys.expand})
-	if m.opening {
-		help = "Opening agent…"
+	controls := []key.Binding{keys.list, keys.details, keys.expand, keys.create}
+	if m.area == agentsArea {
+		controls = append([]key.Binding{keys.nextFilter, keys.attention}, controls...)
+	} else {
+		controls = append(controls, keys.remove, keys.refresh)
 	}
 
+	help := helpView.ShortHelpView(controls)
 	if m.notice != "" {
-		help = m.notice
+		help = tui.CleanLine(m.notice)
 	}
 
-	if m.data.Err != nil {
-		help = "Status unavailable: " + tui.SingleLine(m.data.Err.Error())
+	if m.area == agentsArea && m.data.Err != nil {
+		help = "Agent status unavailable: " + tui.SingleLine(m.data.Err.Error())
 	}
 
-	content := strings.Join([]string{
-		tui.Pad(heading, width),
-		tui.Pad(summary, width),
-		"",
-		tui.Pad(strings.Join(tabs, " "), width),
-		m.panelsView(),
-		tui.Pad(footer, width),
-		tui.Pad(tui.Muted.Render(help), width),
-	}, "\n")
+	if m.area == worktreesArea && m.treeError != "" {
+		help = tui.SingleLine(m.treeError)
+	}
+
+	if m.create != nil {
+		summary = "Create from a committed base; local changes stay in the source."
+		toolbar = "New worktree"
+		title := "New worktree"
+		footer = "Enter create · Esc cancel · Tab ↑/↓ fields · Space toggle"
+
+		help = m.create.message
+		if m.create.picking {
+			summary = "Choose a conversation to fork into the new worktree."
+			toolbar = "Running conversations, grouped by repository"
+			title = "Conversation"
+			footer = "j/k ↑/↓ move · Enter choose · Esc back"
+			help = "Choose in Codex also lets you browse saved conversations."
+		}
+
+		body = panel(title, m.createView(width-4, rows), width, rows, true)
+	} else if m.remove != nil {
+		summary = "Review the checkout, branch, and tmux sessions below."
+		toolbar = "Remove worktree"
+
+		footer = "y remove · Esc cancel · k keep branch · ↑/↓ scroll"
+		if m.remove.keepBranch {
+			footer = "y remove · Esc cancel · k delete branch · ↑/↓ scroll"
+		}
+
+		help = ""
+		if m.remove.checking {
+			help = "Checking Git and tmux…"
+		}
+
+		if m.remove.err != nil || m.remove.checking {
+			footer = "k keep/delete branch · ↑/↓ scroll · Esc cancel"
+		}
+
+		body = panel("Remove worktree", m.removeView(width-4, rows), width, rows, true)
+	}
+
+	if m.busy {
+		footer = "Working…"
+	}
+
+	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(footer, width), tui.Pad(tui.Muted.Render(tui.CleanLine(help)), width)}, "\n")
 	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 
 	return view
-}
-
-type activity struct {
-	ID         string
-	generation uint64
-	Entries    []entry
-	Err        error
-}
-
-type entry struct{ Label, Text string }
-
-func activityEntries(data threadDetails) []entry {
-	var entries []entry
-	if data.HistoryError != nil {
-		entries = append(entries, entry{"Error", *data.HistoryError})
-	}
-
-	var turn struct {
-		Error *struct {
-			Message string `json:"message"`
-		} `json:"error"`
-	}
-	if json.Unmarshal(data.LatestTurn, &turn) == nil && turn.Error != nil {
-		entries = append(entries, entry{"Error", turn.Error.Message})
-	}
-
-	for _, raw := range data.RecentItems {
-		var row struct {
-			Item struct {
-				Type    string `json:"type"`
-				Text    string `json:"text"`
-				Command string `json:"command"`
-				Server  string `json:"server"`
-				Tool    string `json:"tool"`
-				Content []struct {
-					Type string `json:"type"`
-					Text string `json:"text"`
-				} `json:"content"`
-			} `json:"item"`
-		}
-		if json.Unmarshal(raw, &row) != nil {
-			continue
-		}
-
-		item := row.Item
-		e := entry{}
-
-		switch item.Type {
-		case "agentMessage":
-			e = entry{"Agent", item.Text}
-		case "userMessage":
-			e.Label = "Prompt"
-
-			for _, part := range item.Content {
-				if part.Type == "text" {
-					e.Text += part.Text + "\n"
-				}
-			}
-		case "commandExecution":
-			e = entry{"Command", item.Command}
-		case "mcpToolCall":
-			e = entry{"Tool", item.Server + " / " + item.Tool}
-		}
-
-		if e.Text != "" {
-			entries = append(entries, e)
-		}
-
-		if len(entries) >= 3 {
-			break
-		}
-	}
-
-	return entries
 }
