@@ -32,9 +32,6 @@ ShellPopup {
         id: filteredAgents
 
         sourceModel: root.backend.agents
-        sorters: RoleSorter {
-            roleName: "path"
-        }
         filters: ValueFilter {
             roleName: "needsAttention"
             value: true

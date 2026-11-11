@@ -54,6 +54,11 @@ Scope {
 
     function syncAgents(next) {
         // Keep delegates alive across refreshes so clicks and focus are not interrupted.
+        const ids = new Set(next.map(agent => agent.id));
+        for (let i = agentModel.count - 1; i >= 0; --i) {
+            if (!ids.has(agentModel.get(i).threadId))
+                agentModel.remove(i);
+        }
         for (let i = 0; i < next.length; ++i) {
             const agent = next[i];
             let existing = i;
@@ -79,8 +84,6 @@ Scope {
                 agentModel.set(i, row);
             }
         }
-        if (agentModel.count > next.length)
-            agentModel.remove(next.length, agentModel.count - next.length);
     }
 
     function open(threadId) {

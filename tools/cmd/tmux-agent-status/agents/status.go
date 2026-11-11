@@ -7,8 +7,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -68,6 +70,19 @@ type Connection struct {
 
 func rank(state string) int { return slices.Index(states, state) }
 
+// Pane IDs remain stable across status changes, renames, and tmux reindexing.
+func paneNumber(a Agent) int {
+	number := math.MaxInt
+
+	for _, pane := range a.Panes {
+		if n, err := strconv.Atoi(strings.TrimPrefix(pane, "%")); err == nil {
+			number = min(number, n)
+		}
+	}
+
+	return number
+}
+
 func classify(result codex.ReadResult) string {
 	switch result.Thread.Status.Type {
 	case "active":
@@ -124,7 +139,7 @@ func agentRecord(result codex.ReadResult) Agent {
 	return record
 }
 
-// Collect reads loaded conversations with matching live tmux panes.
+// Collect reads loaded conversations with live tmux panes, ordered by path and pane ID.
 func Collect(ctx context.Context) (data Snapshot) {
 	data = Snapshot{
 		SchemaVersion: 1, Source: "codex", Scope: "tmux",
@@ -207,10 +222,9 @@ func Collect(ctx context.Context) (data Snapshot) {
 
 	slices.SortFunc(data.Agents, func(a, b Agent) int {
 		return cmp.Or(
-			cmp.Compare(rank(a.State), rank(b.State)),
-			strings.Compare(strings.ToLower(a.Cwd), strings.ToLower(b.Cwd)),
-			strings.Compare(strings.ToLower(a.Title), strings.ToLower(b.Title)),
-			strings.Compare(a.ID, b.ID),
+			cmp.Compare(a.Cwd, b.Cwd),
+			cmp.Compare(paneNumber(a), paneNumber(b)),
+			cmp.Compare(a.ID, b.ID),
 		)
 	})
 

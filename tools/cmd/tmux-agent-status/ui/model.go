@@ -6,10 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -190,19 +188,6 @@ const (
 
 var filters = []string{"All", "Needs you", "Working", "Unread", "Idle"}
 
-// Pane IDs remain stable across status changes, renames, and tmux reindexing.
-func agentPaneNumber(a agents.Agent) int {
-	number := math.MaxInt
-
-	for _, pane := range a.Panes {
-		if n, err := strconv.Atoi(strings.TrimPrefix(pane, "%")); err == nil {
-			number = min(number, n)
-		}
-	}
-
-	return number
-}
-
 func agentRow(a agents.Agent) tui.ListItem {
 	style, label, _ := stateStyle(a.State)
 
@@ -350,13 +335,6 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 			}
 		}
 
-		slices.SortFunc(msg.Agents, func(a, b agents.Agent) int {
-			return cmp.Or(
-				cmp.Compare(a.Cwd, b.Cwd),
-				cmp.Compare(agentPaneNumber(a), agentPaneNumber(b)),
-				cmp.Compare(a.ID, b.ID),
-			)
-		})
 		m.data = msg
 
 		cmd := m.updateAgents()
