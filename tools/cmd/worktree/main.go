@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ddeville/scripts/tools/internal/tui"
+	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
 func main() {
@@ -31,11 +32,7 @@ func main() {
 type settings struct{ root, directory string }
 
 func command() *cobra.Command {
-	options := &settings{root: os.Getenv("GIT_SRC_WORKTREE_DIR"), directory: "."}
-	if options.root == "" {
-		home, _ := os.UserHomeDir()
-		options.root = filepath.Join(home, "src/worktrees")
-	}
+	options := &settings{root: worktree.DefaultRoot(), directory: "."}
 
 	cmd := &cobra.Command{
 		Use:           "worktree",
@@ -61,24 +58,7 @@ func command() *cobra.Command {
 	}
 	cmd.SetOut(os.Stdout)
 	cmd.PersistentFlags().StringVar(&options.root, "root", options.root, "directory containing repo/worktree folders")
-	cmd.AddCommand(createCommand(options), listCommand(options), openCommand(options), removeCommand(options), tuiCommand(options))
-
-	return cmd
-}
-
-func tuiCommand(options *settings) *cobra.Command {
-	var client string
-
-	cmd := &cobra.Command{
-		Use:   "tui",
-		Short: "Create, open, and remove worktrees interactively",
-		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			return runTUI(cmd.Context(), options.root, options.directory, client)
-		},
-	}
-	cmd.Flags().StringVar(&client, "client", "", "tmux client to switch")
-	cmd.Flags().StringVarP(&options.directory, "directory", "C", options.directory, "initial source repository or worktree")
+	cmd.AddCommand(createCommand(options), listCommand(options), openCommand(options), removeCommand(options))
 
 	return cmd
 }

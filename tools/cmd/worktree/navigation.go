@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ddeville/scripts/tools/internal/tmux"
+	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
 func listCommand(options *settings) *cobra.Command {
@@ -21,7 +22,7 @@ func listCommand(options *settings) *cobra.Command {
 		Short:   "List managed worktrees, Git state, and tmux sessions",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			items, err := listWorktrees(cmd.Context(), options.root)
+			items, err := worktree.List(cmd.Context(), options.root)
 			if err != nil {
 				return fmt.Errorf("list worktrees: %w", err)
 			}
@@ -66,12 +67,12 @@ func openCommand(options *settings) *cobra.Command {
 		Short: "Switch to a worktree's tmux session, creating it if missing",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			item, err := resolveWorktree(cmd.Context(), options.root, options.directory, target(args))
+			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, target(args))
 			if err != nil {
 				return fmt.Errorf("resolve worktree: %w", err)
 			}
 
-			id, err := ensureSession(cmd.Context(), item, sessionOptions{})
+			id, err := worktree.Open(cmd.Context(), item)
 			if err != nil {
 				return fmt.Errorf("open session: %w", err)
 			}

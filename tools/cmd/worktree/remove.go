@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
 func removeCommand(options *settings) *cobra.Command {
@@ -17,12 +19,12 @@ func removeCommand(options *settings) *cobra.Command {
 		Short:   "Remove a clean worktree, its merged branch, and matching tmux sessions",
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			item, err := resolveWorktree(cmd.Context(), options.root, options.directory, target(args))
+			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, target(args))
 			if err != nil {
 				return fmt.Errorf("resolve worktree: %w", err)
 			}
 
-			plan, err := planRemoval(cmd.Context(), item, keepBranch)
+			plan, err := worktree.PlanRemoval(cmd.Context(), item, keepBranch)
 			if err != nil {
 				return fmt.Errorf("plan removal: %w", err)
 			}
@@ -57,7 +59,7 @@ func removeCommand(options *settings) *cobra.Command {
 				}
 			}
 
-			if err := removeWorktree(cmd.Context(), plan); err != nil {
+			if err := worktree.Remove(cmd.Context(), plan); err != nil {
 				return fmt.Errorf("remove worktree: %w", err)
 			}
 
