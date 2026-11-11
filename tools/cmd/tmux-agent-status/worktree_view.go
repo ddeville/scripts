@@ -9,16 +9,16 @@ import (
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
-func worktreeStateStyle(status string) (string, lipgloss.Style) {
+func worktreeStateStyle(status string) (lipgloss.Style, string, string) {
 	switch status {
 	case "clean":
-		return "Clean", tui.Green
+		return tui.Muted, "Clean", "Clean working tree"
 	case "dirty":
-		return "Changed", tui.Yellow
+		return tui.Yellow, "Changed", "Changed working tree"
 	case "unknown":
-		return "Error", tui.Red
+		return tui.Red, "Error", "Could not read Git status"
 	default:
-		return "…", tui.Muted
+		return tui.Muted, "…", "Reading Git status…"
 	}
 }
 
@@ -28,23 +28,24 @@ func (m *model) worktreeDetails(width int) string {
 		return tui.Muted.Render("Create a worktree with n.")
 	}
 
-	state, style := worktreeStateStyle(item.Status)
-	lines := []string{
-		tui.Yellow.Bold(true).Render(tui.CleanLine(item.Name)),
-		tui.Blue.Render(tui.ShortPath(item.Path)), "",
-		style.Render(state) + tui.Muted.Render(" working tree"),
-		tui.Muted.Render("Branch  ") + tui.CleanLine(item.Branch), "",
-		tui.Muted.Render("TMUX SESSION"),
-	}
+	style, _, hint := worktreeStateStyle(item.Status)
+	action := "to open"
+	session := tui.Muted.Render("Not running")
 
-	session := "Enter creates repo / editor / Codex"
-	if !m.sessionsReady {
-		session = "Checking sessions…"
-	} else if item.Session.ID != "" {
+	switch {
+	case !m.sessionsReady:
+		session = tui.Muted.Render("Checking sessions…")
+	case item.Session.ID != "":
 		session = tui.CleanLine(item.Session.Name)
+	default:
+		action = "to create repo / editor / Codex"
 	}
 
-	lines = append(lines, session, "", tui.Muted.Render("CHANGES"))
+	lines := detailHeader(item.Name, item.Path, style.Render(hint), action)
+	lines = append(lines,
+		"", tui.Heading.Render("Branch"), tui.CleanLine(item.Branch),
+		"", tui.Heading.Render("Tmux session"), session,
+		"", tui.Heading.Render("Changes"))
 
 	changes := m.changes[item.Path]
 	switch {

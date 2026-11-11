@@ -73,9 +73,9 @@ func (m *model) reloadWorktrees(path string) tea.Cmd {
 func (m *model) updateTreeList(path string) {
 	m.worktreeView.list.Items = make([]tui.ListItem, 0, len(m.trees))
 	for _, item := range m.trees {
-		state, style := worktreeStateStyle(item.Status)
+		style, state, _ := worktreeStateStyle(item.Status)
 		m.worktreeView.list.Items = append(m.worktreeView.list.Items, tui.ListItem{
-			ID: item.Path, Group: item.Repo, Title: item.Name, Subtitle: item.Branch, Status: state, Style: style,
+			ID: item.Path, Group: item.Repo, Title: item.Name, Subtitle: item.Branch, Status: state, StatusStyle: style,
 		})
 	}
 

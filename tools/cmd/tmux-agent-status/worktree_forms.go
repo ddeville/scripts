@@ -140,7 +140,7 @@ func (m *model) updateThreadChoices() {
 	}
 
 	form.choices.Items = append(form.choices.Items, tui.ListItem{
-		ID: "codex-picker", Group: "Other conversations", Title: "Choose in Codex", Subtitle: "Browse saved conversations when the new session opens", Style: tui.Muted,
+		ID: "codex-picker", Group: "Other conversations", Title: "Choose in Codex", Subtitle: "Browse saved conversations when the new session opens", StatusStyle: tui.Muted,
 	})
 	form.choices.SelectID(selected)
 

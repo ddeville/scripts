@@ -104,7 +104,7 @@ func (m *model) createView(width, rows int) string {
 
 func (m *model) removeView(width, rows int) string {
 	form := m.remove
-	lines := []string{tui.Yellow.Bold(true).Render(tui.CleanLine(form.item.Repo + " / " + form.item.Name)), tui.Blue.Render(ansi.Wrap(tui.ShortPath(form.item.Path), width, "")), ""}
+	lines := []string{tui.Title.Render(tui.CleanLine(form.item.Repo + " / " + form.item.Name)), tui.Muted.Render(ansi.Wrap(tui.ShortPath(form.item.Path), width, "")), ""}
 
 	branch := "Delete branch: " + form.item.Branch
 	if form.keepBranch {

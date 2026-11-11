@@ -43,6 +43,15 @@ func panel(title, content string, width, rows int, focused bool) string {
 		Render(style.Render(tui.Fit(title, width-4)) + "\n\n" + content)
 }
 
+func detailHeader(title, path, status, action string) []string {
+	return []string{
+		tui.Title.Render(tui.CleanLine(title)),
+		tui.Muted.Render(tui.ShortPath(path)), "",
+		status,
+		tui.Yellow.Render("Enter") + " " + action,
+	}
+}
+
 func (m *model) listView() string {
 	view := m.activeView()
 	if len(view.list.Items) > 0 {
@@ -67,7 +76,7 @@ func (m *model) panelsView() string {
 	left, right, rows := m.panelDimensions(m.area)
 	view := m.activeView()
 	list := m.listView()
-	title := fmt.Sprintf("Threads · %d", len(view.list.Items))
+	title := fmt.Sprintf("Agents · %d", len(view.list.Items))
 	detailTitle := "Selected agent"
 
 	if m.area == worktreesArea {
@@ -108,7 +117,8 @@ func (m *model) areaHeading() string {
 
 func (m *model) toolbar() string {
 	if m.area == worktreesArea {
-		return tui.Yellow.Render("n") + " new   " + tui.Yellow.Render("d") + " remove   " + tui.Yellow.Render("r") + " refresh"
+		help := tui.NewHelp(max(12, m.width-2))
+		return help.ShortHelpView([]key.Binding{keys.create, keys.remove})
 	}
 
 	var tabs []string
@@ -133,7 +143,7 @@ func (m *model) View() tea.View {
 
 	summary := m.summary()
 	if m.area == worktreesArea {
-		summary = tui.Blue.Render(tui.ShortPath(m.root))
+		summary = tui.Muted.Render(tui.ShortPath(m.root))
 	}
 
 	toolbar := m.toolbar()
@@ -150,15 +160,15 @@ func (m *model) View() tea.View {
 
 	help := helpView.ShortHelpView(controls)
 	if m.notice != "" {
-		help = tui.CleanLine(m.notice)
+		help = tui.Muted.Render(tui.CleanLine(m.notice))
 	}
 
 	if m.area == agentsArea && m.data.Err != nil {
-		help = "Agent status unavailable: " + tui.SingleLine(m.data.Err.Error())
+		help = tui.Red.Render("Agent status unavailable: " + tui.SingleLine(m.data.Err.Error()))
 	}
 
 	if m.area == worktreesArea && m.treeError != "" {
-		help = tui.SingleLine(m.treeError)
+		help = tui.Red.Render(tui.SingleLine(m.treeError))
 	}
 
 	if m.create != nil {
@@ -167,13 +177,13 @@ func (m *model) View() tea.View {
 		title := "New worktree"
 		footer = "Enter create · Esc cancel · Tab ↑/↓ fields · Space toggle"
 
-		help = m.create.message
+		help = tui.Muted.Render(tui.CleanLine(m.create.message))
 		if m.create.picking {
 			summary = "Choose a conversation to fork into the new worktree."
 			toolbar = "Running conversations, grouped by repository"
 			title = "Conversation"
 			footer = "j/k ↑/↓ move · Enter choose · Esc back"
-			help = "Choose in Codex also lets you browse saved conversations."
+			help = tui.Muted.Render("Choose in Codex also lets you browse saved conversations.")
 		}
 
 		body = panel(title, m.createView(width-4, rows), width, rows, true)
@@ -188,7 +198,7 @@ func (m *model) View() tea.View {
 
 		help = ""
 		if m.remove.checking {
-			help = "Checking Git and tmux…"
+			help = tui.Muted.Render("Checking Git and tmux…")
 		}
 
 		if m.remove.err != nil || m.remove.checking {
@@ -202,7 +212,7 @@ func (m *model) View() tea.View {
 		footer = "Working…"
 	}
 
-	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(footer, width), tui.Pad(tui.Muted.Render(tui.CleanLine(help)), width)}, "\n")
+	content := strings.Join([]string{tui.Pad(m.areaHeading(), width), tui.Pad(summary, width), "", tui.Pad(toolbar, width), body, tui.Pad(footer, width), tui.Pad(help, width)}, "\n")
 	view := tea.NewView(tui.Frame.Render(content))
 	view.AltScreen = true
 

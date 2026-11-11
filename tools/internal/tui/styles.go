@@ -19,17 +19,20 @@ var (
 	Cyan    = lipgloss.NewStyle().Foreground(lipgloss.Cyan)
 	Magenta = lipgloss.NewStyle().Foreground(lipgloss.Magenta)
 
+	Title   = Yellow.Bold(true)
+	Heading = Blue.Bold(true)
+
 	SelectedBackground = lipgloss.Color("237")
 	Selected           = lipgloss.NewStyle().Background(SelectedBackground)
 	Frame              = lipgloss.NewStyle().Padding(1, 1, 0, 1)
 )
 
-// NewHelp creates a help view with the shared muted styling and separators.
+// NewHelp uses yellow keys, normal descriptions, and muted separators.
 func NewHelp(width int) help.Model {
 	model := help.New()
 	model.SetWidth(width)
 	model.ShortSeparator = " · "
-	model.Styles = help.Styles{ShortKey: Muted, ShortDesc: Muted, ShortSeparator: Muted, Ellipsis: Muted}
+	model.Styles = help.Styles{ShortKey: Yellow, ShortDesc: lipgloss.NewStyle(), ShortSeparator: Muted, Ellipsis: Muted}
 
 	return model
 }
@@ -39,7 +42,7 @@ func SectionHeading(label string, count, width int) string {
 	countText := fmt.Sprintf("  %d  ", count)
 	label = Fit(CleanLine(label), max(0, width-len(countText)-5))
 
-	heading := " " + Blue.Bold(true).Render(label) + Muted.Render(countText)
+	heading := " " + Heading.Render(label) + Muted.Render(countText)
 	rule := strings.Repeat("─", max(0, width-ansi.StringWidth(heading)-1))
 
 	return Fit(heading+Muted.Render(rule), width)

@@ -15,7 +15,7 @@ import (
 // ListItem is a two-line row in a grouped navigation list.
 type ListItem struct {
 	ID, Group, Title, Subtitle, Status, Indicator string
-	Style                                         lipgloss.Style
+	StatusStyle                                   lipgloss.Style
 }
 
 // List keeps selection, group headings, and complete rows visible while scrolling.
@@ -171,7 +171,7 @@ func (l *List) render() {
 
 func (a ListItem) render(width, numberWidth, statusWidth, position int, selected bool) string {
 	width = max(0, width-1)
-	style := a.Style
+	style := a.StatusStyle
 
 	base, keyStyle, subtitleStyle := lipgloss.NewStyle(), Muted, Muted
 	if selected {
@@ -206,7 +206,7 @@ func (a ListItem) render(width, numberWidth, statusWidth, position int, selected
 	}
 
 	prefix := marker + base.Render(" ") + keyStyle.Render(fmt.Sprintf("%*d ", numberWidth, position)) + style.Render(indicator)
-	name := style.Bold(selected).Render(Pad(SingleLine(a.Title), titleWidth))
+	name := base.Bold(selected).Render(Pad(SingleLine(a.Title), titleWidth))
 	subtitle := marker + base.Render(strings.Repeat(" ", prefixWidth-1)) + subtitleStyle.Render(Pad(SingleLine(a.Subtitle), width-prefixWidth))
 	padding := base.Render(" ")
 

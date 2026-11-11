@@ -15,17 +15,17 @@ import (
 func stateStyle(state string) (lipgloss.Style, string, string) {
 	switch state {
 	case "approval":
-		return tui.Red, "Approve", "Waiting for approval. Open the agent to approve or reject."
+		return tui.Yellow, "Approve", "Waiting for approval. Open the agent to approve or reject."
 	case "input":
-		return tui.Red, "Reply", "Waiting for your answer. Open the agent to reply."
+		return tui.Yellow, "Reply", "Waiting for your answer. Open the agent to reply."
 	case "error":
-		return tui.Magenta, "Check error", "The agent reported an error. Open it to investigate."
+		return tui.Red, "Check error", "The agent reported an error. Open it to investigate."
 	case "ready":
 		return tui.Green, "Read result", "A completed result is waiting to be read."
 	case "working":
 		return tui.Cyan, "Working", "Working. Open the agent to follow progress or steer it."
 	case "idle":
-		return lipgloss.NewStyle(), "Idle", "Idle. Open the agent to continue the conversation."
+		return tui.Muted, "Idle", "Idle. Open the agent to continue the conversation."
 	default:
 		return tui.Muted, "Check status", "Status is unknown. Open the agent to check."
 	}
@@ -34,10 +34,10 @@ func stateStyle(state string) (lipgloss.Style, string, string) {
 func (m *model) summary() string {
 	if m.data.Err != nil {
 		if m.data.At.IsZero() {
-			return tui.Magenta.Render("Agent status unavailable")
+			return tui.Red.Render("Agent status unavailable")
 		}
 
-		return tui.Magenta.Render("Status unavailable · showing last known data")
+		return tui.Red.Render("Status unavailable · showing last known data")
 	}
 
 	if m.data.At.IsZero() {
@@ -69,16 +69,10 @@ func (m *model) detailContent(width int) string {
 	a := m.data.Agents[index]
 	style, _, hint := stateStyle(a.State)
 
-	lines := []string{
-		tui.Yellow.Bold(true).Render(tui.CleanText(a.Title)),
-		tui.Blue.Render(tui.ShortPath(a.Cwd)),
-		"",
-		style.Render(hint),
-		tui.Yellow.Render("Enter") + tui.Muted.Render(" to open"),
-	}
+	lines := detailHeader(a.Title, a.Cwd, style.Render(hint), "to open")
 
 	if a.Error != nil {
-		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(*a.Error)))
+		lines = append(lines, "", tui.Red.Render(tui.CleanText(*a.Error)))
 	}
 
 	entries := m.activity.Entries
@@ -87,7 +81,7 @@ func (m *model) detailContent(width int) string {
 	}
 
 	if m.activity.Err != nil {
-		lines = append(lines, "", tui.Magenta.Render(tui.CleanText(m.activity.Err.Error())))
+		lines = append(lines, "", tui.Red.Render(tui.CleanText(m.activity.Err.Error())))
 	}
 
 	for _, e := range entries {
@@ -96,26 +90,15 @@ func (m *model) detailContent(width int) string {
 			text = text[:6000]
 		}
 
-		lines = append(lines, "", entryStyle(e.Label).Bold(true).Render(e.Label),
-			strings.ReplaceAll(tui.CleanText(string(text)), "\t", "    "))
+		body := strings.ReplaceAll(tui.CleanText(string(text)), "\t", "    ")
+		if e.Label == "Error" {
+			body = tui.Red.Render(body)
+		}
+
+		lines = append(lines, "", tui.Heading.Render(e.Label), body)
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), width, "")
-}
-
-func entryStyle(label string) lipgloss.Style {
-	switch label {
-	case "Prompt":
-		return tui.Blue
-	case "Agent":
-		return tui.Cyan
-	case "Command", "Tool":
-		return tui.Yellow
-	case "Error":
-		return tui.Magenta
-	default:
-		return tui.Muted
-	}
 }
 
 type activity struct {

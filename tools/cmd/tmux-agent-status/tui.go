@@ -182,7 +182,7 @@ func agentRow(a agent) tui.ListItem {
 		title = "↳ " + title
 	}
 
-	return tui.ListItem{ID: a.ID, Group: cmp.Or(tui.ShortPath(a.Cwd), "Unknown location"), Title: title, Subtitle: a.Preview, Status: label, Indicator: indicator, Style: style}
+	return tui.ListItem{ID: a.ID, Group: cmp.Or(tui.ShortPath(a.Cwd), "Unknown location"), Title: title, Subtitle: a.Preview, Status: label, Indicator: indicator, StatusStyle: style}
 }
 
 func (m *model) selectAgent(id string) tea.Cmd {
