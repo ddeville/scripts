@@ -112,10 +112,14 @@ func ensureSession(ctx context.Context, item Info, options sessionOptions) (stri
 	}
 
 	command := []string{"codex"}
-	if options.Fork != "" {
+
+	switch {
+	case options.Fork != "":
 		command = append(command, "fork", "--cd", item.Path, "--", options.Fork)
-	} else if options.ForkPicker {
+	case options.ForkPicker:
 		command = append(command, "fork", "--all", "--cd", item.Path)
+	default:
+		command = append(command, "resume")
 	}
 
 	source := options.SourceDir
