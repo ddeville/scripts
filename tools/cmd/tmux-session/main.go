@@ -21,13 +21,14 @@ import (
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := command().ExecuteContext(ctx)
+	cmd := command()
+	err := cmd.ExecuteContext(ctx)
 	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
 
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-session:", tui.CleanLine(err.Error()))
+		fmt.Fprintln(os.Stderr, cmd.Name()+":", tui.CleanLine(err.Error()))
 		os.Exit(1)
 	}
 }
@@ -38,10 +39,19 @@ func command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "tmux-session <path> [session-name]",
 		Short:         "Create a tmux session with repo, editor, and Codex windows",
-		Args:          cobra.RangeArgs(1, 2),
+		Example:       "  tmux-session .\n  tmux-session ~/src/project my-project\n  tmux-session --no-switch .",
+		Args:          cobra.MaximumNArgs(2),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				if err := cmd.Help(); err != nil {
+					return fmt.Errorf("show help: %w", err)
+				}
+
+				return nil
+			}
+
 			directory, err := resolveDirectory(args[0])
 			if err != nil {
 				return err
