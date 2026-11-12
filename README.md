@@ -40,7 +40,7 @@ Run `systemctl --user restart hyprpaper.service` after changing the wallpaper.
 
 ## Maintenance
 
-- Run `update-shell-plugins` to update the shell plugins.
 - Run `stow-config` whenever there's a new file that should be symlinked or a tool that should be installed.
+- Run `update-shell-plugins` to update the shell plugins.
 - Run `bus` to install/update all packages.
 - On Arch Linux, run `make -C install system-config` to apply system configuration changes.
