@@ -16,11 +16,7 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 
 - On MacOS, use Ghostty as the default terminal and give it Full Disk Access and Developer Tools support by going to "System Settings" > "Privacy & Security" > "Full Disk Access" / "Developer Tools". The installer associates Unix executables with Ghostty.
 - On Arch Linux, adjust displays in `config/linux/.config/hypr/hyprland.lua` and workspace assignments in `config/linux/.config/hypr/workspaces.lua`.
-- Check health of a few Neovim plugins and make sure that the appropriate packages are installed:
-    - `nvim +checkhealth lazy`
-    - `nvim +checkhealth mason`
-    - `nvim +checkhealth conform`
-    - `nvim +checkhealth` to check health of everything at once
+- Check health of a few Neovim plugins and make sure that the appropriate packages are installed with `nvim +checkhealth`.
 
 ### System configuration on Arch Linux
 
