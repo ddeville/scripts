@@ -40,6 +40,9 @@ case "$arch" in
 "x86_64")
   arch="amd64"
   ;;
+"aarch64")
+  arch="arm64"
+  ;;
 esac
 
 if [[ -d $install_dir && ! -x $install_dir/bin/go ]]; then
