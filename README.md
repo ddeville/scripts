@@ -24,9 +24,9 @@ Give Terminal Full Disk Access and run the `install/macos/install.sh` script.
 
 ### System configuration on Arch Linux
 
-[install/arch/config/](install/arch/config/) contains the greeter and PAM configuration copied into `/etc` by the Arch installer. Edit the repository files and run `make -C install system-config` to apply changes. This also enables system services without restarting them; edits made directly to the managed files in `/etc` are overwritten.
+[install/arch/config/](install/arch/config/) contains the greeter and PAM configuration copied into `/etc` by the Arch installer. Edit the repository files and run `make -C install system-config` to apply changes. Edits made directly to the managed files in `/etc` are overwritten.
 
-Fingerprint authentication is configured for login, sudo, polkit, and hyprlock. Enroll fingerprints separately with `fprintd-enroll damien -f right-index-finger`.
+Enroll fingerprints separately with `fprintd-enroll damien -f right-index-finger`.
 
 ### Backgrounds on Arch Linux
 
@@ -40,7 +40,7 @@ Place images in `/usr/share/backgrounds`, keeping their original extensions, and
 
 For example, `sudo ln -sfn 18.jpg /usr/share/backgrounds/login` selects `18.jpg` as the login background.
 
-Run `systemctl --user restart hyprpaper.service` after changing the wallpaper. Login and lock backgrounds load on their next launch. Missing images leave a plain background without preventing login or locking.
+Run `systemctl --user restart hyprpaper.service` after changing the wallpaper.
 
 ## Maintenance
 
