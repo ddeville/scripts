@@ -3,13 +3,15 @@ package worktree
 import (
 	"context"
 	"fmt"
+
+	"github.com/ddeville/scripts/tools/internal/session"
 )
 
 // Create makes a managed checkout and its repo/editor/Codex session unless NoTmux is set.
 // The checkout is returned even when subsequent session setup fails.
 func Create(ctx context.Context, root string, options CreateOptions) (Info, string, error) {
 	if !options.NoTmux {
-		if err := checkSessionTools(); err != nil {
+		if err := session.CheckTools(); err != nil {
 			return Info{}, "", fmt.Errorf("check session tools: %w", err)
 		}
 	}

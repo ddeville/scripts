@@ -2,39 +2,19 @@ package worktree
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
-	"os/exec"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/ddeville/scripts/tools/internal/session"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 )
-
-var errEditor = errors.New("EDITOR is not set")
 
 type sessionOptions struct {
 	Fork       string
 	ForkPicker bool
 	SourceDir  string
-}
-
-func checkSessionTools() error {
-	if _, err := exec.LookPath("tmux"); err != nil {
-		return fmt.Errorf("find tmux: %w", err)
-	}
-
-	if os.Getenv("EDITOR") == "" {
-		return errEditor
-	}
-
-	if _, err := exec.LookPath("codex"); err != nil {
-		return fmt.Errorf("find Codex: %w", err)
-	}
-
-	return nil
 }
 
 func sessionName(item Info) string {
@@ -78,37 +58,9 @@ func ensureSession(ctx context.Context, item Info, options sessionOptions) (stri
 		return existing.ID, nil
 	}
 
-	if err := checkSessionTools(); err != nil {
-		return "", err
-	}
-
 	name := sessionName(item)
 	for suffix := 2; slices.ContainsFunc(sessions, func(s tmux.Session) bool { return s.Name == name }); suffix++ {
 		name = fmt.Sprintf("%s-%d", sessionName(item), suffix)
-	}
-
-	id, err := tmux.NewSession(ctx, name, "repo", item.Path)
-	if err != nil {
-		return "", fmt.Errorf("create session: %w", err)
-	}
-
-	ready := false
-
-	defer func() {
-		if !ready {
-			cleanup, stop := context.WithTimeout(context.WithoutCancel(ctx), 2*time.Second)
-			defer stop()
-
-			_ = tmux.KillSession(cleanup, id)
-		}
-	}()
-
-	if err := tmux.SetOption(ctx, id, "@display_name", item.Name); err != nil {
-		return "", fmt.Errorf("set session display name: %w", err)
-	}
-
-	if err := tmux.NewWindow(ctx, id, "editor", item.Path, os.Getenv("EDITOR")); err != nil {
-		return "", fmt.Errorf("create editor window: %w", err)
 	}
 
 	command := []string{"codex"}
@@ -122,25 +74,18 @@ func ensureSession(ctx context.Context, item Info, options sessionOptions) (stri
 		command = append(command, "resume")
 	}
 
-	source := options.SourceDir
-	if source == "" {
-		source = item.Path
-	}
-
-	if err := tmux.NewWindow(ctx, id, "codex", source, command...); err != nil {
-		return "", fmt.Errorf("create Codex window: %w", err)
-	}
-
 	window := "repo"
 	if options.Fork != "" || options.ForkPicker {
 		window = "codex"
 	}
 
-	if err := tmux.SelectWindow(ctx, id, window); err != nil {
-		return "", fmt.Errorf("select session window: %w", err)
+	id, err := session.Create(ctx, session.Options{
+		Name: name, Directory: item.Path, DisplayName: item.Name,
+		CodexDirectory: options.SourceDir, CodexCommand: command, ActiveWindow: window,
+	})
+	if err != nil {
+		return "", fmt.Errorf("set up session: %w", err)
 	}
-
-	ready = true
 
 	return id, nil
 }
