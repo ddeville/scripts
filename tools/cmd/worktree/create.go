@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
@@ -26,7 +27,7 @@ func createCommand(options *settings) *cobra.Command {
 		Use:     "create <name>",
 		Aliases: []string{"new"},
 		Short:   "Create a worktree, tmux session, editor, and forked Codex thread",
-		Args:    cobra.ExactArgs(1),
+		Args:    cli.ExactArgs("worktree name"),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if forkCurrent {
 				fork = os.Getenv("CODEX_THREAD_ID")

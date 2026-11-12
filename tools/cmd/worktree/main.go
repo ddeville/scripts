@@ -18,13 +18,14 @@ import (
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := command().ExecuteContext(ctx)
+	cmd := command()
+	err := cmd.ExecuteContext(ctx)
 	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
 
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "worktree:", tui.CleanLine(err.Error()))
+		fmt.Fprintln(os.Stderr, cmd.Name()+":", tui.CleanLine(err.Error()))
 		os.Exit(1)
 	}
 }

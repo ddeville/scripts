@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui"
+	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/tui"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
@@ -22,13 +23,14 @@ var errInvalidInterval = errors.New("interval must be a positive number of secon
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := command().ExecuteContext(ctx)
+	cmd := command()
+	err := cmd.ExecuteContext(ctx)
 	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
 
 	stop()
 
 	if failed {
-		fmt.Fprintln(os.Stderr, "tmux-agent-status:", tui.CleanText(err.Error()))
+		fmt.Fprintln(os.Stderr, cmd.Name()+":", tui.CleanText(err.Error()))
 		os.Exit(1)
 	}
 }
@@ -104,7 +106,7 @@ func command() *cobra.Command {
 	open := &cobra.Command{
 		Use:   "open THREAD_ID",
 		Short: "Open an agent in the only attached tmux client",
-		Args:  cobra.ExactArgs(1),
+		Args:  cli.ExactArgs("thread ID"),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return openThread(cmd.Context(), args[0])
 		},
