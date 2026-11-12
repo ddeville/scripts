@@ -4,6 +4,7 @@ package agents
 import (
 	"cmp"
 	"context"
+	"fmt"
 	"slices"
 	"time"
 
@@ -230,6 +231,9 @@ func (m *Model) updateAgentDetails() {
 // Row renders a conversation consistently in the list and fork chooser.
 func Row(a agentdata.Agent) tui.ListItem {
 	style, label, _ := stateStyle(a.State)
+	if len(a.Panes) > 1 {
+		label += fmt.Sprintf(" · %d panes", len(a.Panes))
+	}
 
 	indicator := "●"
 	if a.State == "idle" {

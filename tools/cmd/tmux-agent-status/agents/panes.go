@@ -13,7 +13,7 @@ import (
 var titleID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-(?:[0-9a-f]{12}|[0-9a-f]{5}\.\.\.)$`)
 
 // ErrPaneMatch means a conversation could not be resolved to exactly one live pane.
-var ErrPaneMatch = errors.New("expected one live pane")
+var ErrPaneMatch = errors.New("thread must be open in exactly one tmux pane")
 
 // MatchPanes checks all loaded IDs so truncated titles cannot resolve ambiguously.
 func MatchPanes(ctx context.Context, ids []string) (map[string][]string, error) {

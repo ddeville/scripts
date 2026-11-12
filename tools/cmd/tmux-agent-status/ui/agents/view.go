@@ -70,7 +70,12 @@ func (m *Model) detailContent(width int) string {
 	}
 
 	a := m.data.Agents[index]
+
 	style, _, hint := stateStyle(a.State)
+	if len(a.Panes) > 1 {
+		style = tui.Yellow
+		hint = fmt.Sprintf("This thread is open in %d tmux panes. Close the extra Codex instance, then try again.", len(a.Panes))
+	}
 
 	lines := panel.DetailHeader(a.Title, a.Cwd, style.Render(hint), "to open")
 
