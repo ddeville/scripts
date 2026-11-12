@@ -34,13 +34,16 @@ func main() {
 }
 
 func command() *cobra.Command {
-	var noSwitch bool
+	var (
+		name     string
+		noSwitch bool
+	)
 
 	cmd := &cobra.Command{
-		Use:           "tmux-session <path> [session-name]",
+		Use:           "tmux-session <path>",
 		Short:         "Create a tmux session with repo, editor, and Codex windows",
-		Example:       "  tmux-session .\n  tmux-session ~/src/project my-project\n  tmux-session --no-switch .",
-		Args:          cobra.MaximumNArgs(2),
+		Example:       "  tmux-session .\n  tmux-session ~/src/project --name my-project\n  tmux-session --no-switch . -n scratch",
+		Args:          cobra.MaximumNArgs(1),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -61,22 +64,22 @@ func command() *cobra.Command {
 				return fmt.Errorf("check session tools: %w", err)
 			}
 
-			name := filepath.Base(directory)
-			if len(args) == 2 {
-				name = args[1]
+			sessionName := filepath.Base(directory)
+			if cmd.Flags().Changed("name") {
+				sessionName = name
 			}
 
-			name, err = chooseName(cmd, name)
+			sessionName, err = chooseName(cmd, sessionName)
 			if err != nil {
 				return fmt.Errorf("choose session name: %w", err)
 			}
 
-			id, err := session.Create(cmd.Context(), session.Options{Name: name, Directory: directory})
+			id, err := session.Create(cmd.Context(), session.Options{Name: sessionName, Directory: directory})
 			if err != nil {
 				return fmt.Errorf("set up session: %w", err)
 			}
 
-			cmd.Printf("Created tmux session: %s\nWorkdir: %s\n", tui.CleanLine(name), tui.CleanLine(directory))
+			cmd.Printf("Created tmux session: %s\nWorkdir: %s\n", tui.CleanLine(sessionName), tui.CleanLine(directory))
 
 			if noSwitch {
 				return nil
@@ -86,6 +89,7 @@ func command() *cobra.Command {
 		},
 	}
 	cmd.SetOut(os.Stdout)
+	cmd.Flags().StringVarP(&name, "name", "n", "", "session name (defaults to the directory name)")
 	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "create the session without switching or attaching")
 
 	return cmd
