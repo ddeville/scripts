@@ -23,9 +23,10 @@ func createCommand(options *settings) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "create <name>",
-		Short: "Create a worktree, tmux session, editor, and forked Codex thread",
-		Args:  cobra.ExactArgs(1),
+		Use:     "create <name>",
+		Aliases: []string{"new"},
+		Short:   "Create a worktree, tmux session, editor, and forked Codex thread",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if forkCurrent {
 				fork = os.Getenv("CODEX_THREAD_ID")
