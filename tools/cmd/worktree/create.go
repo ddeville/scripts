@@ -51,7 +51,7 @@ func createCommand(options *settings) *cobra.Command {
 				return fmt.Errorf("create workspace: %w", err)
 			}
 
-			cmd.Printf("Created worktree: %s\nBranch: %s\n", item.Path, item.Branch)
+			cmd.Printf("Created worktree: %s\nBranch: %s\n", display(item.Path), display(item.Branch))
 
 			if noTmux || noSwitch {
 				return nil

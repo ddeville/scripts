@@ -22,6 +22,10 @@ func MatchPanes(ctx context.Context, ids []string) (map[string][]string, error) 
 		return nil, fmt.Errorf("match agent panes: %w", err)
 	}
 
+	return matchPanes(ids, panes), nil
+}
+
+func matchPanes(ids []string, panes []tmux.Pane) map[string][]string {
 	matches := map[string][]string{}
 
 	for _, pane := range panes {
@@ -54,5 +58,5 @@ func MatchPanes(ctx context.Context, ids []string) (map[string][]string, error) 
 		}
 	}
 
-	return matches, nil
+	return matches
 }

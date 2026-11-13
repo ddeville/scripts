@@ -117,6 +117,8 @@ func (m *Model) removalContent(width int) string {
 	if form.err != nil && !form.checking {
 		message := form.err.Error()
 		switch {
+		case errors.Is(form.err, worktree.ErrUnmergedDetached):
+			message = worktree.ErrUnmergedDetached.Error()
 		case errors.Is(form.err, git.ErrNotMerged):
 			message = "This branch has unmerged commits. Press k to keep the branch when removing the worktree."
 		case errors.Is(form.err, worktree.ErrDirty):

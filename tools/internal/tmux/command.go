@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 func run(ctx context.Context, args ...string) (string, error) {
 	cmd := exec.CommandContext(ctx, "tmux", args...) // #nosec G204 G702 -- Arguments are separate; callers explicitly supply any window shell command.
+	cmd.WaitDelay = time.Second
 
 	var stderr bytes.Buffer
 

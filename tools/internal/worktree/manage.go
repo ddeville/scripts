@@ -14,8 +14,10 @@ import (
 
 var (
 	// ErrDirty prevents removing or implicitly copying uncommitted work.
-	ErrDirty       = errors.New("worktree has local changes")
-	errInvalidName = errors.New("worktree name must be a single directory name")
+	ErrDirty = errors.New("worktree has local changes")
+	// ErrUnmergedDetached prevents discarding commits without a branch to keep.
+	ErrUnmergedDetached = errors.New("detached HEAD has unmerged commits; create a branch before removing it")
+	errInvalidName      = errors.New("worktree name must be a single directory name")
 )
 
 // CreateOptions selects the source checkout, committed base, and session setup.
@@ -170,12 +172,25 @@ func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, erro
 	}
 
 	plan := Removal{Worktree: item, MainPath: main}
-	if !keepBranch {
-		plan.Branch, err = git.CurrentBranch(ctx, item.Path)
+
+	branch, err := git.CurrentBranch(ctx, item.Path)
+	if err != nil {
+		return Removal{}, fmt.Errorf("read branch: %w", err)
+	}
+
+	if branch == "" {
+		commit, err := git.ResolveCommit(ctx, item.Path, "HEAD")
 		if err != nil {
-			return Removal{}, fmt.Errorf("read branch: %w", err)
+			return Removal{}, fmt.Errorf("read detached HEAD: %w", err)
 		}
 
+		if err := git.CheckMerged(ctx, main, commit); err != nil {
+			return Removal{}, fmt.Errorf("%w: %w", ErrUnmergedDetached, err)
+		}
+	}
+
+	if !keepBranch {
+		plan.Branch = branch
 		if plan.Branch != "" {
 			if err := git.CheckMerged(ctx, main, plan.Branch); err != nil {
 				return Removal{}, fmt.Errorf("%w; use --keep-branch to retain it", err)

@@ -91,6 +91,7 @@ func DeleteBranch(ctx context.Context, path, branch string) error {
 func run(ctx context.Context, path string, args ...string) (string, error) {
 	command := append([]string{"--no-optional-locks", "-C", path}, args...)
 	cmd := exec.CommandContext(ctx, "git", command...) // #nosec G204 -- Git is fixed; subcommands and paths are separate arguments, never shell source.
+	cmd.WaitDelay = time.Second
 
 	var stderr bytes.Buffer
 

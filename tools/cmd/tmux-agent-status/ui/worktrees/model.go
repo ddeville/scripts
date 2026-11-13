@@ -20,6 +20,7 @@ import (
 // Model owns worktree discovery, Git status, sessions, and management forms.
 type Model struct {
 	Panel                  panel.Model
+	tasks                  *tui.Tasks
 	root, source           string
 	width, rows            int
 	trees                  []worktree.Info
@@ -40,8 +41,8 @@ type Model struct {
 type OpenSessionMsg struct{ ID string }
 
 // New discovers worktrees before asynchronous status collection begins.
-func New(root, source string) Model {
-	m := Model{Panel: panel.New(), root: root, source: source, changes: map[string]string{}}
+func New(root, source string, tasks *tui.Tasks) Model {
+	m := Model{Panel: panel.New(), tasks: tasks, root: root, source: source, changes: map[string]string{}}
 
 	items, err := worktree.Discover(root)
 	if err != nil {

@@ -38,6 +38,7 @@ type Options struct {
 
 type model struct {
 	ctx                       context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
+	tasks                     *tui.Tasks
 	area, returnArea          Area
 	agents                    agentui.Model
 	worktrees                 worktrees.Model
@@ -107,7 +108,7 @@ func (m *model) openItem(id string) tea.Cmd {
 	if m.area == AgentsArea {
 		data := m.agents.Snapshot()
 
-		return func() tea.Msg {
+		return m.tasks.Track(func() tea.Msg {
 			if data.Err != nil || time.Since(data.At) > 10*time.Second {
 				return openMsg{err: errStaleStatus}
 			}
@@ -125,7 +126,7 @@ func (m *model) openItem(id string) tea.Cmd {
 			}
 
 			return openMsg{pane: panes[id][0]}
-		}
+		})
 	}
 
 	item, ok := m.worktrees.Find(id)
@@ -139,10 +140,10 @@ func (m *model) openItem(id string) tea.Cmd {
 
 	m.notice = "Opening " + item.Name + "…"
 
-	return func() tea.Msg {
+	return m.tasks.Track(func() tea.Msg {
 		session, err := worktree.Open(ctx, item)
 		return openMsg{session: session, err: err}
-	}
+	})
 }
 
 func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn // Signature required by tea.Model.
@@ -261,7 +262,12 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 // Run opens the interface and switches to the selected tmux pane or session on exit.
 func Run(ctx context.Context, options Options) error {
 	uiCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	tasks := &tui.Tasks{}
+
+	defer func() {
+		cancel()
+		tasks.Wait()
+	}()
 
 	source := options.Directory
 	if resolved, err := filepath.EvalSymlinks(source); err == nil {
@@ -269,8 +275,8 @@ func Run(ctx context.Context, options Options) error {
 	}
 
 	initial := &model{
-		ctx: uiCtx, area: options.Area, width: 100, height: 30, hasOrigin: options.Pane != "",
-		agents: agentui.New(options.Pane), worktrees: worktrees.New(options.Root, source),
+		ctx: uiCtx, tasks: tasks, area: options.Area, width: 100, height: 30, hasOrigin: options.Pane != "",
+		agents: agentui.New(options.Pane), worktrees: worktrees.New(options.Root, source, tasks),
 	}
 
 	initial.updatePanels()

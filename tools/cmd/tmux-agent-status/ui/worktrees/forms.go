@@ -268,10 +268,10 @@ func (m *Model) submitCreate(ctx context.Context) tea.Cmd {
 	ctx = m.beginOperation(ctx)
 	form.message = "Creating worktree…"
 
-	return func() tea.Msg {
+	return m.tasks.Track(func() tea.Msg {
 		item, id, err := worktree.Create(ctx, m.root, options)
 		return createdMsg{item: item, id: id, err: err}
-	}
+	})
 }
 
 func (m *Model) created(msg createdMsg) tea.Cmd {
@@ -336,7 +336,7 @@ func (m *Model) removeKey(ctx context.Context, msg tea.KeyPressMsg) tea.Cmd {
 		ctx = m.beginOperation(ctx)
 		m.updateRemovalDetails()
 
-		return func() tea.Msg { return removedMsg{plan: plan, err: worktree.Remove(ctx, plan)} }
+		return m.tasks.Track(func() tea.Msg { return removedMsg{plan: plan, err: worktree.Remove(ctx, plan)} })
 	default:
 		var cmd tea.Cmd
 
