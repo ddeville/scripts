@@ -38,6 +38,9 @@ Server = https://mirror.hackingand.coffee/arch/\$repo/os/\$arch
 Server = https://mirrors.mit.edu/archlinux/\$repo/os/\$arch
 EOT
 
+sed -i 's/^#Color$/Color/' /etc/pacman.conf
+sed -i 's/^#VerbosePkgLists$/VerbosePkgLists/' /etc/pacman.conf
+
 # Install grub
 pacman -Syu --needed grub efibootmgr os-prober
 
