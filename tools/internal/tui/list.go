@@ -25,7 +25,7 @@ type TextSpan struct {
 	Style lipgloss.Style
 }
 
-// List keeps selection, group headings, and complete rows visible while scrolling.
+// List keeps group headings and the selected row visible while scrolling.
 type List struct {
 	items  []ListItem
 	index  int
@@ -97,9 +97,9 @@ func (l *List) Move(msg tea.KeyPressMsg) {
 	case "G", "end":
 		l.Select(len(l.items) - 1)
 	case "pgup":
-		l.Select(l.index - max(1, l.view.Height()/3))
+		l.Select(l.index - max(1, l.view.Height()/(2+l.spacing())))
 	case "pgdown":
-		l.Select(l.index + max(1, l.view.Height()/3))
+		l.Select(l.index + max(1, l.view.Height()/(2+l.spacing())))
 	}
 }
 
@@ -111,6 +111,21 @@ func (l *List) Width() int { return l.view.Width() }
 
 // Height is the available content height in terminal rows.
 func (l *List) Height() int { return l.view.Height() }
+
+func (l *List) spacing() int {
+	rows := max(0, len(l.items)*3-1)
+	for i, item := range l.items {
+		if i == 0 || item.Group != l.items[i-1].Group {
+			rows += 2
+		}
+	}
+
+	if rows > l.view.Height() {
+		return 0
+	}
+
+	return 1
+}
 
 func (l *List) render() {
 	if len(l.items) == 0 {
@@ -126,6 +141,7 @@ func (l *List) render() {
 	)
 
 	numberWidth := max(2, len(strconv.Itoa(len(l.items)-1)))
+	spacing := l.spacing()
 	counts := map[string]int{}
 	statusWidth := 0
 
@@ -135,16 +151,20 @@ func (l *List) render() {
 	}
 
 	for i, item := range l.items {
-		if i > 0 {
+		newGroup := i == 0 || item.Group != l.items[i-1].Group
+		if i > 0 && (spacing > 0 || newGroup) {
 			lines = append(lines, "")
 		}
 
 		start := len(lines)
-		if i == 0 || item.Group != l.items[i-1].Group {
-			lines = append(lines, SectionHeading(item.Group, counts[item.Group], l.view.Width()), "")
+		if newGroup {
+			lines = append(lines, SectionHeading(item.Group, counts[item.Group], l.view.Width()))
+			if spacing > 0 {
+				lines = append(lines, "")
+			}
 		}
 
-		if l.view.Height() < 4 {
+		if l.view.Height() < 3+spacing {
 			start = len(lines)
 		}
 
@@ -161,8 +181,8 @@ func (l *List) render() {
 
 	for i, row := range rows {
 		extra := 0
-		if i > 0 && l.items[i].Group == l.items[i-1].Group && l.view.Height() >= 4 {
-			extra = 2
+		if i > 0 && l.items[i].Group == l.items[i-1].Group && l.view.Height() >= 3+spacing {
+			extra = 1 + spacing
 		}
 
 		if row.start >= offset && selected.end <= row.start+l.view.Height()-extra {
@@ -173,25 +193,18 @@ func (l *List) render() {
 		}
 	}
 
-	end := l.offset
-	for _, row := range rows {
-		if row.end > l.offset+l.view.Height()-headingRows {
-			break
-		}
-
-		if row.start >= l.offset {
-			end = row.end
-		}
-	}
-
 	var visible []string
 
 	if headingRows > 0 {
 		group := l.items[first].Group
-		visible = append(visible, SectionHeading(group, counts[group], l.view.Width()), "")
+
+		visible = append(visible, SectionHeading(group, counts[group], l.view.Width()))
+		if spacing > 0 {
+			visible = append(visible, "")
+		}
 	}
 
-	l.view.SetContentLines(append(visible, lines[l.offset:end]...))
+	l.view.SetContentLines(append(visible, lines[l.offset:]...))
 }
 
 func (a ListItem) render(width, numberWidth, statusWidth, position int, selected bool) string {
