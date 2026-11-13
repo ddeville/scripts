@@ -7,6 +7,8 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
+	agentui "github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/agents"
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
@@ -44,10 +46,23 @@ func (m *Model) worktreeDetails(width int) string {
 	}
 
 	lines := panel.DetailHeader(item.Name, item.Path, style.Render(hint), action)
+
+	var summary []string
+	for _, span := range m.agentSummary(item.Path) {
+		summary = append(summary, span.Style.Render(span.Text))
+	}
+
 	lines = append(lines,
 		"", tui.Heading.Render("Branch"), tui.CleanLine(item.Branch),
 		"", tui.Heading.Render("Tmux session"), session,
-		"", tui.Heading.Render("Changes"))
+		"", tui.Heading.Render("Agents"), strings.Join(summary, tui.Muted.Render(" · ")))
+
+	for _, a := range agents.InDirectory(m.data.Agents, item.Path) {
+		row := agentui.Row(a)
+		lines = append(lines, row.StatusStyle.Render(tui.CleanLine(row.Status))+" · "+tui.CleanLine(row.Title))
+	}
+
+	lines = append(lines, "", tui.Heading.Render("Changes"))
 
 	changes := m.changes[item.Path]
 	switch {
@@ -65,6 +80,57 @@ func (m *Model) worktreeDetails(width int) string {
 	}
 
 	return ansi.Wrap(strings.Join(lines, "\n"), max(1, width), "")
+}
+
+func (m *Model) agentSummary(path string) []tui.TextSpan {
+	if m.data.Err != nil {
+		return []tui.TextSpan{{Text: "Agent status unavailable", Style: tui.Red}}
+	}
+
+	if m.data.At.IsZero() {
+		return []tui.TextSpan{{Text: "Loading agents…", Style: tui.Muted}}
+	}
+
+	counts := map[string]int{}
+
+	for _, a := range agents.InDirectory(m.data.Agents, path) {
+		state := "unknown"
+
+		switch a.State {
+		case "approval", "input":
+			state = "needs you"
+		case "error", "ready", "working", "idle":
+			state = a.State
+		}
+
+		counts[state]++
+	}
+
+	var parts []tui.TextSpan
+
+	for _, state := range []tui.TextSpan{
+		{Text: "error", Style: tui.Red.Bold(true)},
+		{Text: "needs you", Style: tui.Yellow.Bold(true)},
+		{Text: "ready", Style: tui.Green},
+		{Text: "working", Style: tui.Cyan},
+		{Text: "unknown", Style: tui.Muted},
+		{Text: "idle", Style: tui.Muted},
+	} {
+		if count := counts[state.Text]; count > 0 {
+			label := state.Text
+			if label == "error" && count > 1 {
+				label = "errors"
+			}
+
+			parts = append(parts, tui.TextSpan{Text: fmt.Sprintf("%d %s", count, label), Style: state.Style})
+		}
+	}
+
+	if len(parts) == 0 {
+		return []tui.TextSpan{{Text: "No running agents", Style: tui.Muted}}
+	}
+
+	return parts
 }
 
 // View renders managed checkouts and the selected worktree's details.

@@ -16,6 +16,13 @@ import (
 type ListItem struct {
 	ID, Group, Title, Subtitle, Status, Indicator string
 	StatusStyle                                   lipgloss.Style
+	SubtitlePrefix                                []TextSpan
+}
+
+// TextSpan adds individually styled text without accepting terminal escapes.
+type TextSpan struct {
+	Text  string
+	Style lipgloss.Style
 }
 
 // List keeps selection, group headings, and complete rows visible while scrolling.
@@ -225,7 +232,25 @@ func (a ListItem) render(width, numberWidth, statusWidth, position int, selected
 
 	prefix := marker + base.Render(" ") + keyStyle.Render(fmt.Sprintf("%*d ", numberWidth, position)) + style.Render(indicator)
 	name := base.Bold(selected).Render(Pad(SingleLine(a.Title), titleWidth))
-	subtitle := marker + base.Render(strings.Repeat(" ", prefixWidth-1)) + subtitleStyle.Render(Pad(SingleLine(a.Subtitle), width-prefixWidth))
+
+	var parts []string
+
+	for _, span := range a.SubtitlePrefix {
+		spanStyle := span.Style
+		if selected {
+			spanStyle = spanStyle.Background(SelectedBackground)
+		}
+
+		parts = append(parts, spanStyle.Render(SingleLine(span.Text)))
+	}
+
+	if a.Subtitle != "" {
+		parts = append(parts, subtitleStyle.Render(SingleLine(a.Subtitle)))
+	}
+
+	subtitleText := Fit(strings.Join(parts, subtitleStyle.Render(" · ")), width-prefixWidth)
+	subtitlePadding := subtitleStyle.Render(strings.Repeat(" ", max(0, width-prefixWidth-ansi.StringWidth(subtitleText))))
+	subtitle := marker + base.Render(strings.Repeat(" ", prefixWidth-1)) + subtitleText + subtitlePadding
 	padding := base.Render(" ")
 
 	return fmt.Sprint(Fit(prefix+name+status, width), padding, "\n", Fit(subtitle, width), padding)

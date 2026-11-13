@@ -98,9 +98,11 @@ func (m *Model) finishOperation() {
 	m.operationCancel = nil
 }
 
-// SetAgents updates the fork chooser and resolves a pending originating thread.
+// SetAgents refreshes worktree activity and the fork chooser.
 func (m *Model) SetAgents(data agents.Snapshot, origin string) {
 	m.data, m.originThread = data, origin
+	m.updateTreeList(m.Panel.List.SelectedID())
+
 	if data.Err != nil {
 		if m.create != nil {
 			m.create.originPending = false
@@ -290,6 +292,7 @@ func (m *Model) updateTreeList(path string) {
 		style, state, _ := worktreeStateStyle(item.Status)
 		items = append(items, tui.ListItem{
 			ID: item.Path, Group: item.Repo, Title: item.Name, Subtitle: item.Branch, Status: state, StatusStyle: style,
+			SubtitlePrefix: m.agentSummary(item.Path),
 		})
 	}
 
