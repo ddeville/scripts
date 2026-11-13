@@ -36,6 +36,9 @@ jobs:
       - name: Check vulnerabilities
         working-directory: tools
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+      - name: Test Go tools
+        working-directory: tools
+        run: go test -race ./...
       - name: Build Go tools
         working-directory: tools
         run: go build ./...
