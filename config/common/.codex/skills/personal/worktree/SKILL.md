@@ -16,7 +16,7 @@ current options.
 For `$worktree my-feature`, run from the source checkout:
 
 ```sh
-wt create --fork-current --base HEAD -- my-feature
+wt create --fork-current --base master -- my-feature
 ```
 
 Use `-C /path/to/repo` when the source checkout differs from the command's working
@@ -27,8 +27,9 @@ is unclear. Quote names and paths in commands.
   missing, report that instead of guessing a thread or opening a picker. For an
   explicitly supplied thread ID, replace it with `--fork "$thread_id"`. Omit both
   flags only when the user requests the thread picker.
-- Default to explicit `--base HEAD`; use the requested ref instead, such as
-  `--base master`. Without `--base`, the CLI rejects dirty source checkouts.
+- Default to explicit `--base master` to avoid inheriting commits from the
+  current branch. Honor an explicitly requested base instead. Without `--base`,
+  the CLI uses `HEAD` for clean source checkouts and rejects dirty ones.
   Explicit `--base` deliberately leaves staged, unstaged, and untracked changes
   in the source. No extra confirmation is needed; briefly note their exclusion
   when the source is dirty. Do not copy, commit, stash, or discard them.
