@@ -19,7 +19,8 @@ done < <(find "$config_dir" -type f -print0)
 
 install -d -m755 /usr/share/backgrounds
 
-systemctl enable NetworkManager \
+systemctl enable \
+  NetworkManager \
   systemd-timedated \
   bluetooth \
   sshd \
