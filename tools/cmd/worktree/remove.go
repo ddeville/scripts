@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
@@ -45,14 +47,19 @@ func removeCommand(options *settings) *cobra.Command {
 
 			if !yes {
 				cmd.Print("Continue? [y/N] ")
-				input := bufio.NewScanner(cmd.InOrStdin())
-				input.Scan()
 
-				if err := input.Err(); err != nil {
+				input, err := cli.NewInput(cmd.InOrStdin())
+				if err != nil {
+					return fmt.Errorf("prepare confirmation: %w", err)
+				}
+				defer func() { _ = input.Close() }()
+
+				answer, err := input.ReadLine(cmd.Context())
+				if err != nil && !errors.Is(err, io.EOF) {
 					return fmt.Errorf("read confirmation: %w", err)
 				}
 
-				answer := strings.ToLower(strings.TrimSpace(input.Text()))
+				answer = strings.ToLower(strings.TrimSpace(answer))
 				if answer != "y" && answer != "yes" {
 					cmd.Println("Aborted.")
 					return nil

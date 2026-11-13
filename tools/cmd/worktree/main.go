@@ -2,32 +2,18 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"os"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 
 	"github.com/spf13/cobra"
 
-	"github.com/ddeville/scripts/tools/internal/tui"
+	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	cmd := command()
-	err := cmd.ExecuteContext(ctx)
-	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
-
-	stop()
-
-	if failed {
-		fmt.Fprintln(os.Stderr, cmd.Name()+":", tui.CleanLine(err.Error()))
-		os.Exit(1)
-	}
+	os.Exit(cli.Execute(command()))
 }
 
 type settings struct{ root, directory string }

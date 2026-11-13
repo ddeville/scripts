@@ -1,4 +1,4 @@
-// Package cli provides shared command-line validation.
+// Package cli provides shared command-line helpers.
 package cli
 
 import (

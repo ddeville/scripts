@@ -4,28 +4,16 @@
 package main
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	"tailscale.com/client/local"
+
+	"github.com/ddeville/scripts/tools/internal/cli"
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := command().ExecuteContext(ctx)
-	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
-
-	stop()
-
-	if failed {
-		fmt.Fprintln(os.Stderr, "tailscale-status:", err)
-		os.Exit(1)
-	}
+	os.Exit(cli.Execute(command()))
 }
 
 func command() *cobra.Command {

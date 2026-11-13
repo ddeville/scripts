@@ -2,35 +2,23 @@
 package main
 
 import (
-	"bufio"
-	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"slices"
-	"syscall"
 
 	"github.com/spf13/cobra"
 
+	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/session"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	cmd := command()
-	err := cmd.ExecuteContext(ctx)
-	failed := err != nil && ctx.Err() == nil && !errors.Is(err, syscall.EPIPE)
-
-	stop()
-
-	if failed {
-		fmt.Fprintln(os.Stderr, cmd.Name()+":", tui.CleanLine(err.Error()))
-		os.Exit(1)
-	}
+	os.Exit(cli.Execute(command()))
 }
 
 func command() *cobra.Command {
@@ -124,7 +112,7 @@ func chooseName(cmd *cobra.Command, name string) (string, error) {
 		return "", fmt.Errorf("list sessions: %w", err)
 	}
 
-	input := bufio.NewScanner(cmd.InOrStdin())
+	var input *cli.Input
 
 	for {
 		switch {
@@ -138,14 +126,21 @@ func chooseName(cmd *cobra.Command, name string) (string, error) {
 
 		cmd.Print("Enter a different session name: ")
 
-		if !input.Scan() {
-			if err := input.Err(); err != nil {
-				return "", fmt.Errorf("read session name: %w", err)
+		if input == nil {
+			input, err = cli.NewInput(cmd.InOrStdin())
+			if err != nil {
+				return "", fmt.Errorf("prepare session name input: %w", err)
 			}
+			defer func() { _ = input.Close() }()
+		}
 
+		name, err = input.ReadLine(cmd.Context())
+		if errors.Is(err, io.EOF) {
 			return "", fmt.Errorf("%w: provide an unused session name", os.ErrInvalid)
 		}
 
-		name = input.Text()
+		if err != nil {
+			return "", fmt.Errorf("read session name: %w", err)
+		}
 	}
 }
