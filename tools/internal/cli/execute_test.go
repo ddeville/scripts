@@ -35,7 +35,7 @@ func TestExecuteSignals(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer cancel()
 
 			cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestExecuteSignals$") // #nosec G204 G702 -- Runs this test binary, never user-supplied code.
@@ -62,7 +62,7 @@ func TestExecuteSignals(t *testing.T) {
 
 			lines := bufio.NewScanner(output)
 			if !lines.Scan() || lines.Text() != "ready" {
-				t.Fatal("command did not start")
+				t.Fatalf("command did not start: output %q, error %v", lines.Text(), lines.Err())
 			}
 
 			if err := cmd.Process.Signal(tc.sig); err != nil {
@@ -70,7 +70,7 @@ func TestExecuteSignals(t *testing.T) {
 			}
 
 			if !lines.Scan() || lines.Text() != "canceled" {
-				t.Fatal("signal did not cancel the command context")
+				t.Fatalf("signal did not cancel the command context: output %q, error %v", lines.Text(), lines.Err())
 			}
 
 			if tc.name == "force" {

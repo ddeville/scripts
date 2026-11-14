@@ -38,6 +38,8 @@ func TestRemovalRechecksWorktree(t *testing.T) {
 				want = git.ErrNotMerged
 			}
 
+			commit := fixtureGit(t, path, "rev-parse", "HEAD")
+
 			err = worktree.Remove(t.Context(), plan)
 			if !errors.Is(err, want) {
 				t.Fatalf("Remove() = %v, want %v", err, want)
@@ -57,8 +59,15 @@ func TestRemovalRechecksWorktree(t *testing.T) {
 					t.Fatalf("refused removal lost the checkout: %v", statErr)
 				}
 
-				if branches := fixtureGit(t, main, "branch", "--list", "topic"); branches == "" {
-					t.Fatal("refused removal lost the branch")
+				if got := fixtureGit(t, main, "rev-parse", "refs/heads/topic"); got != commit {
+					t.Fatalf("refused removal changed the branch: got %s, want %s", got, commit)
+				}
+
+				if change == "untracked file" {
+					data, err := os.ReadFile(filepath.Join(path, "work.txt")) // #nosec G304 -- Reads only this test's temporary worktree.
+					if err != nil || string(data) != "keep me" {
+						t.Fatalf("refused removal changed local work: %q, %v", data, err)
+					}
 				}
 			}
 		})
@@ -67,21 +76,45 @@ func TestRemovalRechecksWorktree(t *testing.T) {
 
 func TestRemovalPreservesUnmergedDetachedCommit(t *testing.T) {
 	_, path := removalFixture(t, true)
-	if _, err := worktree.PlanRemoval(t.Context(), worktree.Info{Path: path}, false); err != nil {
+
+	plan, err := worktree.PlanRemoval(t.Context(), worktree.Info{Path: path}, false)
+	if err != nil {
 		t.Fatalf("merged detached checkout should be removable: %v", err)
 	}
 
 	fixtureGit(t, path, "commit", "--allow-empty", "-m", "Unmerged detached work")
+	commit := fixtureGit(t, path, "rev-parse", "HEAD")
 
 	for _, keepBranch := range []bool{false, true} {
 		if _, err := worktree.PlanRemoval(t.Context(), worktree.Info{Path: path}, keepBranch); !errors.Is(err, worktree.ErrUnmergedDetached) {
 			t.Fatalf("unmerged detached checkout (keep branch: %v): %v", keepBranch, err)
 		}
 	}
+
+	if err := worktree.Remove(t.Context(), plan); !errors.Is(err, worktree.ErrUnmergedDetached) {
+		t.Fatalf("removal using the earlier plan = %v, want refusal", err)
+	}
+
+	if got := fixtureGit(t, path, "rev-parse", "HEAD"); got != commit {
+		t.Fatalf("refused removal changed detached HEAD: got %s, want %s", got, commit)
+	}
 }
 
 func removalFixture(t *testing.T, detached bool) (string, string) {
 	t.Helper()
+
+	// Inherited Git overrides must never redirect fixture writes to another repo.
+	for _, entry := range os.Environ() {
+		name, _, _ := strings.Cut(entry, "=")
+		if strings.HasPrefix(name, "GIT_") {
+			t.Setenv(name, "") // Register restoration before removing the variable entirely.
+
+			if err := os.Unsetenv(name); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
 	t.Setenv("GIT_AUTHOR_NAME", "Worktree test")
@@ -104,7 +137,7 @@ func removalFixture(t *testing.T, detached bool) (string, string) {
 	t.Setenv("PATH", bin+string(os.PathListSeparator)+os.Getenv("PATH"))
 
 	main, path := filepath.Join(root, "main"), filepath.Join(root, "checkout")
-	fixtureGit(t, root, "init", "--initial-branch=main", main)
+	fixtureGit(t, root, "init", "--template=", "--initial-branch=main", main)
 	fixtureGit(t, main, "commit", "--allow-empty", "-m", "Initial commit")
 
 	if detached {

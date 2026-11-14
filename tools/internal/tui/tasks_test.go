@@ -33,6 +33,12 @@ func TestTasksWaitsForCleanup(t *testing.T) {
 		<-started
 		cancel()
 
+		queuedRan := false
+		queued := tasks.Track(func() tea.Msg {
+			queuedRan = true
+			return nil
+		})
+
 		stopped := make(chan struct{})
 
 		go func() {
@@ -44,8 +50,14 @@ func TestTasksWaitsForCleanup(t *testing.T) {
 
 		select {
 		case <-stopped:
-			t.Fatal("shutdown returned before cleanup finished")
+			t.Error("shutdown returned before cleanup finished")
 		default:
+		}
+
+		queued()
+
+		if queuedRan {
+			t.Error("queued command started during shutdown")
 		}
 
 		close(cleanup)
@@ -56,11 +68,5 @@ func TestTasksWaitsForCleanup(t *testing.T) {
 		default:
 			t.Fatal("shutdown did not finish after cleanup")
 		}
-
-		queued := tasks.Track(func() tea.Msg {
-			t.Fatal("queued command started after shutdown")
-			return nil
-		})
-		queued()
 	})
 }

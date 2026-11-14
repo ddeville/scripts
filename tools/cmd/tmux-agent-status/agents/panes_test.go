@@ -21,6 +21,7 @@ func TestMatchPanesDoesNotGuess(t *testing.T) {
 		{ID: "%3", Command: "codex", Title: "12345678-1234-1234-1234-12345..."},
 		{ID: "%4", Command: "codex", Title: "87654321-1234-1234-1234-12345..."},
 		{ID: "%5", Command: "fish", Title: unique},
+		{ID: "%6", Command: "codex", Title: unique[:8]},
 	}
 
 	want := map[string][]string{first: {"%1", "%2"}, unique: {"%4"}}

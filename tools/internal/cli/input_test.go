@@ -47,22 +47,45 @@ func TestInputCancellationStopsRead(t *testing.T) {
 	reader := &observedReader{CancelReader: input.reader, started: make(chan struct{}), finished: make(chan struct{})}
 	input.reader, input.scanner = reader, bufio.NewScanner(reader)
 	ctx, cancel := context.WithCancel(t.Context())
-	t.Cleanup(cancel)
 
-	done := make(chan error, 1)
+	done := make(chan struct{})
+
+	var readErr error
+
+	t.Cleanup(func() {
+		cancel()
+		// EOF releases the read even when the cancellation behavior under test is broken.
+		_ = w.Close()
+
+		<-done
+
+		select {
+		case <-reader.started:
+			<-reader.finished
+		default:
+		}
+	})
 
 	go func() {
-		_, err := input.ReadLine(ctx)
-		done <- err
+		_, readErr = input.ReadLine(ctx)
+
+		close(done)
 	}()
 
-	<-reader.started
+	select {
+	case <-reader.started:
+	case <-done:
+		t.Fatalf("ReadLine returned before reading input: %v", readErr)
+	case <-time.After(3 * time.Second):
+		t.Fatal("ReadLine did not start reading input")
+	}
+
 	cancel()
 
 	select {
-	case err := <-done:
-		if !errors.Is(err, context.Canceled) {
-			t.Fatalf("ReadLine() = %v, want cancellation", err)
+	case <-done:
+		if !errors.Is(readErr, context.Canceled) {
+			t.Fatalf("ReadLine() = %v, want cancellation", readErr)
 		}
 	case <-time.After(3 * time.Second):
 		t.Fatal("cancellation did not unblock input")
@@ -75,6 +98,10 @@ func TestInputCancellationStopsRead(t *testing.T) {
 	}
 
 	if _, err := io.WriteString(w, "next\n"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
 
