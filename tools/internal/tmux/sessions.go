@@ -56,8 +56,11 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 }
 
 // NewSession creates a detached session with one window and returns its ID.
+// The initial program waits until a client attaches.
 func NewSession(ctx context.Context, name, window, path string) (string, error) {
-	output, err := run(ctx, "new-session", "-d", "-P", "-F", "#{session_id}", "-s", name, "-n", window, "-c", path)
+	args := append([]string{"new-session", "-d", "-P", "-F", "#{session_id}", "-s", name, "-n", window, "-c", path}, attachedCommand()...)
+
+	output, err := run(ctx, args...)
 	if err != nil {
 		return "", err
 	}
@@ -71,9 +74,10 @@ func SetOption(ctx context.Context, session, option, value string) error {
 	return err
 }
 
-// NewWindow creates a window without selecting it. Multiple command arguments bypass the shell.
+// NewWindow creates a window without selecting it. The command waits until the
+// session has an attached client. Multiple command arguments bypass shell parsing.
 func NewWindow(ctx context.Context, session, name, path string, command ...string) error {
-	args := append([]string{"new-window", "-d", "-t", session + ":", "-n", name, "-c", path}, command...)
+	args := append([]string{"new-window", "-d", "-t", session + ":", "-n", name, "-c", path}, attachedCommand(command...)...)
 	_, err := run(ctx, args...)
 
 	return err
