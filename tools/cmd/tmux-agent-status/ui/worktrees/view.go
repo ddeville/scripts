@@ -47,6 +47,10 @@ func (m *Model) worktreeDetails(width int) string {
 
 	lines := panel.DetailHeader(item.Name, item.Path, style.Render(hint), action)
 
+	if item.Note != "" {
+		lines = append(lines, "", tui.Heading.Render("Note"), tui.CleanText(item.Note))
+	}
+
 	var summary []string
 	for _, span := range m.agentSummary(item.Path) {
 		summary = append(summary, span.Style.Render(span.Text))

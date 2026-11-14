@@ -15,22 +15,22 @@ var ErrNotLinkedWorktree = errors.New("not a linked worktree")
 // Head identifies the checked-out branch or detached commit.
 type Head struct{ Branch, Commit string }
 
-// ReadHEAD reads a linked worktree's metadata without launching Git.
-func ReadHEAD(path string) (Head, error) {
+// OpenWorktreeMetadata opens the linked worktree's private Git directory.
+func OpenWorktreeMetadata(path string) (*os.Root, error) {
 	checkout, err := os.OpenRoot(path)
 	if err != nil {
-		return Head{}, fmt.Errorf("open worktree directory: %w", err)
+		return nil, fmt.Errorf("open worktree directory: %w", err)
 	}
 	defer func() { _ = checkout.Close() }()
 
 	data, err := checkout.ReadFile(".git")
 	if err != nil {
-		return Head{}, fmt.Errorf("read worktree metadata: %w", err)
+		return nil, fmt.Errorf("read worktree metadata: %w", err)
 	}
 
 	gitdir, ok := strings.CutPrefix(strings.TrimSpace(string(data)), "gitdir: ")
 	if !ok {
-		return Head{}, ErrNotLinkedWorktree
+		return nil, ErrNotLinkedWorktree
 	}
 
 	if !filepath.IsAbs(gitdir) {
@@ -39,15 +39,20 @@ func ReadHEAD(path string) (Head, error) {
 
 	metadata, err := os.OpenRoot(gitdir)
 	if err != nil {
-		return Head{}, fmt.Errorf("open Git metadata directory: %w", err)
+		return nil, fmt.Errorf("open Git metadata directory: %w", err)
 	}
-	defer func() { _ = metadata.Close() }()
 
 	if _, err := metadata.Stat("commondir"); err != nil {
-		return Head{}, fmt.Errorf("read linked repository: %w", err)
+		_ = metadata.Close()
+		return nil, fmt.Errorf("read linked repository: %w", err)
 	}
 
-	data, err = metadata.ReadFile("HEAD")
+	return metadata, nil
+}
+
+// ReadHEAD reads HEAD from an open worktree metadata directory.
+func ReadHEAD(metadata *os.Root) (Head, error) {
+	data, err := metadata.ReadFile("HEAD")
 	if err != nil {
 		return Head{}, fmt.Errorf("read worktree HEAD: %w", err)
 	}

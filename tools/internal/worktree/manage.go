@@ -134,12 +134,14 @@ func inspect(ctx context.Context, path string) (Info, error) {
 		return Info{}, fmt.Errorf("%w: %s is the main checkout", git.ErrNotLinkedWorktree, source)
 	}
 
-	branch, err := readBranch(source)
+	item, err := readCheckout(source)
 	if err != nil {
 		return Info{}, fmt.Errorf("%s: %w", source, err)
 	}
 
-	return Info{Repo: filepath.Base(main), Name: filepath.Base(source), Path: source, Branch: branch}, nil
+	item.Repo, item.Name = filepath.Base(main), filepath.Base(source)
+
+	return item, nil
 }
 
 // Removal records the checkout, branch, and sessions reviewed before deletion.

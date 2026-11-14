@@ -19,6 +19,7 @@ type Info struct {
 	Name        string       `json:"name"`
 	Path        string       `json:"path"`
 	Branch      string       `json:"branch"`
+	Note        string       `json:"note,omitempty"`
 	Status      string       `json:"status"`
 	StatusError string       `json:"status_error,omitempty"`
 	Session     tmux.Session `json:"session"`
@@ -61,32 +62,39 @@ func Discover(root string) ([]Info, error) {
 		for _, entry := range entries {
 			path := filepath.Join(root, repo.Name(), entry.Name())
 
-			branch, err := readBranch(path)
+			item, err := readCheckout(path)
 			if err != nil {
 				continue
 			}
 
-			result = append(result, Info{
-				Repo: repo.Name(), Name: entry.Name(), Path: canonical(path),
-				Branch: branch, Status: "checking…",
-			})
+			item.Repo, item.Name, item.Status = repo.Name(), entry.Name(), "checking…"
+			result = append(result, item)
 		}
 	}
 
 	return result, nil
 }
 
-func readBranch(path string) (string, error) {
-	head, err := git.ReadHEAD(path)
+func readCheckout(path string) (Info, error) {
+	metadata, err := git.OpenWorktreeMetadata(path)
 	if err != nil {
-		return "", fmt.Errorf("read worktree HEAD: %w", err)
+		return Info{}, fmt.Errorf("inspect worktree: %w", err)
+	}
+	defer func() { _ = metadata.Close() }()
+
+	head, err := git.ReadHEAD(metadata)
+	if err != nil {
+		return Info{}, fmt.Errorf("inspect worktree: %w", err)
 	}
 
-	if head.Branch != "" {
-		return head.Branch, nil
+	item := Info{Path: canonical(path), Branch: head.Branch}
+	if item.Branch == "" {
+		item.Branch = "detached " + head.Commit[:min(8, len(head.Commit))]
 	}
 
-	return "detached " + head.Commit[:min(8, len(head.Commit))], nil
+	item.Note = readNote(metadata)
+
+	return item, nil
 }
 
 // List includes Git status and matching tmux sessions for all managed worktrees.

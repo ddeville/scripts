@@ -45,7 +45,7 @@ func ensureSession(ctx context.Context, item Info, options sessionOptions) (stri
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	if _, err := readBranch(item.Path); err != nil {
+	if _, err := readCheckout(item.Path); err != nil {
 		return "", fmt.Errorf("worktree is no longer available: %w", err)
 	}
 

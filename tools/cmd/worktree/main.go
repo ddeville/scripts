@@ -45,7 +45,7 @@ func command() *cobra.Command {
 	}
 	cmd.SetOut(os.Stdout)
 	cmd.PersistentFlags().StringVar(&options.root, "root", options.root, "directory containing repo/worktree folders")
-	cmd.AddCommand(createCommand(options), listCommand(options), openCommand(options), removeCommand(options))
+	cmd.AddCommand(createCommand(options), listCommand(options), noteCommand(options), openCommand(options), removeCommand(options))
 
 	return cmd
 }
