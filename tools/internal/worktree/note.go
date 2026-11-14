@@ -1,16 +1,20 @@
 package worktree
 
 import (
+	"context"
 	"crypto/rand"
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/ddeville/scripts/tools/internal/git"
 )
 
 const noteFile = "wt-note"
+
+var errEditor = errors.New("EDITOR is not set")
 
 func readNote(metadata *os.Root) string {
 	data, err := metadata.ReadFile(noteFile)
@@ -19,6 +23,50 @@ func readNote(metadata *os.Root) string {
 	}
 
 	return strings.TrimSuffix(string(data), "\n")
+}
+
+// EditNote opens a copy of the note and saves changes after the editor exits.
+func EditNote(ctx context.Context, item Info) error {
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		return errEditor
+	}
+
+	file, err := os.CreateTemp("", "wt-note-*.txt")
+	if err != nil {
+		return fmt.Errorf("create note draft: %w", err)
+	}
+	defer func() { _ = os.Remove(file.Name()) }()
+
+	draft := item.Note
+	if draft != "" {
+		draft += "\n"
+	}
+
+	_, writeErr := file.WriteString(draft)
+	if err := errors.Join(writeErr, file.Close()); err != nil {
+		return fmt.Errorf("write note draft: %w", err)
+	}
+
+	cmd := exec.CommandContext(ctx, "/bin/sh", "-c", editor+` "$@"`, "sh", file.Name()) // #nosec G204 G702 -- Run the user's editor command with the draft path as a separate argument.
+	cmd.Dir = item.Path
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("edit worktree note: %w", err)
+	}
+
+	data, err := os.ReadFile(file.Name()) // #nosec G304 -- Reads the temporary file passed to the user's editor.
+	if err != nil {
+		return fmt.Errorf("read edited note: %w", err)
+	}
+
+	note := strings.TrimSpace(string(data))
+	if note == strings.TrimSpace(item.Note) {
+		return nil
+	}
+
+	return SetNote(item.Path, note)
 }
 
 // SetNote replaces the note for a linked checkout.

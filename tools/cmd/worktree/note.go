@@ -11,15 +11,18 @@ import (
 )
 
 func noteCommand(options *settings) *cobra.Command {
-	var clearNote bool
+	var message string
+
+	var clearNote, showNote bool
 
 	cmd := &cobra.Command{
 		Use:   "note [text]",
-		Short: "Show, replace, or clear a worktree's local note",
+		Short: "Edit, show, or clear a worktree's local note",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if clearNote && len(args) != 0 {
-				return fmt.Errorf("%w: --clear cannot be combined with note text", os.ErrInvalid)
+			hasMessage := cmd.Flags().Changed("message")
+			if len(args) != 0 && (hasMessage || clearNote || showNote) {
+				return fmt.Errorf("%w: positional note text cannot be combined with --message, --show, or --clear", os.ErrInvalid)
 			}
 
 			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, "")
@@ -30,19 +33,29 @@ func noteCommand(options *settings) *cobra.Command {
 			switch {
 			case clearNote:
 				return worktree.ClearNote(item.Path)
+			case hasMessage:
+				return worktree.SetNote(item.Path, message)
 			case len(args) != 0:
 				return worktree.SetNote(item.Path, args[0])
-			case item.Note != "":
-				if _, err := fmt.Fprintln(cmd.OutOrStdout(), tui.CleanText(item.Note)); err != nil {
-					return fmt.Errorf("print worktree note: %w", err)
+			case showNote:
+				if item.Note != "" {
+					if _, err := fmt.Fprintln(cmd.OutOrStdout(), tui.CleanText(item.Note)); err != nil {
+						return fmt.Errorf("print worktree note: %w", err)
+					}
 				}
-			}
 
-			return nil
+				return nil
+			default:
+				return worktree.EditNote(cmd.Context(), item)
+			}
 		},
 	}
-	cmd.Flags().StringVarP(&options.directory, "directory", "C", options.directory, "path to the worktree")
-	cmd.Flags().BoolVar(&clearNote, "clear", false, "remove the note")
+	flags := cmd.Flags()
+	flags.StringVarP(&options.directory, "directory", "C", options.directory, "path to the worktree")
+	flags.StringVarP(&message, "message", "m", "", "replace the note with this message")
+	flags.BoolVar(&showNote, "show", false, "print the note")
+	flags.BoolVar(&clearNote, "clear", false, "remove the note")
+	cmd.MarkFlagsMutuallyExclusive("message", "show", "clear")
 
 	return cmd
 }
