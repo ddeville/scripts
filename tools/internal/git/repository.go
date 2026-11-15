@@ -68,24 +68,76 @@ func CurrentBranch(ctx context.Context, path string) (string, error) {
 // ErrNotMerged means the branch cannot be deleted without losing unmerged commits.
 var ErrNotMerged = errors.New("branch is not merged")
 
-// CheckMerged checks the upstream, or HEAD when no upstream is configured, like branch -d.
-func CheckMerged(ctx context.Context, path, branch string) error {
-	upstream, err := run(ctx, path, "rev-parse", "--verify", "--end-of-options", branch+"@{upstream}")
-	if err != nil {
-		upstream = "HEAD"
+// CheckMerged checks that ref is reachable from base.
+func CheckMerged(ctx context.Context, path, ref, base string) error {
+	_, err := run(ctx, path, "merge-base", "--is-ancestor", ref, base)
+	if exited(err, 1) {
+		return fmt.Errorf("%w: %s", ErrNotMerged, strings.TrimPrefix(ref, "refs/heads/"))
 	}
 
-	if _, err := run(ctx, path, "merge-base", "--is-ancestor", branch, upstream); err != nil {
-		return fmt.Errorf("%w: %s (%w)", ErrNotMerged, branch, err)
-	}
-
-	return nil
+	return err
 }
 
-// DeleteBranch deletes a merged branch using Git's own safety checks.
-func DeleteBranch(ctx context.Context, path, branch string) error {
-	_, err := run(ctx, path, "branch", "-d", "--", branch)
+// BranchDeletionBase returns an alternate local base for branch -d when needed.
+func BranchDeletionBase(ctx context.Context, path, branch string) (string, error) {
+	ref := "refs/heads/" + branch
+
+	upstream, err := run(ctx, path, "rev-parse", "--verify", "--end-of-options", branch+"@{upstream}")
+	if err == nil {
+		return "", CheckMerged(ctx, path, ref, upstream)
+	}
+
+	mergedErr := CheckMerged(ctx, path, ref, "HEAD")
+	if !errors.Is(mergedErr, ErrNotMerged) {
+		return "", mergedErr
+	}
+
+	// Git's -c option splits at the first '='.
+	if strings.Contains(branch, "=") {
+		return "", mergedErr
+	}
+
+	// Preserve an upstream configuration even when its ref is missing.
+	_, err = run(ctx, path, "config", "--get", "branch."+branch+".merge")
+	switch {
+	case err == nil:
+		return "", mergedErr
+	case !exited(err, 1):
+		return "", err
+	}
+
+	output, err := run(ctx, path, "for-each-ref", "--contains="+ref, "--format=%(refname)%09%(symref)", "refs/heads/")
+	if err != nil {
+		return "", err
+	}
+
+	for line := range strings.SplitSeq(output, "\n") {
+		candidate, target, ok := strings.Cut(line, "\t")
+		if ok && target == "" && candidate != ref {
+			return candidate, nil
+		}
+	}
+
+	return "", mergedErr
+}
+
+// DeleteBranch supplies an alternate upstream for this invocation only.
+func DeleteBranch(ctx context.Context, path, branch, base string) error {
+	args := []string{"branch", "-d", "--", branch}
+
+	if base != "" {
+		args = append([]string{"-c", "branch." + branch + ".remote=.", "-c", "branch." + branch + ".merge=" + base}, args...)
+	}
+
+	_, err := run(ctx, path, args...)
+
 	return err
+}
+
+func exited(err error, code int) bool {
+	var exitErr *exec.ExitError
+
+	return errors.As(err, &exitErr) && exitErr.ExitCode() == code
 }
 
 func run(ctx context.Context, path string, args ...string) (string, error) {

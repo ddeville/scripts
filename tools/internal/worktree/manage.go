@@ -150,9 +150,11 @@ type Removal struct {
 	Branch   string
 	Sessions []tmux.Session
 	MainPath string
+
+	branchBase string
 }
 
-// PlanRemoval refuses dirty checkouts and branches with unmerged commits.
+// PlanRemoval checks that a worktree is clean and its commits will be preserved.
 func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, error) {
 	item, err := inspect(ctx, item.Path)
 	if err != nil {
@@ -186,17 +188,21 @@ func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, erro
 			return Removal{}, fmt.Errorf("read detached HEAD: %w", err)
 		}
 
-		if err := git.CheckMerged(ctx, main, commit); err != nil {
+		if err := git.CheckMerged(ctx, main, commit, "HEAD"); err != nil {
 			return Removal{}, fmt.Errorf("%w: %w", ErrUnmergedDetached, err)
 		}
 	}
 
-	if !keepBranch {
+	if !keepBranch && branch != "" {
 		plan.Branch = branch
-		if plan.Branch != "" {
-			if err := git.CheckMerged(ctx, main, plan.Branch); err != nil {
-				return Removal{}, fmt.Errorf("%w; use --keep-branch to retain it", err)
-			}
+
+		plan.branchBase, err = git.BranchDeletionBase(ctx, main, branch)
+		if errors.Is(err, git.ErrNotMerged) {
+			return Removal{}, fmt.Errorf("%w; use --keep-branch to retain it", err)
+		}
+
+		if err != nil {
+			return Removal{}, fmt.Errorf("check branch deletion: %w", err)
 		}
 	}
 
@@ -232,7 +238,7 @@ func Remove(ctx context.Context, plan Removal) error {
 	var cleanupErrors []error
 
 	if current.Branch != "" {
-		if err := git.DeleteBranch(ctx, current.MainPath, current.Branch); err != nil {
+		if err := git.DeleteBranch(ctx, current.MainPath, current.Branch, current.branchBase); err != nil {
 			cleanupErrors = append(cleanupErrors, err)
 		}
 	}

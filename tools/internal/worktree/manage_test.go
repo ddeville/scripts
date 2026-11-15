@@ -14,9 +14,14 @@ import (
 )
 
 func TestRemovalRechecksWorktree(t *testing.T) {
-	for _, change := range []string{"none", "untracked file", "unmerged commit"} {
+	for _, change := range []string{"none", "untracked file", "unmerged commit", "shared commit", "base moved"} {
 		t.Run(change, func(t *testing.T) {
 			main, path := removalFixture(t, false)
+
+			if change == "shared commit" || change == "base moved" {
+				fixtureGit(t, path, "commit", "--allow-empty", "-m", "Shared commit")
+				fixtureGit(t, main, "branch", "base", "topic")
+			}
 
 			plan, err := worktree.PlanRemoval(t.Context(), worktree.Info{Path: path}, false)
 			if err != nil {
@@ -36,6 +41,10 @@ func TestRemovalRechecksWorktree(t *testing.T) {
 				fixtureGit(t, path, "commit", "--allow-empty", "-m", "Unmerged work")
 
 				want = git.ErrNotMerged
+			case "base moved":
+				fixtureGit(t, main, "branch", "-f", "base", "main")
+
+				want = git.ErrNotMerged
 			}
 
 			commit := fixtureGit(t, path, "rev-parse", "HEAD")
@@ -53,6 +62,12 @@ func TestRemovalRechecksWorktree(t *testing.T) {
 
 				if branches := fixtureGit(t, main, "branch", "--list", "topic"); branches != "" {
 					t.Fatalf("removed branch still exists: %s", branches)
+				}
+
+				if change == "shared commit" {
+					if got := fixtureGit(t, main, "rev-parse", "refs/heads/base"); got != commit {
+						t.Fatalf("base = %s, want %s", got, commit)
+					}
 				}
 			} else {
 				if statErr != nil {
