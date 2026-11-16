@@ -47,8 +47,7 @@ offer_rebase() {
 if is_linked_worktree; then
   gh pr merge --admin --squash
 
-  # shellcheck disable=SC2016
-  printf 'Run `wt rm` to remove this worktree and branch? [y/N] '
+  printf "Run 'wt rm' to remove this worktree and branch? [y/N] "
   read -r answer
 
   case "$answer" in
