@@ -16,18 +16,48 @@ is_linked_worktree() {
   [ "$git_dir" != "$common_dir" ]
 }
 
+offer_rebase() {
+  local remote answer
+
+  remote="$(git remote)"
+  case "$remote" in
+  '')
+    echo 'No Git remote configured for rebase.' >&2
+    return 0
+    ;;
+  *$'\n'*)
+    printf 'Git remotes:\n%s\n' "$remote"
+    printf 'Remote to rebase onto (Enter to skip): '
+    read -r remote || return 0
+    [ -n "$remote" ] || return 0
+    git remote get-url -- "$remote" >/dev/null
+    ;;
+  esac
+
+  printf 'Fetch and rebase onto the default branch of %s? [y/N] ' "$remote"
+  read -r answer || return 0
+  case "$answer" in
+  [yY] | [yY][eE][sS])
+    git fetch --no-tags -- "$remote" HEAD
+    git rebase FETCH_HEAD
+    ;;
+  esac
+}
+
 if is_linked_worktree; then
   gh pr merge --admin --squash
 
-  printf 'Run cwrm to remove this worktree and branch? [y/N] '
+  # shellcheck disable=SC2016
+  printf 'Run `wt rm` to remove this worktree and branch? [y/N] '
   read -r answer
 
   case "$answer" in
   [yY] | [yY][eE][sS])
-    cwrm
+    wt rm
     ;;
   *)
-    echo "Skipped cwrm."
+    echo "Keeping this worktree."
+    offer_rebase
     ;;
   esac
 else
