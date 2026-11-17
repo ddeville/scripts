@@ -34,10 +34,10 @@ offer_rebase() {
     ;;
   esac
 
-  printf 'Fetch and rebase onto the default branch of %s? [y/N] ' "$remote"
+  printf 'Fetch and rebase onto the default branch of %s? [Y/n] ' "$remote"
   read -r answer || return 0
   case "$answer" in
-  [yY] | [yY][eE][sS])
+  '' | [yY] | [yY][eE][sS])
     git fetch --no-tags -- "$remote" HEAD
     git rebase FETCH_HEAD
     ;;
