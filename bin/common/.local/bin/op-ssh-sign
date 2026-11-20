@@ -2,9 +2,8 @@
 
 set -eu -o pipefail
 
-# Prefer a forwarded agent with keys; otherwise use the 1Password agent.
-if [[ -z ${SSH_AUTH_SOCK:-} || ! -S ${SSH_AUTH_SOCK:-} || ${SSH_AUTH_SOCK:-} == /private/tmp/com.apple.launchd.* ]] || ! ssh-add -l >/dev/null 2>&1; then
-  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
-fi
+# Verification uses public keys, so run ssh-keygen even when no agent is available.
+SSH_AUTH_SOCK=$("$HOME/.ssh/ssh-session-agent" --socket "$HOME/.1password/agent.sock" 2>/dev/null) || SSH_AUTH_SOCK=
+export SSH_AUTH_SOCK
 
 exec ssh-keygen "$@"
