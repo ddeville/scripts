@@ -49,6 +49,11 @@ func run(ctx context.Context, args ...string) (string, error) {
 	return string(output), nil
 }
 
+// RunOnSocket runs a command on the tmux server listening on socket.
+func RunOnSocket(ctx context.Context, socket string, args ...string) (string, error) {
+	return run(ctx, append([]string{"-S", socket}, args...)...)
+}
+
 func switchClient(ctx context.Context, target, client string) error {
 	args := []string{"switch-client", "-t", target}
 	if client != "" {
