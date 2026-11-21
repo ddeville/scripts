@@ -14,16 +14,21 @@ import (
 )
 
 func TestRemovalRechecksWorktree(t *testing.T) {
-	for _, change := range []string{"none", "untracked file", "unmerged commit", "shared commit", "base moved"} {
+	for _, change := range []string{"none", "untracked file", "unmerged commit", "shared commit", "base moved", "force-delete unmerged branch"} {
 		t.Run(change, func(t *testing.T) {
 			main, path := removalFixture(t, false)
+
+			forceBranch := change == "force-delete unmerged branch"
+			if forceBranch {
+				fixtureGit(t, path, "commit", "--allow-empty", "-m", "Unmerged work")
+			}
 
 			if change == "shared commit" || change == "base moved" {
 				fixtureGit(t, path, "commit", "--allow-empty", "-m", "Shared commit")
 				fixtureGit(t, main, "branch", "base", "topic")
 			}
 
-			plan, err := worktree.PlanRemoval(t.Context(), worktree.Info{Path: path}, false)
+			plan, err := worktree.PlanRemovalWithBranchOptions(t.Context(), worktree.Info{Path: path}, false, forceBranch)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -121,8 +121,13 @@ func BranchDeletionBase(ctx context.Context, path, branch string) (string, error
 	return "", mergedErr
 }
 
-// DeleteBranch supplies an alternate upstream for this invocation only.
-func DeleteBranch(ctx context.Context, path, branch, base string) error {
+// DeleteBranch force-deletes a branch or checks it against the selected base.
+func DeleteBranch(ctx context.Context, path, branch, base string, force bool) error {
+	if force {
+		_, err := run(ctx, path, "branch", "-D", "--", branch)
+		return err
+	}
+
 	args := []string{"branch", "-d", "--", branch}
 
 	if base != "" {

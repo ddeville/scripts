@@ -146,16 +146,23 @@ func inspect(ctx context.Context, path string) (Info, error) {
 
 // Removal records the checkout, branch, and sessions reviewed before deletion.
 type Removal struct {
-	Worktree Info
-	Branch   string
-	Sessions []tmux.Session
-	MainPath string
+	Worktree   Info
+	Branch     string
+	KeptBranch string
+	Sessions   []tmux.Session
+	MainPath   string
 
-	branchBase string
+	branchBase  string
+	forceBranch bool
 }
 
 // PlanRemoval checks that a worktree is clean and its commits will be preserved.
 func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, error) {
+	return PlanRemovalWithBranchOptions(ctx, item, keepBranch, false)
+}
+
+// PlanRemovalWithBranchOptions can skip the merge check for a named branch.
+func PlanRemovalWithBranchOptions(ctx context.Context, item Info, keepBranch, forceBranch bool) (Removal, error) {
 	item, err := inspect(ctx, item.Path)
 	if err != nil {
 		return Removal{}, err
@@ -193,12 +200,17 @@ func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, erro
 		}
 	}
 
-	if !keepBranch && branch != "" {
+	if keepBranch {
+		plan.KeptBranch = branch
+	} else if branch != "" {
 		plan.Branch = branch
+		plan.forceBranch = forceBranch
+	}
 
+	if plan.Branch != "" && !plan.forceBranch {
 		plan.branchBase, err = git.BranchDeletionBase(ctx, main, branch)
 		if errors.Is(err, git.ErrNotMerged) {
-			return Removal{}, fmt.Errorf("%w; use --keep-branch to retain it", err)
+			return Removal{}, fmt.Errorf("%w; use --branch=keep to retain it or --branch=force-delete to delete it", err)
 		}
 
 		if err != nil {
@@ -222,7 +234,7 @@ func PlanRemoval(ctx context.Context, item Info, keepBranch bool) (Removal, erro
 
 // Remove rechecks a removal plan before removing its checkout and resources.
 func Remove(ctx context.Context, plan Removal) error {
-	current, err := PlanRemoval(ctx, plan.Worktree, plan.Branch == "")
+	current, err := PlanRemovalWithBranchOptions(ctx, plan.Worktree, plan.Branch == "", plan.forceBranch)
 	if err != nil {
 		return err
 	}
@@ -238,7 +250,7 @@ func Remove(ctx context.Context, plan Removal) error {
 	var cleanupErrors []error
 
 	if current.Branch != "" {
-		if err := git.DeleteBranch(ctx, current.MainPath, current.Branch, current.branchBase); err != nil {
+		if err := git.DeleteBranch(ctx, current.MainPath, current.Branch, current.branchBase, current.forceBranch); err != nil {
 			cleanupErrors = append(cleanupErrors, err)
 		}
 	}

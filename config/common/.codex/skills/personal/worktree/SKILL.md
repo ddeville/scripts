@@ -56,11 +56,13 @@ For an explicitly requested interactive browser, use `agents tui --area worktree
 ## Remove
 
 For a requested removal, inspect `wt remove --dry-run -- repo/name`, then use
-`wt remove --yes -- repo/name` for the authorized cleanup. It removes the clean
-checkout, its merged branch, and matching tmux sessions. Add `--keep-branch` to
-both commands when retaining the branch, including unmerged work. If the checkout
-is dirty, report the blocker without discarding changes. Use an explicit target
-so omission cannot select the caller's checkout accidentally.
+`wt remove --yes -- repo/name` for the authorized cleanup. The default,
+`--branch=delete-merged`, removes the clean checkout, its merged branch, and
+matching tmux sessions. Use `--branch=keep` to preserve the branch or
+`--branch=force-delete` when the user authorizes deleting an unmerged branch.
+Use the same branch option for the preview and removal. If the checkout is dirty,
+report the blocker without discarding changes. Use an explicit target so omission
+cannot select the caller's checkout accidentally.
 
 Report the resulting checkout, branch, and session state, including any partial
 failure. Distinguish session creation from a verified Codex fork. Creating a fork

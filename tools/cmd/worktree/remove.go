@@ -12,8 +12,12 @@ import (
 	"github.com/ddeville/scripts/tools/internal/worktree"
 )
 
+var errInvalidBranchAction = errors.New("--branch must be delete-merged, keep, or force-delete")
+
 func removeCommand(options *settings) *cobra.Command {
-	var yes, keepBranch, dryRun bool
+	var yes, dryRun bool
+
+	var branchAction string
 
 	cmd := &cobra.Command{
 		Use:     "remove [name|repo/name|path]",
@@ -21,20 +25,33 @@ func removeCommand(options *settings) *cobra.Command {
 		Short:   "Remove a clean worktree, its merged branch, and matching tmux sessions",
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			switch branchAction {
+			case "delete-merged", "keep", "force-delete":
+			default:
+				return fmt.Errorf("%w, got %q", errInvalidBranchAction, branchAction)
+			}
+
 			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, target(args))
 			if err != nil {
 				return fmt.Errorf("resolve worktree: %w", err)
 			}
 
-			plan, err := worktree.PlanRemoval(cmd.Context(), item, keepBranch)
+			plan, err := worktree.PlanRemovalWithBranchOptions(cmd.Context(), item, branchAction == "keep", branchAction == "force-delete")
 			if err != nil {
 				return fmt.Errorf("plan removal: %w", err)
 			}
 
 			cmd.Printf("Remove worktree: %s\n", display(plan.Worktree.Path))
 
-			if plan.Branch != "" {
+			switch {
+			case plan.KeptBranch != "":
+				cmd.Printf("Keep branch: %s\n", display(plan.KeptBranch))
+			case plan.Branch != "" && branchAction == "force-delete":
+				cmd.Printf("Force-delete branch: %s\n", display(plan.Branch))
+			case plan.Branch != "":
 				cmd.Printf("Delete branch: %s\n", display(plan.Branch))
+			default:
+				cmd.Println("Branch: detached HEAD")
 			}
 
 			for _, session := range plan.Sessions {
@@ -77,7 +94,7 @@ func removeCommand(options *settings) *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&options.directory, "directory", "C", options.directory, "source repository or current worktree")
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip the confirmation prompt")
-	cmd.Flags().BoolVar(&keepBranch, "keep-branch", false, "retain the Git branch")
+	cmd.Flags().StringVar(&branchAction, "branch", "delete-merged", "local branch action (delete-merged, keep, or force-delete)")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "show what would be removed")
 
 	return cmd
