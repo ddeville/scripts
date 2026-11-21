@@ -199,6 +199,7 @@ func (m *Model) selectAgent(ctx context.Context, id string) tea.Cmd {
 
 func (m *Model) updateAgents(ctx context.Context) tea.Cmd {
 	filtered := m.filtered(m.filter)
+	slices.SortStableFunc(filtered, func(a, b agentdata.Agent) int { return cmp.Compare(a.SessionNumber, b.SessionNumber) })
 
 	items := make([]tui.ListItem, 0, len(filtered))
 	for _, a := range filtered {

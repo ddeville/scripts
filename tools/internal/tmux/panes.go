@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -25,16 +26,17 @@ func SingleClient(ctx context.Context) (string, error) {
 	return clients[0], nil
 }
 
-// Pane describes a pane's foreground command and terminal title.
+// Pane describes a pane's session, foreground command, and terminal title.
 type Pane struct {
-	ID      string
-	Command string
-	Title   string
+	ID            string
+	SessionNumber int
+	Command       string
+	Title         string
 }
 
 // ListPanes lists panes across all sessions in the current server.
 func ListPanes(ctx context.Context) ([]Pane, error) {
-	output, err := run(ctx, "-u", "list-panes", "-a", "-F", "#{pane_id}\t#{pane_current_command}\t#{pane_title}")
+	output, err := run(ctx, "-u", "list-panes", "-a", "-F", "#{pane_id}\t#{session_id}\t#{pane_current_command}\t#{pane_title}")
 	if err != nil {
 		return nil, fmt.Errorf("read tmux panes: %w", err)
 	}
@@ -42,12 +44,17 @@ func ListPanes(ctx context.Context) ([]Pane, error) {
 	var panes []Pane
 
 	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
-		fields := strings.SplitN(line, "\t", 3)
-		if len(fields) != 3 {
+		fields := strings.SplitN(line, "\t", 4)
+		if len(fields) != 4 {
 			continue
 		}
 
-		panes = append(panes, Pane{ID: fields[0], Command: fields[1], Title: fields[2]})
+		sessionNumber, err := strconv.Atoi(strings.TrimPrefix(fields[1], "$"))
+		if err != nil {
+			continue
+		}
+
+		panes = append(panes, Pane{ID: fields[0], SessionNumber: sessionNumber, Command: fields[2], Title: fields[3]})
 	}
 
 	return panes, nil

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/ddeville/scripts/tools/internal/codex"
+	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
 var states = []string{"approval", "input", "error", "ready", "working", "idle", "unknown"}
@@ -45,6 +46,7 @@ type Agent struct {
 	UpdatedAt      *int64   `json:"updated_at"`
 	Error          *string  `json:"error"`
 	Panes          []string `json:"tmux_panes,omitempty"`
+	SessionNumber  int      `json:"-"`
 	Preview        string   `json:"preview"`
 }
 
@@ -184,15 +186,30 @@ func Collect(ctx context.Context) (data Snapshot) {
 
 	data.IDs = ids
 
-	panes, err := MatchPanes(ctx, ids)
+	panes, err := tmux.ListPanes(ctx)
 	if err != nil {
-		data.Err = err
+		data.Err = fmt.Errorf("match agent panes: %w", err)
 		return data
 	}
 
+	matches := matchPanes(ids, panes)
+	sessions := make(map[string]int, len(panes))
+
+	for _, pane := range panes {
+		if number, ok := sessions[pane.ID]; !ok || pane.SessionNumber < number {
+			sessions[pane.ID] = pane.SessionNumber
+		}
+	}
+
 	for _, id := range ids {
-		if len(panes[id]) == 0 {
+		matched := matches[id]
+		if len(matched) == 0 {
 			continue
+		}
+
+		sessionNumber := sessions[matched[0]]
+		for _, pane := range matched[1:] {
+			sessionNumber = min(sessionNumber, sessions[pane])
 		}
 
 		result, err := client.ReadThread(ctx, id)
@@ -205,7 +222,7 @@ func Collect(ctx context.Context) (data Snapshot) {
 
 			data.Agents = append(data.Agents, Agent{
 				ID: id, Type: Codex, Title: id, State: "error", NeedsAttention: true,
-				Error: &rpcErr.Message, Panes: panes[id], ActiveFlags: []string{},
+				Error: &rpcErr.Message, Panes: matched, SessionNumber: sessionNumber, ActiveFlags: []string{},
 			})
 
 			continue
@@ -216,7 +233,7 @@ func Collect(ctx context.Context) (data Snapshot) {
 		}
 
 		record := agentRecord(result)
-		record.Panes = panes[id]
+		record.Panes, record.SessionNumber = matched, sessionNumber
 		data.Agents = append(data.Agents, record)
 	}
 
