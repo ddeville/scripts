@@ -16,15 +16,17 @@ func noteCommand(options *settings) *cobra.Command {
 	var clearNote, showNote bool
 
 	cmd := &cobra.Command{
-		Use:   "note [text]",
+		Use:   "note",
 		Short: "Edit, show, or clear a worktree's local note",
-		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			hasMessage := cmd.Flags().Changed("message")
-			if len(args) != 0 && (hasMessage || clearNote || showNote) {
-				return fmt.Errorf("%w: positional note text cannot be combined with --message, --show, or --clear", os.ErrInvalid)
+		Long:  "Open the current worktree's note in $EDITOR. Use a flag to replace, show, or clear it.",
+		Args: func(_ *cobra.Command, args []string) error {
+			if len(args) != 0 {
+				return fmt.Errorf("%w: use -m to replace the note", os.ErrInvalid)
 			}
 
+			return nil
+		},
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, "")
 			if err != nil {
 				return fmt.Errorf("resolve worktree: %w", err)
@@ -33,10 +35,8 @@ func noteCommand(options *settings) *cobra.Command {
 			switch {
 			case clearNote:
 				return worktree.ClearNote(item.Path)
-			case hasMessage:
+			case cmd.Flags().Changed("message"):
 				return worktree.SetNote(item.Path, message)
-			case len(args) != 0:
-				return worktree.SetNote(item.Path, args[0])
 			case showNote:
 				if item.Note != "" {
 					if _, err := fmt.Fprintln(cmd.OutOrStdout(), tui.CleanText(item.Note)); err != nil {

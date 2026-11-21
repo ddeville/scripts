@@ -65,7 +65,9 @@ func openCommand(options *settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open [name|repo/name|path]",
 		Short: "Switch to a worktree's tmux session, creating it if missing",
-		Args:  cobra.MaximumNArgs(1),
+		Long: `Open a worktree's tmux session, creating it if missing.
+With no target, use the current worktree.`,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			item, err := worktree.Resolve(cmd.Context(), options.root, options.directory, target(args))
 			if err != nil {
@@ -85,7 +87,7 @@ func openCommand(options *settings) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&options.directory, "directory", "C", options.directory, "source repository or current worktree")
-	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "ensure a session exists without switching or attaching")
+	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "prepare the tmux session without switching or attaching")
 
 	return cmd
 }

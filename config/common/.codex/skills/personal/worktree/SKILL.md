@@ -16,17 +16,17 @@ current options.
 For `$worktree my-feature`, run from the source checkout:
 
 ```sh
-wt create --fork-current --base master -- my-feature
+wt create --fork=current --base master -- my-feature
 ```
 
 Use `-C /path/to/repo` when the source checkout differs from the command's working
 directory. Use the supplied name (a single directory name); ask only if the name
 is unclear. Quote names and paths in commands.
 
-- `--fork-current` reads `CODEX_THREAD_ID` from the command environment. If it is
+- `--fork=current` reads `CODEX_THREAD_ID` from the command environment. If it is
   missing, report that instead of guessing a thread or opening a picker. For an
-  explicitly supplied thread ID, replace it with `--fork "$thread_id"`. Omit both
-  flags only when the user requests the thread picker.
+  explicitly supplied thread ID, use `--fork "$thread_id"`. Omit `--fork` to
+  open the thread picker when requested.
 - Default to explicit `--base master` to avoid inheriting commits from the
   current branch. Honor an explicitly requested base instead. Without `--base`,
   the CLI uses `HEAD` for clean source checkouts and rejects dirty ones.
@@ -35,7 +35,7 @@ is unclear. Quote names and paths in commands.
   when the source is dirty. Do not copy, commit, stash, or discard them.
 - Creation opens repo, editor, and Codex windows and switches/attaches to tmux.
   Use `--no-switch` for background creation or a caller that cannot attach.
-  For a Git-only request, use `--no-tmux` and omit the fork flags.
+  For a Git-only request, use `--no-tmux` and omit `--fork`.
 - The CLI owns naming and honors `GIT_SRC_WORKTREE_DIR` or `--root`. Reuse any
   custom root for later commands; report actual paths and session names.
 
