@@ -15,10 +15,17 @@ const (
 	historyLock         = "window-history"
 )
 
+var errInvalidClientRecord = errors.New("invalid tmux client record")
+
 type socket string
 
 func (s socket) run(ctx context.Context, args ...string) (string, error) {
-	return tmux.RunOnSocket(ctx, string(s), args...)
+	output, err := tmux.RunOnSocket(ctx, string(s), args...)
+	if err != nil {
+		return output, fmt.Errorf("run tmux command: %w", err)
+	}
+
+	return output, nil
 }
 
 type client struct {
@@ -29,8 +36,10 @@ type client struct {
 
 func (s socket) clients(ctx context.Context) (map[string]*client, error) {
 	// Expand the client name to look up its history option in the same request.
-	const historyField = "#{E:##{" + historyOptionPrefix + "#{client_name}#}}"
-	const format = "#{client_name}\t#{session_id}:#{window_id}\t" + historyField
+	const (
+		historyField = "#{E:##{" + historyOptionPrefix + "#{client_name}#}}"
+		format       = "#{client_name}\t#{session_id}:#{window_id}\t" + historyField
+	)
 
 	output, err := s.run(ctx, "list-clients", "-F", format)
 	if err != nil {
@@ -38,10 +47,11 @@ func (s socket) clients(ctx context.Context) (map[string]*client, error) {
 	}
 
 	clients := make(map[string]*client)
+
 	for line := range strings.Lines(output) {
 		fields := strings.SplitN(strings.TrimSuffix(line, "\n"), "\t", 3)
 		if len(fields) != 3 {
-			return nil, fmt.Errorf("invalid tmux client record %q", line)
+			return nil, fmt.Errorf("%w %q", errInvalidClientRecord, line)
 		}
 
 		clients[fields[0]] = &client{

@@ -32,6 +32,7 @@ func parseHistory(value string) history {
 
 	index, entries, _ := strings.Cut(value, " ")
 	cursor, err := strconv.Atoi(index)
+
 	visits := strings.Fields(entries)
 	if err != nil || cursor < 0 || cursor >= len(visits) {
 		return history{}
@@ -40,7 +41,7 @@ func parseHistory(value string) history {
 	return history{visits: visits, cursor: cursor}
 }
 
-func (h history) String() string {
+func (h *history) String() string {
 	if len(h.visits) == 0 {
 		return ""
 	}
@@ -48,7 +49,7 @@ func (h history) String() string {
 	return strconv.Itoa(h.cursor) + " " + strings.Join(h.visits, " ")
 }
 
-func (h history) current() string {
+func (h *history) current() string {
 	if len(h.visits) == 0 {
 		return ""
 	}
