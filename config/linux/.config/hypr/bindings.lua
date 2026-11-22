@@ -110,16 +110,20 @@ function M.setup(workspace_count)
   hl.bind('CTRL + SHIFT + 3', exec('qs ipc call screenshot capture full'), { release = true })
   hl.bind('CTRL + SHIFT + 4', exec('qs ipc call screenshot capture region'), { release = true })
 
-  -- Use the macOS tab-switching gesture in Chrome.
-  for bracket, page in pairs({ bracketleft = 'Page_Up', bracketright = 'Page_Down' }) do
-    hl.bind('CTRL + SHIFT + ' .. bracket, function()
+  -- Use Ctrl with brackets for Chrome history and Ctrl+Shift with brackets for tabs.
+  local function bind_chrome(source, mods, key)
+    hl.bind(source, function()
       local active = hl.get_active_window()
       if not active or active.class:lower() ~= 'google-chrome' then
         return { ok = false }
       end
-      hl.dispatch(hl.dsp.send_shortcut({ mods = 'CTRL', key = page }))
+      hl.dispatch(hl.dsp.send_shortcut({ mods = mods, key = key }))
     end, { auto_consuming = true })
   end
+  bind_chrome('CTRL + bracketleft', 'ALT', 'Left')
+  bind_chrome('CTRL + bracketright', 'ALT', 'Right')
+  bind_chrome('CTRL + SHIFT + bracketleft', 'CTRL', 'Page_Up')
+  bind_chrome('CTRL + SHIFT + bracketright', 'CTRL', 'Page_Down')
 end
 
 return M
