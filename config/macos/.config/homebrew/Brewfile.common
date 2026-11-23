@@ -1,4 +1,5 @@
 tap "koenbollen/public"
+tap "neurosnap/tap"
 tap "warrensbox/tap"
 
 cask_args appdir: "/Applications", require_sha: true
@@ -30,6 +31,7 @@ brew "jwt-cli"
 brew "koenbollen/public/jl", trusted: true
 brew "lazygit"
 brew "neovim"
+brew "neurosnap/tap/zmx", trusted: true
 brew "openssh"
 brew "readline"
 brew "ripgrep"
