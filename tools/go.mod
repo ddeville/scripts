@@ -10,6 +10,7 @@ require (
 	github.com/coder/websocket v1.8.15
 	github.com/muesli/cancelreader v0.2.2
 	github.com/spf13/cobra v1.10.2
+	golang.org/x/sys v0.50.0
 	tailscale.com v1.104.6
 )
 
@@ -47,6 +48,5 @@ require (
 	golang.org/x/exp v0.0.0-20261109185158-a52e3aef5920 // indirect
 	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
-	golang.org/x/sys v0.50.0 // indirect
 	golang.zx2c4.com/wireguard/windows v1.1.1 // indirect
 )

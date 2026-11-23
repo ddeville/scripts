@@ -150,13 +150,18 @@ func removalFixture(t *testing.T, detached bool) (string, string) {
 	}
 
 	// Only session discovery is expected; never operate on the user's tmux server.
-	if err := os.WriteFile(filepath.Join(bin, "tmux"), []byte("#!/bin/sh\n[ \"$1\" = list-sessions ] || exit 99\n"), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private temporary directory.
+	const tmuxFixture = `#!/bin/sh
+[ "$1" = -u ] && [ "$2" = list-sessions ] || exit 99
+printf '$1\t/remote-workspace\t\tdevbox\t%s\n' "$FIXTURE_CHECKOUT"
+`
+	if err := os.WriteFile(filepath.Join(bin, "tmux"), []byte(tmuxFixture), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private temporary directory.
 		t.Fatal(err)
 	}
 
 	t.Setenv("PATH", bin+string(os.PathListSeparator)+os.Getenv("PATH"))
 
 	main, path := filepath.Join(root, "main"), filepath.Join(root, "checkout")
+	t.Setenv("FIXTURE_CHECKOUT", path)
 	fixtureGit(t, root, "init", "--template=", "--initial-branch=main", main)
 	fixtureGit(t, main, "commit", "--allow-empty", "-m", "Initial commit")
 

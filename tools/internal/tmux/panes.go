@@ -13,7 +13,7 @@ var errClientCount = errors.New("expected exactly one attached tmux client")
 
 // SingleClient returns the only attached client, refusing an ambiguous choice.
 func SingleClient(ctx context.Context) (string, error) {
-	output, err := run(ctx, "list-clients", "-F", "#{client_name}")
+	output, err := Run(ctx, "list-clients", "-F", "#{client_name}")
 	if err != nil {
 		return "", fmt.Errorf("read tmux clients: %w", err)
 	}
@@ -36,7 +36,7 @@ type Pane struct {
 
 // ListPanes lists panes across all sessions in the current server.
 func ListPanes(ctx context.Context) ([]Pane, error) {
-	output, err := run(ctx, "-u", "list-panes", "-a", "-F", "#{pane_id}\t#{session_id}\t#{pane_current_command}\t#{pane_title}")
+	output, err := Run(ctx, "-u", "list-panes", "-a", "-F", "#{pane_id}\t#{session_id}\t#{pane_current_command}\t#{pane_title}")
 	if err != nil {
 		return nil, fmt.Errorf("read tmux panes: %w", err)
 	}

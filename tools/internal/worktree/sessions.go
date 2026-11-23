@@ -26,7 +26,7 @@ func MatchSession(item Info, sessions []tmux.Session) tmux.Session {
 	var match tmux.Session
 
 	for _, candidate := range sessions {
-		if candidate.Path == item.Path {
+		if candidate.Remote == "" && candidate.Path == item.Path {
 			if match.ID == "" || candidate.Name == sessionName(item) {
 				match = candidate
 			}

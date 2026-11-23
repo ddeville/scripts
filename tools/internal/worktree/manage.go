@@ -224,7 +224,7 @@ func PlanRemovalWithBranchOptions(ctx context.Context, item Info, keepBranch, fo
 	}
 
 	for _, session := range sessions {
-		if session.Path == item.Path {
+		if session.Remote == "" && session.Path == item.Path {
 			plan.Sessions = append(plan.Sessions, session)
 		}
 	}

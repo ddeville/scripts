@@ -32,7 +32,8 @@ esac
 	return append([]string{"/bin/sh", "-c", script, "sh"}, command...)
 }
 
-func run(ctx context.Context, args ...string) (string, error) {
+// Run executes a tmux command on the current server.
+func Run(ctx context.Context, args ...string) (string, error) {
 	cmd := exec.CommandContext(ctx, "tmux", args...) // #nosec G204 G702 -- Arguments are separate; callers explicitly supply any window shell command.
 	cmd.WaitDelay = time.Second
 
@@ -51,7 +52,7 @@ func run(ctx context.Context, args ...string) (string, error) {
 
 // RunOnSocket runs a command on the tmux server listening on socket.
 func RunOnSocket(ctx context.Context, socket string, args ...string) (string, error) {
-	return run(ctx, append([]string{"-S", socket}, args...)...)
+	return Run(ctx, append([]string{"-S", socket}, args...)...)
 }
 
 func switchClient(ctx context.Context, target, client string) error {
@@ -60,7 +61,7 @@ func switchClient(ctx context.Context, target, client string) error {
 		args = append(args, "-c", client)
 	}
 
-	_, err := run(ctx, args...)
+	_, err := Run(ctx, args...)
 
 	return err
 }

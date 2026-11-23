@@ -16,12 +16,16 @@ import (
 // WorkspaceOption records the project identity assigned by tmux-session.
 const WorkspaceOption = "@tm_workspace"
 
+// RemoteOption points to a remote workspace's private local runtime directory.
+const RemoteOption = "@tm_remote"
+
 // Session identifies a tmux session by its ID and starting directory.
 type Session struct {
 	ID        string `json:"id,omitempty"`
 	Name      string `json:"name,omitempty"`
 	Path      string `json:"path,omitempty"`
 	Workspace string `json:"-"`
+	Remote    string `json:"-"`
 }
 
 // ListSessions returns sessions sorted by name, or none when no server is running.
@@ -29,7 +33,7 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	output, err := run(ctx, "list-sessions", "-F", "#{session_id}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
+	output, err := Run(ctx, "-u", "list-sessions", "-F", "#{session_id}\t#{"+RemoteOption+"}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
 	if err != nil {
 		if errors.Is(err, exec.ErrNotFound) || strings.Contains(output, "no server running") || strings.Contains(output, "No such file or directory") {
 			return nil, nil
@@ -41,17 +45,17 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	var sessions []Session
 
 	for line := range strings.SplitSeq(strings.TrimSuffix(output, "\n"), "\n") {
-		fields := strings.SplitN(line, "\t", 4)
-		if len(fields) != 4 {
+		fields := strings.SplitN(line, "\t", 5)
+		if len(fields) != 5 {
 			continue
 		}
 
-		path := fields[3]
+		path := fields[4]
 		if resolved, err := filepath.EvalSymlinks(path); err == nil {
 			path = resolved
 		}
 
-		sessions = append(sessions, Session{ID: fields[0], Workspace: fields[1], Name: fields[2], Path: filepath.Clean(path)})
+		sessions = append(sessions, Session{ID: fields[0], Remote: fields[1], Workspace: fields[2], Name: fields[3], Path: filepath.Clean(path)})
 	}
 
 	slices.SortFunc(sessions, func(a, b Session) int { return cmp.Compare(a.Name, b.Name) })
@@ -64,7 +68,7 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 func NewSession(ctx context.Context, name, window, path string) (string, error) {
 	args := append([]string{"new-session", "-d", "-P", "-F", "#{session_id}", "-s", name, "-n", window, "-c", path}, attachedCommand()...)
 
-	output, err := run(ctx, args...)
+	output, err := Run(ctx, args...)
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +78,7 @@ func NewSession(ctx context.Context, name, window, path string) (string, error) 
 
 // SetOption sets an option on a session.
 func SetOption(ctx context.Context, session, option, value string) error {
-	_, err := run(ctx, "set-option", "-t", session, option, value)
+	_, err := Run(ctx, "set-option", "-t", session, option, value)
 	return err
 }
 
@@ -82,20 +86,20 @@ func SetOption(ctx context.Context, session, option, value string) error {
 // session has an attached client. Multiple command arguments bypass shell parsing.
 func NewWindow(ctx context.Context, session, name, path string, command ...string) error {
 	args := append([]string{"new-window", "-d", "-t", session + ":", "-n", name, "-c", path}, attachedCommand(command...)...)
-	_, err := run(ctx, args...)
+	_, err := Run(ctx, args...)
 
 	return err
 }
 
 // SelectWindow selects a window within a session.
 func SelectWindow(ctx context.Context, session, window string) error {
-	_, err := run(ctx, "select-window", "-t", session+":"+window)
+	_, err := Run(ctx, "select-window", "-t", session+":"+window)
 	return err
 }
 
 // KillSession closes a session and its windows.
 func KillSession(ctx context.Context, id string) error {
-	_, err := run(ctx, "kill-session", "-t", id)
+	_, err := Run(ctx, "kill-session", "-t", id)
 	return err
 }
 
