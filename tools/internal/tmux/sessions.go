@@ -13,11 +13,15 @@ import (
 	"time"
 )
 
+// WorkspaceOption records the project identity assigned by tmux-session.
+const WorkspaceOption = "@tm_workspace"
+
 // Session identifies a tmux session by its ID and starting directory.
 type Session struct {
-	ID   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-	Path string `json:"path,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Path      string `json:"path,omitempty"`
+	Workspace string `json:"-"`
 }
 
 // ListSessions returns sessions sorted by name, or none when no server is running.
@@ -25,7 +29,7 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	output, err := run(ctx, "list-sessions", "-F", "#{session_id}\t#{session_name}\t#{session_path}")
+	output, err := run(ctx, "list-sessions", "-F", "#{session_id}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
 	if err != nil {
 		if errors.Is(err, exec.ErrNotFound) || strings.Contains(output, "no server running") || strings.Contains(output, "No such file or directory") {
 			return nil, nil
@@ -37,17 +41,17 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	var sessions []Session
 
 	for line := range strings.SplitSeq(strings.TrimSuffix(output, "\n"), "\n") {
-		fields := strings.SplitN(line, "\t", 3)
-		if len(fields) != 3 {
+		fields := strings.SplitN(line, "\t", 4)
+		if len(fields) != 4 {
 			continue
 		}
 
-		path := fields[2]
+		path := fields[3]
 		if resolved, err := filepath.EvalSymlinks(path); err == nil {
 			path = resolved
 		}
 
-		sessions = append(sessions, Session{ID: fields[0], Name: fields[1], Path: filepath.Clean(path)})
+		sessions = append(sessions, Session{ID: fields[0], Workspace: fields[1], Name: fields[2], Path: filepath.Clean(path)})
 	}
 
 	slices.SortFunc(sessions, func(a, b Session) int { return cmp.Compare(a.Name, b.Name) })

@@ -19,6 +19,7 @@ var errEditor = errors.New("EDITOR is not set")
 type Options struct {
 	Name           string
 	Directory      string
+	Workspace      string
 	DisplayName    string
 	CodexDirectory string
 	CodexCommand   []string
@@ -66,6 +67,12 @@ func Create(ctx context.Context, options Options) (string, error) {
 			_ = tmux.KillSession(cleanup, id)
 		}
 	}()
+
+	if options.Workspace != "" {
+		if err := tmux.SetOption(ctx, id, tmux.WorkspaceOption, options.Workspace); err != nil {
+			return "", fmt.Errorf("set session workspace: %w", err)
+		}
+	}
 
 	if options.DisplayName != "" {
 		if err := tmux.SetOption(ctx, id, "@display_name", options.DisplayName); err != nil {
