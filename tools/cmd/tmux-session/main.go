@@ -12,6 +12,7 @@ import (
 
 	"github.com/ddeville/scripts/tools/internal/cli"
 	"github.com/ddeville/scripts/tools/internal/session"
+	"github.com/ddeville/scripts/tools/internal/sshmux"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 	"github.com/ddeville/scripts/tools/internal/tui"
 )
@@ -22,7 +23,7 @@ func main() {
 
 func command() *cobra.Command {
 	var (
-		name, host          string
+		name, host, watch   string
 		launch, closeTarget string
 		noSwitch            bool
 	)
@@ -36,6 +37,10 @@ func command() *cobra.Command {
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
+				if watch != "" {
+					return supervise(cmd.Context(), watch)
+				}
+
 				if launch != "" {
 					return attachPane(cmd.Context(), launch)
 				}
@@ -90,6 +95,8 @@ func command() *cobra.Command {
 	cmd.Flags().StringVarP(&name, "name", "n", "", "open a named workspace for this directory (defaults to the directory name)")
 	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "find or create the session without switching or attaching")
 	cmd.Flags().StringVar(&launch, "remote-pane", "", "launch or resume one pane")
+	cmd.Flags().StringVar(&watch, "supervise", "", "supervise a remote connection")
+	cmd.Flags().Lookup("supervise").Hidden = true
 	cmd.Flags().StringVar(&closeTarget, "remote-close", "", "close a pane or window by ID")
 	cmd.Flags().Lookup("remote-pane").Hidden = true
 	cmd.Flags().Lookup("remote-close").Hidden = true
@@ -120,25 +127,11 @@ func resolveDirectory(path string) (string, error) {
 	return directory, nil
 }
 
-func cacheDir() (string, error) {
-	cache, err := os.UserCacheDir()
-	if err != nil {
-		return "", fmt.Errorf("locate cache directory: %w", err)
-	}
-
-	dir := filepath.Join(cache, "tmux-session")
-	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return "", fmt.Errorf("create session cache: %w", err)
-	}
-
-	return dir, nil
-}
-
 // lockOpen serializes lookup and layout creation, including the first tmux server startup.
 func lockOpen() (*os.File, error) {
-	dir, err := cacheDir()
+	dir, err := sshmux.CacheDir()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("locate tmux session cache: %w", err)
 	}
 
 	return lockFile(filepath.Join(dir, "open.lock"))

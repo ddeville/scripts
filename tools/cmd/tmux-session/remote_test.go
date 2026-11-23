@@ -45,3 +45,26 @@ func TestDiscoveryDistinguishesUnreachableFromGone(t *testing.T) {
 		}
 	}
 }
+
+func TestRecoveryOnlyRetriesSSHFailuresOnThisDestination(t *testing.T) {
+	t.Parallel()
+
+	const terminal = "tm-1234567890abcdef1234.shell-AAAAAAAAAAAAA"
+
+	panes := map[string]tmux.Attachment{
+		"%1": {ID: "%1", Host: "dev", Terminal: terminal, Dead: true, ExitStatus: "255"},
+		"%2": {ID: "%2", Host: "dev", Terminal: terminal, Dead: true, ExitStatus: "1"},
+		"%3": {ID: "%3", Host: "dev", Terminal: terminal},
+		"%4": {ID: "%4", Host: "other", Terminal: terminal, Dead: true, ExitStatus: "255"},
+		"%5": {ID: "%5", Host: "dev", Dead: true, ExitStatus: "255"},
+	}
+
+	active, retry := interrupted(panes, "dev")
+	if !active || !slices.Equal(retry, []tmux.Attachment{panes["%1"]}) {
+		t.Fatalf("active = %t, retry = %v", active, retry)
+	}
+
+	if active, _ := interrupted(panes, "gone"); active {
+		t.Fatal("supervisor should exit without panes")
+	}
+}

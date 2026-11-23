@@ -15,6 +15,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ddeville/scripts/tools/internal/sshmux"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
@@ -76,6 +77,30 @@ func inventory(out string) (map[string]bool, error) {
 	return names, nil
 }
 
+// SSH passes a single command string to the login shell. Quote backslashes outside
+// single quotes so both fish and POSIX shells pass them through literally.
+func quote(s string) string {
+	return "'" + strings.NewReplacer("'", "'\\''", "\\", "'\\\\'").Replace(s) + "'"
+}
+
+func remoteCommand(script string, args ...string) string {
+	// A login's XDG_RUNTIME_DIR can disappear when the connection drops.
+	const setup = `set -eu
+unset ZMX_SESSION ZMX_SESSION_PREFIX
+export ZMX_DIR="${ZMX_DIR:-$HOME/.cache/tm-zmx}" ZMX_DIR_MODE=0700 ZMX_LOG_MODE=0600
+`
+
+	var command strings.Builder
+	command.WriteString("exec sh -c " + quote(setup+script) + " sh")
+
+	for _, arg := range args {
+		command.WriteByte(' ')
+		command.WriteString(quote(arg))
+	}
+
+	return command.String()
+}
+
 const inspect = `unset CDPATH
 command -v zmx >/dev/null || { echo 'Install zmx on the SSH host first' >&2; exit 1; }
 cd -P -- "$HOME"
@@ -88,19 +113,19 @@ func openRemote(ctx context.Context, host, request, name string) (tmux.Session, 
 		return tmux.Session{}, false, fmt.Errorf("%w: empty remote path", os.ErrInvalid)
 	}
 
-	dest, err := sshDestination(host)
+	dest, err := sshmux.ForHost(host)
 	if err != nil {
-		return tmux.Session{}, false, err
+		return tmux.Session{}, false, fmt.Errorf("find connection: %w", err)
 	}
 
-	lock, err := lockFile(dest.socket + ".lock")
+	lock, err := lockFile(dest.Socket + ".lock")
 	if err != nil {
 		return tmux.Session{}, false, err
 	}
 	defer func() { _ = lock.Close() }()
 
-	if err := dest.connect(ctx); err != nil {
-		return tmux.Session{}, false, err
+	if err := dest.Connect(ctx, true); err != nil {
+		return tmux.Session{}, false, fmt.Errorf("open connection: %w", err)
 	}
 
 	if request == "~" {
@@ -111,9 +136,9 @@ func openRemote(ctx context.Context, host, request, name string) (tmux.Session, 
 		request = "./" + strings.TrimPrefix(request, "~/")
 	}
 
-	out, err := dest.query(ctx, remoteCommand(inspect, request))
+	out, err := dest.Query(ctx, remoteCommand(inspect, request))
 	if err != nil {
-		return tmux.Session{}, false, err
+		return tmux.Session{}, false, fmt.Errorf("inspect workspace: %w", err)
 	}
 
 	dir, list, ok := strings.Cut(out, "\x00")
@@ -128,7 +153,12 @@ func openRemote(ctx context.Context, host, request, name string) (tmux.Session, 
 
 	w := workspace{Host: host, Path: dir, Name: cmp.Or(name, path.Base(dir))}
 
-	return w.open(ctx, names)
+	target, created, err := w.open(ctx, names)
+	if err == nil {
+		err = startSupervisor(ctx, dest)
+	}
+
+	return target, created, err
 }
 
 // Pane names and positions are mutable. Only a terminal ID can identify a
@@ -225,7 +255,7 @@ func (w workspace) open(ctx context.Context, names map[string]bool) (tmux.Sessio
 
 	// All workspaces on the destination lost the same connection.
 	for _, p := range panes {
-		if p.Host != w.Host || !p.Dead {
+		if p.Host != w.Host || !p.Dead || !terminalID.MatchString(p.Terminal) || !names[p.Terminal] {
 			continue
 		}
 

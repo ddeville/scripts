@@ -54,6 +54,16 @@ func appendCommand(args, command []string) []string {
 	return args
 }
 
+// commandLine quotes arguments for tmux's command parser inside if-shell -F.
+func commandLine(args ...string) string {
+	quoted := make([]string, 0, len(args))
+	for _, arg := range args {
+		quoted = append(quoted, "'"+strings.ReplaceAll(arg, "'", "'\\''")+"'")
+	}
+
+	return strings.Join(quoted, " ")
+}
+
 func run(ctx context.Context, args ...string) (string, error) {
 	cmd := exec.CommandContext(ctx, "tmux", args...) // #nosec G204 G702 -- Arguments are separate; callers explicitly supply any window shell command.
 	cmd.WaitDelay = time.Second

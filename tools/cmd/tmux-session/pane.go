@@ -14,6 +14,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/ddeville/scripts/tools/internal/sshmux"
 	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
@@ -64,17 +65,21 @@ func attachPane(ctx context.Context, requested string) error {
 		return fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
 	}
 
-	dest, err := sshDestination(p.Host)
+	dest, err := sshmux.ForHost(p.Host)
 	if err != nil {
-		return err
+		return fmt.Errorf("find pane connection: %w", err)
 	}
 
+	// Record before launching. An ambiguous failure can only reattach here.
+	p.Connection = dest.Generation()
+
+	project := ""
 	if dir != "" {
-		// Record the target before launching. Even a manual respawn after
-		// an ambiguous SSH failure can now only reattach to this terminal.
-		if err := p.Record(ctx, displayName(path.Base(dir))); err != nil {
-			return fmt.Errorf("record remote pane: %w", err)
-		}
+		project = displayName(path.Base(dir))
+	}
+
+	if err := p.Record(ctx, project); err != nil {
+		return fmt.Errorf("record remote pane: %w", err)
 	}
 
 	ssh, err := exec.LookPath("ssh")
@@ -82,7 +87,7 @@ func attachPane(ctx context.Context, requested string) error {
 		return fmt.Errorf("find ssh: %w", err)
 	}
 
-	args := dest.channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))
+	args := dest.Channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))
 
 	return fmt.Errorf("start ssh: %w", syscall.Exec(ssh, append([]string{ssh}, args...), os.Environ())) // #nosec G204 -- Replace only with ssh and quote remote arguments.
 }
@@ -97,26 +102,26 @@ func stopTerminal(ctx context.Context, p *tmux.Attachment) error {
 		return fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
 	}
 
-	dest, err := sshDestination(p.Host)
+	dest, err := sshmux.ForHost(p.Host)
 	if err != nil {
-		return err
+		return fmt.Errorf("find pane connection: %w", err)
 	}
 
 	command := remoteCommand(stop, p.Terminal, strconv.FormatBool(p.Dead))
 
-	out, err := dest.query(ctx, command)
-	if errors.Is(err, errChannelRefused) && !p.Dead {
+	out, err := dest.Query(ctx, command)
+	if errors.Is(err, sshmux.ErrChannelRefused) && !p.Dead {
 		// At MaxSessions, free this attachment's slot for the close command.
 		if err := p.Disconnect(ctx); err != nil {
 			return fmt.Errorf("disconnect pane: %w", err)
 		}
 
 		p.Dead = true
-		out, err = dest.query(ctx, command)
+		out, err = dest.Query(ctx, command)
 	}
 
 	if err != nil {
-		return err
+		return fmt.Errorf("stop terminal: %w", err)
 	}
 
 	names, err := inventory(out)

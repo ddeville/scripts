@@ -32,22 +32,22 @@ const (
 
 // Agent describes a running conversation and its current status.
 type Agent struct {
-	ID             string   `json:"id"`
-	Type           Type     `json:"agent_type"`
-	Title          string   `json:"title"`
-	Cwd            string   `json:"cwd"`
-	Project        string   `json:"project"`
-	State          string   `json:"status"`
-	NeedsAttention bool     `json:"needs_attention"`
-	Unread         *bool    `json:"unread"`
-	ActiveFlags    []string `json:"active_flags"`
-	ParentID       *string  `json:"parent_id"`
-	Model          *string  `json:"model"`
-	UpdatedAt      *int64   `json:"updated_at"`
-	Error          *string  `json:"error"`
-	Panes          []string `json:"tmux_panes,omitempty"`
-	SessionNumber  int      `json:"-"`
-	Preview        string   `json:"preview"`
+	ID             string      `json:"id"`
+	Type           Type        `json:"agent_type"`
+	Title          string      `json:"title"`
+	Cwd            string      `json:"cwd"`
+	Project        string      `json:"project"`
+	State          string      `json:"status"`
+	NeedsAttention bool        `json:"needs_attention"`
+	Unread         *bool       `json:"unread"`
+	ActiveFlags    []string    `json:"active_flags"`
+	ParentID       *string     `json:"parent_id"`
+	Model          *string     `json:"model"`
+	UpdatedAt      *int64      `json:"updated_at"`
+	Error          *string     `json:"error"`
+	Panes          []string    `json:"tmux_panes,omitempty"`
+	Targets        []tmux.Pane `json:"-"`
+	Preview        string      `json:"preview"`
 }
 
 // Snapshot contains the agents currently running in tmux and their status counts.
@@ -142,7 +142,8 @@ func agentRecord(result codex.ReadResult) Agent {
 }
 
 // Collect reads loaded conversations with live tmux panes, ordered by path and pane ID.
-func Collect(ctx context.Context) (data Snapshot) {
+// Without a pane snapshot it reads one from the current tmux server.
+func (s *Source) Collect(ctx context.Context, panes []tmux.Pane) (data Snapshot) {
 	data = Snapshot{
 		SchemaVersion: 1, Source: "codex", Scope: "tmux",
 		IDs: []string{}, Agents: []Agent{}, Counts: map[string]int{},
@@ -171,35 +172,37 @@ func Collect(ctx context.Context) (data Snapshot) {
 		}
 	}()
 
-	client, err := codex.Connect(ctx)
-	if err != nil {
-		data.Err = err
+	if panes != nil && !slices.ContainsFunc(panes, candidate) {
+		// The popup has no candidate views here. Leave the SSH slot free.
+		s.Close()
 		return data
 	}
-	defer client.Close()
 
+	if panes == nil {
+		var err error
+
+		panes, err = tmux.ListPanes(ctx)
+		if err != nil {
+			data.Err = fmt.Errorf("match agent panes: %w", err)
+			return data
+		}
+	}
+
+	data.Err = s.use(ctx, func(client *codex.Client) error {
+		return data.read(ctx, client, s.Host, panes)
+	})
+
+	return data
+}
+
+func (data *Snapshot) read(ctx context.Context, client *codex.Client, host string, panes []tmux.Pane) error {
 	ids, err := client.LoadedIDs(ctx)
 	if err != nil {
-		data.Err = err
-		return data
+		return fmt.Errorf("list loaded threads: %w", err)
 	}
 
 	data.IDs = ids
-
-	panes, err := tmux.ListPanes(ctx)
-	if err != nil {
-		data.Err = fmt.Errorf("match agent panes: %w", err)
-		return data
-	}
-
-	matches := matchPanes(ids, panes)
-	sessions := make(map[string]int, len(panes))
-
-	for _, pane := range panes {
-		if number, ok := sessions[pane.ID]; !ok || pane.SessionNumber < number {
-			sessions[pane.ID] = pane.SessionNumber
-		}
-	}
+	matches := matchPanes(host, ids, panes)
 
 	for _, id := range ids {
 		matched := matches[id]
@@ -207,33 +210,29 @@ func Collect(ctx context.Context) (data Snapshot) {
 			continue
 		}
 
-		sessionNumber := sessions[matched[0]]
-		for _, pane := range matched[1:] {
-			sessionNumber = min(sessionNumber, sessions[pane])
-		}
-
 		result, err := client.ReadThread(ctx, id)
+
+		record := agentRecord(result)
 		if err != nil {
 			var rpcErr *codex.RPCError
 			if !errors.As(err, &rpcErr) {
-				data.Err = err
-				return data
+				return fmt.Errorf("read thread: %w", err)
 			}
 
-			data.Agents = append(data.Agents, Agent{
+			record = Agent{
 				ID: id, Type: Codex, Title: id, State: "error", NeedsAttention: true,
-				Error: &rpcErr.Message, Panes: matched, SessionNumber: sessionNumber, ActiveFlags: []string{},
-			})
-
+				Error: &rpcErr.Message, ActiveFlags: []string{},
+			}
+		} else if result.Thread.Status.Type == "notLoaded" || record.ID != id {
 			continue
 		}
 
-		if result.Thread.Status.Type == "notLoaded" {
-			continue
+		record.Targets = matched
+
+		for _, pane := range matched {
+			record.Panes = append(record.Panes, pane.ID)
 		}
 
-		record := agentRecord(result)
-		record.Panes, record.SessionNumber = matched, sessionNumber
 		data.Agents = append(data.Agents, record)
 	}
 
@@ -245,7 +244,7 @@ func Collect(ctx context.Context) (data Snapshot) {
 		)
 	})
 
-	return data
+	return nil
 }
 
 // Details includes a conversation's status, initial prompt, and recent history.
@@ -258,14 +257,22 @@ type Details struct {
 }
 
 // ReadDetails reads one conversation and its recent activity.
-func ReadDetails(ctx context.Context, id string) (Details, error) {
-	data := Details{RecentItems: []json.RawMessage{}}
+func (s *Source) ReadDetails(ctx context.Context, id string) (Details, error) {
+	var data Details
 
-	client, err := codex.Connect(ctx)
-	if err != nil {
-		return data, fmt.Errorf("read details for %s: %w", id, err)
-	}
-	defer client.Close()
+	err := s.use(ctx, func(client *codex.Client) error {
+		var err error
+
+		data, err = readDetails(ctx, client, id)
+
+		return err
+	})
+
+	return data, err
+}
+
+func readDetails(ctx context.Context, client *codex.Client, id string) (Details, error) {
+	data := Details{RecentItems: []json.RawMessage{}}
 
 	result, err := client.ReadThread(ctx, id)
 	if err != nil {

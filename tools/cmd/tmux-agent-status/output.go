@@ -13,6 +13,9 @@ import (
 )
 
 func runStatus(ctx context.Context, watch bool, interval time.Duration, output, detailID string) error {
+	var local agents.Source
+	defer local.Close()
+
 	for {
 		started := time.Now()
 		requestCtx, cancel := context.WithTimeout(ctx, 8*time.Second)
@@ -23,9 +26,9 @@ func runStatus(ctx context.Context, watch bool, interval time.Duration, output, 
 		)
 
 		if detailID == "" {
-			data = agents.Collect(requestCtx)
+			data = local.Collect(requestCtx, nil)
 		} else {
-			data, err = agents.ReadDetails(requestCtx, detailID)
+			data, err = local.ReadDetails(requestCtx, detailID)
 		}
 
 		cancel()

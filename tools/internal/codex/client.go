@@ -1,18 +1,22 @@
-// Package codex provides a client for the local Codex app server.
+// Package codex reads status and activity from a Codex app server.
 package codex
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
+
+	"github.com/ddeville/scripts/tools/internal/sshmux"
 )
 
 // RPCError is an error returned by the app server.
@@ -22,14 +26,13 @@ type RPCError struct {
 
 func (e *RPCError) Error() string { return e.Message }
 
-// Client sends sequential requests over a local app-server connection.
+// Client sends sequential requests over an app-server connection.
 type Client struct {
 	conn *websocket.Conn
 	id   int
 }
 
-// Connect opens and initializes an app-server connection.
-func Connect(ctx context.Context) (*Client, error) {
+func dialLocal(ctx context.Context) (net.Conn, error) {
 	home := os.Getenv("CODEX_HOME")
 	if home == "" {
 		userHome, err := os.UserHomeDir()
@@ -42,8 +45,59 @@ func Connect(ctx context.Context) (*Client, error) {
 
 	socket := filepath.Join(home, "app-server-control", "app-server-control.sock")
 
+	conn, err := (&net.Dialer{}).DialContext(ctx, "unix", socket)
+	if err != nil {
+		return nil, fmt.Errorf("open control socket: %w", err)
+	}
+
+	return conn, nil
+}
+
+// Keep the full control socket off the local filesystem. Only this process
+// holds the proxy channel, which carries the same WebSocket as the local socket.
+func dialRemote(ctx context.Context, host string) (net.Conn, error) {
+	dest, err := sshmux.ForHost(host)
+	if err != nil {
+		return nil, fmt.Errorf("find SSH connection: %w", err)
+	}
+
+	// The WebSocket can outlive the HTTP handshake. Closing the pipe ends ssh.
+	cmd := exec.CommandContext(context.WithoutCancel(ctx), "ssh", dest.Channel("-T", "exec codex app-server proxy")...) // #nosec G204 -- Fixed command on a validated, existing master.
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, fmt.Errorf("open proxy stdin: %w", err)
+	}
+
+	local, peer := net.Pipe()
+
+	cmd.Stdout = peer
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("start Codex proxy: %w", err)
+	}
+
+	go func() {
+		_, _ = io.Copy(stdin, peer)
+		_ = stdin.Close()
+		_ = cmd.Process.Kill()
+	}()
+
+	go func() {
+		_ = cmd.Wait()
+		_ = peer.Close()
+	}()
+
+	return local, nil
+}
+
+// Connect opens the local app server or the one on an existing SSH destination.
+func Connect(ctx context.Context, host string) (*Client, error) {
 	transport := &http.Transport{DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-		return (&net.Dialer{}).DialContext(ctx, "unix", socket)
+		if host != "" {
+			return dialRemote(ctx, host)
+		}
+
+		return dialLocal(ctx)
 	}}
 	defer transport.CloseIdleConnections()
 
@@ -54,6 +108,10 @@ func Connect(ctx context.Context) (*Client, error) {
 		HTTPClient: &http.Client{Transport: transport},
 	})
 	if err != nil {
+		if host != "" {
+			return nil, fmt.Errorf("proxy unavailable (check Codex and SSH MaxSessions): %w", err)
+		}
+
 		return nil, fmt.Errorf("connect to Codex: %w", err)
 	}
 
