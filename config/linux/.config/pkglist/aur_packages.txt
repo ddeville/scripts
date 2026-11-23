@@ -5,6 +5,7 @@ buildifier-bin
 flamegraph
 jl
 sysz
+zmx-bin
 
 # =========== Development ===========
 
