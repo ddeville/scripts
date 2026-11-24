@@ -66,36 +66,39 @@ func (d Destination) Generation() string {
 	return strconv.FormatInt(info.ModTime().UnixNano(), 10)
 }
 
-// Connect must be serialized by destination. Only an explicit open can prompt
-// for credentials or ask about a host key.
-func (d Destination) Connect(ctx context.Context, interactive bool) error {
+// Connect starts or reuses the master under the destination lock. Let OpenSSH
+// select the agent and identities from the caller's environment and config.
+func (d Destination) Connect(ctx context.Context, agent string) error {
+	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	defer cancel()
+
 	if exec.CommandContext(ctx, "ssh", "-S", d.Socket, "-O", "check", "--", d.Host).Run() == nil { // #nosec G204 -- The validated destination follows --.
 		return nil
 	}
 
-	args := []string{
+	cmd := exec.CommandContext(ctx, "ssh", // #nosec G204 -- The validated destination follows --.
 		"-S", d.Socket, "-fN", "-oControlMaster=auto", "-oControlPersist=60",
 		"-oRemoteCommand=none", "-oConnectTimeout=10", "-oServerAliveInterval=5", "-oServerAliveCountMax=2",
-	}
-	if !interactive {
-		args = append(args, "-oBatchMode=yes", "-oStrictHostKeyChecking=yes")
-	}
-
-	cmd := exec.CommandContext(ctx, "ssh", append(args, "--", d.Host)...) // #nosec G204 -- The validated destination follows --.
-	if interactive {
-		cmd.Stdin, cmd.Stderr = os.Stdin, os.Stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("connect to %s: %w", d.Host, err)
-		}
-
-		return nil
+		"-oBatchMode=yes", "-oStrictHostKeyChecking=yes", "--", d.Host)
+	if agent != os.Getenv("SSH_AUTH_SOCK") {
+		cmd.Env = append(cmd.Environ(), "SSH_AUTH_SOCK="+agent)
 	}
 
+	// A proxy can keep stderr open after ssh backgrounds the master.
 	cmd.WaitDelay = time.Second
 	if _, err := cmd.Output(); err != nil && !errors.Is(err, exec.ErrWaitDelay) {
+		if ctx.Err() != nil {
+			return fmt.Errorf("connect to %s: %w", d.Host, ctx.Err())
+		}
+
 		var exit *exec.ExitError
-		if errors.As(err, &exit) && needsSignIn(string(exit.Stderr)) {
-			return fmt.Errorf("%w on %s", ErrSignIn, d.Host)
+		if errors.As(err, &exit) && len(exit.Stderr) != 0 {
+			detail := strings.TrimSpace(string(exit.Stderr))
+			if needsSignIn(detail) {
+				err = ErrSignIn
+			}
+
+			return fmt.Errorf("connect to %s: %w: %s", d.Host, err, detail)
 		}
 
 		return fmt.Errorf("connect to %s: %w", d.Host, err)

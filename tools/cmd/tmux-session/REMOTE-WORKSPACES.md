@@ -15,12 +15,17 @@ connection. Use the same SSH alias across projects. Each pane uses one of sshd's
 `MaxSessions` slots. Leave room for discovery and one channel per open agent
 popup. A full connection never falls back to a second login.
 
-- **Reconnect** happens automatically. The first `tm` can prompt for sign-in.
-  Each local tmux server runs one supervisor per destination. It retries a lost
-  connection with backoff and reattaches surviving terminals in place, including
-  moved panes. Input typed into a dead pane is discarded. Programs that ended
-  stay closed. If SSH needs attention or recovery stalls, rerun `tm --host …`
-  from a local shell. Automatic retries never prompt or accept new host keys.
+- **Connect** with a trusted SSH host key and a working agent. The supervisor
+  opens the first connection before creating any panes. All logins use batch
+  mode and strict host-key checking. For a new host, verify its key with
+  ordinary `ssh` first. OpenSSH honors `IdentityAgent`. Each successful open
+  records the current `SSH_AUTH_SOCK` path in the private destination lock
+  file for future reconnects. Login does not require agent forwarding.
+- **Reconnect** happens automatically. Each local tmux server keeps one
+  supervisor per destination. It retries with backoff and reattaches surviving
+  terminals in place, including moved panes. Input typed into a dead pane is
+  discarded. Programs that ended stay closed. If SSH needs attention, fix the
+  agent or host key and rerun `tm --host …` from a local shell.
 - **Recover after losing the local tmux server** by reopening each workspace.
   Each surviving terminal gets a window named for its role. Custom titles, order
   and split layouts survive only while the local server does.

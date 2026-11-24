@@ -108,26 +108,7 @@ cd -P -- "$1"
 printf '%s\000' "$PWD"
 ` + listTerminals
 
-func openRemote(ctx context.Context, host, request, name string) (tmux.Session, bool, error) {
-	if request == "" {
-		return tmux.Session{}, false, fmt.Errorf("%w: empty remote path", os.ErrInvalid)
-	}
-
-	dest, err := sshmux.ForHost(host)
-	if err != nil {
-		return tmux.Session{}, false, fmt.Errorf("find connection: %w", err)
-	}
-
-	lock, err := lockFile(dest.Socket + ".lock")
-	if err != nil {
-		return tmux.Session{}, false, err
-	}
-	defer func() { _ = lock.Close() }()
-
-	if err := dest.Connect(ctx, true); err != nil {
-		return tmux.Session{}, false, fmt.Errorf("open connection: %w", err)
-	}
-
+func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name string) (tmux.Session, bool, error) {
 	if request == "~" {
 		request = "."
 	}
@@ -151,14 +132,9 @@ func openRemote(ctx context.Context, host, request, name string) (tmux.Session, 
 		return tmux.Session{}, false, err
 	}
 
-	w := workspace{Host: host, Path: dir, Name: cmp.Or(name, path.Base(dir))}
+	w := workspace{Host: dest.Host, Path: dir, Name: cmp.Or(name, path.Base(dir))}
 
-	target, created, err := w.open(ctx, names)
-	if err == nil {
-		err = startSupervisor(ctx, dest)
-	}
-
-	return target, created, err
+	return w.open(ctx, names)
 }
 
 // Pane names and positions are mutable. Only a terminal ID can identify a
