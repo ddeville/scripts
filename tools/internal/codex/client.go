@@ -63,6 +63,7 @@ func dialRemote(ctx context.Context, host string) (net.Conn, error) {
 
 	// The WebSocket can outlive the HTTP handshake. Closing the pipe ends ssh.
 	cmd := exec.CommandContext(context.WithoutCancel(ctx), "ssh", dest.Channel("-T", "exec codex app-server proxy")...) // #nosec G204 -- Fixed command on a validated, existing master.
+	cmd.WaitDelay = time.Second
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -79,15 +80,42 @@ func dialRemote(ctx context.Context, host string) (net.Conn, error) {
 	go func() {
 		_, _ = io.Copy(stdin, peer)
 		_ = stdin.Close()
-		_ = cmd.Process.Kill()
 	}()
+
+	done := make(chan struct{})
 
 	go func() {
 		_ = cmd.Wait()
 		_ = peer.Close()
+
+		close(done)
 	}()
 
-	return local, nil
+	return &proxyConn{Conn: local, process: cmd.Process, done: done}, nil
+}
+
+// Wait for ssh to return the session slot before another command needs it.
+type proxyConn struct {
+	net.Conn
+
+	process *os.Process
+	done    <-chan struct{}
+}
+
+func (p *proxyConn) Close() error {
+	err := p.Conn.Close()
+	select {
+	case <-p.done:
+	case <-time.After(time.Second):
+		_ = p.process.Kill()
+		<-p.done
+	}
+
+	if err != nil {
+		return fmt.Errorf("close Codex proxy: %w", err)
+	}
+
+	return nil
 }
 
 // Connect opens the local app server or the one on an existing SSH destination.

@@ -134,7 +134,7 @@ func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name s
 
 	w := workspace{Host: dest.Host, Path: dir, Name: cmp.Or(name, path.Base(dir))}
 
-	return w.open(ctx, names)
+	return w.open(ctx, dest, names)
 }
 
 // Pane names and positions are mutable. Only a terminal ID can identify a
@@ -179,7 +179,7 @@ func (w workspace) windows(names map[string]bool, panes map[string]tmux.Attachme
 	return windows, nil
 }
 
-func (w workspace) open(ctx context.Context, names map[string]bool) (tmux.Session, bool, error) {
+func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[string]bool) (tmux.Session, bool, error) {
 	helper, err := os.Executable()
 	if err != nil {
 		return tmux.Session{}, false, fmt.Errorf("locate tmux-session: %w", err)
@@ -190,14 +190,7 @@ func (w workspace) open(ctx context.Context, names map[string]bool) (tmux.Sessio
 		return tmux.Session{}, false, fmt.Errorf("encode workspace: %w", err)
 	}
 
-	// SSH authentication and discovery must never hold the local project lock.
-	lock, err := lockOpen()
-	if err != nil {
-		return tmux.Session{}, false, err
-	}
-	defer func() { _ = lock.Close() }()
-
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	sessions, err := tmux.ListSessions(ctx)
@@ -229,38 +222,83 @@ func (w workspace) open(ctx context.Context, names map[string]bool) (tmux.Sessio
 		return tmux.Session{}, false, err
 	}
 
-	// All workspaces on the destination lost the same connection.
+	var resume []tmux.Attachment
+
+	prefix := w.prefix()
 	for _, p := range panes {
-		if p.Host != w.Host || !p.Dead || !terminalID.MatchString(p.Terminal) || !names[p.Terminal] {
-			continue
-		}
-
-		if err := p.Resume(ctx, helper, "--remote-pane", p.Terminal); err != nil {
-			return tmux.Session{}, false, fmt.Errorf("resume pane %s: %w", p.ID, err)
+		if p.Host == w.Host && p.Dead && strings.HasPrefix(p.Terminal, prefix) && names[p.Terminal] && terminalID.MatchString(p.Terminal) {
+			resume = append(resume, p)
 		}
 	}
 
-	if created {
-		target.Name = tmux.AvailableName(sessions, displayName(w.Host+"/"+w.Name))
-		target.Remote = string(meta)
-		first := windows[0]
-		windows = windows[1:]
+	want := len(windows) + len(resume)
 
-		target.ID, err = tmux.NewRemoteSession(ctx, target, first.role, "exec "+quote(helper)+" --remote-pane shell",
-			helper, "--remote-pane", cmp.Or(first.terminal, first.role))
-		if err != nil {
-			return tmux.Session{}, false, fmt.Errorf("create remote session: %w", err)
-		}
+	if err := requireCapacity(ctx, dest, want); err != nil {
+		return tmux.Session{}, false, err
 	}
 
-	for _, win := range windows {
-		err := tmux.StartWindow(ctx, target.ID, win.role, "", helper, "--remote-pane", cmp.Or(win.terminal, win.role))
-		if err != nil {
-			return tmux.Session{}, false, fmt.Errorf("create remote window: %w", err)
+	err = launch(ctx, dest, want, func(token string) error {
+		if err := resumePanes(ctx, helper, token, resume); err != nil {
+			return err
 		}
+
+		if created {
+			target.Name, target.Remote = displayName(w.Host+"/"+w.Name), string(meta)
+
+			if err := createRemote(ctx, &target, windows[0], helper, token); err != nil {
+				return err
+			}
+
+			windows = windows[1:]
+		}
+
+		for _, win := range windows {
+			if err := tmux.StartWindow(ctx, target.ID, win.role, "", helper, "--remote-pane", cmp.Or(win.terminal, win.role), "--pane-batch", token); err != nil {
+				return fmt.Errorf("create remote window: %w", err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return tmux.Session{}, false, err
 	}
 
 	target.Path = w.Path
 
 	return target, created, nil
+}
+
+func createRemote(ctx context.Context, target *tmux.Session, first window, helper, token string) error {
+	// Only allocating a session name and starting tmux require the local lock.
+	lock, err := lockOpen()
+	if err != nil {
+		return err
+	}
+	defer func() { _ = lock.Close() }()
+
+	sessions, err := tmux.ListSessions(ctx)
+	if err != nil {
+		return fmt.Errorf("list sessions: %w", err)
+	}
+
+	target.Name = tmux.AvailableName(sessions, target.Name)
+
+	target.ID, err = tmux.NewRemoteSession(ctx, *target, first.role, "exec "+quote(helper)+" --remote-pane shell",
+		helper, "--remote-pane", cmp.Or(first.terminal, first.role), "--pane-batch", token)
+	if err != nil {
+		return fmt.Errorf("create remote session: %w", err)
+	}
+
+	return nil
+}
+
+func resumePanes(ctx context.Context, helper, token string, panes []tmux.Attachment) error {
+	for _, p := range panes {
+		if err := p.Resume(ctx, helper, "--remote-pane", p.Terminal, "--pane-batch", token); err != nil {
+			return fmt.Errorf("resume pane %s: %w", p.ID, err)
+		}
+	}
+
+	return nil
 }

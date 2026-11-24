@@ -132,19 +132,28 @@ func (d Destination) Query(ctx context.Context, command string) (string, error) 
 
 	out, err := cmd.Output()
 	if err != nil {
-		var exit *exec.ExitError
-		if errors.As(err, &exit) && len(exit.Stderr) != 0 {
-			if exit.ExitCode() == 255 && strings.Contains(string(exit.Stderr), "Session open refused") {
-				return "", fmt.Errorf("%w on %s", ErrChannelRefused, d.Host)
-			}
-
-			return "", fmt.Errorf("SSH %s: %w: %s", d.Host, err, strings.TrimSpace(string(exit.Stderr)))
-		}
-
-		return "", fmt.Errorf("SSH %s: %w", d.Host, err)
+		return "", d.commandError(err, "")
 	}
 
 	return string(out), nil
+}
+
+func (d Destination) commandError(err error, stderr string) error {
+	if exit, ok := errors.AsType[*exec.ExitError](err); ok {
+		if stderr == "" {
+			stderr = string(exit.Stderr)
+		}
+
+		if exit.ExitCode() == 255 && strings.Contains(stderr, "Session open refused") {
+			return fmt.Errorf("%w on %s", ErrChannelRefused, d.Host)
+		}
+	}
+
+	if stderr != "" {
+		return fmt.Errorf("SSH %s: %w: %s", d.Host, err, strings.TrimSpace(stderr))
+	}
+
+	return fmt.Errorf("SSH %s: %w", d.Host, err)
 }
 
 // CacheDir locates the user’s session cache.

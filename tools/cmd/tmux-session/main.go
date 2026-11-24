@@ -23,9 +23,9 @@ func main() {
 
 func command() *cobra.Command {
 	var (
-		name, host, watch   string
-		launch, closeTarget string
-		noSwitch            bool
+		name, host, watch          string
+		launch, batch, closeTarget string
+		noSwitch                   bool
 	)
 
 	cmd := &cobra.Command{
@@ -42,7 +42,12 @@ func command() *cobra.Command {
 				}
 
 				if launch != "" {
-					return attachPane(cmd.Context(), launch)
+					code, err := attachPane(cmd.Context(), launch, batch)
+					if err != nil {
+						cmd.PrintErrln(tui.CleanLine(err.Error()))
+					}
+
+					os.Exit(code)
 				}
 
 				if closeTarget != "" {
@@ -95,6 +100,8 @@ func command() *cobra.Command {
 	cmd.Flags().StringVarP(&name, "name", "n", "", "open a named workspace for this directory (defaults to the directory name)")
 	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "find or create the session without switching or attaching")
 	cmd.Flags().StringVar(&launch, "remote-pane", "", "launch or resume one pane")
+	cmd.Flags().StringVar(&batch, "pane-batch", "", "confirm startup with the supervisor")
+	cmd.Flags().Lookup("pane-batch").Hidden = true
 	cmd.Flags().StringVar(&watch, "supervise", "", "supervise a remote connection")
 	cmd.Flags().Lookup("supervise").Hidden = true
 	cmd.Flags().StringVar(&closeTarget, "remote-close", "", "close a pane or window by ID")

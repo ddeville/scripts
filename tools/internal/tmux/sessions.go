@@ -32,7 +32,7 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 
 	output, err := run(ctx, "-u", "list-sessions", "-F", "#{session_id}\t#{"+RemoteEnv+"}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
 	if err != nil {
-		if errors.Is(err, exec.ErrNotFound) || strings.Contains(output, "no server running") || strings.Contains(output, "No such file or directory") {
+		if errors.Is(err, exec.ErrNotFound) || noServer(output) {
 			return nil, nil
 		}
 
@@ -58,6 +58,11 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	slices.SortFunc(sessions, func(a, b Session) int { return cmp.Compare(a.Name, b.Name) })
 
 	return sessions, nil
+}
+
+func noServer(output string) bool {
+	return strings.HasPrefix(output, "no server running on ") ||
+		(strings.HasPrefix(output, "error connecting to ") && strings.HasSuffix(output, "(No such file or directory)"))
 }
 
 // AvailableName adds a numeric suffix if a session already uses name.

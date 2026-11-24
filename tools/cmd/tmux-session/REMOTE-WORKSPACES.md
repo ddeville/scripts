@@ -11,9 +11,15 @@ directory and workspace name identify a session even after you rename it in tmux
 The picker, copy mode and key bindings stay local. The devbox runs the shell,
 `$EDITOR` (default `nvim`) and `codex` under zmx. New windows and splits start in
 the project directory. Sessions using the same SSH destination share one OpenSSH
-connection. Use the same SSH alias across projects. Each pane uses one of sshd's
-`MaxSessions` slots. Leave room for discovery and one channel per open agent
-popup. A full connection never falls back to a second login.
+connection. Use the same SSH alias across projects.
+
+Each pane uses one of sshd's `MaxSessions` slots. `tm` reserves one slot per
+connection for discovery, closes and the agent popup. With a limit of 10, up
+to nine panes can share the connection across projects and local tmux servers.
+Startup checks capacity with short-lived SSH commands. A fresh workspace needs
+room for all three windows. A rejected split closes with a tmux message.
+The popup yields the slot between requests. A full connection never falls back
+to a second login.
 
 - **Connect** with a trusted SSH host key and a working agent. The supervisor
   opens the first connection before creating any panes. All logins use batch
@@ -23,9 +29,10 @@ popup. A full connection never falls back to a second login.
   file for future reconnects. Login does not require agent forwarding.
 - **Reconnect** happens automatically. Each local tmux server keeps one
   supervisor per destination. It retries with backoff and reattaches surviving
-  terminals in place, including moved panes. Input typed into a dead pane is
-  discarded. Programs that ended stay closed. If SSH needs attention, fix the
-  agent or host key and rerun `tm --host …` from a local shell.
+  terminals in place, including moved panes. If fewer slots are available,
+  remaining panes wait for room. Input typed into a dead pane is discarded.
+  Programs that ended stay closed. If SSH needs attention, fix the agent or
+  host key and rerun `tm --host …` from a local shell.
 - **Recover after losing the local tmux server** by reopening each workspace.
   Each surviving terminal gets a window named for its role. Custom titles, order
   and split layouts survive only while the local server does.

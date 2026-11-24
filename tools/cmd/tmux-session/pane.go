@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/json"
@@ -13,35 +14,46 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/ddeville/scripts/tools/internal/sshmux"
 	"github.com/ddeville/scripts/tools/internal/tmux"
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 const attach = `export ZMX_NO_DETACH_KEY=1
 if [ "$1" = resume ]; then
     zmx get "$2" >/dev/null
+    printf '\000'
     # If it exits between get and attach, zmx must never relaunch its program.
     exec zmx attach "$2" /bin/sh -c 'exit 1'
 fi
 cd -P -- "$3"
+printf '\000'
 case "$1" in
 editor) exec zmx attach "$2" sh -c "exec ${EDITOR:-nvim}" ;;
 codex) exec zmx attach "$2" codex ;;
 *) exec zmx attach "$2" ;;
 esac`
 
-func attachPane(ctx context.Context, requested string) error {
+func attachPane(ctx context.Context, requested, batch string) (int, error) {
+	// Until an existing terminal can be reattached, keep a setup failure
+	// retryable on its original SSH generation.
+	failure := 1
+	if terminalID.MatchString(requested) {
+		failure = 255
+	}
+
 	id := os.Getenv("TMUX_PANE")
 
 	panes, err := tmux.Attachments(ctx, id)
 	if err != nil {
-		return fmt.Errorf("find attachment: %w", err)
+		return failure, fmt.Errorf("find attachment: %w", err)
 	}
 
 	p, ok := panes[id]
 	if !ok {
-		return fmt.Errorf("%w: expected a tmux pane", os.ErrInvalid)
+		return failure, fmt.Errorf("%w: expected a tmux pane", os.ErrInvalid)
 	}
 
 	mode, dir := "resume", ""
@@ -49,7 +61,7 @@ func attachPane(ctx context.Context, requested string) error {
 	if p.Terminal == "" {
 		var w workspace
 		if err := json.Unmarshal([]byte(os.Getenv(tmux.RemoteEnv)), &w); err != nil {
-			return fmt.Errorf("read remote workspace: %w", err)
+			return failure, fmt.Errorf("read remote workspace: %w", err)
 		}
 
 		p.Host, p.Terminal, dir = w.Host, requested, w.Path
@@ -57,18 +69,42 @@ func attachPane(ctx context.Context, requested string) error {
 			mode = requested
 			p.Terminal = w.prefix() + mode + "-" + rand.Text()[:13]
 		} else if !strings.HasPrefix(p.Terminal, w.prefix()) {
-			return fmt.Errorf("%w: terminal belongs to another workspace", os.ErrInvalid)
+			return failure, fmt.Errorf("%w: terminal belongs to another workspace", os.ErrInvalid)
 		}
 	}
 
 	if !terminalID.MatchString(p.Terminal) {
-		return fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
+		return failure, fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
 	}
 
 	dest, err := sshmux.ForHost(p.Host)
 	if err != nil {
-		return fmt.Errorf("find pane connection: %w", err)
+		return failure, fmt.Errorf("find pane connection: %w", err)
 	}
+
+	finish, err := admit(ctx, dest, batch)
+	if batch != "" && dir == "" && (errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ECONNREFUSED)) {
+		// respawn-pane can replay the original command after a batch ends.
+		finish, err = admit(ctx, dest, "")
+	}
+
+	if err != nil {
+		if original := panes[id]; original.Terminal == "" && errors.Is(err, errPaneLimit) {
+			_ = original.CloseOnExit(ctx)
+		}
+
+		_ = tmux.Notify(ctx, "tm: "+tui.CleanLine(err.Error()))
+
+		return failure, err
+	}
+
+	defer finish(false)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	timer := time.AfterFunc(15*time.Second, cancel)
+	defer timer.Stop()
 
 	// Record before launching. An ambiguous failure can only reattach here.
 	p.Connection = dest.Generation()
@@ -79,17 +115,40 @@ func attachPane(ctx context.Context, requested string) error {
 	}
 
 	if err := p.Record(ctx, project); err != nil {
-		return fmt.Errorf("record remote pane: %w", err)
+		return failure, fmt.Errorf("record remote pane: %w", err)
 	}
 
-	ssh, err := exec.LookPath("ssh")
+	cmd := exec.CommandContext(ctx, "ssh", dest.Channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))...) // #nosec G204 -- Pinned master and quoted arguments.
+	cmd.SysProcAttr = &syscall.SysProcAttr{Foreground: true}
+	cmd.Stdin, cmd.Stderr = os.Stdin, os.Stderr
+	cmd.Stdout = &paneOutput{opened: func() { timer.Stop(); finish(true) }}
+	cmd.WaitDelay = time.Second
+
+	if err := cmd.Run(); err != nil {
+		if exit, ok := errors.AsType[*exec.ExitError](err); ok {
+			return max(1, exit.ExitCode()), nil
+		}
+
+		return 1, fmt.Errorf("run SSH pane: %w", err)
+	}
+
+	return 0, nil
+}
+
+type paneOutput struct{ opened func() }
+
+func (w *paneOutput) Write(data []byte) (int, error) {
+	if w.opened != nil && bytes.IndexByte(data, 0) >= 0 {
+		w.opened()
+		w.opened = nil
+	}
+
+	n, err := os.Stdout.Write(data)
 	if err != nil {
-		return fmt.Errorf("find ssh: %w", err)
+		return n, fmt.Errorf("write terminal output: %w", err)
 	}
 
-	args := dest.Channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))
-
-	return fmt.Errorf("start ssh: %w", syscall.Exec(ssh, append([]string{ssh}, args...), os.Environ())) // #nosec G204 -- Replace only with ssh and quote remote arguments.
+	return n, nil
 }
 
 // A missing live terminal may still be starting. A missing dead one can be
@@ -108,6 +167,12 @@ func stopTerminal(ctx context.Context, p *tmux.Attachment) error {
 	}
 
 	command := remoteCommand(stop, p.Terminal, strconv.FormatBool(p.Dead))
+
+	lock, err := dest.Lock(ctx)
+	if err != nil {
+		return fmt.Errorf("lock destination: %w", err)
+	}
+	defer func() { _ = lock.Close() }()
 
 	out, err := dest.Query(ctx, command)
 	if errors.Is(err, sshmux.ErrChannelRefused) && !p.Dead {

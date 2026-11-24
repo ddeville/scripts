@@ -1,14 +1,50 @@
 package sshmux_test
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ddeville/scripts/tools/internal/sshmux"
 )
+
+func TestAdmissionWaitsForEveryApprovedPane(t *testing.T) {
+	t.Parallel()
+
+	dest := sshmux.Destination{Host: "devbox", Socket: filepath.Join(t.TempDir(), "master")}
+	lock, err := dest.Lock(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pane, err := dest.Hold(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// The caller goes away before the pane has finished opening its channel.
+	_ = lock.Close()
+
+	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
+	defer cancel()
+
+	if _, err := dest.Lock(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("overlapped an approved launch: %v", err)
+	}
+
+	_ = pane.Close()
+
+	lock, err = dest.Lock(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_ = lock.Close()
+}
 
 func TestConnectUsesCurrentAgentAndRefusesUntrustedHost(t *testing.T) {
 	dir := t.TempDir()

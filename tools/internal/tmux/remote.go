@@ -49,7 +49,7 @@ type Attachment struct {
 func Attachments(ctx context.Context, target string) (map[string]Attachment, error) {
 	const format = "#{pane_id}\t#{window_id}\t#{pane_dead}\t#{@tm_host}\t#{@tm_terminal}\t#{pid}\t#{pane_dead_status}\t#{@tm_connection}"
 
-	args := []string{"list-panes", "-F", format}
+	args := []string{"-u", "list-panes", "-F", format}
 	if target == "" {
 		args = append(args, "-a")
 	} else {
@@ -58,6 +58,10 @@ func Attachments(ctx context.Context, target string) (map[string]Attachment, err
 
 	out, err := run(ctx, args...)
 	if err != nil {
+		if target == "" && (noServer(out) || out == "no current target") {
+			return map[string]Attachment{}, nil
+		}
+
 		return nil, fmt.Errorf("list pane attachments: %w", err)
 	}
 
@@ -79,12 +83,21 @@ func Attachments(ctx context.Context, target string) (map[string]Attachment, err
 	return panes, nil
 }
 
+// Notify displays a literal message on a local client.
+func Notify(ctx context.Context, message string) error {
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
+	_, err := run(ctx, "display-message", "-d", "5000", "-l", literalArg(message))
+
+	return err
+}
+
 // Record pins a terminal to this pane, even across moves and respawns.
 func (p Attachment) Record(ctx context.Context, project string) error {
 	const message = "#{?#{==:#{pane_dead_status},255},SSH disconnected · rerun tm for #{@tm_host} if recovery stalls,Remote terminal exited or unavailable}"
 
 	args := []string{
-		"set-option", "-p", "-t", p.ID, "@tm_connection", p.Connection, ";",
 		"set-option", "-pu", "-t", p.ID, "@tm_sign_in", ";",
 		"set-option", "-p", "-t", p.ID, "remain-on-exit", "failed", ";",
 		"set-option", "-p", "-t", p.ID, "remain-on-exit-format", message,
@@ -95,6 +108,9 @@ func (p Attachment) Record(ctx context.Context, project string) error {
 			"set-option", "-p", "-t", p.ID, "@tm_terminal", literalArg(p.Terminal))
 	}
 
+	// Keep the previous generation retryable if setup fails partway through.
+	args = append(args, ";", "set-option", "-p", "-t", p.ID, "@tm_connection", p.Connection)
+
 	_, err := run(ctx, args...)
 
 	return err
@@ -103,6 +119,11 @@ func (p Attachment) Record(ctx context.Context, project string) error {
 // RequireSignIn leaves a notice in the status line until the next attachment.
 func (p Attachment) RequireSignIn(ctx context.Context) error {
 	return p.change(ctx, "set-option -p -t "+p.ID+" @tm_sign_in 1")
+}
+
+// CloseOnExit discards a rejected split even if tmux normally retains exits.
+func (p Attachment) CloseOnExit(ctx context.Context) error {
+	return p.change(ctx, "set-option -p -t "+p.ID+" remain-on-exit off")
 }
 
 // Resume replaces a dead client and its input queue. A live pane is left alone.
