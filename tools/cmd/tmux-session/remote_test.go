@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -13,23 +14,17 @@ import (
 	"github.com/ddeville/scripts/tools/internal/tmux"
 )
 
-func TestWorkspaceChecksAllPaneSlotsBeforeCreatingWindows(t *testing.T) {
+func TestDiscoveryKeepsItsSlotUntilPanesStart(t *testing.T) {
 	dir := t.TempDir()
 	t.Chdir(dir)
 	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
 
 	const ssh = `#!/bin/sh
 case " $* " in *" -oProxyCommand=false "*) ;; *) exit 1 ;; esac
+mkdir slot 2>/dev/null || { echo "Session open refused by peer" >&2; exit 255; }
+trap 'rmdir slot' EXIT
 for arg do command=$arg; done
-for slot in 1 2 3; do
-    if mkdir "$slot" 2>/dev/null; then
-        trap 'rmdir "$slot"' EXIT
-        sh -c "$command"
-        exit $?
-    fi
-done
-echo 'Session open refused by peer' >&2
-exit 255
+sh -c "$command"
 `
 	if err := os.WriteFile("ssh", []byte(ssh), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private test directory.
 		t.Fatal(err)
@@ -37,28 +32,29 @@ exit 255
 
 	dest := sshmux.Destination{Host: "devbox", Socket: filepath.Join(dir, "master")}
 
-	const tm = `#!/bin/sh
-[ "$1" != -u ] || shift
-if [ "$1" = list-sessions ]; then exit 0; fi
-echo "$1" > unexpected
-exit 1
-`
-	if err := os.WriteFile("tmux", []byte(tm), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private test directory.
+	if err := os.WriteFile("zmx", []byte("#!/bin/sh\necho 'name=term\tclients=0'\n"), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private test directory.
 		t.Fatal(err)
 	}
 
-	// Three slots are free, but one is needed for discovery, close and status.
-	w := workspace{Host: dest.Host, Path: "/project", Name: "project"}
-	if _, _, err := w.open(t.Context(), dest, nil); !errors.Is(err, errPaneLimit) {
-		t.Fatalf("expected refusal of a three-window workspace, got %v", err)
+	m, err := openManagement(t.Context(), dest, dir)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if command, err := os.ReadFile("unexpected"); !errors.Is(err, os.ErrNotExist) {
-		t.Fatalf("tmux command before capacity check: %q, %v", command, err)
+	_, err = dest.Query(t.Context(), "true")
+
+	m.close()
+
+	if m.listing != "name=term\tclients=0\n\x00" {
+		t.Fatalf("unexpected zmx listing %q", m.listing)
 	}
 
-	if err := requireCapacity(t.Context(), dest, 2); err != nil {
-		t.Fatalf("refused batch did not release its probes: %v", err)
+	if !errors.Is(err, sshmux.ErrChannelRefused) {
+		t.Fatalf("expected refusal while session held, got %v", err)
+	}
+
+	if _, err := dest.Query(t.Context(), "true"); err != nil {
+		t.Fatalf("session not released: %v", err)
 	}
 }
 
@@ -124,6 +120,15 @@ func TestRecoveryOnlyRetriesSSHFailuresOnThisDestination(t *testing.T) {
 	}
 }
 
+func TestRemoteExit255DoesNotTriggerReconnect(t *testing.T) {
+	t.Parallel()
+
+	cmd := exec.CommandContext(t.Context(), "sh", "-ec", "zmx() { return 255; }\n"+attach, "sh", "repo", "terminal", "/")
+	if exit, ok := errors.AsType[*exec.ExitError](cmd.Run()); !ok || exit.ExitCode() != 1 {
+		t.Fatalf("zmx exit 255 was not reported as a program failure: %v", cmd.ProcessState)
+	}
+}
+
 func TestFailedPaneLookupKeepsReattachmentRetryable(t *testing.T) {
 	t.Setenv("PATH", t.TempDir()) // tmux is unavailable before the helper can record a new connection.
 
@@ -153,7 +158,7 @@ list-panes)
         : > failed
         exit 1
     fi
-    printf '%%1\t@1\t0\tdev\ttm-1234567890abcdef1234.shell-AAAAAAAAAAAAA\t1\t\t1\n'
+    printf '%%1\t@1\t0\tdev\ttm-1234567890abcdef1234.shell-AAAAAAAAAAAAA\t1\t\n'
     ;;
 wait-for) : > stopped ;;
 *) exit 1 ;;
@@ -163,7 +168,7 @@ esac
 		t.Fatal(err)
 	}
 
-	watch, err := lockFile("watch")
+	watch, err := lockFile(t.Context(), "watch")
 	if err != nil {
 		t.Fatal(err)
 	}

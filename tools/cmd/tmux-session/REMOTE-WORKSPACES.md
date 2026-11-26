@@ -14,12 +14,15 @@ the project directory. Sessions using the same SSH destination share one OpenSSH
 connection. Use the same SSH alias across projects.
 
 Each pane uses one of sshd's `MaxSessions` slots. `tm` reserves one slot per
-connection for discovery, closes and the agent popup. With a limit of 10, up
+connection for workspace discovery and closing terminals. With a limit of 10, up
 to nine panes can share the connection across projects and local tmux servers.
-Startup checks capacity with short-lived SSH commands. A fresh workspace needs
-room for all three windows. A rejected split closes with a tmux message.
-The popup yields the slot between requests. A full connection never falls back
-to a second login.
+Discovery keeps its SSH session open while the windows start. Splits and
+reconnects briefly occupy the same slot. sshd enforces the limit.
+A fresh workspace tries `repo`, `editor`, then `codex`. On refusal,
+it keeps the windows that opened and names the ones it skipped. If none fit,
+the open fails. Start skipped programs manually in a new window or split when
+there's room. A refused split closes with a tmux message. A refusal never
+triggers a second login.
 
 - **Connect** with a trusted SSH host key and a working agent. The supervisor
   opens the first connection before creating any panes. All logins use batch
@@ -39,17 +42,9 @@ to a second login.
 - **End a terminal** with prefix `x`, or a whole window with prefix `&`. These
   bindings report unconfirmed closes. Raw tmux kill commands only detach remote
   terminals. Exiting a program on the devbox ends its terminal.
-- **Open Codex** with prefix `a`. The popup groups remote conversations by host
-  and directory, including Codex started manually in a split. Choose a pane
-  when a thread has multiple views. Enter rechecks the thread and pane before
-  switching the invoking client. Worktree actions and the CLI status feed stay local.
 
 Use tmux 3.8+ locally. Zmx must be on the devbox's SSH command path. Its sockets live in
 `~/.cache/tm-zmx` unless the SSH environment sets `ZMX_DIR`. Forwarded agent
 sockets in surviving programs can go stale after reconnecting.
 
-Remote status requires a shared Codex app server, `codex app-server proxy` on
-the SSH command path, and `thread-id` last in `tui.terminal_title`. The popup
-uses the same title matching locally and remotely. A shortened ID must match
-exactly one loaded thread on that host. A stale or forged title can misidentify
-a conversation. The popup only queries each app server while open.
+The agent popup and status feed show local conversations only.

@@ -37,17 +37,17 @@ func NewRemoteSession(ctx context.Context, s Session, window, defaultCommand str
 
 // Attachment identifies a local pane and the remote terminal it owns, if any.
 type Attachment struct {
-	ID, WindowID           string
-	Host, Terminal         string
-	Dead                   bool
-	ExitStatus, Connection string
-	server                 string
+	ID, WindowID   string
+	Host, Terminal string
+	Dead           bool
+	ExitStatus     string
+	server         string
 }
 
 // Attachments returns each pane once, even if its window is linked to multiple
 // sessions. A pane or window ID limits the lookup to that window.
 func Attachments(ctx context.Context, target string) (map[string]Attachment, error) {
-	const format = "#{pane_id}\t#{window_id}\t#{pane_dead}\t#{@tm_host}\t#{@tm_terminal}\t#{pid}\t#{pane_dead_status}\t#{@tm_connection}"
+	const format = "#{pane_id}\t#{window_id}\t#{pane_dead}\t#{@tm_host}\t#{@tm_terminal}\t#{pid}\t#{pane_dead_status}"
 
 	args := []string{"-u", "list-panes", "-F", format}
 	if target == "" {
@@ -69,13 +69,13 @@ func Attachments(ctx context.Context, target string) (map[string]Attachment, err
 
 	for line := range strings.Lines(out) {
 		fields := strings.Split(strings.TrimSuffix(line, "\n"), "\t")
-		if len(fields) != 8 {
+		if len(fields) != 7 {
 			return nil, fmt.Errorf("%w: invalid pane record", os.ErrInvalid)
 		}
 
 		p := Attachment{
 			ID: fields[0], WindowID: fields[1], Dead: fields[2] == "1", Host: fields[3],
-			Terminal: fields[4], server: fields[5], ExitStatus: fields[6], Connection: fields[7],
+			Terminal: fields[4], server: fields[5], ExitStatus: fields[6],
 		}
 		panes[p.ID] = p
 	}
@@ -108,9 +108,6 @@ func (p Attachment) Record(ctx context.Context, project string) error {
 			"set-option", "-p", "-t", p.ID, "@tm_terminal", literalArg(p.Terminal))
 	}
 
-	// Keep the previous generation retryable if setup fails partway through.
-	args = append(args, ";", "set-option", "-p", "-t", p.ID, "@tm_connection", p.Connection)
-
 	_, err := run(ctx, args...)
 
 	return err
@@ -129,11 +126,6 @@ func (p Attachment) CloseOnExit(ctx context.Context) error {
 // Resume replaces a dead client and its input queue. A live pane is left alone.
 func (p Attachment) Resume(ctx context.Context, command ...string) error {
 	return p.change(ctx, "respawn-pane -t "+p.ID+" "+commandLine(command...))
-}
-
-// Disconnect stops just the local client and keeps the failed pane for retry.
-func (p Attachment) Disconnect(ctx context.Context) error {
-	return p.change(ctx, "respawn-pane -k -t "+p.ID+" /bin/sh -c 'exit 1'")
 }
 
 // KillPane removes this pane from its local window.

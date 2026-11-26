@@ -23,6 +23,7 @@ import (
 type openResult struct {
 	Session tmux.Session `json:"session"`
 	Created bool         `json:"created"`
+	Warning string       `json:"warning,omitempty"`
 	Error   string       `json:"error,omitempty"`
 }
 
@@ -73,6 +74,12 @@ func openRemote(ctx context.Context, host, path, name string) (tmux.Session, boo
 
 	if result.Error != "" {
 		return tmux.Session{}, false, errors.New(result.Error) //nolint:err113 // The child sends the original diagnostic.
+	}
+
+	if result.Warning != "" {
+		message := "tm: " + tui.CleanLine(result.Warning)
+		_, _ = fmt.Fprintln(os.Stderr, message)
+		_ = tmux.Notify(ctx, message)
 	}
 
 	return result.Session, result.Created, nil
@@ -134,9 +141,9 @@ func prepare(ctx context.Context, dest sshmux.Destination, result *openResult) (
 		return nil, fmt.Errorf("read workspace request: %w", err)
 	}
 
-	lock, err := dest.Lock(ctx)
+	lock, err := lockDestination(ctx, dest)
 	if err != nil {
-		return nil, fmt.Errorf("lock destination: %w", err)
+		return nil, err
 	}
 	defer func() { _ = lock.Close() }()
 
@@ -145,7 +152,7 @@ func prepare(ctx context.Context, dest sshmux.Destination, result *openResult) (
 		return nil, fmt.Errorf("SSH: %w", err)
 	}
 
-	result.Session, result.Created, err = openWorkspace(ctx, dest, w.Path, w.Name)
+	*result, err = openWorkspace(ctx, dest, w.Path, w.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -168,22 +175,17 @@ func prepare(ctx context.Context, dest sshmux.Destination, result *openResult) (
 }
 
 func watchPanes(ctx context.Context, dest sshmux.Destination, watch *os.File) error {
-	helper, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("locate tmux-session: %w", err)
-	}
-
 	backoff := time.Second
 	notified := false
 
 	for ctx.Err() == nil {
 		// Explicit opens and automatic retries must never start competing masters.
-		lock, err := dest.Lock(ctx)
+		lock, err := lockDestination(ctx, dest)
 		if err != nil {
-			return fmt.Errorf("lock destination: %w", err)
+			return err
 		}
 
-		active, err := recoverPanes(ctx, dest, helper, lock)
+		active, err := recoverPanes(ctx, dest, lock)
 
 		done := (!active && err == nil) || errors.Is(err, sshmux.ErrSignIn)
 		if done {
@@ -224,7 +226,7 @@ func watchPanes(ctx context.Context, dest sshmux.Destination, watch *os.File) er
 	return nil
 }
 
-func recoverPanes(ctx context.Context, dest sshmux.Destination, helper string, lock *os.File) (bool, error) {
+func recoverPanes(ctx context.Context, dest sshmux.Destination, lock *os.File) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
@@ -281,37 +283,20 @@ func recoverPanes(ctx context.Context, dest sshmux.Destination, helper string, l
 		return true, fmt.Errorf("restore connection: %w", connectErr)
 	}
 
-	generation := dest.Generation()
-	if generation == "" {
-		return true, fmt.Errorf("%w: missing SSH master", os.ErrNotExist)
-	}
-
-	var resume []tmux.Attachment
-
-	for _, p := range failed {
-		if p.Connection != generation {
-			resume = append(resume, p)
-		}
-	}
-
-	free, err := dest.Capacity(ctx, len(resume))
+	m, err := openManagement(ctx, dest, "")
 	if err != nil {
-		return true, fmt.Errorf("check SSH capacity: %w", err)
+		return true, fmt.Errorf("open management session: %w", err)
+	}
+	defer m.close()
+
+	resume := make([]window, 0, len(failed))
+	for _, p := range failed {
+		resume = append(resume, window{role: p.ID, terminal: p.Terminal, pane: p})
 	}
 
-	if err := launch(ctx, dest, free, func(token string) error {
-		return resumePanes(ctx, helper, token, resume[:free])
-	}); err != nil {
-		return true, err
-	}
+	_, err = startPanes(ctx, dest, nil, resume)
 
-	// A replacement connection can have a lower limit. Leave the other panes
-	// untouched so they can resume as slots become available.
-	if free < len(resume) {
-		return true, capacityError(dest, len(resume), free)
-	}
-
-	return true, nil
+	return true, err
 }
 
 func interrupted(panes map[string]tmux.Attachment, host string) (bool, []tmux.Attachment) {

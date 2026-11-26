@@ -22,10 +22,7 @@ func openThread(ctx context.Context, id string) error {
 		return fmt.Errorf("open agent: %w", err)
 	}
 
-	var local agents.Source
-	defer local.Close()
-
-	data := local.Collect(ctx, nil)
+	data := agents.Collect(ctx)
 	if data.Err != nil {
 		return data.Err
 	}
@@ -35,12 +32,12 @@ func openThread(ctx context.Context, id string) error {
 		return errThreadGone
 	}
 
-	panes := data.Agents[index].Targets
+	panes := data.Agents[index].Panes
 	if len(panes) != 1 {
 		return fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes))
 	}
 
-	if err := local.Open(ctx, id, panes[0], client); err != nil {
+	if err := tmux.SwitchPane(ctx, panes[0], client); err != nil {
 		return fmt.Errorf("open agent: %w", err)
 	}
 

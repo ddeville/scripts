@@ -19,10 +19,7 @@ import (
 // Model owns agent snapshots, filtering, selection, and activity requests.
 type Model struct {
 	Panel                                           panel.Model
-	hosts                                           map[string]*destination
-	choices                                         map[string]Choice
-	initialHost                                     string
-	scanErr                                         error
+	data                                            agentdata.Snapshot
 	selected, initialPane, originPane, originThread string
 	filter                                          int
 	activity                                        activity
@@ -34,45 +31,54 @@ type tickMsg struct{}
 
 // New starts the section with the originating pane as its initial selection.
 func New(pane string) Model {
-	return Model{Panel: panel.New(), initialPane: pane, originPane: pane, hosts: map[string]*destination{"": {}}}
+	return Model{Panel: panel.New(), initialPane: pane, originPane: pane}
 }
+
+// Snapshot returns the last known agent data and connection state.
+func (m *Model) Snapshot() agentdata.Snapshot { return m.data }
 
 // OriginID returns the conversation found in the originating tmux pane.
 func (m *Model) OriginID() string { return m.originThread }
 
 // Init begins polling agent status.
-func (m *Model) Init(ctx context.Context) tea.Cmd { return scan(ctx) }
+func (m *Model) Init(ctx context.Context) tea.Cmd { return fetch(ctx) }
+
+func fetch(ctx context.Context) tea.Cmd {
+	return func() tea.Msg {
+		ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
+		defer cancel()
+
+		return agentdata.Collect(ctx)
+	}
+}
+
+func tick() tea.Cmd { return tea.Tick(time.Second, func(time.Time) tea.Msg { return tickMsg{} }) }
 
 // Update handles section input and applies status and activity results.
 func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 	switch msg := message.(type) {
-	case panesMsg:
-		return m.fetch(ctx, msg)
-	case StatusMsg:
-		dest := m.hosts[msg.Host]
-		dest.busy = false
+	case agentdata.Snapshot:
+		if msg.Err != nil {
+			m.data.Err = msg.Err
+			return tick()
+		}
 
-		dest.data = msg.data
-		if msg.Host == "" && m.originThread == "" {
-			for _, a := range msg.data.Agents {
-				if slices.Contains(a.Panes, m.originPane) {
-					m.originThread = a.ID
-				}
+		for _, a := range msg.Agents {
+			if m.originThread == "" && slices.Contains(a.Panes, m.originPane) {
+				m.originThread = a.ID
 			}
 		}
 
+		m.data = msg
+
 		cmd := m.updateAgents(ctx)
-		if msg.Host == m.initialHost {
-			m.initialPane = ""
+		if cmd == nil && m.selected != "" && m.activityCancel == nil {
+			cmd = m.refreshActivity(ctx)
 		}
 
-		if choice, ok := m.Find(m.selected); ok && choice.Pane.Host == msg.Host && cmd == nil && m.activityCancel == nil {
-			return m.refreshActivity(ctx)
-		}
-
-		return cmd
+		return tea.Batch(tick(), cmd)
 	case tickMsg:
-		return scan(ctx)
+		return fetch(ctx)
 	case activity:
 		if msg.ID == m.selected && msg.generation == m.activityGeneration {
 			m.activity = msg
@@ -80,7 +86,6 @@ func (m *Model) Update(ctx context.Context, message tea.Msg) tea.Cmd {
 			m.updateAgentDetails()
 		}
 	case tea.KeyPressMsg:
-		m.initialPane = ""
 		if key.Matches(msg, Keys.NextFilter, Keys.PreviousFilter, Keys.Attention) {
 			return m.changeFilter(ctx, msg)
 		}
@@ -135,9 +140,7 @@ func (m *Model) refreshActivity(ctx context.Context) tea.Cmd {
 	}
 
 	m.activityGeneration++
-
-	choice, ok := m.Find(m.selected)
-	if !ok {
+	if m.selected == "" {
 		return nil
 	}
 
@@ -148,17 +151,16 @@ func (m *Model) refreshActivity(ctx context.Context) tea.Cmd {
 	return func() tea.Msg {
 		defer cancel()
 
-		data, err := choice.Source.ReadDetails(ctx, choice.Agent.ID)
+		data, err := agentdata.ReadDetails(ctx, id)
 
 		return activity{ID: id, generation: generation, Entries: activityEntries(data), Err: err}
 	}
 }
 
-func (m *Model) filtered(filter int) []Choice {
-	var result []Choice
+func (m *Model) filtered(filter int) []agentdata.Agent {
+	var result []agentdata.Agent
 
-	for _, c := range m.choices {
-		a := c.Agent
+	for _, a := range m.data.Agents {
 		match := false
 
 		switch filter {
@@ -175,7 +177,7 @@ func (m *Model) filtered(filter int) []Choice {
 		}
 
 		if match {
-			result = append(result, c)
+			result = append(result, a)
 		}
 	}
 
@@ -196,38 +198,24 @@ func (m *Model) selectAgent(ctx context.Context, id string) tea.Cmd {
 }
 
 func (m *Model) updateAgents(ctx context.Context) tea.Cmd {
-	m.choices = make(map[string]Choice)
-	for _, dest := range m.hosts {
-		for _, a := range dest.data.Agents {
-			for _, pane := range a.Targets {
-				c := Choice{Agent: a, Pane: pane, Source: &dest.source}
-				m.choices[c.key()] = c
-			}
-		}
-	}
-
 	filtered := m.filtered(m.filter)
-	slices.SortFunc(filtered, func(a, b Choice) int {
-		return cmp.Or(cmp.Compare(a.Pane.SessionNumber, b.Pane.SessionNumber),
-			cmp.Compare(a.Pane.Host, b.Pane.Host), cmp.Compare(a.Agent.Cwd, b.Agent.Cwd),
-			cmp.Compare(len(a.Pane.ID), len(b.Pane.ID)), cmp.Compare(a.Pane.ID, b.Pane.ID))
-	})
-
-	selected := m.selected
+	slices.SortStableFunc(filtered, func(a, b agentdata.Agent) int { return cmp.Compare(a.SessionNumber, b.SessionNumber) })
 
 	items := make([]tui.ListItem, 0, len(filtered))
-	for _, c := range filtered {
-		row := Row(c.Agent)
+	for _, a := range filtered {
+		items = append(items, Row(a))
+	}
 
-		row.ID, row.Group = c.key(), c.location()
-		if len(c.Agent.Panes) > 1 {
-			row.Title = c.Pane.ID + " · " + row.Title
+	selected := m.selected
+	if m.initialPane != "" {
+		for _, a := range filtered {
+			if slices.Contains(a.Panes, m.initialPane) {
+				selected = a.ID
+				break
+			}
 		}
 
-		items = append(items, row)
-		if c.Pane.ID == m.initialPane {
-			selected = row.ID
-		}
+		m.initialPane = ""
 	}
 
 	m.Panel.List.SetItems(items, selected)

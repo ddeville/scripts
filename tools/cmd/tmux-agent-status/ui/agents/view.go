@@ -1,7 +1,6 @@
 package agents
 
 import (
-	"cmp"
 	"encoding/json"
 	"fmt"
 	"slices"
@@ -36,55 +35,49 @@ func stateStyle(state string) (lipgloss.Style, string, string) {
 
 // Summary describes agents that need attention.
 func (m *Model) Summary() string {
-	if m.loading() {
-		return tui.Muted.Render("Loading agents…")
+	if m.data.Err != nil {
+		if m.data.At.IsZero() {
+			return tui.Red.Render("Agent status unavailable")
+		}
+
+		return tui.Red.Render("Status unavailable · showing last known data")
 	}
 
-	counts := map[string]int{}
-
-	for _, dest := range m.hosts {
-		for state, count := range dest.data.Counts {
-			counts[state] += count
-		}
+	if m.data.At.IsZero() {
+		return tui.Muted.Render("Loading agents…")
 	}
 
 	var parts []string
 
 	for _, state := range []string{"approval", "input", "error", "ready"} {
-		if count := counts[state]; count > 0 {
+		if count := m.data.Counts[state]; count > 0 {
 			style, label, _ := stateStyle(state)
 			parts = append(parts, style.Render(fmt.Sprintf("%s %d", label, count)))
 		}
 	}
 
 	if len(parts) == 0 {
-		if m.issue() != "" {
-			return tui.Yellow.Render("Some agent status is unavailable")
-		}
-
 		return tui.Muted.Render("Nothing needs your attention")
 	}
 
 	return "Needs you:  " + strings.Join(parts, tui.Muted.Render("  ·  "))
 }
 
-func (c Choice) location() string {
-	if c.Pane.Host != "" {
-		return tui.CleanLine(c.Pane.Host + " · " + cmp.Or(c.Agent.Cwd, "Unknown location"))
-	}
-
-	return cmp.Or(tui.ShortPath(c.Agent.Cwd), "Unknown location")
-}
-
 func (m *Model) detailContent(width int) string {
-	c, ok := m.Find(m.selected)
-	if !ok {
+	index := slices.IndexFunc(m.data.Agents, func(a agentdata.Agent) bool { return a.ID == m.selected })
+	if index < 0 {
 		return tui.Muted.Render("No conversation selected")
 	}
 
-	a := c.Agent
+	a := m.data.Agents[index]
+
 	style, _, hint := stateStyle(a.State)
-	lines := panel.DetailHeader(a.Title, c.location(), style.Render(hint), "to open pane "+c.Pane.ID)
+	if len(a.Panes) > 1 {
+		style = tui.Yellow
+		hint = fmt.Sprintf("This thread is open in %d tmux panes. Close the extra Codex instance, then try again.", len(a.Panes))
+	}
+
+	lines := panel.DetailHeader(a.Title, a.Cwd, style.Render(hint), "to open")
 
 	if a.Error != nil {
 		lines = append(lines, "", tui.Red.Render(tui.CleanText(*a.Error)))
@@ -193,11 +186,11 @@ func activityEntries(data agentdata.Details) []entry {
 // View renders the agent list and selected conversation.
 func (m *Model) View() string {
 	empty := "No conversations match this status"
-	if m.loading() {
+	if m.data.At.IsZero() {
 		empty = "Loading agents…"
 	}
 
-	if m.issue() != "" && len(m.choices) == 0 {
+	if m.data.Err != nil {
 		empty = "Could not read agent status"
 	}
 
@@ -206,47 +199,15 @@ func (m *Model) View() string {
 
 // Message provides connection errors or the current app notice for the footer.
 func (m *Model) Message(notice string) string {
+	if m.data.Err != nil {
+		return tui.Red.Render("Agent status unavailable: " + tui.SingleLine(m.data.Err.Error()))
+	}
+
 	if notice != "" {
 		return tui.Muted.Render(tui.CleanLine(notice))
 	}
 
-	if issue := m.issue(); issue != "" {
-		return tui.Red.Render(tui.SingleLine(issue))
-	}
-
 	return ""
-}
-
-func (m *Model) loading() bool {
-	if m.scanErr != nil || len(m.choices) != 0 {
-		return false
-	}
-
-	for _, dest := range m.hosts {
-		if dest.data.At.IsZero() {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (m *Model) issue() string {
-	if m.scanErr != nil {
-		return m.scanErr.Error()
-	}
-
-	var issues []string
-
-	for host, dest := range m.hosts {
-		if err := dest.data.Err; err != nil {
-			issues = append(issues, cmp.Or(host, "local")+" · "+err.Error())
-		}
-	}
-
-	slices.Sort(issues)
-
-	return strings.Join(issues, "  ·  ")
 }
 
 // Toolbar renders status filters and their counts.

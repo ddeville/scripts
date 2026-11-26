@@ -1,4 +1,4 @@
-// Package sshmux shares a private OpenSSH master between tmux panes and agent queries.
+// Package sshmux shares a private OpenSSH master between tmux workspaces.
 package sshmux
 
 import (
@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -24,7 +23,7 @@ type Destination struct {
 var (
 	sshHost = regexp.MustCompile(`^[a-zA-Z0-9_@.%+:/\[\]-]+$`)
 	// ErrChannelRefused indicates that the master cannot open another session.
-	ErrChannelRefused = errors.New("SSH session channel refused (check sshd MaxSessions)")
+	ErrChannelRefused = errors.New("SSH session refused")
 	// ErrSignIn stops automatic retries until the user explicitly runs tm again.
 	ErrSignIn = errors.New("SSH requires attention")
 )
@@ -53,17 +52,6 @@ func ForHost(host string) (Destination, error) {
 	sum := sha256.Sum256([]byte(host))
 
 	return Destination{Host: host, Socket: filepath.Join(dir, fmt.Sprintf("ssh-%x", sum[:10]))}, nil
-}
-
-// Generation distinguishes old attachments from channels refused by a healthy
-// master. OpenSSH creates a new socket for each connection.
-func (d Destination) Generation() string {
-	info, err := os.Stat(d.Socket)
-	if err != nil {
-		return ""
-	}
-
-	return strconv.FormatInt(info.ModTime().UnixNano(), 10)
 }
 
 // Connect starts or reuses the master under the destination lock. Let OpenSSH
@@ -118,7 +106,7 @@ func needsSignIn(message string) bool {
 func (d Destination) Channel(tty, command string) []string {
 	return []string{
 		"-S", d.Socket, "-oControlMaster=no", "-oProxyCommand=false", "-oBatchMode=yes",
-		"-oClearAllForwardings=yes", "-oRemoteCommand=none", "-oLogLevel=ERROR", "-e", "none", tty, "--", d.Host, command,
+		"-oClearAllForwardings=yes", "-oStdinNull=no", "-oRemoteCommand=none", "-oLogLevel=ERROR", "-e", "none", tty, "--", d.Host, command,
 	}
 }
 
@@ -132,28 +120,29 @@ func (d Destination) Query(ctx context.Context, command string) (string, error) 
 
 	out, err := cmd.Output()
 	if err != nil {
-		return "", d.commandError(err, "")
+		return "", fmt.Errorf("SSH %s: %w", d.Host, CommandError(err, ""))
 	}
 
 	return string(out), nil
 }
 
-func (d Destination) commandError(err error, stderr string) error {
+// CommandError distinguishes a rejected session from a broken connection.
+func CommandError(err error, stderr string) error {
 	if exit, ok := errors.AsType[*exec.ExitError](err); ok {
 		if stderr == "" {
 			stderr = string(exit.Stderr)
 		}
 
 		if exit.ExitCode() == 255 && strings.Contains(stderr, "Session open refused") {
-			return fmt.Errorf("%w on %s", ErrChannelRefused, d.Host)
+			return fmt.Errorf("%w (check sshd MaxSessions)", ErrChannelRefused)
 		}
 	}
 
 	if stderr != "" {
-		return fmt.Errorf("SSH %s: %w: %s", d.Host, err, strings.TrimSpace(stderr))
+		return fmt.Errorf("%w: %s", err, strings.TrimSpace(stderr))
 	}
 
-	return fmt.Errorf("SSH %s: %w", d.Host, err)
+	return err
 }
 
 // CacheDir locates the user’s session cache.

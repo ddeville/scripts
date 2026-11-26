@@ -3,10 +3,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -24,7 +26,7 @@ func main() {
 func command() *cobra.Command {
 	var (
 		name, host, watch          string
-		launch, batch, closeTarget string
+		launch, reply, closeTarget string
 		noSwitch                   bool
 	)
 
@@ -42,7 +44,7 @@ func command() *cobra.Command {
 				}
 
 				if launch != "" {
-					code, err := attachPane(cmd.Context(), launch, batch)
+					code, err := attachPane(cmd.Context(), launch, reply)
 					if err != nil {
 						cmd.PrintErrln(tui.CleanLine(err.Error()))
 					}
@@ -100,8 +102,8 @@ func command() *cobra.Command {
 	cmd.Flags().StringVarP(&name, "name", "n", "", "open a named workspace for this directory (defaults to the directory name)")
 	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "find or create the session without switching or attaching")
 	cmd.Flags().StringVar(&launch, "remote-pane", "", "launch or resume one pane")
-	cmd.Flags().StringVar(&batch, "pane-batch", "", "confirm startup with the supervisor")
-	cmd.Flags().Lookup("pane-batch").Hidden = true
+	cmd.Flags().StringVar(&reply, "pane-reply", "", "report pane startup to the supervisor")
+	cmd.Flags().Lookup("pane-reply").Hidden = true
 	cmd.Flags().StringVar(&watch, "supervise", "", "supervise a remote connection")
 	cmd.Flags().Lookup("supervise").Hidden = true
 	cmd.Flags().StringVar(&closeTarget, "remote-close", "", "close a pane or window by ID")
@@ -135,27 +137,46 @@ func resolveDirectory(path string) (string, error) {
 }
 
 // lockOpen serializes lookup and layout creation, including the first tmux server startup.
-func lockOpen() (*os.File, error) {
+func lockOpen(ctx context.Context) (*os.File, error) {
 	dir, err := sshmux.CacheDir()
 	if err != nil {
 		return nil, fmt.Errorf("locate tmux session cache: %w", err)
 	}
 
-	return lockFile(filepath.Join(dir, "open.lock"))
+	return lockFile(ctx, filepath.Join(dir, "open.lock"))
 }
 
-func lockFile(filename string) (*os.File, error) {
+// All tmux servers sharing a master use the same management slot.
+func lockDestination(ctx context.Context, dest sshmux.Destination) (*os.File, error) {
+	return lockFile(ctx, dest.Socket+".lock")
+}
+
+func lockFile(ctx context.Context, filename string) (*os.File, error) {
 	lock, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0o600) // #nosec G304 -- Internal lock file in a private directory.
 	if err != nil {
 		return nil, fmt.Errorf("open session lock: %w", err)
 	}
 
-	if err := syscall.Flock(int(lock.Fd()), syscall.LOCK_EX); err != nil {
-		_ = lock.Close()
-		return nil, fmt.Errorf("lock session creation: %w", err)
+	for ctx.Err() == nil {
+		err := syscall.Flock(int(lock.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
+		if err == nil {
+			return lock, nil
+		}
+
+		if !errors.Is(err, syscall.EWOULDBLOCK) {
+			_ = lock.Close()
+			return nil, fmt.Errorf("acquire session lock: %w", err)
+		}
+
+		select {
+		case <-ctx.Done():
+		case <-time.After(25 * time.Millisecond):
+		}
 	}
 
-	return lock, nil
+	_ = lock.Close()
+
+	return nil, fmt.Errorf("wait for session lock: %w", ctx.Err())
 }
 
 func openSession(ctx context.Context, path, name string) (tmux.Session, bool, error) {
@@ -168,7 +189,7 @@ func openSession(ctx context.Context, path, name string) (tmux.Session, bool, er
 		name = filepath.Base(directory)
 	}
 
-	lock, err := lockOpen()
+	lock, err := lockOpen(ctx)
 	if err != nil {
 		return tmux.Session{}, false, err
 	}

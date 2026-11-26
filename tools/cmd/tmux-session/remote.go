@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"cmp"
 	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"regexp"
 	"slices"
@@ -48,6 +51,7 @@ var (
 
 type window struct {
 	role, terminal string
+	pane           tmux.Attachment
 }
 
 const listTerminals = `zmx list
@@ -108,7 +112,71 @@ cd -P -- "$1"
 printf '%s\000' "$PWD"
 ` + listTerminals
 
-func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name string) (tmux.Session, bool, error) {
+type management struct {
+	dir, listing string
+	close        func()
+}
+
+// Keep discovery's session open until sshd accepts or refuses the panes.
+// Splits and reconnects need the slot but have nothing to discover.
+func openManagement(ctx context.Context, dest sshmux.Destination, request string) (management, error) {
+	script := inspect
+	if request == "" {
+		script = `printf '\000\000'`
+	}
+
+	command := remoteCommand(script+"\nread -r done || :", request)
+	cmd := exec.CommandContext(ctx, "ssh", dest.Channel("-T", command)...) // #nosec G204 -- Pinned master and quoted arguments.
+	cmd.WaitDelay = time.Second
+
+	var stderr bytes.Buffer
+
+	cmd.Stderr = &stderr
+
+	in, err := cmd.StdinPipe()
+	if err != nil {
+		return management{}, fmt.Errorf("open management stdin: %w", err)
+	}
+
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		_ = in.Close()
+		return management{}, fmt.Errorf("open management stdout: %w", err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		return management{}, fmt.Errorf("start management session: %w", err)
+	}
+
+	stop := context.AfterFunc(ctx, func() { _ = out.Close() })
+	defer stop()
+
+	reader := bufio.NewReader(out)
+
+	var fields [2]string
+	for i := range fields {
+		fields[i], err = reader.ReadString(0)
+		if err != nil {
+			_ = in.Close()
+
+			if waitErr := cmd.Wait(); waitErr != nil {
+				return management{}, fmt.Errorf("%s: %w", dest.Host, sshmux.CommandError(waitErr, stderr.String()))
+			}
+
+			return management{}, fmt.Errorf("read management reply: %w", err)
+		}
+	}
+
+	return management{
+		dir: strings.TrimSuffix(fields[0], "\x00"), listing: fields[1],
+		close: func() { _ = in.Close(); _ = cmd.Wait() },
+	}, nil
+}
+
+func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name string) (openResult, error) {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
 	if request == "~" {
 		request = "."
 	}
@@ -117,22 +185,22 @@ func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name s
 		request = "./" + strings.TrimPrefix(request, "~/")
 	}
 
-	out, err := dest.Query(ctx, remoteCommand(inspect, request))
+	m, err := openManagement(ctx, dest, request)
 	if err != nil {
-		return tmux.Session{}, false, fmt.Errorf("inspect workspace: %w", err)
+		return openResult{}, fmt.Errorf("inspect workspace: %w", err)
+	}
+	defer m.close()
+
+	if !path.IsAbs(m.dir) || !utf8.ValidString(m.dir) {
+		return openResult{}, fmt.Errorf("%w: invalid remote directory", os.ErrInvalid)
 	}
 
-	dir, list, ok := strings.Cut(out, "\x00")
-	if !ok || !path.IsAbs(dir) || !utf8.ValidString(dir) {
-		return tmux.Session{}, false, fmt.Errorf("%w: invalid remote directory", os.ErrInvalid)
-	}
-
-	names, err := inventory(list)
+	names, err := inventory(m.listing)
 	if err != nil {
-		return tmux.Session{}, false, err
+		return openResult{}, err
 	}
 
-	w := workspace{Host: dest.Host, Path: dir, Name: cmp.Or(name, path.Base(dir))}
+	w := workspace{Host: dest.Host, Path: m.dir, Name: cmp.Or(name, path.Base(m.dir))}
 
 	return w.open(ctx, dest, names)
 }
@@ -179,26 +247,18 @@ func (w workspace) windows(names map[string]bool, panes map[string]tmux.Attachme
 	return windows, nil
 }
 
-func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[string]bool) (tmux.Session, bool, error) {
-	helper, err := os.Executable()
-	if err != nil {
-		return tmux.Session{}, false, fmt.Errorf("locate tmux-session: %w", err)
-	}
-
+func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[string]bool) (openResult, error) {
 	meta, err := json.Marshal(w)
 	if err != nil {
-		return tmux.Session{}, false, fmt.Errorf("encode workspace: %w", err)
+		return openResult{}, fmt.Errorf("encode workspace: %w", err)
 	}
-
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
 
 	sessions, err := tmux.ListSessions(ctx)
 	if err != nil {
-		return tmux.Session{}, false, fmt.Errorf("list sessions: %w", err)
+		return openResult{}, fmt.Errorf("list sessions: %w", err)
 	}
 
-	var target tmux.Session
+	target := tmux.Session{Name: displayName(w.Host + "/" + w.Name), Remote: string(meta)}
 
 	for _, s := range sessions {
 		if s.Remote == string(meta) {
@@ -211,7 +271,7 @@ func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[
 	if len(sessions) != 0 {
 		panes, err = tmux.Attachments(ctx, "")
 		if err != nil {
-			return tmux.Session{}, false, fmt.Errorf("find existing remote panes: %w", err)
+			return openResult{}, fmt.Errorf("find existing remote panes: %w", err)
 		}
 	}
 
@@ -219,59 +279,39 @@ func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[
 
 	windows, err := w.windows(names, panes, created)
 	if err != nil {
-		return tmux.Session{}, false, err
+		return openResult{}, err
 	}
-
-	var resume []tmux.Attachment
 
 	prefix := w.prefix()
 	for _, p := range panes {
 		if p.Host == w.Host && p.Dead && strings.HasPrefix(p.Terminal, prefix) && names[p.Terminal] && terminalID.MatchString(p.Terminal) {
-			resume = append(resume, p)
+			windows = append(windows, window{role: p.ID, terminal: p.Terminal, pane: p})
 		}
-	}
-
-	want := len(windows) + len(resume)
-
-	if err := requireCapacity(ctx, dest, want); err != nil {
-		return tmux.Session{}, false, err
-	}
-
-	err = launch(ctx, dest, want, func(token string) error {
-		if err := resumePanes(ctx, helper, token, resume); err != nil {
-			return err
-		}
-
-		if created {
-			target.Name, target.Remote = displayName(w.Host+"/"+w.Name), string(meta)
-
-			if err := createRemote(ctx, &target, windows[0], helper, token); err != nil {
-				return err
-			}
-
-			windows = windows[1:]
-		}
-
-		for _, win := range windows {
-			if err := tmux.StartWindow(ctx, target.ID, win.role, "", helper, "--remote-pane", cmp.Or(win.terminal, win.role), "--pane-batch", token); err != nil {
-				return fmt.Errorf("create remote window: %w", err)
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return tmux.Session{}, false, err
 	}
 
 	target.Path = w.Path
+	result := openResult{Session: target, Created: created}
 
-	return target, created, nil
+	started, err := startPanes(ctx, dest, &result.Session, windows)
+	if err != nil {
+		if created && started == 0 {
+			return openResult{}, err
+		}
+
+		var missing []string
+		for _, win := range windows[started:] {
+			missing = append(missing, win.role)
+		}
+
+		result.Warning = fmt.Sprintf("could not open %s: %v", strings.Join(missing, ", "), err)
+	}
+
+	return result, nil
 }
 
-func createRemote(ctx context.Context, target *tmux.Session, first window, helper, token string) error {
+func createRemote(ctx context.Context, target *tmux.Session, role string, command ...string) error {
 	// Only allocating a session name and starting tmux require the local lock.
-	lock, err := lockOpen()
+	lock, err := lockOpen(ctx)
 	if err != nil {
 		return err
 	}
@@ -284,20 +324,9 @@ func createRemote(ctx context.Context, target *tmux.Session, first window, helpe
 
 	target.Name = tmux.AvailableName(sessions, target.Name)
 
-	target.ID, err = tmux.NewRemoteSession(ctx, *target, first.role, "exec "+quote(helper)+" --remote-pane shell",
-		helper, "--remote-pane", cmp.Or(first.terminal, first.role), "--pane-batch", token)
+	target.ID, err = tmux.NewRemoteSession(ctx, *target, role, "exec "+quote(command[0])+" --remote-pane shell", command...)
 	if err != nil {
 		return fmt.Errorf("create remote session: %w", err)
-	}
-
-	return nil
-}
-
-func resumePanes(ctx context.Context, helper, token string, panes []tmux.Attachment) error {
-	for _, p := range panes {
-		if err := p.Resume(ctx, helper, "--remote-pane", p.Terminal, "--pane-batch", token); err != nil {
-			return fmt.Errorf("resume pane %s: %w", p.ID, err)
-		}
 	}
 
 	return nil

@@ -3,6 +3,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/agents"
 	agentui "github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/agents"
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/panel"
 	"github.com/ddeville/scripts/tools/cmd/tmux-agent-status/ui/worktrees"
@@ -35,24 +37,25 @@ type Options struct {
 }
 
 type model struct {
-	ctx                   context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
-	tasks                 *tui.Tasks
-	area, returnArea      Area
-	agents                agentui.Model
-	worktrees             worktrees.Model
-	width, height         int
-	hasOrigin             bool
-	selectionLost         bool
-	notice                string
-	quitting              bool
-	operationCancel       context.CancelFunc
-	client, targetSession string
+	ctx                       context.Context //nolint:containedctx // Bubble Tea callbacks share the lifetime of the program.
+	tasks                     *tui.Tasks
+	area, returnArea          Area
+	agents                    agentui.Model
+	worktrees                 worktrees.Model
+	width, height             int
+	hasOrigin                 bool
+	notice                    string
+	quitting                  bool
+	operationCancel           context.CancelFunc
+	targetPane, targetSession string
 }
 
 type openMsg struct {
-	session string
-	err     error
+	pane, session string
+	err           error
 }
+
+var errStaleStatus = errors.New("status is stale; wait for a fresh update")
 
 func (m *model) Init() tea.Cmd { return tea.Batch(m.agents.Init(m.ctx), m.worktrees.Init(m.ctx)) }
 
@@ -77,19 +80,12 @@ func (m *model) beginCreate() tea.Cmd {
 
 	id := m.agents.OriginID()
 	if m.area == AgentsArea {
-		if choice, ok := m.agents.Find(m.agents.Panel.List.SelectedID()); ok {
-			if choice.Pane.Host != "" {
-				m.notice = "Worktree creation is local. Choose a local conversation or worktree."
-				return nil
-			}
-
-			id = choice.Agent.ID
-		}
+		id = m.agents.Panel.List.SelectedID()
 	} else if selected, ok := m.worktrees.Selected(); ok {
 		source = selected.Path
 	}
 
-	data := m.agents.Local()
+	data := m.agents.Snapshot()
 	pending := m.area == WorktreesArea && m.hasOrigin && data.At.IsZero() && data.Err == nil
 
 	cmd := m.worktrees.BeginCreate(source, id, pending)
@@ -110,20 +106,26 @@ func (m *model) openItem(id string) tea.Cmd {
 
 	m.operationCancel = cancel
 	if m.area == AgentsArea {
-		choice, ok := m.agents.Find(id)
-		if !ok {
-			cancel()
-
-			m.operationCancel = nil
-
-			return nil
-		}
+		data := m.agents.Snapshot()
 
 		return m.tasks.Track(func() tea.Msg {
-			ctx, stop := context.WithTimeout(ctx, 3*time.Second)
+			if data.Err != nil || time.Since(data.At) > 10*time.Second {
+				return openMsg{err: errStaleStatus}
+			}
+
+			ctx, stop := context.WithTimeout(ctx, time.Second)
 			defer stop()
 
-			return openMsg{err: choice.Source.Open(ctx, choice.Agent.ID, choice.Pane, m.client)}
+			panes, err := agents.MatchPanes(ctx, data.IDs)
+			if err != nil {
+				return openMsg{err: err}
+			}
+
+			if len(panes[id]) != 1 {
+				return openMsg{err: fmt.Errorf("%w, found %d", agents.ErrPaneMatch, len(panes[id]))}
+			}
+
+			return openMsg{pane: panes[id][0]}
 		})
 	}
 
@@ -166,7 +168,7 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 		case msg.err != nil:
 			m.notice = tui.SingleLine(msg.err.Error())
 		default:
-			m.targetSession = msg.session
+			m.targetPane, m.targetSession = msg.pane, msg.session
 			cmd = tea.Quit
 		}
 	case worktrees.OpenSessionMsg:
@@ -174,8 +176,8 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 		cmd = tea.Quit
 	default:
 		cmd = tea.Batch(m.agents.Update(m.ctx, msg), m.worktrees.Update(m.ctx, msg))
-		if update, ok := msg.(agentui.StatusMsg); ok && update.Host == "" {
-			m.worktrees.SetAgents(m.agents.Local(), m.agents.OriginID())
+		if _, ok := msg.(agents.Snapshot); ok {
+			m.worktrees.SetAgents(m.agents.Snapshot(), m.agents.OriginID())
 		}
 
 		if m.quitting && !m.busy() {
@@ -184,14 +186,7 @@ func (m *model) Update(message tea.Msg) (tea.Model, tea.Cmd) { //nolint:ireturn 
 	}
 
 	if selected != m.agents.Panel.List.SelectedID() {
-		if _, input := message.(tea.KeyPressMsg); input {
-			m.selectionLost = false
-			m.notice = ""
-		} else if _, ok := m.agents.Find(selected); selected != "" && !ok {
-			// A refresh can remove the highlighted thread and select the first
-			// row. A pending Enter must not open that replacement.
-			m.selectionLost = true
-		}
+		m.notice = ""
 	}
 
 	return m, cmd
@@ -247,13 +242,6 @@ func (m *model) handleKey(msg tea.KeyPressMsg) tea.Cmd {
 	case key.Matches(msg, keys.refresh) && m.area == WorktreesArea:
 		return m.worktrees.Reload(m.worktrees.Panel.List.SelectedID())
 	case key.Matches(msg, keys.open):
-		if m.area == AgentsArea && m.selectionLost {
-			m.selectionLost = false
-			m.notice = "The previous conversation disappeared. Choose a pane or press Enter again."
-
-			return nil
-		}
-
 		return m.openItem(m.activePanel().List.SelectedID())
 	case key.Matches(msg, keys.jump):
 		position := int(msg.String()[0] - '0')
@@ -287,11 +275,9 @@ func Run(ctx context.Context, options Options) error {
 	}
 
 	initial := &model{
-		ctx: uiCtx, tasks: tasks, client: options.Client, area: options.Area, width: 100, height: 30, hasOrigin: options.Pane != "",
+		ctx: uiCtx, tasks: tasks, area: options.Area, width: 100, height: 30, hasOrigin: options.Pane != "",
 		agents: agentui.New(options.Pane), worktrees: worktrees.New(options.Root, source, tasks),
 	}
-
-	defer initial.agents.Close()
 
 	initial.updatePanels()
 	result, err := tea.NewProgram(initial, tea.WithContext(uiCtx), tea.WithoutSignalHandler()).Run()
@@ -302,9 +288,17 @@ func Run(ctx context.Context, options Options) error {
 		return fmt.Errorf("run status TUI: %w", err)
 	}
 
-	if final, ok := result.(*model); ok && final.targetSession != "" {
-		if err := tmux.SwitchSession(ctx, final.targetSession, options.Client); err != nil {
-			return fmt.Errorf("open worktree session: %w", err)
+	if final, ok := result.(*model); ok {
+		if final.targetPane != "" {
+			if err := tmux.SwitchPane(ctx, final.targetPane, options.Client); err != nil {
+				return fmt.Errorf("open selected agent: %w", err)
+			}
+		}
+
+		if final.targetSession != "" {
+			if err := tmux.SwitchSession(ctx, final.targetSession, options.Client); err != nil {
+				return fmt.Errorf("open worktree session: %w", err)
+			}
 		}
 	}
 
