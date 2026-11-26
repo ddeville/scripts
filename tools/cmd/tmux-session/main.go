@@ -25,7 +25,7 @@ func main() {
 
 func command() *cobra.Command {
 	var (
-		name, host, watch          string
+		name, host, retry          string
 		launch, reply, closeTarget string
 		noSwitch                   bool
 	)
@@ -39,8 +39,13 @@ func command() *cobra.Command {
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
-				if watch != "" {
-					return supervise(cmd.Context(), watch)
+				if retry != "" {
+					master, err := sshmux.ForSession(host, retry)
+					if err != nil {
+						return fmt.Errorf("find session connection: %w", err)
+					}
+
+					return reconnect(cmd.Context(), master)
 				}
 
 				if launch != "" {
@@ -102,10 +107,10 @@ func command() *cobra.Command {
 	cmd.Flags().StringVarP(&name, "name", "n", "", "open a named workspace for this directory (defaults to the directory name)")
 	cmd.Flags().BoolVar(&noSwitch, "no-switch", false, "find or create the session without switching or attaching")
 	cmd.Flags().StringVar(&launch, "remote-pane", "", "launch or resume one pane")
-	cmd.Flags().StringVar(&reply, "pane-reply", "", "report pane startup to the supervisor")
+	cmd.Flags().StringVar(&reply, "pane-reply", "", "report pane startup to the caller")
 	cmd.Flags().Lookup("pane-reply").Hidden = true
-	cmd.Flags().StringVar(&watch, "supervise", "", "supervise a remote connection")
-	cmd.Flags().Lookup("supervise").Hidden = true
+	cmd.Flags().StringVar(&retry, "reconnect", "", "recover interrupted panes of a remote session")
+	cmd.Flags().Lookup("reconnect").Hidden = true
 	cmd.Flags().StringVar(&closeTarget, "remote-close", "", "close a pane or window by ID")
 	cmd.Flags().Lookup("remote-pane").Hidden = true
 	cmd.Flags().Lookup("remote-close").Hidden = true
@@ -146,9 +151,9 @@ func lockOpen(ctx context.Context) (*os.File, error) {
 	return lockFile(ctx, filepath.Join(dir, "open.lock"))
 }
 
-// All tmux servers sharing a master use the same management slot.
-func lockDestination(ctx context.Context, dest sshmux.Destination) (*os.File, error) {
-	return lockFile(ctx, dest.Socket+".lock")
+// Only one operation at a time may use the connection's management slot.
+func lockMaster(ctx context.Context, master sshmux.Master) (*os.File, error) {
+	return lockFile(ctx, master.Socket+".lock")
 }
 
 func lockFile(ctx context.Context, filename string) (*os.File, error) {

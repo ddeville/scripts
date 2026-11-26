@@ -1,4 +1,4 @@
-// Package sshmux shares a private OpenSSH master between tmux workspaces.
+// Package sshmux manages a private OpenSSH master for a tmux session.
 package sshmux
 
 import (
@@ -15,9 +15,9 @@ import (
 	"time"
 )
 
-// Destination identifies a master by its exact SSH destination.
-type Destination struct {
-	Host, Socket string
+// Master identifies the connection used by the panes of one local session.
+type Master struct {
+	Host, ID, Socket string
 }
 
 var (
@@ -28,39 +28,38 @@ var (
 	ErrSignIn = errors.New("SSH requires attention")
 )
 
-// ForHost resolves the private control socket without opening a connection.
-func ForHost(host string) (Destination, error) {
+// ForSession resolves the private control socket without opening a connection.
+func ForSession(host, id string) (Master, error) {
 	if !sshHost.MatchString(host) || strings.HasPrefix(host, "-") {
-		return Destination{}, fmt.Errorf("%w: invalid SSH destination %q", os.ErrInvalid, host)
+		return Master{}, fmt.Errorf("%w: invalid SSH destination %q", os.ErrInvalid, host)
+	}
+
+	if id == "" {
+		return Master{}, fmt.Errorf("%w: missing SSH connection ID", os.ErrInvalid)
 	}
 
 	dir, err := CacheDir()
 	if err != nil {
-		return Destination{}, err
+		return Master{}, err
 	}
 
-	info, err := os.Lstat(dir)
-	if err != nil {
-		return Destination{}, fmt.Errorf("inspect SSH socket directory: %w", err)
-	}
+	sum := sha256.Sum256([]byte(host + "\x00" + id))
 
-	stat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok || !info.IsDir() || int(stat.Uid) != os.Geteuid() || info.Mode().Perm()&0o077 != 0 {
-		return Destination{}, fmt.Errorf("%w: SSH socket directory %s must be private", os.ErrPermission, dir)
-	}
-
-	sum := sha256.Sum256([]byte(host))
-
-	return Destination{Host: host, Socket: filepath.Join(dir, fmt.Sprintf("ssh-%x", sum[:10]))}, nil
+	return Master{Host: host, ID: id, Socket: filepath.Join(dir, fmt.Sprintf("ssh-%x", sum[:10]))}, nil
 }
 
-// Connect starts or reuses the master under the destination lock. Let OpenSSH
+// Running checks only the local control socket.
+func (d Master) Running(ctx context.Context) bool {
+	return exec.CommandContext(ctx, "ssh", "-S", d.Socket, "-O", "check", "--", d.Host).Run() == nil // #nosec G204 -- The validated destination follows --.
+}
+
+// Connect starts or reuses the master under the session lock. Let OpenSSH
 // select the agent and identities from the caller's environment and config.
-func (d Destination) Connect(ctx context.Context, agent string) error {
+func (d Master) Connect(ctx context.Context, agent string) error {
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
-	if exec.CommandContext(ctx, "ssh", "-S", d.Socket, "-O", "check", "--", d.Host).Run() == nil { // #nosec G204 -- The validated destination follows --.
+	if d.Running(ctx) {
 		return nil
 	}
 
@@ -68,6 +67,9 @@ func (d Destination) Connect(ctx context.Context, agent string) error {
 		"-S", d.Socket, "-fN", "-oControlMaster=auto", "-oControlPersist=60",
 		"-oRemoteCommand=none", "-oConnectTimeout=10", "-oServerAliveInterval=5", "-oServerAliveCountMax=2",
 		"-oBatchMode=yes", "-oStrictHostKeyChecking=yes", "--", d.Host)
+	// A ProxyCommand starts before ssh backgrounds itself. Let it outlive tm.
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+
 	if agent != os.Getenv("SSH_AUTH_SOCK") {
 		cmd.Env = append(cmd.Environ(), "SSH_AUTH_SOCK="+agent)
 	}
@@ -95,6 +97,11 @@ func (d Destination) Connect(ctx context.Context, agent string) error {
 	return nil
 }
 
+// Stop discards a provisional master that did not acquire any panes.
+func (d Master) Stop(ctx context.Context) {
+	_ = exec.CommandContext(ctx, "ssh", "-S", d.Socket, "-O", "exit", "--", d.Host).Run() // #nosec G204 -- The validated destination follows --.
+}
+
 func needsSignIn(message string) bool {
 	return strings.Contains(message, "Permission denied") ||
 		strings.Contains(message, "Host key verification failed") ||
@@ -103,7 +110,7 @@ func needsSignIn(message string) bool {
 
 // Channel returns ssh arguments for an existing master only.
 // ControlMaster=no alone allows a direct connection if the socket is gone or the master refuses a channel.
-func (d Destination) Channel(tty, command string) []string {
+func (d Master) Channel(tty, command string) []string {
 	return []string{
 		"-S", d.Socket, "-oControlMaster=no", "-oProxyCommand=false", "-oBatchMode=yes",
 		"-oClearAllForwardings=yes", "-oStdinNull=no", "-oRemoteCommand=none", "-oLogLevel=ERROR", "-e", "none", tty, "--", d.Host, command,
@@ -111,7 +118,7 @@ func (d Destination) Channel(tty, command string) []string {
 }
 
 // Query runs one non-interactive command with a deadline.
-func (d Destination) Query(ctx context.Context, command string) (string, error) {
+func (d Master) Query(ctx context.Context, command string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
@@ -155,6 +162,16 @@ func CacheDir() (string, error) {
 	dir := filepath.Join(cache, "tmux-session")
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", fmt.Errorf("create session cache: %w", err)
+	}
+
+	info, err := os.Lstat(dir)
+	if err != nil {
+		return "", fmt.Errorf("inspect SSH socket directory: %w", err)
+	}
+
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok || !info.IsDir() || int(stat.Uid) != os.Geteuid() || info.Mode().Perm()&0o077 != 0 {
+		return "", fmt.Errorf("%w: SSH socket directory %s must be private", os.ErrPermission, dir)
 	}
 
 	return dir, nil

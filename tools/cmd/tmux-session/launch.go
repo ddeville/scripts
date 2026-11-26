@@ -16,7 +16,7 @@ import (
 )
 
 // Give sshd the real requests in order, with the management slot occupied.
-func startPanes(ctx context.Context, dest sshmux.Destination, target *tmux.Session, windows []window) (int, error) {
+func startPanes(ctx context.Context, master sshmux.Master, target *tmux.Session, windows []window) (int, error) {
 	if len(windows) == 0 {
 		return 0, nil
 	}
@@ -27,7 +27,7 @@ func startPanes(ctx context.Context, dest sshmux.Destination, target *tmux.Sessi
 	}
 
 	for i, win := range windows {
-		reply := filepath.Join(filepath.Dir(dest.Socket), "open-"+rand.Text()[:16])
+		reply := filepath.Join(filepath.Dir(master.Socket), "open-"+rand.Text()[:16])
 		if err := win.start(ctx, target, helper, reply); err != nil {
 			return i, err
 		}

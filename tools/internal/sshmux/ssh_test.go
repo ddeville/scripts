@@ -10,6 +10,32 @@ import (
 	"github.com/ddeville/scripts/tools/internal/sshmux"
 )
 
+func TestSessionControlsWhichMasterPanesUse(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	t.Setenv("XDG_CACHE_HOME", dir)
+
+	socket := func(host, session string) string {
+		t.Helper()
+
+		master, err := sshmux.ForSession(host, session)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		return master.Socket
+	}
+
+	first := socket("devbox", "a")
+	if first != socket("devbox", "a") || first == socket("devbox", "b") || first == socket("other", "a") {
+		t.Fatal("only panes of the same session and host should use the same master")
+	}
+
+	if _, err := sshmux.ForSession("devbox", ""); err == nil {
+		t.Fatal("a missing session ID must not select a shared master")
+	}
+}
+
 func TestConnectUsesCurrentAgentAndRefusesUntrustedHost(t *testing.T) {
 	dir := t.TempDir()
 
@@ -28,9 +54,9 @@ exit 255
 	t.Setenv("PATH", dir)
 	t.Setenv("SSH_AUTH_SOCK", "/old-agent")
 
-	dest := sshmux.Destination{Host: "devbox", Socket: filepath.Join(dir, "master")}
+	master := sshmux.Master{Host: "devbox", Socket: filepath.Join(dir, "master")}
 
-	err := dest.Connect(t.Context(), "/new-agent")
+	err := master.Connect(t.Context(), "/new-agent")
 	if !errors.Is(err, sshmux.ErrSignIn) || !strings.Contains(err.Error(), "Host key verification failed") {
 		t.Fatalf("expected an actionable host key failure that stops retries, got %v", err)
 	}

@@ -5,12 +5,14 @@ import (
 	"bytes"
 	"cmp"
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -20,14 +22,18 @@ import (
 
 	"github.com/ddeville/scripts/tools/internal/sshmux"
 	"github.com/ddeville/scripts/tools/internal/tmux"
+	"github.com/ddeville/scripts/tools/internal/tui"
 )
 
 type workspace struct {
-	Host string `json:"host"`
-	Path string `json:"path"`
-	Name string `json:"name"`
+	Host       string `json:"host"`
+	Path       string `json:"path"`
+	Name       string `json:"name"`
+	Request    string `json:"request"`
+	Connection string `json:"connection"`
 }
 
+// Terminal names survive the loss of a local session and its connection ID.
 func (w workspace) prefix() string {
 	sum := sha256.Sum256([]byte(w.Host + "\x00" + w.Path + "\x00" + w.Name))
 	return fmt.Sprintf("tm-%x.", sum[:10])
@@ -119,14 +125,14 @@ type management struct {
 
 // Keep discovery's session open until sshd accepts or refuses the panes.
 // Splits and reconnects need the slot but have nothing to discover.
-func openManagement(ctx context.Context, dest sshmux.Destination, request string) (management, error) {
+func openManagement(ctx context.Context, master sshmux.Master, request string) (management, error) {
 	script := inspect
 	if request == "" {
 		script = `printf '\000\000'`
 	}
 
 	command := remoteCommand(script+"\nread -r done || :", request)
-	cmd := exec.CommandContext(ctx, "ssh", dest.Channel("-T", command)...) // #nosec G204 -- Pinned master and quoted arguments.
+	cmd := exec.CommandContext(ctx, "ssh", master.Channel("-T", command)...) // #nosec G204 -- Pinned master and quoted arguments.
 	cmd.WaitDelay = time.Second
 
 	var stderr bytes.Buffer
@@ -160,7 +166,7 @@ func openManagement(ctx context.Context, dest sshmux.Destination, request string
 			_ = in.Close()
 
 			if waitErr := cmd.Wait(); waitErr != nil {
-				return management{}, fmt.Errorf("%s: %w", dest.Host, sshmux.CommandError(waitErr, stderr.String()))
+				return management{}, fmt.Errorf("%s: %w", master.Host, sshmux.CommandError(waitErr, stderr.String()))
 			}
 
 			return management{}, fmt.Errorf("read management reply: %w", err)
@@ -173,36 +179,178 @@ func openManagement(ctx context.Context, dest sshmux.Destination, request string
 	}, nil
 }
 
-func openWorkspace(ctx context.Context, dest sshmux.Destination, request, name string) (openResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
+type remoteSession struct {
+	target tmux.Session
+	info   workspace
+}
+
+// For a given host and requested name, the resolved directory selects the session.
+func matchingSessions(sessions []tmux.Session, host, name string) map[string]remoteSession {
+	known := make(map[string]remoteSession)
+
+	for _, s := range sessions {
+		var w workspace
+		if s.Remote != "" && json.Unmarshal([]byte(s.Remote), &w) == nil &&
+			w.Host == host && w.Name == cmp.Or(name, path.Base(w.Path)) {
+			known[w.Path] = remoteSession{s, w}
+		}
+	}
+
+	return known
+}
+
+// A new path spelling may be a symlink to an open workspace. Use a live
+// candidate for discovery so resolving that alias doesn't require a login.
+func discoverySession(ctx context.Context, known map[string]remoteSession, request string) remoteSession {
+	if s, ok := known[request]; ok {
+		return s
+	}
+
+	for _, s := range known {
+		if s.info.Request == request {
+			return s
+		}
+	}
+
+	for _, s := range known {
+		master, err := sshmux.ForSession(s.info.Host, s.info.Connection)
+		if err == nil && master.Running(ctx) {
+			return s
+		}
+	}
+
+	return remoteSession{}
+}
+
+func openRemote(ctx context.Context, host, request, name string) (tmux.Session, bool, error) {
+	if host == "" || request == "" {
+		return tmux.Session{}, false, fmt.Errorf("%w: expected an SSH host and remote path", os.ErrInvalid)
+	}
 
 	if request == "~" {
 		request = "."
 	}
 
 	if !path.IsAbs(request) {
-		request = "./" + strings.TrimPrefix(request, "~/")
+		request = "./" + strings.TrimPrefix(strings.TrimPrefix(request, "~/"), "./")
 	}
 
-	m, err := openManagement(ctx, dest, request)
+	// Concurrent opens can resolve to the same workspace. Serialize lookup
+	// without blocking local opens or other sessions' splits and reconnects.
+	dir, err := sshmux.CacheDir()
 	if err != nil {
-		return openResult{}, fmt.Errorf("inspect workspace: %w", err)
+		return tmux.Session{}, false, fmt.Errorf("locate session cache: %w", err)
 	}
-	defer m.close()
 
+	sum := sha256.Sum256([]byte(host))
+
+	lookup, err := lockFile(ctx, filepath.Join(dir, fmt.Sprintf("open-%x.lock", sum[:10])))
+	if err != nil {
+		return tmux.Session{}, false, err
+	}
+
+	defer func() { _ = lookup.Close() }()
+
+	sessions, err := tmux.ListSessions(ctx)
+	if err != nil {
+		return tmux.Session{}, false, fmt.Errorf("list sessions: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	defer cancel()
+
+	known := matchingSessions(sessions, host, name)
+	candidate := discoverySession(ctx, known, request)
+
+	// Switch to the actual owner before opening any panes. A second mismatch
+	// means the directory changed while we were opening it.
+	for range 2 {
+		id := candidate.info.Connection
+		if candidate.target.ID == "" {
+			id = rand.Text()
+		}
+
+		master, err := sshmux.ForSession(host, id)
+		if err != nil {
+			return tmux.Session{}, false, fmt.Errorf("find session connection: %w", err)
+		}
+
+		lock, err := lockMaster(ctx, master)
+		if err != nil {
+			return tmux.Session{}, false, err
+		}
+
+		if err := master.Connect(ctx, os.Getenv("SSH_AUTH_SOCK")); err != nil {
+			_ = lock.Close()
+			return tmux.Session{}, false, fmt.Errorf("SSH: %w", err)
+		}
+
+		m, err := openManagement(ctx, master, request)
+		if err != nil {
+			_ = lock.Close()
+			return tmux.Session{}, false, fmt.Errorf("inspect workspace: %w", err)
+		}
+
+		owner := known[m.dir]
+		if owner == candidate {
+			defer func() { _ = lock.Close() }()
+			defer m.close()
+
+			return owner.open(ctx, master, lock, m, request, name)
+		}
+
+		m.close()
+
+		if candidate.target.ID == "" {
+			master.Stop(ctx)
+		}
+
+		_ = lock.Close()
+		candidate = owner
+	}
+
+	return tmux.Session{}, false, fmt.Errorf("%w: remote workspace changed while opening %s", os.ErrInvalid, request)
+}
+
+func (s remoteSession) open(ctx context.Context, master sshmux.Master, lock *os.File, m management, request, name string) (tmux.Session, bool, error) {
 	if !path.IsAbs(m.dir) || !utf8.ValidString(m.dir) {
-		return openResult{}, fmt.Errorf("%w: invalid remote directory", os.ErrInvalid)
+		return tmux.Session{}, false, fmt.Errorf("%w: invalid remote directory", os.ErrInvalid)
 	}
 
 	names, err := inventory(m.listing)
 	if err != nil {
-		return openResult{}, err
+		return tmux.Session{}, false, err
 	}
 
-	w := workspace{Host: dest.Host, Path: m.dir, Name: cmp.Or(name, path.Base(m.dir))}
+	target, w := s.target, s.info
 
-	return w.open(ctx, dest, names)
+	created := target.ID == ""
+	if created {
+		w = workspace{Host: master.Host, Path: m.dir, Name: cmp.Or(name, path.Base(m.dir)), Request: request, Connection: master.ID}
+
+		meta, err := json.Marshal(w)
+		if err != nil {
+			return tmux.Session{}, false, fmt.Errorf("encode workspace: %w", err)
+		}
+
+		target = tmux.Session{Name: displayName(w.Host + "/" + w.Name), Remote: string(meta)}
+	}
+
+	target.Path = w.Path
+	if err := w.attach(ctx, master, &target, names); err != nil {
+		return tmux.Session{}, false, err
+	}
+
+	// tmux may still have an older agent in its environment after a reopen.
+	if err := lock.Truncate(0); err != nil {
+		return tmux.Session{}, false, fmt.Errorf("update SSH agent socket: %w", err)
+	}
+
+	if _, err := lock.WriteString(os.Getenv("SSH_AUTH_SOCK")); err != nil {
+		return tmux.Session{}, false, fmt.Errorf("save SSH agent socket: %w", err)
+	}
+
+	return target, created, nil
 }
 
 // Pane names and positions are mutable. Only a terminal ID can identify a
@@ -247,55 +395,29 @@ func (w workspace) windows(names map[string]bool, panes map[string]tmux.Attachme
 	return windows, nil
 }
 
-func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[string]bool) (openResult, error) {
-	meta, err := json.Marshal(w)
+func (w workspace) attach(ctx context.Context, master sshmux.Master, target *tmux.Session, names map[string]bool) error {
+	panes, err := tmux.Attachments(ctx, "")
 	if err != nil {
-		return openResult{}, fmt.Errorf("encode workspace: %w", err)
-	}
-
-	sessions, err := tmux.ListSessions(ctx)
-	if err != nil {
-		return openResult{}, fmt.Errorf("list sessions: %w", err)
-	}
-
-	target := tmux.Session{Name: displayName(w.Host + "/" + w.Name), Remote: string(meta)}
-
-	for _, s := range sessions {
-		if s.Remote == string(meta) {
-			target = s
-			break
-		}
-	}
-
-	var panes map[string]tmux.Attachment
-	if len(sessions) != 0 {
-		panes, err = tmux.Attachments(ctx, "")
-		if err != nil {
-			return openResult{}, fmt.Errorf("find existing remote panes: %w", err)
-		}
+		return fmt.Errorf("find existing remote panes: %w", err)
 	}
 
 	created := target.ID == ""
 
 	windows, err := w.windows(names, panes, created)
 	if err != nil {
-		return openResult{}, err
+		return err
 	}
 
-	prefix := w.prefix()
 	for _, p := range panes {
-		if p.Host == w.Host && p.Dead && strings.HasPrefix(p.Terminal, prefix) && names[p.Terminal] && terminalID.MatchString(p.Terminal) {
+		if p.Host == w.Host && p.Connection == w.Connection && p.Dead && names[p.Terminal] && terminalID.MatchString(p.Terminal) {
 			windows = append(windows, window{role: p.ID, terminal: p.Terminal, pane: p})
 		}
 	}
 
-	target.Path = w.Path
-	result := openResult{Session: target, Created: created}
-
-	started, err := startPanes(ctx, dest, &result.Session, windows)
+	started, err := startPanes(ctx, master, target, windows)
 	if err != nil {
 		if created && started == 0 {
-			return openResult{}, err
+			return err
 		}
 
 		var missing []string
@@ -303,10 +425,12 @@ func (w workspace) open(ctx context.Context, dest sshmux.Destination, names map[
 			missing = append(missing, win.role)
 		}
 
-		result.Warning = fmt.Sprintf("could not open %s: %v", strings.Join(missing, ", "), err)
+		message := tui.CleanLine(fmt.Sprintf("tm: could not open %s: %v", strings.Join(missing, ", "), err))
+		_, _ = fmt.Fprintln(os.Stderr, message)
+		_ = tmux.Notify(ctx, message)
 	}
 
-	return result, nil
+	return nil
 }
 
 func createRemote(ctx context.Context, target *tmux.Session, role string, command ...string) error {

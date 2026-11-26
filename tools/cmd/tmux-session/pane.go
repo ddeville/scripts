@@ -48,7 +48,7 @@ func attachPane(ctx context.Context, requested, reply string) (int, error) {
 		conn  net.Conn
 	)
 
-	// A raw respawn may replay a command whose supervisor has already left.
+	// A raw respawn may replay a command whose caller has already left.
 	if reply != "" {
 		conn, _ = (&net.Dialer{}).DialContext(ctx, "unix", reply)
 		if conn != nil {
@@ -100,7 +100,7 @@ func runPane(ctx context.Context, requested string, ready func()) (int, error) {
 			return failure, fmt.Errorf("read remote workspace: %w", err)
 		}
 
-		p.Host, p.Terminal, dir = w.Host, requested, w.Path
+		p.Host, p.Connection, p.Terminal, dir = w.Host, w.Connection, requested, w.Path
 		if slices.Contains(roles, requested) {
 			mode = requested
 			p.Terminal = w.prefix() + mode + "-" + rand.Text()[:13]
@@ -113,7 +113,7 @@ func runPane(ctx context.Context, requested string, ready func()) (int, error) {
 		return failure, fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
 	}
 
-	dest, err := sshmux.ForHost(p.Host)
+	master, err := sshmux.ForSession(p.Host, p.Connection)
 	if err != nil {
 		return failure, fmt.Errorf("find pane connection: %w", err)
 	}
@@ -124,14 +124,14 @@ func runPane(ctx context.Context, requested string, ready func()) (int, error) {
 	timer := time.AfterFunc(15*time.Second, cancel)
 	defer timer.Stop()
 
-	// Splits have no supervisor holding the management session for them.
+	// Splits have no caller holding the management session for them.
 	if ready == nil {
-		lock, err := lockDestination(sshCtx, dest)
+		lock, err := lockMaster(sshCtx, master)
 		if err != nil {
 			return failure, err
 		}
 
-		m, err := openManagement(sshCtx, dest, "")
+		m, err := openManagement(sshCtx, master, "")
 		if err != nil {
 			_ = lock.Close()
 
@@ -146,20 +146,27 @@ func runPane(ctx context.Context, requested string, ready func()) (int, error) {
 		defer ready()
 	}
 
-	project := ""
+	var project, reconnect string
+
 	if dir != "" {
+		helper, err := os.Executable()
+		if err != nil {
+			return failure, fmt.Errorf("locate tmux-session: %w", err)
+		}
+
 		project = displayName(path.Base(dir))
+		reconnect = "exec " + quote(helper) + " --host " + quote(master.Host) + " --reconnect " + quote(master.ID)
 	}
 
 	// Record before launching. An ambiguous failure can only reattach here.
-	if err := p.Record(sshCtx, project); err != nil {
+	if err := p.Record(sshCtx, project, reconnect); err != nil {
 		return failure, fmt.Errorf("record remote pane: %w", err)
 	}
 
 	var stderr bytes.Buffer
 
 	output := &paneOutput{opened: func() { timer.Stop(); ready() }}
-	cmd := exec.CommandContext(sshCtx, "ssh", dest.Channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))...) // #nosec G204 -- Pinned master and quoted arguments.
+	cmd := exec.CommandContext(sshCtx, "ssh", master.Channel("-tt", remoteCommand(attach, mode, p.Terminal, dir))...) // #nosec G204 -- Pinned master and quoted arguments.
 	cmd.SysProcAttr = &syscall.SysProcAttr{Foreground: true}
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, output, io.MultiWriter(os.Stderr, &stderr)
 	cmd.WaitDelay = time.Second
@@ -217,20 +224,20 @@ func stopTerminal(ctx context.Context, p tmux.Attachment) error {
 		return fmt.Errorf("%w: invalid terminal ID", os.ErrInvalid)
 	}
 
-	dest, err := sshmux.ForHost(p.Host)
+	master, err := sshmux.ForSession(p.Host, p.Connection)
 	if err != nil {
 		return fmt.Errorf("find pane connection: %w", err)
 	}
 
 	command := remoteCommand(stop, p.Terminal, strconv.FormatBool(p.Dead))
 
-	lock, err := lockDestination(ctx, dest)
+	lock, err := lockMaster(ctx, master)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = lock.Close() }()
 
-	out, err := dest.Query(ctx, command)
+	out, err := master.Query(ctx, command)
 	if err != nil {
 		return fmt.Errorf("stop terminal: %w", err)
 	}

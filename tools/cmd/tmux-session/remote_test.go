@@ -30,7 +30,7 @@ sh -c "$command"
 		t.Fatal(err)
 	}
 
-	dest := sshmux.Destination{Host: "devbox", Socket: filepath.Join(dir, "master")}
+	dest := sshmux.Master{Host: "devbox", Socket: filepath.Join(dir, "master")}
 
 	if err := os.WriteFile("zmx", []byte("#!/bin/sh\necho 'name=term\tclients=0'\n"), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private test directory.
 		t.Fatal(err)
@@ -61,13 +61,16 @@ sh -c "$command"
 func TestRestoreOnlyUnattachedSurvivors(t *testing.T) {
 	t.Parallel()
 
-	w := workspace{Host: "devbox", Path: "/work/api", Name: "api"}
+	w := workspace{Host: "devbox", Path: "/work/api", Name: "api", Request: "./api", Connection: "old"}
 	other := workspace{Host: "devbox", Path: "/personal/api", Name: "api"}
 	moved := w.prefix() + "editor-AAAAAAAAAAAAA"
 	first := w.prefix() + "shell-AAAAAAAAAAAAA"
 	second := w.prefix() + "shell-BBBBBBBBBBBBB"
 	names := map[string]bool{moved: true, second: true, first: true, other.prefix() + "repo-AAAAAAAAAAAAA": true}
 	panes := map[string]tmux.Attachment{"%4": {Host: w.Host, Terminal: moved, Dead: true}}
+
+	// A replacement session may have a new master and a different path spelling.
+	w.Connection, w.Request = "new", w.Path
 
 	got, err := w.windows(names, panes, true)
 	if err != nil {
@@ -77,6 +80,28 @@ func TestRestoreOnlyUnattachedSurvivors(t *testing.T) {
 	want := []window{{role: "shell", terminal: first}, {role: "shell", terminal: second}}
 	if !slices.Equal(got, want) {
 		t.Fatalf("restored windows = %v, want %v", got, want)
+	}
+}
+
+func TestReopenSelectsTheSessionEvenAfterRename(t *testing.T) {
+	t.Parallel()
+
+	sessions := []tmux.Session{
+		{ID: "$1", Name: "renamed", Remote: `{"host":"dev","path":"/work/api","name":"api","request":"./api","connection":"a"}`},
+		{ID: "$2", Remote: `{"host":"dev","path":"/work/api","name":"scratch","request":"./api","connection":"b"}`},
+		{ID: "$3", Remote: `{"host":"dev","path":"/other/api","name":"api","request":"./other/api","connection":"c"}`},
+	}
+
+	for _, tc := range []struct{ dir, name, connection string }{
+		{"./api", "", "a"},
+		{"/work/api", "api", "a"},
+		{"./api", "scratch", "b"},
+		{"./other/api", "", "c"},
+	} {
+		known := matchingSessions(sessions, "dev", tc.name)
+		if s := discoverySession(t.Context(), known, tc.dir); s.info.Connection != tc.connection {
+			t.Errorf("reopen %s %q selected %q, want %q", tc.dir, tc.name, s.info.Connection, tc.connection)
+		}
 	}
 }
 
@@ -97,26 +122,23 @@ func TestDiscoveryDistinguishesUnreachableFromGone(t *testing.T) {
 	}
 }
 
-func TestRecoveryOnlyRetriesSSHFailuresOnThisDestination(t *testing.T) {
+func TestRecoveryOnlyRetriesSSHFailuresOnThisConnection(t *testing.T) {
 	t.Parallel()
 
 	const terminal = "tm-1234567890abcdef1234.shell-AAAAAAAAAAAAA"
 
 	panes := map[string]tmux.Attachment{
-		"%1": {ID: "%1", Host: "dev", Terminal: terminal, Dead: true, ExitStatus: "255"},
-		"%2": {ID: "%2", Host: "dev", Terminal: terminal, Dead: true, ExitStatus: "1"},
-		"%3": {ID: "%3", Host: "dev", Terminal: terminal},
-		"%4": {ID: "%4", Host: "other", Terminal: terminal, Dead: true, ExitStatus: "255"},
-		"%5": {ID: "%5", Host: "dev", Dead: true, ExitStatus: "255"},
+		"%1": {ID: "%1", Host: "dev", Connection: "a", Terminal: terminal, Dead: true, ExitStatus: "255"},
+		"%2": {ID: "%2", Host: "dev", Connection: "a", Terminal: terminal, Dead: true, ExitStatus: "1"},
+		"%3": {ID: "%3", Host: "dev", Connection: "a", Terminal: terminal},
+		"%4": {ID: "%4", Host: "dev", Connection: "b", Terminal: terminal, Dead: true, ExitStatus: "255"},
+		"%5": {ID: "%5", Host: "dev", Connection: "a", Dead: true, ExitStatus: "255"},
+		"%6": {ID: "%6", Host: "dev", Connection: "a", Terminal: terminal, Dead: true, ExitStatus: "255", NeedsSignIn: true},
 	}
 
-	active, retry := interrupted(panes, "dev")
-	if !active || !slices.Equal(retry, []tmux.Attachment{panes["%1"]}) {
-		t.Fatalf("active = %t, retry = %v", active, retry)
-	}
-
-	if active, _ := interrupted(panes, "gone"); active {
-		t.Fatal("supervisor should exit without panes")
+	retry := interrupted(panes, sshmux.Master{Host: "dev", ID: "a"})
+	if !slices.Equal(retry, []tmux.Attachment{panes["%1"]}) {
+		t.Fatalf("retry = %v", retry)
 	}
 }
 
@@ -141,48 +163,32 @@ func TestFailedPaneLookupKeepsReattachmentRetryable(t *testing.T) {
 	}
 }
 
-func TestWatcherSurvivesLookupFailureAndExitsWithServer(t *testing.T) {
+func TestReconnectRetriesLookupAndExitsWithServer(t *testing.T) {
 	dir := t.TempDir()
 	t.Chdir(dir)
 	t.Setenv("PATH", dir)
 
 	const script = `#!/bin/sh
-[ "$1" != -u ] || shift
-if [ -f stopped ]; then
+if [ -f failed ]; then
+    : > stopped
     echo "no server running on /test" >&2
-    exit 1
 fi
-case "$1" in
-list-panes)
-    if [ ! -f failed ]; then
-        : > failed
-        exit 1
-    fi
-    printf '%%1\t@1\t0\tdev\ttm-1234567890abcdef1234.shell-AAAAAAAAAAAAA\t1\t\n'
-    ;;
-wait-for) : > stopped ;;
-*) exit 1 ;;
-esac
+: > failed
+exit 1
 `
 	if err := os.WriteFile("tmux", []byte(script), 0o700); err != nil { // #nosec G306 -- Executable fixture in a private test directory.
 		t.Fatal(err)
 	}
 
-	watch, err := lockFile(t.Context(), "watch")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = watch.Close() }()
-
 	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
-	dest := sshmux.Destination{Host: "dev", Socket: filepath.Join(dir, "ssh")}
-	if err := watchPanes(ctx, dest, watch); err != nil || ctx.Err() != nil {
-		t.Fatalf("watchPanes = %v, context = %v", err, ctx.Err())
+	dest := sshmux.Master{Host: "dev", ID: "abc", Socket: filepath.Join(dir, "ssh")}
+	if err := reconnect(ctx, dest); err != nil || ctx.Err() != nil {
+		t.Fatalf("reconnect = %v, context = %v", err, ctx.Err())
 	}
 
 	if _, err := os.Stat("stopped"); err != nil {
-		t.Fatal("watcher did not resume waiting for pane events")
+		t.Fatal("reconnect did not retry the failed lookup")
 	}
 }

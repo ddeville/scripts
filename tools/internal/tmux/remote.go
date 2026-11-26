@@ -11,12 +11,6 @@ import (
 // RemoteEnv identifies a remote session and supplies the workspace to new panes.
 const RemoteEnv = "TM_REMOTE_WORKSPACE"
 
-// SocketPath identifies the local server, even when opened from outside tmux.
-func SocketPath(ctx context.Context) (string, error) {
-	out, err := run(ctx, "display-message", "-p", "#{socket_path}")
-	return strings.TrimSuffix(out, "\n"), err
-}
-
 // NewRemoteSession sets the command for future windows and splits in the same
 // queue that creates the session. Its local working directory is the user's home.
 func NewRemoteSession(ctx context.Context, s Session, window, defaultCommand string, command ...string) (string, error) {
@@ -37,17 +31,17 @@ func NewRemoteSession(ctx context.Context, s Session, window, defaultCommand str
 
 // Attachment identifies a local pane and the remote terminal it owns, if any.
 type Attachment struct {
-	ID, WindowID   string
-	Host, Terminal string
-	Dead           bool
-	ExitStatus     string
-	server         string
+	ID, WindowID               string
+	Host, Connection, Terminal string
+	Dead, NeedsSignIn          bool
+	ExitStatus                 string
+	server                     string
 }
 
 // Attachments returns each pane once, even if its window is linked to multiple
 // sessions. A pane or window ID limits the lookup to that window.
 func Attachments(ctx context.Context, target string) (map[string]Attachment, error) {
-	const format = "#{pane_id}\t#{window_id}\t#{pane_dead}\t#{@tm_host}\t#{@tm_terminal}\t#{pid}\t#{pane_dead_status}"
+	const format = "#{pane_id}\t#{window_id}\t#{pane_dead}\t#{@tm_host}\t#{@tm_connection}\t#{@tm_terminal}\t#{pid}\t#{pane_dead_status}\t#{@tm_sign_in}"
 
 	args := []string{"-u", "list-panes", "-F", format}
 	if target == "" {
@@ -69,13 +63,14 @@ func Attachments(ctx context.Context, target string) (map[string]Attachment, err
 
 	for line := range strings.Lines(out) {
 		fields := strings.Split(strings.TrimSuffix(line, "\n"), "\t")
-		if len(fields) != 7 {
+		if len(fields) != 9 {
 			return nil, fmt.Errorf("%w: invalid pane record", os.ErrInvalid)
 		}
 
 		p := Attachment{
 			ID: fields[0], WindowID: fields[1], Dead: fields[2] == "1", Host: fields[3],
-			Terminal: fields[4], server: fields[5], ExitStatus: fields[6],
+			Connection: fields[4], Terminal: fields[5], server: fields[6], ExitStatus: fields[7],
+			NeedsSignIn: fields[8] == "1",
 		}
 		panes[p.ID] = p
 	}
@@ -94,7 +89,7 @@ func Notify(ctx context.Context, message string) error {
 }
 
 // Record pins a terminal to this pane, even across moves and respawns.
-func (p Attachment) Record(ctx context.Context, project string) error {
+func (p Attachment) Record(ctx context.Context, project, reconnect string) error {
 	const message = "#{?#{==:#{pane_dead_status},255},SSH disconnected · rerun tm for #{@tm_host} if recovery stalls,Remote terminal exited or unavailable}"
 
 	args := []string{
@@ -102,10 +97,16 @@ func (p Attachment) Record(ctx context.Context, project string) error {
 		"set-option", "-p", "-t", p.ID, "remain-on-exit", "failed", ";",
 		"set-option", "-p", "-t", p.ID, "remain-on-exit-format", message,
 	}
+
 	if project != "" {
+		retry := commandLine("run-shell", "-b", literalFormat(reconnect))
+		hook := commandLine("if-shell", "-F", "#{==:#{pane_dead_status},255}", retry)
+
 		args = append(args, ";", "set-option", "-p", "-t", p.ID, "@tm_host", literalArg(p.Host), ";",
+			"set-option", "-p", "-t", p.ID, "@tm_connection", literalArg(p.Connection), ";",
 			"set-option", "-p", "-t", p.ID, "@tm_project", literalArg(project), ";",
-			"set-option", "-p", "-t", p.ID, "@tm_terminal", literalArg(p.Terminal))
+			"set-option", "-p", "-t", p.ID, "@tm_terminal", literalArg(p.Terminal), ";",
+			"set-hook", "-p", "-t", p.ID, "pane-died", hook)
 	}
 
 	_, err := run(ctx, args...)
@@ -147,18 +148,4 @@ func (p Attachment) change(ctx context.Context, command string) error {
 	}
 
 	return nil
-}
-
-// WaitPaneDeath wakes on a retained pane exit or periodically to catch removed
-// panes and events missed during recovery. No SSH probe is needed while idle.
-func WaitPaneDeath(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	_, err := run(ctx, "wait-for", "-E", "pane-died")
-	if ctx.Err() != nil {
-		return nil
-	}
-
-	return err
 }
