@@ -3,7 +3,6 @@ package worktree
 import (
 	"context"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -26,7 +25,7 @@ func MatchSession(item Info, sessions []tmux.Session) tmux.Session {
 	var match tmux.Session
 
 	for _, candidate := range sessions {
-		if candidate.Path == item.Path {
+		if candidate.Remote == "" && candidate.Path == item.Path {
 			if match.ID == "" || candidate.Name == sessionName(item) {
 				match = candidate
 			}
@@ -58,10 +57,7 @@ func ensureSession(ctx context.Context, item Info, options sessionOptions) (stri
 		return existing.ID, nil
 	}
 
-	name := sessionName(item)
-	for suffix := 2; slices.ContainsFunc(sessions, func(s tmux.Session) bool { return s.Name == name }); suffix++ {
-		name = fmt.Sprintf("%s-%d", sessionName(item), suffix)
-	}
+	name := tmux.AvailableName(sessions, sessionName(item))
 
 	command := []string{"codex"}
 

@@ -32,6 +32,38 @@ esac
 	return append([]string{"/bin/sh", "-c", script, "sh"}, command...)
 }
 
+// tmux treats a trailing semicolon as a command separator even in argv.
+func literalArg(value string) string {
+	if prefix, ok := strings.CutSuffix(value, ";"); ok {
+		return prefix + `\;`
+	}
+
+	return value
+}
+
+// Insert literal '#' characters after tmux parses the format.
+func literalFormat(value string) string {
+	return strings.ReplaceAll(literalArg(value), "#", "#{a:35}")
+}
+
+func appendCommand(args, command []string) []string {
+	for _, arg := range command {
+		args = append(args, literalArg(arg))
+	}
+
+	return args
+}
+
+// commandLine quotes arguments for tmux's command parser inside if-shell -F.
+func commandLine(args ...string) string {
+	quoted := make([]string, 0, len(args))
+	for _, arg := range args {
+		quoted = append(quoted, "'"+strings.ReplaceAll(arg, "'", "'\\''")+"'")
+	}
+
+	return strings.Join(quoted, " ")
+}
+
 func run(ctx context.Context, args ...string) (string, error) {
 	cmd := exec.CommandContext(ctx, "tmux", args...) // #nosec G204 G702 -- Arguments are separate; callers explicitly supply any window shell command.
 	cmd.WaitDelay = time.Second

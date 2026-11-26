@@ -22,6 +22,7 @@ type Session struct {
 	Name      string `json:"name,omitempty"`
 	Path      string `json:"path,omitempty"`
 	Workspace string `json:"-"`
+	Remote    string `json:"-"`
 }
 
 // ListSessions returns sessions sorted by name, or none when no server is running.
@@ -29,9 +30,9 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	output, err := run(ctx, "list-sessions", "-F", "#{session_id}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
+	output, err := run(ctx, "-u", "list-sessions", "-F", "#{session_id}\t#{"+RemoteEnv+"}\t#{"+WorkspaceOption+"}\t#{session_name}\t#{session_path}")
 	if err != nil {
-		if errors.Is(err, exec.ErrNotFound) || strings.Contains(output, "no server running") || strings.Contains(output, "No such file or directory") {
+		if errors.Is(err, exec.ErrNotFound) || noServer(output) {
 			return nil, nil
 		}
 
@@ -41,17 +42,17 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	var sessions []Session
 
 	for line := range strings.SplitSeq(strings.TrimSuffix(output, "\n"), "\n") {
-		fields := strings.SplitN(line, "\t", 4)
-		if len(fields) != 4 {
+		fields := strings.SplitN(line, "\t", 5)
+		if len(fields) != 5 {
 			continue
 		}
 
-		path := fields[3]
+		path := fields[4]
 		if resolved, err := filepath.EvalSymlinks(path); err == nil {
 			path = resolved
 		}
 
-		sessions = append(sessions, Session{ID: fields[0], Workspace: fields[1], Name: fields[2], Path: filepath.Clean(path)})
+		sessions = append(sessions, Session{ID: fields[0], Remote: fields[1], Workspace: fields[2], Name: fields[3], Path: filepath.Clean(path)})
 	}
 
 	slices.SortFunc(sessions, func(a, b Session) int { return cmp.Compare(a.Name, b.Name) })
@@ -59,12 +60,27 @@ func ListSessions(ctx context.Context) ([]Session, error) {
 	return sessions, nil
 }
 
+func noServer(output string) bool {
+	return strings.HasPrefix(output, "no server running on ") ||
+		(strings.HasPrefix(output, "error connecting to ") && strings.HasSuffix(output, "(No such file or directory)"))
+}
+
+// AvailableName adds a numeric suffix if a session already uses name.
+func AvailableName(sessions []Session, name string) string {
+	display := name
+	for suffix := 2; slices.ContainsFunc(sessions, func(s Session) bool { return s.Name == display }); suffix++ {
+		display = fmt.Sprintf("%s-%d", name, suffix)
+	}
+
+	return display
+}
+
 // NewSession creates a detached session with one window and returns its ID.
 // The initial program waits until a client attaches.
 func NewSession(ctx context.Context, name, window, path string) (string, error) {
-	args := append([]string{"new-session", "-d", "-P", "-F", "#{session_id}", "-s", name, "-n", window, "-c", path}, attachedCommand()...)
+	args := []string{"new-session", "-d", "-P", "-F", "#{session_id}", "-s", literalFormat(name), "-n", literalFormat(window), "-c", literalFormat(path)}
 
-	output, err := run(ctx, args...)
+	output, err := run(ctx, appendCommand(args, attachedCommand())...)
 	if err != nil {
 		return "", err
 	}
@@ -74,15 +90,24 @@ func NewSession(ctx context.Context, name, window, path string) (string, error) 
 
 // SetOption sets an option on a session.
 func SetOption(ctx context.Context, session, option, value string) error {
-	_, err := run(ctx, "set-option", "-t", session, option, value)
+	_, err := run(ctx, "set-option", "-t", session, option, literalArg(value))
 	return err
 }
 
 // NewWindow creates a window without selecting it. The command waits until the
 // session has an attached client. Multiple command arguments bypass shell parsing.
 func NewWindow(ctx context.Context, session, name, path string, command ...string) error {
-	args := append([]string{"new-window", "-d", "-t", session + ":", "-n", name, "-c", path}, attachedCommand(command...)...)
-	_, err := run(ctx, args...)
+	return StartWindow(ctx, session, name, path, attachedCommand(command...)...)
+}
+
+// StartWindow runs the command immediately, even in a detached session.
+func StartWindow(ctx context.Context, session, name, path string, command ...string) error {
+	args := []string{"new-window", "-d", "-t", session + ":", "-n", literalFormat(name)}
+	if path != "" {
+		args = append(args, "-c", literalFormat(path))
+	}
+
+	_, err := run(ctx, appendCommand(args, command)...)
 
 	return err
 }
